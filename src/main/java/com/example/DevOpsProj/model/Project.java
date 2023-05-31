@@ -66,4 +66,6 @@ public class Project {
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> users; //change into list
 
+
+
 }

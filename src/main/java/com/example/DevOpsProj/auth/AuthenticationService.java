@@ -1,3 +1,7 @@
+/**
+
+-- JWT --
+
 package com.example.DevOpsProj.auth;
 
 import com.example.DevOpsProj.commons.enumerations.EnumRole;
@@ -46,3 +50,4 @@ public class AuthenticationService {
                 .build();
     }
 }
+**/

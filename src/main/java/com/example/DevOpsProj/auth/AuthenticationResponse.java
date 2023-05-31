@@ -1,3 +1,7 @@
+/**
+
+-- JWT --
+
 package com.example.DevOpsProj.auth;
 
 import lombok.AllArgsConstructor;
@@ -13,3 +17,4 @@ public class AuthenticationResponse {
 
     private String token;
 }
+**/

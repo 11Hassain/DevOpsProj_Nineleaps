@@ -1,3 +1,7 @@
+/**
+
+-- JWT --
+
 package com.example.DevOpsProj.auth;
 
 import lombok.RequiredArgsConstructor;
@@ -28,3 +32,4 @@ public class AuthenticationController {
         return ResponseEntity.ok(service.authenticate(request));
     }
 }
+**/

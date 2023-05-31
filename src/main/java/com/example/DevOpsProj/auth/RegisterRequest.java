@@ -1,3 +1,7 @@
+/**
+
+-- JWT --
+
 package com.example.DevOpsProj.auth;
 
 import com.example.DevOpsProj.commons.enumerations.EnumRole;
@@ -17,3 +21,4 @@ public class RegisterRequest {
     private String password;
     private EnumRole role;
 }
+**/
