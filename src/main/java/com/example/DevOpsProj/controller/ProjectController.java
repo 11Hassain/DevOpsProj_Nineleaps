@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -68,7 +69,7 @@ public class ProjectController {
         try{
             Optional<Project> checkProject = projectService.getProjectById(id);
             Project project = checkProject.get();
-            if(project.getDeleted()==true){
+            if(project.getDeleted()){
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             ProjectDTO projectDTO = new ProjectDTO();
@@ -85,12 +86,12 @@ public class ProjectController {
         }
     }
 
-    @GetMapping("/allProjects") //retrieve list of projects
-    public ResponseEntity<List<ProjectDTO>> getAllProjects(){
+    @GetMapping("/all") //retrieve list of projects
+    public ResponseEntity<List<ProjectDTO>> getAll(){
         try{
-            List<Project> projects = projectService.getAllProjects();
+            List<Project> projects = projectService.getAll();
             List<ProjectDTO> projectDTOs = projects.stream()
-                    .map(project -> new ProjectDTO(project.getProjectId(),project.getProjectName(),project.getProjectDescription()))
+                    .map(project -> new ProjectDTO(project.getProjectId(),project.getProjectName(),project.getProjectDescription(), project.getLastUpdated(), project.getDeleted()))
                     .collect(Collectors.toList());
             return new ResponseEntity<>(projectDTOs, HttpStatus.OK);
 
@@ -100,6 +101,22 @@ public class ProjectController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @GetMapping("/allProjects") //retrieve list of projects
+    public ResponseEntity<List<ProjectDTO>> getAllProjects(){
+        try{
+            List<Project> projects = projectService.getAllProjects();
+            List<ProjectDTO> projectDTOs = projects.stream()
+                    .map(project -> new ProjectDTO(project.getProjectId(), project.getProjectName(), project.getProjectDescription()))
+                    .collect(Collectors.toList());
+            return new ResponseEntity<>(projectDTOs, HttpStatus.OK);
+
+        }catch (NotFoundException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
     //get list of user in the project
     @GetMapping("/{projectId}/users")
@@ -123,11 +140,11 @@ public class ProjectController {
             Optional<Project> optionalProject = projectService.getProjectById(projectId);
             if (optionalProject.isPresent()) {
                 Project existingProject = optionalProject.get();
-//                existingProject.setProjectId(projectDTO.getProjectId());
                 existingProject.setProjectName(projectDTO.getProjectName());
                 existingProject.setProjectDescription(projectDTO.getProjectDescription());
+                existingProject.setLastUpdated(LocalDateTime.now());
                 Project updatedProject = projectService.updateProject(existingProject);
-                ProjectDTO updatedProjectDTO = new ProjectDTO(updatedProject.getProjectId(), updatedProject.getProjectName(), updatedProject.getProjectDescription());
+                ProjectDTO updatedProjectDTO = new ProjectDTO(updatedProject.getProjectId(), updatedProject.getProjectName(), updatedProject.getProjectDescription(), updatedProject.getLastUpdated());
                 return new ResponseEntity<>(updatedProjectDTO, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);

@@ -1,8 +1,12 @@
 package com.example.DevOpsProj.service;
 
+import com.example.DevOpsProj.dto.responseDto.RepositoryDTO;
+import com.example.DevOpsProj.dto.responseDto.UserDTO;
+import com.example.DevOpsProj.model.Project;
 import com.example.DevOpsProj.model.Repository;
 //import com.example.DevOpsProj.model.RepositoryEntity;
 import com.example.DevOpsProj.repository.RepositoryRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -13,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 @Service
 public class RepositoryService {
@@ -60,6 +65,10 @@ public class RepositoryService {
 
     @Autowired
     private RepositoryRepository repositoryRepository;
+    @Autowired
+    private ProjectService projectService;
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Value("${github.accessToken}")
     private String accessToken;
@@ -105,4 +114,16 @@ public class RepositoryService {
         return repositoryRepository.findAll();
     }
 
+
+    public List<RepositoryDTO> getAllRepositoriesByProject(Long id) {
+        Project project = projectService.getProjectById(id).orElse(null);
+        if(project != null){
+            List<Repository> repositories = repositoryRepository.findRepositoriesByProject(project);
+            List<RepositoryDTO> repositoryDTOS = repositories.stream()
+                    .map(repository -> new RepositoryDTO(repository.getName(), repository.getDescription()))
+                    .collect(Collectors.toList());
+            return repositoryDTOS;
+        }
+        else return null;
+    }
 }

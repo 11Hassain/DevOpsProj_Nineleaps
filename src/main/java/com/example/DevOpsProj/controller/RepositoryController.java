@@ -1,4 +1,5 @@
 package com.example.DevOpsProj.controller;
+import com.example.DevOpsProj.dto.responseDto.ProjectDTO;
 import com.example.DevOpsProj.dto.responseDto.RepositoryDTO;
 import com.example.DevOpsProj.model.Repository;
 import com.example.DevOpsProj.repository.RepositoryRepository;
@@ -30,6 +31,12 @@ public class RepositoryController {
     @GetMapping("/get")
     public List<Repository> getAllRepositories() {
         return repositoryService.getAllRepositories();
+    }
+
+    @GetMapping("/project/{id}")
+    public ResponseEntity<List<RepositoryDTO>> getAllReposByProject(@PathVariable Long id){
+        List<RepositoryDTO> repositoryDTOS = repositoryService.getAllRepositoriesByProject(id);
+        return new ResponseEntity<>(repositoryDTOS, HttpStatus.OK);
     }
 
 }

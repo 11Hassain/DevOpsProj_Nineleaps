@@ -7,6 +7,7 @@ import lombok.*;
 import org.hibernate.annotations.Cascade;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -39,6 +40,13 @@ public class Project {
     @Column(name = "is_deleted")
     private Boolean deleted=false;
 
+    @Column(nullable = false)
+    private LocalDateTime lastUpdated=LocalDateTime.now();
+
+//    @PreUpdate
+//    public void preUpdate() {
+//        this.lastUpdated = LocalDateTime.now();
+//    }
 
     public Boolean getDeleted() {
         return deleted;

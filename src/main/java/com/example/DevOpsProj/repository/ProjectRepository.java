@@ -27,4 +27,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     @Modifying
     @Query("UPDATE Project p SET p.deleted=true WHERE p.projectId=?1") //setting is_deleted to true
     void softDeleteProject(Long id);
+
+
 }

@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -42,6 +43,7 @@ public class ProjectService {
         project.setProjectId(projectDTO.getProjectId());
         project.setProjectName(projectDTO.getProjectName());
         project.setProjectDescription(projectDTO.getProjectDescription());
+        project.setLastUpdated(LocalDateTime.now());
         List<User> users = projectDTO.getUsers().stream()
                 .map(userDTO -> modelMapper.map(userDTO, User.class))
                 .collect(Collectors.toList());
@@ -52,9 +54,10 @@ public class ProjectService {
 
     public ProjectDTO createProject(ProjectDTO projectDTO) {
         Project project = new Project();
-        project.setProjectId(projectDTO.getProjectId());
+//        project.setProjectId(projectDTO.getProjectId());
         project.setProjectName(projectDTO.getProjectName());
         project.setProjectDescription(projectDTO.getProjectDescription());
+        project.setLastUpdated(LocalDateTime.now());
 
 //        List<Repository> repositories = new ArrayList<>();
 //        for (RepositoryDTO repositoryDTO: projectDTO.getRepositories()){
@@ -90,10 +93,8 @@ public class ProjectService {
         List<Repository> repositories = repositoryDTOs.stream()
                 .map(repositoryDTO -> modelMapper.map(repositoryDTO, Repository.class))
                 .collect(Collectors.toList());
-        System.out.println(project);
-        System.out.println(repositoryDTOs);
-        System.out.println(repositories);
         project.setRepositories(repositories);
+        project.setLastUpdated(LocalDateTime.now());
         projectRepository.save(project);
 
         return modelMapper.map(project, ProjectDTO.class);
@@ -103,6 +104,9 @@ public class ProjectService {
         return projectRepository.findById(id);
     }
 
+    public List<Project> getAll(){
+        return projectRepository.findAll();
+    }
     public List<Project> getAllProjects(){
         return projectRepository.findAllProjects();
     }
@@ -154,6 +158,5 @@ public class ProjectService {
             return true;
         }
     }
-
 
 }
