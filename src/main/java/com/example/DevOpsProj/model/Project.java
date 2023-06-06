@@ -36,6 +36,8 @@ public class Project {
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
     private List<Repository> repositories;
 
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    private List<AccessRequest> accessRequest;
 
     @Column(name = "is_deleted")
     private Boolean deleted=false;
@@ -43,10 +45,6 @@ public class Project {
     @Column(nullable = false)
     private LocalDateTime lastUpdated=LocalDateTime.now();
 
-//    @PreUpdate
-//    public void preUpdate() {
-//        this.lastUpdated = LocalDateTime.now();
-//    }
 
     public Boolean getDeleted() {
         return deleted;
