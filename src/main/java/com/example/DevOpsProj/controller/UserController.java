@@ -3,20 +3,17 @@ package com.example.DevOpsProj.controller;
 import com.example.DevOpsProj.commons.enumerations.EnumRole;
 import com.example.DevOpsProj.dto.requestDto.UserCreationDTO;
 import com.example.DevOpsProj.dto.responseDto.UserDTO;
+import com.example.DevOpsProj.model.Project;
 import com.example.DevOpsProj.model.User;
 import com.example.DevOpsProj.service.UserService;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.security.core.parameters.P;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -86,7 +83,6 @@ public class UserController {
         else return ResponseEntity.ok("Invalid user ID");
     }
 
-
     @GetMapping("/role/{role}") //get list of user by role
     public ResponseEntity<List<UserDTO>> getUserByRoleId(@PathVariable("role") String role){
         EnumRole userRole = EnumRole.valueOf(role.toUpperCase()); //getting value of role(string)
@@ -97,4 +93,37 @@ public class UserController {
         return new ResponseEntity<>(userDTOList, HttpStatus.OK);
     }
 
+    @GetMapping("/count") //get count of all the users
+    public Integer getCountAllUsers(){
+        Integer countUsers = userService.getCountAllUsers();
+        if (countUsers == 0){
+            return 0;
+        }
+        else {
+            return countUsers;
+        }
+    }
+
+    @GetMapping("/count/{role}")
+    public Integer getCountAllUsersByRole(@PathVariable String role){
+        EnumRole userRole = EnumRole.valueOf(role.toUpperCase());
+        Integer countUsersByRole = userService.getCountAllUsersByRole(userRole);
+        if(countUsersByRole == 0){
+            return 0;
+        }
+        else {
+            return countUsersByRole;
+        }
+    }
+
+    @GetMapping("/count/project/{projectId}")
+    public Integer getCountAllUsersByProjectId(@PathVariable Long projectId){
+        Integer countUsersByProject = userService.getCountAllUsersByProjectId(projectId);
+        if (countUsersByProject == 0){
+            return 0;
+        }
+        else {
+            return countUsersByProject;
+        }
+    }
 }

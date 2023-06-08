@@ -59,8 +59,8 @@ public class User{
     @ManyToMany(mappedBy = "users")
     private List<Project> projects;
 
-    @OneToOne(mappedBy = "user")
-    private AccessRequest accessRequest;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<AccessRequest> accessRequest;
 
     /*
     -- JWT --

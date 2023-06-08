@@ -26,4 +26,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     public User findByEmail(String email);
 
+    @Query("SELECT count(u) FROM User u WHERE u.deleted=false")
+    Integer countAllUsers();
+
+    @Query("SELECT count(u) FROM User u WHERE u.deleted=false AND u.enumRole=?1")
+    Integer countAllUsersByRole(EnumRole role);
+
+    @Query("SELECT count(u) FROM User u " +
+            "JOIN u.projects p WHERE p.id = :projectId " +
+            "AND u.deleted=false")
+    Integer countAllUsersByProjectId(Long projectId);
 }

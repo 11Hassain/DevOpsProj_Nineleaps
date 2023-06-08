@@ -3,6 +3,7 @@ package com.example.DevOpsProj.service;
 import com.example.DevOpsProj.commons.enumerations.EnumRole;
 import com.example.DevOpsProj.dto.requestDto.UserCreationDTO;
 import com.example.DevOpsProj.dto.responseDto.UserDTO;
+import com.example.DevOpsProj.model.Project;
 import com.example.DevOpsProj.model.User;
 import com.example.DevOpsProj.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +20,8 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ProjectService projectService;
 
     private ModelMapper modelMapper;
 
@@ -81,4 +85,21 @@ public class UserService {
         return userRepository.findByEmail(userEmail);
     }
 
+    public Integer getCountAllUsers() {
+        return userRepository.countAllUsers();
+    }
+
+    public Integer getCountAllUsersByRole(EnumRole role) {
+        return userRepository.countAllUsersByRole(role);
+    }
+
+    public Integer getCountAllUsersByProjectId(Long projectId) {
+        Optional<Project> project = projectService.getProjectById(projectId);
+        if (project.isPresent()){
+            return userRepository.countAllUsersByProjectId(projectId);
+        }
+        else {
+            return 0;
+        }
+    }
 }

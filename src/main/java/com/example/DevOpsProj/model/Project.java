@@ -5,6 +5,7 @@ import com.mysql.cj.jdbc.Blob;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.time.LocalDateTime;
@@ -43,6 +44,7 @@ public class Project {
     private Boolean deleted=false;
 
     @Column(nullable = false)
+    @UpdateTimestamp
     private LocalDateTime lastUpdated=LocalDateTime.now();
 
 
