@@ -47,6 +47,18 @@ public class Project {
     @UpdateTimestamp
     private LocalDateTime lastUpdated=LocalDateTime.now();
 
+    private boolean is_github_repo_added;
+    private boolean is_figma_added;
+
+    //connecting project with user entity (project is owning side)
+    @JsonIgnore
+    @ManyToMany
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @JoinTable(name = "project_user",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private List<User> users; //change into list
+
 
     public Boolean getDeleted() {
         return deleted;
@@ -62,18 +74,6 @@ public class Project {
     public void setProjectName(String projectName) {
         this.projectName = projectName;
     }
-
-
-
-    //connecting project with user entity (project is owning side)
-    @JsonIgnore
-    @ManyToMany
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
-    @JoinTable(name = "project_user",
-            joinColumns = @JoinColumn(name = "project_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private List<User> users; //change into list
-
 
 
 }

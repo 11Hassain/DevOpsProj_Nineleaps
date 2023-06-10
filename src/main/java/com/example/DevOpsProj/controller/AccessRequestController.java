@@ -26,10 +26,10 @@ public class AccessRequestController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<AccessResponseDTO>> getAllActiveRequests(){
-        List<AccessResponseDTO>  accessResponseDTOList = accessRequestService.getAllRequests();
+    public ResponseEntity<Object> getAllActiveRequests(){
+        List<AccessRequestDTO>  accessRequestDTOList= accessRequestService.getAllRequests();
 //        List<AccessRequest> accessRequestList = accessRequestService.getAllRequests();
-        return ResponseEntity.ok(accessResponseDTOList);
+        return ResponseEntity.ok(accessRequestDTOList);
     }
 
     @PutMapping("/update/{accessRequestId}")

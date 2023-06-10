@@ -1,22 +1,20 @@
 package com.example.DevOpsProj.service;
 
+import com.example.DevOpsProj.commons.enumerations.EnumRole;
 import com.example.DevOpsProj.dto.responseDto.ProjectDTO;
 import com.example.DevOpsProj.dto.responseDto.RepositoryDTO;
-import com.example.DevOpsProj.dto.responseDto.UserDTO;
 import com.example.DevOpsProj.model.Project;
 import com.example.DevOpsProj.model.Repository;
 import com.example.DevOpsProj.model.User;
 import com.example.DevOpsProj.repository.ProjectRepository;
 import com.example.DevOpsProj.repository.RepositoryRepository;
 import com.example.DevOpsProj.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -123,7 +121,17 @@ public class ProjectService {
             return null;
         }
         else {
-            return projectRepository.findAllUsersByProjectId(projectId);
+            return users;
+        }
+    }
+
+    public List<User> getAllUsersByProjectIdAndRole(Long projectId, EnumRole role){
+        List<User> users = projectRepository.findAllUsersByProjectIdAndRole(projectId, role);
+        if(users.isEmpty()){
+            return null;
+        }
+        else {
+            return users;
         }
     }
 
@@ -159,4 +167,31 @@ public class ProjectService {
         }
     }
 
+    public Integer getCountAllProjects(){
+        return projectRepository.countAllProjects();
+    }
+
+    public Integer getCountAllProjectsByRole(EnumRole enumRole) {
+        return projectRepository.countAllProjectsByRole(enumRole);
+    }
+
+    public Integer getCountAllProjectsByUserId(Long id) {
+        return projectRepository.countAllProjectsByUserId(id);
+    }
+
+    public Integer getCountAllUsersByProjectId(Long projectId) {
+        return projectRepository.countAllUsersByProjectId(projectId);
+    }
+
+    public Integer getCountAllUsersByProjectIdAndRole(Long projectId, EnumRole enumRole) {
+        return projectRepository.countAllUsersByProjectIdAndRole(projectId, enumRole);
+    }
+
+    public Integer getCountAllActiveProjects(){
+        return projectRepository.countAllActiveProjects();
+    }
+
+    public Integer getCountAllInActiveProjects(){
+        return projectRepository.countAllInActiveProjects();
+    }
 }

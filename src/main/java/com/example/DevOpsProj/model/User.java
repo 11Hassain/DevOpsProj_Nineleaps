@@ -38,6 +38,11 @@ public class User{
     @Column(name = "email", nullable = false)
     private String email;
 
+    @Column(name = "phone_number")
+    private String phone;
+
+    @Column(name = "address")
+    private String address;
 //   -- JwT -- private String password;
 
     @Enumerated(EnumType.STRING)

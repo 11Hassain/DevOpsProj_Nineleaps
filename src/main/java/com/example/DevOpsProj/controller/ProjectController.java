@@ -1,5 +1,6 @@
 package com.example.DevOpsProj.controller;
 
+import com.example.DevOpsProj.commons.enumerations.EnumRole;
 import com.example.DevOpsProj.dto.responseDto.ProjectDTO;
 import com.example.DevOpsProj.dto.responseDto.ProjectUserDTO;
 import com.example.DevOpsProj.dto.responseDto.UserDTO;
@@ -14,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -86,7 +89,7 @@ public class ProjectController {
         }
     }
 
-    @GetMapping("/all") //retrieve list of projects
+    @GetMapping("/all") //retrieve list of all projects
     public ResponseEntity<List<ProjectDTO>> getAll(){
         try{
             List<Project> projects = projectService.getAll();
@@ -123,6 +126,22 @@ public class ProjectController {
     public ResponseEntity<List<UserDTO>> getAllUsersByProjectId(@PathVariable Long projectId){
         try{
             List<User> userList = projectService.getAllUsersByProjectId(projectId);
+            List<UserDTO> userDTOList = userList.stream()
+                    .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(userDTOList);
+        }catch (NoSuchElementException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{projectId}/users/{role}")
+    public ResponseEntity<List<UserDTO>> getAllUsersByProjectIdByRole(@PathVariable Long projectId,@PathVariable String role){
+        try{
+            EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
+            List<User> userList = projectService.getAllUsersByProjectIdAndRole(projectId, enumRole);
             List<UserDTO> userDTOList = userList.stream()
                     .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
                     .collect(Collectors.toList());
@@ -222,4 +241,54 @@ public class ProjectController {
         else return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project or User not found");
     }
 
+    @GetMapping("/count")
+    public Integer countAllProjects(){
+        Integer countProjects = projectService.getCountAllProjects();
+        if (countProjects == 0){return 0;}
+        else {return countProjects;}
+    }
+
+    @GetMapping("/count/role/{role}")
+    public Integer countAllProjectsByRole(@PathVariable("role") String role){
+        EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
+        Integer countProjects = projectService.getCountAllProjectsByRole(enumRole);
+        if (countProjects == 0) {return 0;}
+        else {return countProjects;}
+    }
+
+    @GetMapping("/count/user/{userId}")
+    public Integer countAllProjectsByUserId(@PathVariable("userId") Long id){
+        Integer countProjects = projectService.getCountAllProjectsByUserId(id);
+        if(countProjects == 0){return 0;}
+        else {return countProjects;}
+    }
+
+    @GetMapping("/{projectId}/count")
+    public Integer countAllUsersByProjectId(@PathVariable Long projectId){
+        Integer countUsers = projectService.getCountAllUsersByProjectId(projectId);
+        if (countUsers == 0){return 0;}
+        else {return countUsers;}
+    }
+
+    @GetMapping("/{projectId}/count/{role}")
+    public Integer countAllUsersByProjectIdByRole(@PathVariable Long projectId,@PathVariable String role){
+        EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
+        Integer countUsers = projectService.getCountAllUsersByProjectIdAndRole(projectId, enumRole);
+        if (countUsers == 0){return 0;}
+        else {return countUsers;}
+    }
+
+    @GetMapping("/count/active")
+    public Integer countAllActiveProjects(){
+        Integer countProjects = projectService.getCountAllActiveProjects();
+        if (countProjects==0){return 0;}
+        else {return countProjects;}
+    }
+
+    @GetMapping("/count/inactive")
+    public Integer countAllInActiveProjects(){
+        Integer countProjects = projectService.getCountAllInActiveProjects();
+        if (countProjects==0){return 0;}
+        else {return countProjects;}
+    }
 }

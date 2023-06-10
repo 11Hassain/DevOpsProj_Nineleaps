@@ -15,7 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -32,6 +34,7 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
+
     //fetch the email from the token given to verify the user - whether present in DB
     @GetMapping("/api/get-email")
     public ResponseEntity getEmailFromToken(@RequestHeader("Authorization") String authHeader, HttpServletResponse response) throws IOException{
@@ -45,13 +48,20 @@ public class AuthController {
     }
 
     //check if he Email is present in DB
-    public ResponseEntity<String> getUserByEmail(HttpServletResponse response, String emailToVerify) throws IOException{
+    public ResponseEntity<Map<String, String>> getUserByEmail(HttpServletResponse response, String emailToVerify) throws IOException{
         User user = userService. getUserByEmail(emailToVerify);
         String role = user.getEnumRole().toString();
+
         if(user!=null){
+            Map<String, String> userDetails = new HashMap<>();
+            userDetails.put("email", user.getEmail());
+            userDetails.put("role", user.getEnumRole().toString());
+            userDetails.put("name", user.getName());
+            userDetails.put("id", String.valueOf(user.getId()));
+
             HttpHeaders headers = new HttpHeaders();
             headers.set("Custom-Header", role);
-            return new ResponseEntity<>(role, headers, HttpStatus.OK);
+            return new ResponseEntity<>(userDetails, headers, HttpStatus.OK);
 //            return ResponseEntity.ok(role);
         }
         else

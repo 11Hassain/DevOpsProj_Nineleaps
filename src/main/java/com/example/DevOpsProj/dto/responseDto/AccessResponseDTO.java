@@ -12,8 +12,8 @@ import lombok.*;
 public class AccessResponseDTO {
     private Long accessRequestId;
     private String pmName;
-    private User user;
-    private Project project;
+    private UserDTO user;
+    private ProjectDTO project;
     private String accessDescription;
     private boolean allowed;
 }

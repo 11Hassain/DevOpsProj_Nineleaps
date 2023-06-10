@@ -2,13 +2,17 @@ package com.example.DevOpsProj.service;
 
 import com.example.DevOpsProj.dto.requestDto.AccessRequestDTO;
 import com.example.DevOpsProj.dto.responseDto.AccessResponseDTO;
+import com.example.DevOpsProj.dto.responseDto.ProjectDTO;
 import com.example.DevOpsProj.dto.responseDto.UserDTO;
 import com.example.DevOpsProj.model.AccessRequest;
+import com.example.DevOpsProj.model.Project;
+import com.example.DevOpsProj.model.User;
 import com.example.DevOpsProj.repository.AccessRequestRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,21 +30,31 @@ public class AccessRequestService {
         AccessRequest accessRequest = new AccessRequest();
         accessRequest.setPmName(accessRequestDTO.getPmName());
         accessRequest.setRequestDescription(accessRequestDTO.getRequestDescription());
-        accessRequest.setUser(accessRequestDTO.getUser());
-        accessRequest.setProject(accessRequestDTO.getProject());
+        accessRequest.setUser(mapUserDTOToUser(accessRequestDTO.getUser()));
+        accessRequest.setProject(mapProjectDTOToProject(accessRequestDTO.getProject()));
         accessRequestRepository.save(accessRequest);
         return modelMapper.map(accessRequest, AccessRequestDTO.class);
     }
 
-    public List<AccessResponseDTO> getAllRequests(){
+    public List<AccessRequestDTO> getAllRequests() {
         List<AccessRequest> accessRequestList = accessRequestRepository.findAllActiveRequests();
-        List<AccessResponseDTO> accessResponseDTOList = accessRequestList.stream()
-                .map(accessRequest -> new AccessResponseDTO(accessRequest.getAccessRequestId(), accessRequest.getPmName(), accessRequest.getUser(), accessRequest.getProject(), accessRequest.getRequestDescription(), accessRequest.isAllowed()))
-                .collect(Collectors.toList());
-        return accessResponseDTOList;
+        List<AccessRequestDTO> accessRequestDTOList = new ArrayList<>();
 
-//        return accessRequestRepository.findAllActiveRequests();
+        for (AccessRequest accessRequest : accessRequestList) {
+            AccessRequestDTO accessRequestDTO = new AccessRequestDTO();
+            accessRequestDTO.setAccessRequestId(accessRequest.getAccessRequestId());
+            accessRequestDTO.setPmName(accessRequest.getPmName());
+            accessRequestDTO.setUser(mapUserToUserDTO(accessRequest.getUser()));
+            accessRequestDTO.setProject(mapProjectToProjectDTO(accessRequest.getProject()));
+            accessRequestDTO.setRequestDescription(accessRequest.getRequestDescription());
+            accessRequestDTO.setAllowed(accessRequest.isAllowed());
+
+            accessRequestDTOList.add(accessRequestDTO);
+        }
+
+        return accessRequestDTOList;
     }
+
 
     public List<AccessResponseDTO> getUpdatedRequests(Long id, AccessRequestDTO accessRequestDTO){
         Optional<AccessRequest> optionalAccessRequest = accessRequestRepository.findById(id);
@@ -52,15 +66,44 @@ public class AccessRequestService {
             AccessResponseDTO accessResponseDTO = new AccessResponseDTO(
                     updatedAccessRequest.getAccessRequestId(),
                     updatedAccessRequest.getPmName(),
-                    updatedAccessRequest.getUser(),
-                    updatedAccessRequest.getProject(),
+                    mapUserToUserDTO(updatedAccessRequest.getUser()),
+                    mapProjectToProjectDTO(updatedAccessRequest.getProject()),
                     updatedAccessRequest.getRequestDescription(),
                     updatedAccessRequest.isAllowed());
         }
         List<AccessRequest> accessRequests = accessRequestRepository.findAllActiveRequests();
         List<AccessResponseDTO> accessResponseDTOList = accessRequests.stream()
-                .map(accessRequest -> new AccessResponseDTO(accessRequest.getAccessRequestId(), accessRequest.getPmName(), accessRequest.getUser(), accessRequest.getProject(), accessRequest.getRequestDescription(), accessRequest.isAllowed()))
+                .map(accessRequest -> new AccessResponseDTO(accessRequest.getAccessRequestId(), accessRequest.getPmName(), mapUserToUserDTO(accessRequest.getUser()), mapProjectToProjectDTO(accessRequest.getProject()), accessRequest.getRequestDescription(), accessRequest.isAllowed()))
                 .collect(Collectors.toList());
         return accessResponseDTOList;
+    }
+
+    private UserDTO mapUserToUserDTO(User user) {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setName(user.getName());
+        // Map other fields as needed
+        return userDTO;
+    }
+    private ProjectDTO mapProjectToProjectDTO(Project project) {
+        ProjectDTO projectDTO = new ProjectDTO();
+        projectDTO.setProjectName(project.getProjectName());
+        // Map other fields as needed
+        return projectDTO;
+    }
+
+    private User mapUserDTOToUser(UserDTO userDTO) {
+        User user = new User();
+        user.setId(userDTO.getId());
+        user.setName(userDTO.getName());
+        // Set other fields as needed
+        return user;
+    }
+
+    private Project mapProjectDTOToProject(ProjectDTO projectDTO) {
+        Project project = new Project();
+        project.setProjectId(projectDTO.getProjectId());
+        project.setProjectName(projectDTO.getProjectName());
+        // Set other fields as needed
+        return project;
     }
 }
