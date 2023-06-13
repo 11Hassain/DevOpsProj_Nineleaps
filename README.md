@@ -17,9 +17,9 @@ Project Access Management is a web platform designed for the Nineleaps DevOps te
 ### Installation 
 >-To install the Project Access Management application, you'll need to follow these steps:  
 >
->-Clone the repository from GitHub to your local machine.   
+>-Clone the gitRepository from GitHub to your local machine.   
 >
->-Navigate to the directory where the repository was cloned.   
+>-Navigate to the directory where the gitRepository was cloned.   
 >
 >-Open the IDE and import the project into your IDE.  
 >

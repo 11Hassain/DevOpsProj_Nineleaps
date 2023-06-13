@@ -12,4 +12,5 @@ public class JwtUtils {
         DecodedJWT decodedJWT = JWT.decode(jwt);
         return decodedJWT.getClaim("email").asString();
     }
+
 }

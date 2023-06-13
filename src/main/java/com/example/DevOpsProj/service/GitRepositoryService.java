@@ -1,11 +1,10 @@
 package com.example.DevOpsProj.service;
 
-import com.example.DevOpsProj.dto.responseDto.RepositoryDTO;
-import com.example.DevOpsProj.dto.responseDto.UserDTO;
+import com.example.DevOpsProj.dto.responseDto.GitRepositoryDTO;
+import com.example.DevOpsProj.model.GitRepository;
 import com.example.DevOpsProj.model.Project;
-import com.example.DevOpsProj.model.Repository;
 //import com.example.DevOpsProj.model.RepositoryEntity;
-import com.example.DevOpsProj.repository.RepositoryRepository;
+import com.example.DevOpsProj.repository.GitRepositoryRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,11 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 @Service
-public class RepositoryService {
+public class GitRepositoryService {
 
 //    @Value("${github.accessToken}")
 //    private String accessToken;
@@ -64,7 +62,7 @@ public class RepositoryService {
 
 
     @Autowired
-    private RepositoryRepository repositoryRepository;
+    private GitRepositoryRepository gitRepositoryRepository;
     @Autowired
     private ProjectService projectService;
     @Autowired
@@ -78,7 +76,7 @@ public class RepositoryService {
 
     private RestTemplate restTemplate;
 
-    public RepositoryService() {
+    public GitRepositoryService() {
         this.restTemplate = new RestTemplate();
         this.restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
     }
@@ -88,41 +86,41 @@ public class RepositoryService {
     }
 
     @Transactional
-    public Repository createRepository(Repository repository) {
+    public GitRepository createRepository(GitRepository gitRepository) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<Repository> requestEntity = new HttpEntity<>(repository, headers);
+        HttpEntity<GitRepository> requestEntity = new HttpEntity<>(gitRepository, headers);
 
-        ResponseEntity<Repository> responseEntity = restTemplate.exchange(
+        ResponseEntity<GitRepository> responseEntity = restTemplate.exchange(
                 API_BASE_URL + USER_REPOS_ENDPOINT,
                 HttpMethod.POST,
                 requestEntity,
-                Repository.class);
+                GitRepository.class);
 
         if (responseEntity.getStatusCode() == HttpStatus.CREATED) {
-            Repository createdRepository = responseEntity.getBody();
-            repositoryRepository.save(createdRepository);
-            return createdRepository;
+            GitRepository createdGitRepository = responseEntity.getBody();
+            gitRepositoryRepository.save(createdGitRepository);
+            return createdGitRepository;
         } else {
-            throw new RuntimeException("Error creating repository " + repository.getName() + ". Response: " + responseEntity.getBody());
+            throw new RuntimeException("Error creating repository " + gitRepository.getName() + ". Response: " + responseEntity.getBody());
         }
     }
     @Transactional(readOnly = true)
-    public List<Repository> getAllRepositories() {
-        return repositoryRepository.findAll();
+    public List<GitRepository> getAllRepositories() {
+        return gitRepositoryRepository.findAll();
     }
 
 
-    public List<RepositoryDTO> getAllRepositoriesByProject(Long id) {
+    public List<GitRepositoryDTO> getAllRepositoriesByProject(Long id) {
         Project project = projectService.getProjectById(id).orElse(null);
         if(project != null){
-            List<Repository> repositories = repositoryRepository.findRepositoriesByProject(project);
-            List<RepositoryDTO> repositoryDTOS = repositories.stream()
-                    .map(repository -> new RepositoryDTO(repository.getName(), repository.getDescription()))
+            List<GitRepository> repositories = gitRepositoryRepository.findRepositoriesByProject(project);
+            List<GitRepositoryDTO> gitRepositoryDTOS = repositories.stream()
+                    .map(repository -> new GitRepositoryDTO(repository.getName(), repository.getDescription()))
                     .collect(Collectors.toList());
-            return repositoryDTOS;
+            return gitRepositoryDTOS;
         }
         else return null;
     }

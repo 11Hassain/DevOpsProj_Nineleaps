@@ -1,6 +1,5 @@
 package com.example.DevOpsProj.dto.responseDto;
 
-import com.example.DevOpsProj.model.Project;
 import lombok.*;
 
 @AllArgsConstructor
@@ -8,7 +7,7 @@ import lombok.*;
 @Setter
 @Getter
 @ToString
-public class RepositoryDTO {
+public class GitRepositoryDTO {
     private String name;
     private String description;
 }

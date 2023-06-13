@@ -8,6 +8,7 @@ import com.example.DevOpsProj.model.User;
 import com.example.DevOpsProj.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -32,7 +33,6 @@ public class UserService {
         user.setId(userCreationDTO.getId());
         user.setName(userCreationDTO.getName());
         user.setEmail(userCreationDTO.getEmail());
-//        user.setPassword(userCreationDTO.getPassword());
         user.setEnumRole(userCreationDTO.getEnumRole());
         return userRepository.save(user);
     }

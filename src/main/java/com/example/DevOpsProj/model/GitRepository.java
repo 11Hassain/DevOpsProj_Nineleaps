@@ -1,7 +1,5 @@
 package com.example.DevOpsProj.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +10,7 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
-public class Repository {
+public class GitRepository {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +23,7 @@ public class Repository {
     @JoinColumn(name = "project_id")
     private Project project;
 
-    public Repository(String name, String description, Project project) {
+    public GitRepository(String name, String description, Project project) {
         this.name = name;
         this.description = description;
         this.project = project;

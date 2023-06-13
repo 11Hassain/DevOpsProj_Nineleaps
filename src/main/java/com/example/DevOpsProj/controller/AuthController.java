@@ -25,12 +25,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/auth")
 public class AuthController {
 
-//    @Autowired
-//    private GoogleTokenUtil tokenUtil;
-
-//    @Autowired
-//    private ProjectService projectService;
-
     @Autowired
     private UserService userService;
 
@@ -49,8 +43,9 @@ public class AuthController {
 
     //check if he Email is present in DB
     public ResponseEntity<Map<String, String>> getUserByEmail(HttpServletResponse response, String emailToVerify) throws IOException{
-        User user = userService. getUserByEmail(emailToVerify);
+        User user = userService.getUserByEmail(emailToVerify);
         String role = user.getEnumRole().toString();
+
 
         if(user!=null){
             Map<String, String> userDetails = new HashMap<>();
@@ -58,11 +53,12 @@ public class AuthController {
             userDetails.put("role", user.getEnumRole().toString());
             userDetails.put("name", user.getName());
             userDetails.put("id", String.valueOf(user.getId()));
+            userDetails.put("deleted", user.getDeleted().toString());
+
 
             HttpHeaders headers = new HttpHeaders();
             headers.set("Custom-Header", role);
             return new ResponseEntity<>(userDetails, headers, HttpStatus.OK);
-//            return ResponseEntity.ok(role);
         }
         else
             return ResponseEntity.notFound().build();

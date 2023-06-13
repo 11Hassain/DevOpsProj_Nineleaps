@@ -2,12 +2,12 @@ package com.example.DevOpsProj.service;
 
 import com.example.DevOpsProj.commons.enumerations.EnumRole;
 import com.example.DevOpsProj.dto.responseDto.ProjectDTO;
-import com.example.DevOpsProj.dto.responseDto.RepositoryDTO;
+import com.example.DevOpsProj.dto.responseDto.GitRepositoryDTO;
 import com.example.DevOpsProj.model.Project;
-import com.example.DevOpsProj.model.Repository;
+import com.example.DevOpsProj.model.GitRepository;
 import com.example.DevOpsProj.model.User;
 import com.example.DevOpsProj.repository.ProjectRepository;
-import com.example.DevOpsProj.repository.RepositoryRepository;
+import com.example.DevOpsProj.repository.GitRepositoryRepository;
 import com.example.DevOpsProj.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ public class ProjectService {
     private ModelMapper modelMapper;
 
     @Autowired
-    private RepositoryRepository repositoryRepository;
+    private GitRepositoryRepository gitRepositoryRepository;
 
 
     //implementing DTO pattern for project for saving project
@@ -87,9 +87,9 @@ public class ProjectService {
 //    }
 
 
-        List<RepositoryDTO> repositoryDTOs = projectDTO.getRepositories();
-        List<Repository> repositories = repositoryDTOs.stream()
-                .map(repositoryDTO -> modelMapper.map(repositoryDTO, Repository.class))
+        List<GitRepositoryDTO> gitRepositoryDTOS = projectDTO.getRepositories();
+        List<GitRepository> repositories = gitRepositoryDTOS.stream()
+                .map(gitRepositoryDTO -> modelMapper.map(gitRepositoryDTO, GitRepository.class))
                 .collect(Collectors.toList());
         project.setRepositories(repositories);
         project.setLastUpdated(LocalDateTime.now());

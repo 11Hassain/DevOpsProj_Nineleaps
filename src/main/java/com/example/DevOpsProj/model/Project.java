@@ -1,18 +1,13 @@
 package com.example.DevOpsProj.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.mysql.cj.jdbc.Blob;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 @AllArgsConstructor
@@ -35,7 +30,7 @@ public class Project {
     private String projectDescription;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
-    private List<Repository> repositories;
+    private List<GitRepository> repositories;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
     private List<AccessRequest> accessRequest;

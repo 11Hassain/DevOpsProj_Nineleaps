@@ -18,7 +18,7 @@ public class ProjectDTO {
     private String projectDescription;
     private LocalDateTime lastUpdated;
     private List<User> users;
-    private List<RepositoryDTO> repositories;
+    private List<GitRepositoryDTO> repositories;
     private boolean status;
 
 
