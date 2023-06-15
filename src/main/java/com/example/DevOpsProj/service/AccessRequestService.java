@@ -38,6 +38,9 @@ public class AccessRequestService {
 
     public List<AccessRequestDTO> getAllRequests() {
         List<AccessRequest> accessRequestList = accessRequestRepository.findAllActiveRequests();
+        if (accessRequestList.isEmpty()){
+            return null;
+        }
         List<AccessRequestDTO> accessRequestDTOList = new ArrayList<>();
 
         for (AccessRequest accessRequest : accessRequestList) {
@@ -48,7 +51,6 @@ public class AccessRequestService {
             accessRequestDTO.setProject(mapProjectToProjectDTO(accessRequest.getProject()));
             accessRequestDTO.setRequestDescription(accessRequest.getRequestDescription());
             accessRequestDTO.setAllowed(accessRequest.isAllowed());
-
             accessRequestDTOList.add(accessRequestDTO);
         }
 

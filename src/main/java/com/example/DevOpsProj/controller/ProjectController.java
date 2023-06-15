@@ -191,8 +191,6 @@ public class ProjectController {
             }
         }
         else return ResponseEntity.ok("Invalid project id");
-
-
     }
 
     @PutMapping("/{projectId}/users/{userId}") //add user to project
@@ -290,5 +288,10 @@ public class ProjectController {
         Integer countProjects = projectService.getCountAllInActiveProjects();
         if (countProjects==0){return 0;}
         else {return countProjects;}
+    }
+
+    @GetMapping("/testing")
+    public String giveCustomResponse(){
+        return "User added";
     }
 }
