@@ -13,6 +13,7 @@ import java.util.List;
 @Getter
 @ToString
 public class ProjectDTO {
+
     private Long projectId;
     private String projectName;
     private String projectDescription;
@@ -20,7 +21,16 @@ public class ProjectDTO {
     private List<User> users;
     private List<GitRepositoryDTO> repositories;
     private boolean status;
+    private FigmaDTO figma;
 
+    public ProjectDTO(Long projectId, String projectName, String projectDescription, List<User> users, List<GitRepositoryDTO> repositories, FigmaDTO figma) {
+        this.projectId = projectId;
+        this.projectName = projectName;
+        this.projectDescription = projectDescription;
+        this.users = users;
+        this.repositories = repositories;
+        this.figma = figma;
+    }
 
     public ProjectDTO(Long projectId, String projectName, String projectDescription) {
         this.projectId = projectId;

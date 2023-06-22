@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -52,46 +53,9 @@ public class ProjectService {
 
     public ProjectDTO createProject(ProjectDTO projectDTO) {
         Project project = new Project();
-//        project.setProjectId(projectDTO.getProjectId());
+        project.setProjectId(projectDTO.getProjectId());
         project.setProjectName(projectDTO.getProjectName());
         project.setProjectDescription(projectDTO.getProjectDescription());
-        project.setLastUpdated(LocalDateTime.now());
-
-//        List<Repository> repositories = new ArrayList<>();
-//        for (RepositoryDTO repositoryDTO: projectDTO.getRepositories()){
-//            Repository repository = new Repository();
-//            repository.setName(repositoryDTO.getName());
-//            repository.setProject(project);
-//            repositories.add(repository);
-//        }
-
-
-//        List<RepositoryDTO> repositoryDTOs = projectDTO.getRepositories();
-//        List<Repository> repositories = new ArrayList<>();
-//        for (RepositoryDTO repositoryDTO : repositoryDTOs) {
-//            Optional<Repository> optionalRepository = repositoryRepository.findById(repositoryDTO.getId());
-//            if (optionalRepository.isPresent()) {
-//                Repository repository = optionalRepository.get();
-//                repositories.add(repository);
-//            } else {
-//                throw new RuntimeException("Repository not found for ID: " + repositoryDTO.getId());
-//            }
-//        }
-//        System.out.println(project);
-//        System.out.println(repositoryDTOs);
-//        System.out.println(repositories);
-//        project.setRepositories(repositories);
-//        projectRepository.save(project);
-//
-//        return modelMapper.map(project, ProjectDTO.class);
-//    }
-
-
-        List<GitRepositoryDTO> gitRepositoryDTOS = projectDTO.getRepositories();
-        List<GitRepository> repositories = gitRepositoryDTOS.stream()
-                .map(gitRepositoryDTO -> modelMapper.map(gitRepositoryDTO, GitRepository.class))
-                .collect(Collectors.toList());
-        project.setRepositories(repositories);
         project.setLastUpdated(LocalDateTime.now());
         projectRepository.save(project);
 
@@ -193,5 +157,31 @@ public class ProjectService {
 
     public Integer getCountAllInActiveProjects(){
         return projectRepository.countAllInActiveProjects();
+    }
+
+    public List<User> getUsersByProjectIdAndRole(Long projectId, EnumRole role) {
+        return projectRepository.findUsersByProjectIdAndRole(projectId, role);
+    }
+
+    public List<ProjectDTO> getProjectsWithoutFigmaURL() {
+        List<Project> projects = projectRepository.findAllProjects();
+        List<ProjectDTO> projectDTOs = new ArrayList<>();
+
+        for (Project project : projects) {
+            // Check if the project has a Figma URL set
+            if (project.getFigma() == null || project.getFigma().getFigmaURL() == null) {
+                // Create a ProjectDTO and add it to the list
+                ProjectDTO projectDTO = mapProjectToProjectDTO(project);
+                projectDTOs.add(projectDTO);
+            }
+        }
+        return projectDTOs;
+    }
+
+    public ProjectDTO mapProjectToProjectDTO(Project project) {
+        ProjectDTO projectDTO = new ProjectDTO();
+        projectDTO.setProjectId(project.getProjectId());
+        projectDTO.setProjectName(project.getProjectName());
+        return projectDTO;
     }
 }

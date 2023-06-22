@@ -36,4 +36,16 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "JOIN u.projects p WHERE p.id = :projectId " +
             "AND u.deleted=false")
     Integer countAllUsersByProjectId(Long projectId);
+
+    @Query("SELECT p FROM Project as p " +
+            "JOIN p.users as u " +
+            "WHERE u.id = :userId " +
+            "AND u.enumRole = :userRole")
+    List<Project> findByRoleAndUserId(Long userId, EnumRole userRole);
+
+    @Query("SELECT u FROM User u WHERE u.email = :email")
+    User existsByEmail(String email);
+
+    @Query("SELECT t.user FROM Token t WHERE t.token = :tokenValue")
+    User findUserByToken(@Param("tokenValue") String tokenValue);
 }

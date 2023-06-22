@@ -1,63 +1,42 @@
 package com.example.DevOpsProj.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Entity
-@Table(name = "repositories")
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
+@Entity
+@Table(name = "repositories")
 public class GitRepository {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long repoId;
 
+    @Column(name = "repo_name", nullable = false)
     private String name;
+    @Column(name = "repo_description")
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id")
+    @ManyToOne
+    @JoinColumn(name = "project_id", referencedColumnName = "projectId")
     private Project project;
-
-    public GitRepository(String name, String description, Project project) {
-        this.name = name;
-        this.description = description;
-        this.project = project;
+    public Long getRepoId() {
+        return repoId;
     }
+//    @ManyToMany(mappedBy = "repositories")
+//    private List<UserNames> usernames;
 
-    public Long getId() {
-        return id;
-    }
+    @ManyToMany
+    @JoinTable(name = "repository_username",
+            joinColumns = @JoinColumn(name = "repository_id"),
+            inverseJoinColumns = @JoinColumn(name = "username_id"))
+    private List<UserNames> usernames;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Project getProject() {
-        return project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
-    }
 }

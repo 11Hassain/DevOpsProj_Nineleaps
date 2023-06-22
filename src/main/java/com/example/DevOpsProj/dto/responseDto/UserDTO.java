@@ -13,4 +13,12 @@ public class UserDTO {
     private String name;
     private String email;
     private EnumRole enumRole;
+    private String token;
+
+    public UserDTO(Long id, String name, String email, EnumRole enumRole) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.enumRole = enumRole;
+    }
 }
