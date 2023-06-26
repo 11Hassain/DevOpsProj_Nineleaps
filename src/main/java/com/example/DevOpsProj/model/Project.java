@@ -42,9 +42,6 @@ public class Project {
     @UpdateTimestamp
     private LocalDateTime lastUpdated=LocalDateTime.now();
 
-    private boolean is_github_repo_added;
-    private boolean is_figma_added;
-
     //connecting project with user entity (project is owning side)
     @JsonIgnore
     @ManyToMany

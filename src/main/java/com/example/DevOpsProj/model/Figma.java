@@ -23,9 +23,6 @@ public class Figma {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long figmaId;
 
-//    @Column(name = "project_name", nullable = false)
-//    private String projectName;
-
     @Column(name = "figma_url", nullable = false)
     private String figmaURL;
 

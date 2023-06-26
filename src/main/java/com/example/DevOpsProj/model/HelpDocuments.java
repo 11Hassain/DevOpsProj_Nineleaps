@@ -39,5 +39,4 @@ public class HelpDocuments {
         documentCategory.setCategory(category);
         return documentCategory;
     }
-    // Constructors, getters, and setters
 }
