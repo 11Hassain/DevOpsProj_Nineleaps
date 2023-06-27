@@ -47,7 +47,7 @@ public class FigmaController {
                 // Optionally, you can access the generated figmaId if needed
                 Long figmaId = figma.getFigmaId();
 
-                return ResponseEntity.ok("Figma created successfully");
+                return ResponseEntity.ok("Figma created successfully properly okay bye");
 
             } catch (DataIntegrityViolationException e) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("Could not create figma");
