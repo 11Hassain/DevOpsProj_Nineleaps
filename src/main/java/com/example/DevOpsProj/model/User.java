@@ -24,7 +24,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Entity
 @Table(name = "user")
-public class User{
+public class User implements UserDetails{
 
     // -- JWT -- public class User implements UserDetails
     @Id
@@ -38,7 +38,13 @@ public class User{
     @Column(name = "email", nullable = false)
     private String email;
 
-//   -- JwT -- private String password;
+    @Column(name = "phone_number")
+    private String phone;
+
+    @Column(name = "address")
+    private String address;
+
+    private String password;
 
     @Enumerated(EnumType.STRING)
     private EnumRole enumRole;
@@ -59,12 +65,13 @@ public class User{
     @ManyToMany(mappedBy = "users")
     private List<Project> projects;
 
-    /*
-    -- JWT --
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<AccessRequest> accessRequest;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(enumRole.name()));
+        return null;
     }
 
     @Override
@@ -74,7 +81,7 @@ public class User{
 
     @Override
     public String getUsername() {
-        return email;
+        return name;
     }
 
     @Override
@@ -95,5 +102,5 @@ public class User{
     @Override
     public boolean isEnabled() {
         return true;
-    }*/
+    }
 }

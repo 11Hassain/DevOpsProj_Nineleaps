@@ -1,16 +1,13 @@
 package com.example.DevOpsProj.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.mysql.cj.jdbc.Blob;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Cascade;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.hibernate.annotations.UpdateTimestamp;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 
 @AllArgsConstructor
@@ -33,11 +30,30 @@ public class Project {
     private String projectDescription;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
-    private List<Repository> repositories;
+    private List<GitRepository> repositories;
 
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    private List<AccessRequest> accessRequest;
 
     @Column(name = "is_deleted")
     private Boolean deleted=false;
+
+    @Column(nullable = false)
+    @UpdateTimestamp
+    private LocalDateTime lastUpdated=LocalDateTime.now();
+
+    //connecting project with user entity (project is owning side)
+    @JsonIgnore
+    @ManyToMany
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @JoinTable(name = "project_user",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private List<User> users; //change into list
+
+    @OneToOne(mappedBy = "project")
+    private Figma figma;
+
 
 
     public Boolean getDeleted() {
@@ -54,18 +70,6 @@ public class Project {
     public void setProjectName(String projectName) {
         this.projectName = projectName;
     }
-
-
-
-    //connecting project with user entity (project is owning side)
-    @JsonIgnore
-    @ManyToMany
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
-    @JoinTable(name = "project_user",
-            joinColumns = @JoinColumn(name = "project_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private List<User> users; //change into list
-
 
 
 }

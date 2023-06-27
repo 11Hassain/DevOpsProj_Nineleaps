@@ -1,20 +1,20 @@
 package com.example.DevOpsProj.service;
 
+import com.example.DevOpsProj.commons.enumerations.EnumRole;
 import com.example.DevOpsProj.dto.responseDto.ProjectDTO;
-import com.example.DevOpsProj.dto.responseDto.RepositoryDTO;
-import com.example.DevOpsProj.dto.responseDto.UserDTO;
+import com.example.DevOpsProj.dto.responseDto.GitRepositoryDTO;
 import com.example.DevOpsProj.model.Project;
-import com.example.DevOpsProj.model.Repository;
+import com.example.DevOpsProj.model.GitRepository;
 import com.example.DevOpsProj.model.User;
 import com.example.DevOpsProj.repository.ProjectRepository;
-import com.example.DevOpsProj.repository.RepositoryRepository;
+import com.example.DevOpsProj.repository.GitRepositoryRepository;
 import com.example.DevOpsProj.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +33,7 @@ public class ProjectService {
     private ModelMapper modelMapper;
 
     @Autowired
-    private RepositoryRepository repositoryRepository;
+    private GitRepositoryRepository gitRepositoryRepository;
 
 
     //implementing DTO pattern for project for saving project
@@ -42,6 +42,7 @@ public class ProjectService {
         project.setProjectId(projectDTO.getProjectId());
         project.setProjectName(projectDTO.getProjectName());
         project.setProjectDescription(projectDTO.getProjectDescription());
+        project.setLastUpdated(LocalDateTime.now());
         List<User> users = projectDTO.getUsers().stream()
                 .map(userDTO -> modelMapper.map(userDTO, User.class))
                 .collect(Collectors.toList());
@@ -55,45 +56,7 @@ public class ProjectService {
         project.setProjectId(projectDTO.getProjectId());
         project.setProjectName(projectDTO.getProjectName());
         project.setProjectDescription(projectDTO.getProjectDescription());
-
-//        List<Repository> repositories = new ArrayList<>();
-//        for (RepositoryDTO repositoryDTO: projectDTO.getRepositories()){
-//            Repository repository = new Repository();
-//            repository.setName(repositoryDTO.getName());
-//            repository.setProject(project);
-//            repositories.add(repository);
-//        }
-
-
-//        List<RepositoryDTO> repositoryDTOs = projectDTO.getRepositories();
-//        List<Repository> repositories = new ArrayList<>();
-//        for (RepositoryDTO repositoryDTO : repositoryDTOs) {
-//            Optional<Repository> optionalRepository = repositoryRepository.findById(repositoryDTO.getId());
-//            if (optionalRepository.isPresent()) {
-//                Repository repository = optionalRepository.get();
-//                repositories.add(repository);
-//            } else {
-//                throw new RuntimeException("Repository not found for ID: " + repositoryDTO.getId());
-//            }
-//        }
-//        System.out.println(project);
-//        System.out.println(repositoryDTOs);
-//        System.out.println(repositories);
-//        project.setRepositories(repositories);
-//        projectRepository.save(project);
-//
-//        return modelMapper.map(project, ProjectDTO.class);
-//    }
-
-
-        List<RepositoryDTO> repositoryDTOs = projectDTO.getRepositories();
-        List<Repository> repositories = repositoryDTOs.stream()
-                .map(repositoryDTO -> modelMapper.map(repositoryDTO, Repository.class))
-                .collect(Collectors.toList());
-        System.out.println(project);
-        System.out.println(repositoryDTOs);
-        System.out.println(repositories);
-        project.setRepositories(repositories);
+        project.setLastUpdated(LocalDateTime.now());
         projectRepository.save(project);
 
         return modelMapper.map(project, ProjectDTO.class);
@@ -103,6 +66,9 @@ public class ProjectService {
         return projectRepository.findById(id);
     }
 
+    public List<Project> getAll(){
+        return projectRepository.findAll();
+    }
     public List<Project> getAllProjects(){
         return projectRepository.findAllProjects();
     }
@@ -119,7 +85,17 @@ public class ProjectService {
             return null;
         }
         else {
-            return projectRepository.findAllUsersByProjectId(projectId);
+            return users;
+        }
+    }
+
+    public List<User> getAllUsersByProjectIdAndRole(Long projectId, EnumRole role){
+        List<User> users = projectRepository.findAllUsersByProjectIdAndRole(projectId, role);
+        if(users.isEmpty()){
+            return null;
+        }
+        else {
+            return users;
         }
     }
 
@@ -155,5 +131,57 @@ public class ProjectService {
         }
     }
 
+    public Integer getCountAllProjects(){
+        return projectRepository.countAllProjects();
+    }
 
+    public Integer getCountAllProjectsByRole(EnumRole enumRole) {
+        return projectRepository.countAllProjectsByRole(enumRole);
+    }
+
+    public Integer getCountAllProjectsByUserId(Long id) {
+        return projectRepository.countAllProjectsByUserId(id);
+    }
+
+    public Integer getCountAllUsersByProjectId(Long projectId) {
+        return projectRepository.countAllUsersByProjectId(projectId);
+    }
+
+    public Integer getCountAllUsersByProjectIdAndRole(Long projectId, EnumRole enumRole) {
+        return projectRepository.countAllUsersByProjectIdAndRole(projectId, enumRole);
+    }
+
+    public Integer getCountAllActiveProjects(){
+        return projectRepository.countAllActiveProjects();
+    }
+
+    public Integer getCountAllInActiveProjects(){
+        return projectRepository.countAllInActiveProjects();
+    }
+
+    public List<User> getUsersByProjectIdAndRole(Long projectId, EnumRole role) {
+        return projectRepository.findUsersByProjectIdAndRole(projectId, role);
+    }
+
+    public List<ProjectDTO> getProjectsWithoutFigmaURL() {
+        List<Project> projects = projectRepository.findAllProjects();
+        List<ProjectDTO> projectDTOs = new ArrayList<>();
+
+        for (Project project : projects) {
+            // Check if the project has a Figma URL set
+            if (project.getFigma() == null || project.getFigma().getFigmaURL() == null) {
+                // Create a ProjectDTO and add it to the list
+                ProjectDTO projectDTO = mapProjectToProjectDTO(project);
+                projectDTOs.add(projectDTO);
+            }
+        }
+        return projectDTOs;
+    }
+
+    public ProjectDTO mapProjectToProjectDTO(Project project) {
+        ProjectDTO projectDTO = new ProjectDTO();
+        projectDTO.setProjectId(project.getProjectId());
+        projectDTO.setProjectName(project.getProjectName());
+        return projectDTO;
+    }
 }
