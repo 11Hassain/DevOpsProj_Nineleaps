@@ -13,8 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.DataTruncation;
-import java.sql.SQLDataException;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -33,7 +31,7 @@ public class HelpDocumentsController {
     private JwtService jwtService;
 
     @PostMapping("/upload")
-    public ResponseEntity<?> uploadPDF(
+    public ResponseEntity<?> uploadFile(
             @RequestParam("projectId") long projectId,
             @RequestParam(name = "projectFile", required = false) MultipartFile projectFile,
             @RequestHeader("AccessToken") String accessToken)
@@ -41,7 +39,8 @@ public class HelpDocumentsController {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
             try {
-                return helpDocumentsService.uploadFiles(projectId, projectFile);
+                String fileExtension = helpDocumentsService.getFileExtension(projectFile);
+                return helpDocumentsService.uploadFiles(projectId, projectFile, fileExtension);
             } catch (IllegalArgumentException e) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid parameters");
             }
@@ -90,4 +89,5 @@ public class HelpDocumentsController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
         }
     }
+
 }

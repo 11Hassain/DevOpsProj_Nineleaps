@@ -26,7 +26,13 @@ public class AuthController {
 
     @GetMapping("/api/get-email")
     public ResponseEntity<Object> getEmailFromToken(@RequestHeader("emailToVerify") String emailToVerify) throws IOException {
-        return ResponseEntity.ok(userService.loginVerification(emailToVerify));
+        Object object = userService.loginVerification(emailToVerify);
+        System.out.println(object);
+        if (object == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }else {
+            return ResponseEntity.ok(userService.loginVerification(emailToVerify));
+        }
     }
 
 

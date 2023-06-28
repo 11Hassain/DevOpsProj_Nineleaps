@@ -22,20 +22,32 @@ public class HelpDocumentsService {
     @Autowired
     private ProjectService projectService;
 
-    public ResponseEntity<?> uploadFiles(long projectId, MultipartFile projectFile) throws IOException {
+    public ResponseEntity<?> uploadFiles(long projectId, MultipartFile projectFile, String fileExtension) throws IOException {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalArgumentException("Project not found"));
         HelpDocuments helpDocuments = new HelpDocuments();
-        saveFile(helpDocuments, projectFile);
+        saveFile(helpDocuments, projectFile,fileExtension);
         helpDocuments.setProject(project);
         helpDocumentsRepository.save(helpDocuments);
         return ResponseEntity.ok("File uploaded successfully");
     }
 
-    private void saveFile(HelpDocuments helpDocuments, MultipartFile file) throws IOException {
+    private void saveFile(HelpDocuments helpDocuments, MultipartFile file, String fileExtension) throws IOException {
         if (file != null && !file.isEmpty()) {
             helpDocuments.setFileName(file.getOriginalFilename());
             helpDocuments.setData(file.getBytes());
+            helpDocuments.setFileExtension(fileExtension);
         }
+    }
+
+    public String getFileExtension(MultipartFile file) {
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename != null) {
+            int dotIndex = originalFilename.lastIndexOf('.');
+            if (dotIndex >= 0 && dotIndex < originalFilename.length() - 1) {
+                return originalFilename.substring(dotIndex + 1).toLowerCase();
+            }
+        }
+        return null;
     }
 }

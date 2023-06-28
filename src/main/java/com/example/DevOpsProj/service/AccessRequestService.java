@@ -82,12 +82,14 @@ public class AccessRequestService {
 
     private UserDTO mapUserToUserDTO(User user) {
         UserDTO userDTO = new UserDTO();
+        userDTO.setId(user.getId());
         userDTO.setName(user.getName());
         // Map other fields as needed
         return userDTO;
     }
     private ProjectDTO mapProjectToProjectDTO(Project project) {
         ProjectDTO projectDTO = new ProjectDTO();
+        projectDTO.setProjectId(project.getProjectId());
         projectDTO.setProjectName(project.getProjectName());
         // Map other fields as needed
         return projectDTO;

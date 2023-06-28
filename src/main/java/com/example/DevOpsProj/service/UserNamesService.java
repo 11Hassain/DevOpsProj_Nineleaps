@@ -26,6 +26,7 @@ public class UserNamesService {
 
     public UserNamesDTO saveUsername(UserNamesDTO userNamesDTO) {
         boolean yes = GitHubUserValidation.isGitHubUserValid(userNamesDTO.getUsername(), userNamesDTO.getAccessToken());
+        System.out.println(yes);
         if (yes){
             UserNames userNames = new UserNames();
             userNames.setUsername(userNamesDTO.getUsername());

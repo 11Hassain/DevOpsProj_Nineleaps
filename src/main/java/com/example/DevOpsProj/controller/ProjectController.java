@@ -8,6 +8,7 @@ import com.example.DevOpsProj.exceptions.NotFoundException;
 import com.example.DevOpsProj.model.GitRepository;
 import com.example.DevOpsProj.model.Project;
 import com.example.DevOpsProj.model.User;
+import com.example.DevOpsProj.model.UserNames;
 import com.example.DevOpsProj.repository.GitRepositoryRepository;
 import com.example.DevOpsProj.repository.ProjectRepository;
 import com.example.DevOpsProj.repository.UserRepository;
@@ -330,6 +331,7 @@ public class ProjectController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
         }
     }
+
 
     @DeleteMapping("/{projectId}/users/{userId}/roles/{roleId}")
     public ResponseEntity<Void> removeRoleFromUserInProject(@PathVariable("projectId") Long projectId, @PathVariable("userId") Long userId, @PathVariable("roleId") Long roleId) {
