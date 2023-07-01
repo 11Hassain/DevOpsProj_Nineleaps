@@ -58,4 +58,9 @@ public class FigmaService {
         figma.setFigmaURL(figmaDTO.getFigmaURL());
         return figma;
     }
+
+    public void deleteFigma(Long figmaId) {
+        figmaRepository.deleteById(figmaId);
+    }
+
 }

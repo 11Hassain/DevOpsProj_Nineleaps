@@ -1,6 +1,10 @@
 package com.example.DevOpsProj;
 
+import com.example.DevOpsProj.config.TwilioConfig;
+import com.twilio.Twilio;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -10,14 +14,19 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
-//@CrossOrigin
-public class
-DevOpsProjApplication {
+public class DevOpsProjApplication {
+
+	@Autowired
+	private TwilioConfig twilioConfig;
+
+	@PostConstruct
+	public void initTwilio(){
+		Twilio.init(twilioConfig.getAccountSid(), twilioConfig.getAuthToken());
+	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(DevOpsProjApplication.class, args);
 	}
-
 
 	@Bean
 	public WebMvcConfigurer corsConfigurer(){

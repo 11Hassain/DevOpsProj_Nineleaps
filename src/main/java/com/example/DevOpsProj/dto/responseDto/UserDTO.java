@@ -21,4 +21,10 @@ public class UserDTO {
         this.email = email;
         this.enumRole = enumRole;
     }
+
+    public UserDTO(Long id, String name, String email) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+    }
 }

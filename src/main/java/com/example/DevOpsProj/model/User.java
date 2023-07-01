@@ -38,13 +38,10 @@ public class User implements UserDetails{
     @Column(name = "email", nullable = false)
     private String email;
 
-//    @Column(name = "phone_number")
-//    private String phone;
+    @Column(name = "phone_number")
+    private String phoneNumber;
 
-//    @Column(name = "address")
-//    private String address;
-//
-    private String password;
+//    private String password;
 
     @Enumerated(EnumType.STRING)
     private EnumRole enumRole;
@@ -76,7 +73,7 @@ public class User implements UserDetails{
 
     @Override
     public String getPassword() {
-        return password;
+        return null;
     }
 
     @Override

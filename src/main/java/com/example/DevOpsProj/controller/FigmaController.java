@@ -120,6 +120,12 @@ public class FigmaController {
         }
     }
 
+    @DeleteMapping("/{figmaId}")
+    public ResponseEntity<String> deleteFigma(@PathVariable Long figmaId) {
+        figmaService.deleteFigma(figmaId);
+        return ResponseEntity.ok("Figma deleted successfully");
+    }
+
 }
 
 

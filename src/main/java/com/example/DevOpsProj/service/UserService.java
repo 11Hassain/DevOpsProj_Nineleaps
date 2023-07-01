@@ -9,6 +9,7 @@ import com.example.DevOpsProj.dto.responseDto.UserProjectsDTO;
 import com.example.DevOpsProj.model.GitRepository;
 import com.example.DevOpsProj.model.Project;
 import com.example.DevOpsProj.model.User;
+import com.example.DevOpsProj.otp.OTPService.IUserService;
 import com.example.DevOpsProj.repository.UserRepository;
 import com.example.DevOpsProj.utils.JwtUtils;
 import jakarta.persistence.EntityNotFoundException;
@@ -28,7 +29,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class UserService {
+public class UserService implements IUserService {
 
     @Autowired
     private UserRepository userRepository;
@@ -40,6 +41,7 @@ public class UserService {
     private JwtUtils jwtUtils;
 
     private ModelMapper modelMapper;
+
 
 
     //implementing user creation using DTO pattern
@@ -214,6 +216,44 @@ public class UserService {
         jwtUtils.saveUserToken(user,jwtToken);
         userDTO.setToken(jwtToken);
         return userDTO;
+    }
+
+    //-------------IUService-----------
+
+    @Override
+    public User getUserViaPhoneNumber(String phoneNumber){
+        return userRepository.findByPhoneNumber(phoneNumber);
+    }
+
+    @Override
+    public User updateUser(User user) {
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User getUserByMail(String userMai) {
+        return userRepository.findByEmail(userMai);
+    }
+
+    @Override
+    public User insertuser(UserDTO newSsoUser) {
+        User user = new User();
+        user.setName(newSsoUser.getName());
+        user.setEmail(newSsoUser.getEmail());
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User findUserByEmail(String userMail) {
+        return userRepository.findByEmail(userMail);
+    }
+
+    @Override
+    public User insertUser(UserDTO newSsoUser) {
+        User user = new User();
+        user.setName(newSsoUser.getName());
+        user.setEmail(newSsoUser.getEmail());
+        return userRepository.save(user);
     }
 
 }

@@ -48,4 +48,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT t.user FROM Token t WHERE t.token = :tokenValue")
     User findUserByToken(@Param("tokenValue") String tokenValue);
+
+    User findByPhoneNumber(String phoneNumber);
 }
