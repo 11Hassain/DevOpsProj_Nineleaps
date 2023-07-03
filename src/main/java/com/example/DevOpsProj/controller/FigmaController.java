@@ -126,6 +126,24 @@ public class FigmaController {
         return ResponseEntity.ok("Figma deleted successfully");
     }
 
+    @GetMapping("/project/{projectId}")
+    public ResponseEntity<Object> getFigmaByProjectId(@PathVariable Long projectId,
+                                                      @RequestHeader("AccessToken") String accessToken) {
+        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        if (isTokenValid) {
+            Optional<Figma> optionalFigma = figmaRepository.findFigmaByProjectId(projectId);
+            if (optionalFigma.isPresent()) {
+                Figma figma = optionalFigma.get();
+                String figmaURL = figma.getFigmaURL();
+                return ResponseEntity.ok(figmaURL);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+        }
+    }
+
 }
 
 

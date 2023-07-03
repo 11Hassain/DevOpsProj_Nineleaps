@@ -95,15 +95,9 @@ public class UserService implements IUserService {
         }
     }
 
-    //check if the user is present in db
     public boolean existsById(Long id){
         return userRepository.existsById(id);
     }
-
-    //updating the user details
-//    public User updateUser(User updateUser){
-//        return userRepository.save(updateUser);
-//    }
 
     //editing
     //get all user based on role id
@@ -139,7 +133,7 @@ public class UserService implements IUserService {
     }
 
     public List<UserProjectsDTO> getAllUsersWithProjects() {
-        List<User> users = userRepository.findAll();
+        List<User> users = userRepository.findAllUsers();
         List<UserProjectsDTO> userProjectsDTOs = new ArrayList<>();
 
         for (User user : users) {
@@ -153,6 +147,24 @@ public class UserService implements IUserService {
             userProjectsDTOs.add(userProjectsDTO);
         }
         return userProjectsDTOs;
+    }
+
+    public List<UserDTO> getAllUsersWithoutProjects(EnumRole role, Long projectId) {
+        List<User> users = userRepository.findAllUsersByRole(role);
+        List<UserDTO> userDTOs = new ArrayList<>();
+
+        for (User user : users) {
+            List<Project> projects = user.getProjects();
+//            if (projects.isEmpty()){
+//                UserDTO userDTO = new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole());
+//                userDTOs.add(userDTO);
+//            }
+            if (projects.stream().noneMatch(project -> project.getProjectId() == projectId)) {
+                UserDTO userDTO = new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole());
+                userDTOs.add(userDTO);
+            }
+        }
+        return userDTOs;
     }
 
     public List<UserProjectsDTO> getUsersWithMultipleProjects() {
@@ -255,5 +267,6 @@ public class UserService implements IUserService {
         user.setEmail(newSsoUser.getEmail());
         return userRepository.save(user);
     }
+
 
 }

@@ -240,4 +240,19 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
         }
     }
+
+    @GetMapping("/withoutProject")
+    public ResponseEntity<?> getUserWithoutProject(
+            @RequestParam("role") String role,
+            @RequestParam("projectId") Long projectId,
+            @RequestHeader("AccessToken") String accessToken) {
+        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        if (isTokenValid) {
+            EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
+            List<UserDTO> userDTOList = userService.getAllUsersWithoutProjects(enumRole, projectId);
+            return ResponseEntity.status(HttpStatus.OK).body(userDTOList);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+        }
+    }
 }

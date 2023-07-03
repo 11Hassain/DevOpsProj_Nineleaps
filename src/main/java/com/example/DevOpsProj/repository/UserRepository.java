@@ -11,7 +11,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -21,7 +20,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("UPDATE User u SET u.deleted = true WHERE u.id=?1")
     void softDelete(Long id);
 
-    @Query("SELECT u FROM User u WHERE u.enumRole=?1 AND u.deleted=false")
+    @Query("SELECT u FROM User u WHERE u.deleted=false")
+    List<User> findAllUsers();
+
+    @Query("SELECT u FROM User u WHERE u.deleted=false AND u.enumRole=?1")
+    List<User> findAllUsersByRole(EnumRole enumRole);
+
+    @Query("SELECT u FROM User u WHERE u.enumRole=:enumRole AND u.deleted=false")
     List<User> findByRole(EnumRole enumRole);
 
     public User findByEmail(String email);
@@ -50,4 +55,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User findUserByToken(@Param("tokenValue") String tokenValue);
 
     User findByPhoneNumber(String phoneNumber);
+
+//    @Query("SELECT u FROM User u WHERE u.deleted = false AND u.enumRole = :role")
+//    List<User> findAllUsersByRole(@Param("role") EnumRole role);
+
+//    @Query("SELECT u FROM User u WHERE u NOT IN (SELECT DISTINCT pu.user FROM Project p JOIN p.users pu) " +
+//            "AND u.enumRole = :role")
+//    List<User> findUsersWithoutProjects(EnumRole role);
+
+
 }

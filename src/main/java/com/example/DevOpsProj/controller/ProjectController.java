@@ -1,21 +1,17 @@
 package com.example.DevOpsProj.controller;
 
 import com.example.DevOpsProj.commons.enumerations.EnumRole;
+import com.example.DevOpsProj.dto.responseDto.FigmaDTO;
 import com.example.DevOpsProj.dto.responseDto.ProjectDTO;
 import com.example.DevOpsProj.dto.responseDto.ProjectUserDTO;
 import com.example.DevOpsProj.dto.responseDto.UserDTO;
 import com.example.DevOpsProj.exceptions.NotFoundException;
-import com.example.DevOpsProj.model.GitRepository;
-import com.example.DevOpsProj.model.Project;
-import com.example.DevOpsProj.model.User;
-import com.example.DevOpsProj.model.UserNames;
+import com.example.DevOpsProj.model.*;
+import com.example.DevOpsProj.repository.FigmaRepository;
 import com.example.DevOpsProj.repository.GitRepositoryRepository;
 import com.example.DevOpsProj.repository.ProjectRepository;
 import com.example.DevOpsProj.repository.UserRepository;
-import com.example.DevOpsProj.service.JwtService;
-import com.example.DevOpsProj.service.ProjectService;
-import com.example.DevOpsProj.service.TwoFactorAuthenticationService;
-import com.example.DevOpsProj.service.UserService;
+import com.example.DevOpsProj.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -146,7 +142,7 @@ public class ProjectController {
         }
     }
 
-    @GetMapping("/allProjects") //retrieve list of projects
+    @GetMapping("/allProjects") //retrieve list of projects (only soft deleted)
     public ResponseEntity<Object> getAllProjects(@RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
@@ -521,58 +517,6 @@ public class ProjectController {
             }
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
-        }
-    }
-
-    public ResponseEntity<?> addUserToProjectByAdmin(Long adminId, String adminVerificationCode, Long userId, String userVerificationCode, Long projectId) {
-        // Step 1: Admin Authorization
-        if (!twoFAService.isAdmin(adminId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access");
-        }
-
-        // Step 2: Request Admin Verification
-        // Prompt the admin to enter the verification code
-
-        // Step 3: Validate Admin Verification Code
-        if (!twoFAService.validateVerificationCode(adminId, adminVerificationCode)) {
-            // Invalid admin verification code
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid admin verification code");
-        }
-
-        // Step 4: Request User Details
-        // Prompt the admin to enter the user details, e.g., name, email, role, etc.
-
-        // Step 5: Request User Verification
-        // Prompt the admin to enter the verification code for the user being added
-
-        // Step 6: Validate User Verification Code
-        if (!twoFAService.validateVerificationCode(userId, userVerificationCode)) {
-            // Invalid user verification code
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid user verification code");
-        }
-
-        // Step 7: Add User to Project
-        try {
-            Optional<Project> optionalProject = projectRepository.findById(projectId);
-            Optional<User> optionalUser = userRepository.findById(userId);
-            if (optionalProject.isPresent() && optionalUser.isPresent()) {
-                Project project = optionalProject.get();
-                User user = optionalUser.get();
-                if(projectService.existUserInProject(project.getProjectId(), user.getId())){
-                    return new ResponseEntity<>(HttpStatus.CONFLICT);
-                }
-                project.getUsers().add(user);
-                projectRepository.save(project);
-                List<UserDTO> userDTOList = project.getUsers().stream()
-                        .map(users -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
-                        .collect(Collectors.toList());
-//                ProjectUserDTO projectUserDTO = new ProjectUserDTO(project.getProjectId(), project.getProjectName(), project.getProjectDescription(), userDTOList);
-                return ResponseEntity.ok("User added successfully");
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-        }catch (Exception e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
