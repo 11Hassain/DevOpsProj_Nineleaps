@@ -44,7 +44,6 @@ public class SmsController {
     private final String TOPIC_DESTINATION = "/lesson/sms";
 
     @PostMapping("/send")
-    @ApiOperation("Send an OTP for Login using phone Number and OTP")
     public ResponseEntity<String> smsSubmit(@RequestBody SmsPojo sms){
         try{
             service.send(sms);
@@ -56,7 +55,6 @@ public class SmsController {
     }
 
     @PostMapping("/resend")
-    @ApiOperation("Resend an OTP for Login using phone Number and OTP")
     public ResponseEntity<String> smsSub(@RequestBody SmsPojo resendsms){
         try{
             service.send(resendsms);
@@ -67,7 +65,6 @@ public class SmsController {
         return new ResponseEntity<String>("OTP sent",HttpStatus.OK);}
 
     @PostMapping("/verify/token")
-    @ApiOperation("Verify the OTP sent to your Mobile Number for Login using phone Number and OTP")
     public ResponseEntity<?> verifyOTP(@RequestBody TempOTP tempOTP, HttpServletResponse response) throws Exception {
 
         if (tempOTP.getOtp() == StoreOTP.getOtp()) {
@@ -97,14 +94,13 @@ public class SmsController {
     }
 
     @PostMapping("/verify")
-    @ApiOperation("Verify the OTP sent to your Mobile Number  for sign Up using phone Number and OTP")
-    public ResponseEntity<String> verifyOTPsignup(@RequestBody TempOTP sms,HttpServletResponse response) throws Exception{
+    public Boolean verifyOTPsignup(@RequestBody TempOTP sms,HttpServletResponse response) throws Exception{
 
         if(sms.getOtp()== StoreOTP.getOtp()) {
-            return ResponseEntity.ok("Correct OTP");
+            return true;
         }
         else
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect OTP");
+            return false;
     }
 
     private static final String SECRET_KEY = "HRlELXqpSBssiieeeaqwertyujhgfdszxcASWERFDXCDWqwertyggffAQWSXCFRFFFTYHJkkitrsaafarsrAASSDFQWERQWASDWESDYUNJXCVRTYWSXCDERFVTYHJUK";

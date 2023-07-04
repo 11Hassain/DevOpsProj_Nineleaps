@@ -45,7 +45,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT p FROM Project as p " +
             "JOIN p.users as u " +
             "WHERE u.id = :userId " +
-            "AND u.enumRole = :userRole")
+            "AND u.enumRole = :userRole " +
+            "AND p.deleted = false")
     List<Project> findByRoleAndUserId(Long userId, EnumRole userRole);
 
     @Query("SELECT u FROM User u WHERE u.email = :email")
