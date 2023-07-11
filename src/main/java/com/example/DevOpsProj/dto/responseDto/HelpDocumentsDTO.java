@@ -12,5 +12,5 @@ import java.sql.Blob;
 public class HelpDocumentsDTO {
     private Long helpDocumentId;
     private String fileName;
-    private Blob data;
+//    private Blob data;
 }

@@ -1,6 +1,7 @@
 package com.example.DevOpsProj.model;
 
 import com.example.DevOpsProj.commons.enumerations.EnumRole;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
@@ -56,12 +57,15 @@ public class User implements UserDetails{
 
 
     //linking project entity with user
-    @JsonIgnore
-    @ManyToMany(mappedBy = "users")
+@JsonIgnore
+@ManyToMany(mappedBy = "users")
     private List<Project> projects;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<AccessRequest> accessRequest;
+
+    @OneToOne(mappedBy = "user")
+    private UserNames userNames;
 
 
     @Override

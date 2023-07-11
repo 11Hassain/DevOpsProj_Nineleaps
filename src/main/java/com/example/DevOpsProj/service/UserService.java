@@ -10,6 +10,7 @@ import com.example.DevOpsProj.model.GitRepository;
 import com.example.DevOpsProj.model.Project;
 import com.example.DevOpsProj.model.User;
 import com.example.DevOpsProj.otp.OTPService.IUserService;
+import com.example.DevOpsProj.repository.ProjectRepository;
 import com.example.DevOpsProj.repository.UserRepository;
 import com.example.DevOpsProj.utils.JwtUtils;
 import jakarta.persistence.EntityNotFoundException;
@@ -39,13 +40,14 @@ public class UserService implements IUserService {
     private JwtService jwtService;
     @Autowired
     private JwtUtils jwtUtils;
+    @Autowired
+    private ProjectRepository projectRepository;
 
     private ModelMapper modelMapper;
 
 
-
     //implementing user creation using DTO pattern
-    public User saveUser(@RequestBody UserCreationDTO userCreationDTO){
+    public User saveUser(@RequestBody UserCreationDTO userCreationDTO) {
         User user = new User();
         user.setId(userCreationDTO.getId());
         user.setName(userCreationDTO.getName());
@@ -54,9 +56,9 @@ public class UserService implements IUserService {
         return userRepository.save(user);
     }
 
-    public UserDTO updateUser(Long id, UserDTO userDTO){
+    public UserDTO updateUser(Long id, UserDTO userDTO) {
         Optional<User> optionalUser = userRepository.findById(id);
-        if(optionalUser.isPresent()) {
+        if (optionalUser.isPresent()) {
             User existingUser = optionalUser.get();
             existingUser.setId(userDTO.getId());
             existingUser.setName(userDTO.getName());
@@ -66,51 +68,50 @@ public class UserService implements IUserService {
             User updatedUser = userRepository.save(existingUser);
             UserDTO userDTOs = new UserDTO(updatedUser.getId(), updatedUser.getName(), updatedUser.getEmail(), updatedUser.getEnumRole());
             return userDTOs;
-        }
-        else {
+        } else {
             throw new EntityNotFoundException("User not found" + id);
         }
     }
 
     //find user by user id
-    public Optional<User> getUserById(Long id){
+    public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
     }
 
 
     //this function says whether id is soft-deleted or not
-    public boolean existsByIdIsDeleted(Long id){
+    public boolean existsByIdIsDeleted(Long id) {
         Optional<User> checkUser = userRepository.findById(id);
         User cuser = checkUser.get();
         return cuser.getDeleted(); //true if deleted=1, false otherwise
     }
 
     //Soft deleting the user
-    public boolean softDeleteUser(Long id){
-        try{
+    public boolean softDeleteUser(Long id) {
+        try {
             userRepository.softDelete(id);
             return true; //setting deleted=1 / true
-        }catch (Exception e){
+        } catch (Exception e) {
             return false; //keeping deleted false
         }
     }
 
-    public boolean existsById(Long id){
+    public boolean existsById(Long id) {
         return userRepository.existsById(id);
     }
 
     //editing
     //get all user based on role id
-    public List<User> getUsersByRole(EnumRole enumRole){
+    public List<User> getUsersByRole(EnumRole enumRole) {
         return userRepository.findByRole(enumRole);
     }
 
-    private UserDTO convertToUserDto(User user){
+    private UserDTO convertToUserDto(User user) {
         UserDTO userDTO = modelMapper.map(user, UserDTO.class);
         return userDTO;
     }
 
-    public User getUserByEmail(String userEmail){
+    public User getUserByEmail(String userEmail) {
         return userRepository.findByEmail(userEmail);
     }
 
@@ -124,10 +125,9 @@ public class UserService implements IUserService {
 
     public Integer getCountAllUsersByProjectId(Long projectId) {
         Optional<Project> project = projectService.getProjectById(projectId);
-        if (project.isPresent()){
+        if (project.isPresent()) {
             return userRepository.countAllUsersByProjectId(projectId);
-        }
-        else {
+        } else {
             return 0;
         }
     }
@@ -139,15 +139,23 @@ public class UserService implements IUserService {
         for (User user : users) {
             List<Project> projects = user.getProjects();
 
-            List<String> projectNames = projects.stream()
+            // Remove any projects that are marked as deleted
+            List<Project> existingProjects = projects.stream()
+                    .filter(project -> !project.getDeleted())
+                    .collect(Collectors.toList());
+
+            List<String> projectNames = existingProjects.stream()
                     .map(Project::getProjectName)
                     .collect(Collectors.toList());
 
             UserProjectsDTO userProjectsDTO = new UserProjectsDTO(user.getId(), user.getName(), projectNames);
             userProjectsDTOs.add(userProjectsDTO);
         }
+
         return userProjectsDTOs;
     }
+
+
 
     public List<UserDTO> getAllUsersWithoutProjects(EnumRole role, Long projectId) {
         List<User> users = userRepository.findAllUsersByRole(role);
@@ -172,11 +180,32 @@ public class UserService implements IUserService {
         List<UserProjectsDTO> usersWithMultipleProjects = new ArrayList<>();
 
         for (UserProjectsDTO userProjectsDTO : allUsersWithProjects) {
-            if (userProjectsDTO.getProjectNames().size() > 1) {
+            List<String> projectNames = userProjectsDTO.getProjectNames();
+            List<String> validProjectNames = new ArrayList<>();
+
+            // Check if each project exists in the database
+            for (String projectName : projectNames) {
+                if (projectExists(projectName)) {
+                    validProjectNames.add(projectName);
+                }
+            }
+
+            // Update the UserProjectsDTO with valid project names
+            userProjectsDTO.setProjectNames(validProjectNames);
+
+            // Add the UserProjectsDTO to the list if it has multiple projects
+            if (validProjectNames.size() > 1) {
                 usersWithMultipleProjects.add(userProjectsDTO);
             }
         }
+
         return usersWithMultipleProjects;
+    }
+
+    private boolean projectExists(String projectName) {
+        List<Project> projects = projectRepository.findAllProjects();
+        return projects.stream()
+                .anyMatch(project -> project.getProjectName().equals(projectName));
     }
 
     public List<UserDTO> getAllUsers() {

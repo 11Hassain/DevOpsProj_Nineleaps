@@ -1,10 +1,7 @@
 package com.example.DevOpsProj.controller;
 
 import com.example.DevOpsProj.commons.enumerations.EnumRole;
-import com.example.DevOpsProj.dto.responseDto.FigmaDTO;
-import com.example.DevOpsProj.dto.responseDto.ProjectDTO;
-import com.example.DevOpsProj.dto.responseDto.ProjectUserDTO;
-import com.example.DevOpsProj.dto.responseDto.UserDTO;
+import com.example.DevOpsProj.dto.responseDto.*;
 import com.example.DevOpsProj.exceptions.NotFoundException;
 import com.example.DevOpsProj.model.*;
 import com.example.DevOpsProj.repository.FigmaRepository;
@@ -45,7 +42,8 @@ public class ProjectController {
     private JwtService jwtService;
     @Autowired
     private TwoFactorAuthenticationService twoFAService;
-
+    @Autowired
+    private GitHubCollaboratorService collaboratorService;
 
 
     @Value("${github.accessToken}")
@@ -202,9 +200,15 @@ public class ProjectController {
                 if (userList == null){
                     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
                 }
+
                 List<UserDTO> userDTOList = userList.stream()
-                        .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
+                        .map(user -> {
+                            UserNames usernames = user.getUserNames();
+                            String username = (usernames != null) ? usernames.getUsername() : null;
+                            return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole(), username);
+                        })
                         .collect(Collectors.toList());
+
                 return ResponseEntity.ok(userDTOList);
             }catch (NoSuchElementException e){
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -314,15 +318,54 @@ public class ProjectController {
             Optional<Project> optionalProject = projectRepository.findById(projectId);
             //for checking if the user with given id exists
             Optional<User> optionalUser = userRepository.findById(userId);
+
             if(optionalProject.isPresent() && optionalUser.isPresent()){
                 Project project = optionalProject.get();
                 User user = optionalUser.get();
                 project.getUsers().remove(user);
                 projectRepository.save(project);
+
                 List<UserDTO> userDTOList = project.getUsers().stream()
                         .map(users -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
                         .toList();
                 ProjectUserDTO projectUserDTO = new ProjectUserDTO(project.getProjectId(), project.getProjectName(), project.getProjectDescription(), userDTOList);
+
+                return ResponseEntity.ok("User removed");
+            }
+            else return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project or User not found");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+        }
+    }
+
+    @DeleteMapping("/{projectId}/users/{userId}/repo") //remove user from the project and repo as well
+    public ResponseEntity<String> removeUserFromProject(
+            @PathVariable("projectId") Long projectId,
+            @PathVariable("userId") Long userId,
+            @RequestBody CollaboratorDTO collaboratorDTO,
+            @RequestHeader("AccessToken") String accessToken){
+        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        if (isTokenValid) {
+            //for checking if the project with given id exists
+            Optional<Project> optionalProject = projectRepository.findById(projectId);
+            //for checking if the user with given id exists
+            Optional<User> optionalUser = userRepository.findById(userId);
+
+            if(optionalProject.isPresent() && optionalUser.isPresent()){
+                Project project = optionalProject.get();
+                User user = optionalUser.get();
+                project.getUsers().remove(user);
+                projectRepository.save(project);
+
+                List<UserDTO> userDTOList = project.getUsers().stream()
+                        .map(users -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
+                        .toList();
+                ProjectUserDTO projectUserDTO = new ProjectUserDTO(project.getProjectId(), project.getProjectName(), project.getProjectDescription(), userDTOList);
+
+                boolean deleted = collaboratorService.deleteCollaborator(collaboratorDTO);
+                if (!deleted){
+                    return ResponseEntity.ok("Unable to remove user");
+                }
                 return ResponseEntity.ok("User removed");
             }
             else return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project or User not found");

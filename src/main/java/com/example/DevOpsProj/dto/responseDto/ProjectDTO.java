@@ -23,11 +23,10 @@ public class ProjectDTO {
     private boolean status;
     private FigmaDTO figma;
 
-    public ProjectDTO(Long projectId, String projectName, String projectDescription, List<User> users, List<GitRepositoryDTO> repositories, FigmaDTO figma) {
+    public ProjectDTO(Long projectId, String projectName, String projectDescription,  List<GitRepositoryDTO> repositories, FigmaDTO figma) {
         this.projectId = projectId;
         this.projectName = projectName;
         this.projectDescription = projectDescription;
-        this.users = users;
         this.repositories = repositories;
         this.figma = figma;
     }

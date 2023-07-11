@@ -25,7 +25,6 @@ public class UserNames {
     @Column(name = "github_username", nullable = false)
     private String username;
 
-
     @OneToOne
     @JoinColumn(name = "user_id", unique = true)
     private User user;

@@ -98,41 +98,39 @@ public class HelpDocumentsController {
 
 
     @GetMapping("/files")
-    public ResponseEntity<?> generatePdfFilesArchive(@RequestParam("projectId") long projectId,
-                                                     @RequestHeader("AccessToken") String accessToken) {
+    public ResponseEntity<?> getPdfFilesList(@RequestParam("projectId") long projectId,
+                                             @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
             List<HelpDocuments> pdfFiles = helpDocumentsRepository.findAll();
-            List<HelpDocuments> desiredDocuments = pdfFiles.stream()
+            List<String> fileNames = pdfFiles.stream()
                     .filter(pdfFile -> pdfFile != null && pdfFile.getProject() != null && pdfFile.getProject().getProjectId() == projectId)
+                    .map(HelpDocuments::getFileName)
                     .filter(Objects::nonNull) // Filter out any remaining null values
                     .collect(Collectors.toList());
-            if (desiredDocuments.isEmpty()) {
+            if (fileNames.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
-            try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                 ZipOutputStream zipOut = new ZipOutputStream(baos)) {
-                for (HelpDocuments pdfFile : desiredDocuments) {
-                    String fileName = pdfFile.getFileName();
-                    ZipEntry zipEntry = new ZipEntry(fileName);
-                    zipOut.putNextEntry(zipEntry);
-                    zipOut.write(pdfFile.getData());
-                    zipOut.closeEntry();
-                }
-                zipOut.finish();
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-                headers.setContentDispositionFormData("attachment", "pdf_files.zip");
-                return ResponseEntity.ok()
-                        .headers(headers)
-                        .body(baos.toByteArray());
-            } catch (IOException e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
+            return ResponseEntity.ok().body(fileNames);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
         }
     }
+
+    @GetMapping("/files/{fileName}")
+    public ResponseEntity<?> downloadPdfFile(@PathVariable("fileName") String fileName) {
+        HelpDocuments pdfFile = helpDocumentsRepository.findByFileName(fileName);
+        if (pdfFile == null) {
+            return ResponseEntity.notFound().build();
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", fileName);
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(pdfFile.getData());
+    }
+
 
 //    @GetMapping("/download")
 //    public void downloadAllPdfFiles(@RequestParam("projectId") long projectId,

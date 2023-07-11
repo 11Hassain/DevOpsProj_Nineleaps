@@ -36,6 +36,7 @@ public class GitHubCollaboratorController {
         }
 
     }
+
     @DeleteMapping("/delete")
     public ResponseEntity<String> deleteCollaborator(@RequestBody CollaboratorDTO collaboratorDTO,
                                                      @RequestHeader("AccessToken") String accessToken) {

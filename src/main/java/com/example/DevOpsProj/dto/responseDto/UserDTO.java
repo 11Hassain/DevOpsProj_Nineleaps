@@ -14,6 +14,7 @@ public class UserDTO {
     private String email;
     private EnumRole enumRole;
     private String token;
+    private String gitHubUsername;
 
     public UserDTO(Long id, String name, String email, EnumRole enumRole) {
         this.id = id;
@@ -26,5 +27,13 @@ public class UserDTO {
         this.id = id;
         this.name = name;
         this.email = email;
+    }
+
+    public UserDTO(Long id, String name, String email, EnumRole enumRole, String gitHubUsername) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.enumRole = enumRole;
+        this.gitHubUsername = gitHubUsername;
     }
 }

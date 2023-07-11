@@ -4,6 +4,7 @@ import com.example.DevOpsProj.commons.enumerations.EnumRole;
 import com.example.DevOpsProj.dto.requestDto.UserCreationDTO;
 import com.example.DevOpsProj.dto.responseDto.*;
 import com.example.DevOpsProj.model.Figma;
+import com.example.DevOpsProj.model.GitRepository;
 import com.example.DevOpsProj.model.Project;
 import com.example.DevOpsProj.model.User;
 import com.example.DevOpsProj.service.JwtService;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -198,7 +200,7 @@ public class UserController {
                         Figma figma = project.getFigma();
                         String figmaURL = figma != null ? figma.getFigmaURL() : null; // Retrieve the Figma URL
                         FigmaDTO figmaDTO = new FigmaDTO(figmaURL);
-                        return new ProjectDTO(project.getProjectId(), project.getProjectName(), project.getProjectDescription(), project.getUsers(), repositoryDTOList, figmaDTO);
+                        return new ProjectDTO(project.getProjectId(), project.getProjectName(), project.getProjectDescription(),  repositoryDTOList, figmaDTO);
                     })
                     .collect(Collectors.toList());
 
@@ -208,6 +210,8 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
         }
     }
+
+
 
     @GetMapping("/get")
     public ResponseEntity<Object> getAllUsers(@RequestHeader("AccessToken") String accessToken){
@@ -240,7 +244,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
         }
     }
-
     @GetMapping("/withoutProject")
     public ResponseEntity<?> getUserWithoutProject(
             @RequestParam("role") String role,
