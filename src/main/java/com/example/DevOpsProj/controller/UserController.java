@@ -254,6 +254,7 @@ public class UserController {
             EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
             List<UserDTO> userDTOList = userService.getAllUsersWithoutProjects(enumRole, projectId);
             return ResponseEntity.status(HttpStatus.OK).body(userDTOList);
+            // if else condition
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
         }
