@@ -5,16 +5,23 @@ import com.example.DevOpsProj.dto.responseDto.ProjectDTO;
 import com.example.DevOpsProj.model.Figma;
 import com.example.DevOpsProj.model.Project;
 import com.example.DevOpsProj.repository.FigmaRepository;
+import com.example.DevOpsProj.repository.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class FigmaService {
     @Autowired
     private FigmaRepository figmaRepository;
+//    @Autowired
+//    public FigmaService(ProjectRepository projectRepository) {
+//        this.projectRepository = projectRepository;
+//    }
+    @Autowired ProjectRepository projectRepository;
 
 
     public Figma createFigma(FigmaDTO figmaDTO) {
@@ -25,7 +32,12 @@ public class FigmaService {
     }
 
     public List<Figma> getAllFigmaProjects() {
-        return figmaRepository.findAll();
+        List<Project> activeProjects = projectRepository.findAllProjects();
+        List<Figma> figmaProjects = activeProjects.stream()
+                .map(Project::getFigma)
+                .collect(Collectors.toList());
+
+        return figmaProjects;
     }
 
     public Optional<FigmaDTO> getFigmaById(Long figmaId) {

@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 public class Token {
+
     @Id
     @GeneratedValue
     public Integer id;

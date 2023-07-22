@@ -97,21 +97,21 @@ public class GitRepositoryController {
         }
     }
 
-    @DeleteMapping("/{repoId}")
-    public ResponseEntity<Object> deleteRepository(@PathVariable Long repoId,
-                                   @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            try {
-                gitRepositoryService.deleteRepository(repoId);
-                return ResponseEntity.ok("Success");
+    @DeleteMapping("/delete/{repoId}")
+    public ResponseEntity<Object> deleteRepository(
+            @PathVariable Long repoId,
+            @RequestHeader(value = "AccessToken", required = false) String accessToken
+    ) {
+        boolean isTokenValid = false;
+        if (accessToken != null && !accessToken.isEmpty()) {
+            isTokenValid = jwtService.isTokenTrue(accessToken);
+        }
 
-            } catch (HttpClientErrorException.NotFound e) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Repository not found", e);
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+        try {
+            gitRepositoryService.deleteRepository(repoId); // Delete the repository
+            return ResponseEntity.ok("Deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting repository");
         }
     }
-
 }

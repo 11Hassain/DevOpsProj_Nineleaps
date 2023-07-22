@@ -56,8 +56,6 @@ public class FigmaController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
         }
     }
-
-
     @GetMapping("/getAll")
     public ResponseEntity<Object> getAllFigmaProjects(@RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -65,6 +63,7 @@ public class FigmaController {
             List<Figma> figmaProjects = figmaService.getAllFigmaProjects();
 
             List<FigmaDTO> figmaDTOs = figmaProjects.stream()
+                    .filter(figma -> figma != null) // Filter out null values
                     .map(figma -> new FigmaDTO(
                             figma.getFigmaId(),
                             figmaService.mapProjectToProjectDTO(figma.getProject()),
@@ -76,6 +75,8 @@ public class FigmaController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
         }
     }
+
+
 
 
     @GetMapping("/get/{figmaId}")

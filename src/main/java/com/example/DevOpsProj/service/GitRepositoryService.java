@@ -11,12 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,11 +34,13 @@ public class GitRepositoryService {
 
     @Value("${github.accessToken}")
     private String accessToken;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     private static final String API_BASE_URL = "https://api.github.com";
     private static final String USER_REPOS_ENDPOINT = "/user/repos";
 
-    private static final String REPOS_ENDPOINT = "/repos/swe1304";
+    private static final String REPOS_ENDPOINT = "/repos/Bindushree-0906";
 
 
     private final RestTemplate restTemplate;
@@ -83,6 +87,8 @@ public class GitRepositoryService {
         return gitRepositoriesDTO;
     }
 
+
+
     @Transactional
     public void deleteRepository(Long repoId) {
         GitRepository repository = gitRepositoryRepository.findByRepoId(repoId)
@@ -112,6 +118,9 @@ public class GitRepositoryService {
             throw new RuntimeException("Repository with repoId " + repoId + " not found.", e);
         }
     }
+
+
+
 
     public List<GitRepositoryDTO> getAllRepositoriesByProject(Long id) {
         Project project = projectService.getProjectById(id).orElse(null);

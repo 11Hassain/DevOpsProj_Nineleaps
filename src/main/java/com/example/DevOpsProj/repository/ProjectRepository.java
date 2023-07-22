@@ -40,7 +40,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             "AND p.deleted=false")
     Integer countAllProjectsByRole(EnumRole role);
 
-    @Query("SELECT count(p) FROM Project p JOIN p.users u WHERE u.id = :userId")
+    @Query("SELECT count(p) FROM Project p JOIN p.users u WHERE u.id = :userId AND p.deleted=false")
     Integer countAllProjectsByUserId(Long userId);
 
     @Query("SELECT u FROM User u JOIN u.projects p " +

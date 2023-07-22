@@ -7,6 +7,7 @@ import lombok.*;
 @Setter
 @Getter
 @ToString
+@Data
 public class CollaboratorDTO {
     private String owner;
     private String repo;
