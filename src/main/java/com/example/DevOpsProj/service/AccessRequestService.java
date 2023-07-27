@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,7 +40,7 @@ public class AccessRequestService {
     public List<AccessRequestDTO> getAllRequests() {
         List<AccessRequest> accessRequestList = accessRequestRepository.findAllActiveRequests();
         if (accessRequestList.isEmpty()){
-            return null;
+            return Collections.emptyList();
         }
         List<AccessRequestDTO> accessRequestDTOList = new ArrayList<>();
 
@@ -79,6 +80,30 @@ public class AccessRequestService {
                 .collect(Collectors.toList());
         return accessResponseDTOList;
     }
+
+    public List<String> getPMRequests(String pmName){
+        List<AccessRequest> accessRequests = accessRequestRepository.findAllPMRequests(pmName);
+        if (accessRequests.isEmpty()){
+            return Collections.emptyList();
+        }
+//        List<AccessResponseDTO> accessResponseDTOList = new ArrayList<>();
+        List<String> listOfPMRequests = new ArrayList<>();
+        for (AccessRequest accessRequest : accessRequests) {
+//            AccessResponseDTO accessResponseDTO = new AccessResponseDTO();
+//            accessResponseDTO.setAccessRequestId(accessRequest.getAccessRequestId());
+//            accessResponseDTO.setPmName(accessRequest.getPmName());
+//            accessResponseDTO.setUser(mapUserToUserDTO(accessRequest.getUser()));
+//            accessResponseDTOList.add(accessResponseDTO);
+            if (!accessRequest.isAllowed()){
+                listOfPMRequests.add("Request for adding "+accessRequest.getUser().getName()+" has been granted");
+            }
+            else {
+                listOfPMRequests.add("Request for adding "+accessRequest.getUser().getName()+" has been denied");
+            }
+        }
+        return listOfPMRequests;
+    }
+
 
     private UserDTO mapUserToUserDTO(User user) {
         UserDTO userDTO = new UserDTO();

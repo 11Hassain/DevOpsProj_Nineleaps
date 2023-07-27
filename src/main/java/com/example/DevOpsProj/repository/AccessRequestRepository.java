@@ -3,6 +3,7 @@ package com.example.DevOpsProj.repository;
 import com.example.DevOpsProj.model.AccessRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,4 +13,8 @@ public interface AccessRequestRepository extends JpaRepository<AccessRequest, Lo
 
     @Query("SELECT a FROM AccessRequest a WHERE a.updated=false")
     List<AccessRequest> findAllActiveRequests();
+
+    @Query("SELECT a FROM AccessRequest a WHERE a.updated = false " +
+            "AND a.pmName = :pmName")
+    List<AccessRequest> findAllPMRequests(@Param("pmName") String pmName);
 }

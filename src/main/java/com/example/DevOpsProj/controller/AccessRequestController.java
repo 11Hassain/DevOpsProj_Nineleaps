@@ -38,6 +38,9 @@ public class AccessRequestController {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
             List<AccessRequestDTO>  accessRequestDTOList= accessRequestService.getAllRequests();
+            if (accessRequestDTOList.isEmpty()){
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No requests");
+            }
             return ResponseEntity.ok(accessRequestDTOList);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
@@ -56,6 +59,21 @@ public class AccessRequestController {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
             else return ResponseEntity.ok(accessResponseDTOList);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+        }
+    }
+
+    @GetMapping("/notiPM")
+    public ResponseEntity<Object> getPMRequests(@RequestParam("pmName") String pmName,
+                                                @RequestHeader("AccessToken") String accessToken){
+        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        if (isTokenValid) {
+            List<String> listPMRequests = accessRequestService.getPMRequests(pmName);
+            if (listPMRequests.isEmpty()){
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            else return ResponseEntity.ok(listPMRequests);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
         }

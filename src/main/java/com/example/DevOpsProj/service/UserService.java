@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.swing.text.html.Option;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -53,6 +54,7 @@ public class UserService implements IUserService {
         user.setName(userCreationDTO.getName());
         user.setEmail(userCreationDTO.getEmail());
         user.setEnumRole(userCreationDTO.getEnumRole());
+        user.setLastUpdated(LocalDateTime.now());
         return userRepository.save(user);
     }
 
@@ -64,10 +66,9 @@ public class UserService implements IUserService {
             existingUser.setName(userDTO.getName());
             existingUser.setEmail(userDTO.getEmail());
             existingUser.setEnumRole(userDTO.getEnumRole());
-//            User updatedUser = userService.updateUser(existingUser);
+            existingUser.setLastUpdated(LocalDateTime.now());
             User updatedUser = userRepository.save(existingUser);
-            UserDTO userDTOs = new UserDTO(updatedUser.getId(), updatedUser.getName(), updatedUser.getEmail(), updatedUser.getEnumRole());
-            return userDTOs;
+            return new UserDTO(updatedUser.getId(), updatedUser.getName(), updatedUser.getEmail(), updatedUser.getEnumRole(), updatedUser.getLastUpdated());
         } else {
             throw new EntityNotFoundException("User not found" + id);
         }
@@ -248,16 +249,32 @@ public class UserService implements IUserService {
         if(user == null){
             return null;
         }
+        user.setLastUpdated(LocalDateTime.now());
+        userRepository.save(user);
         userDTO.setId(user.getId());
         userDTO.setName(user.getName());
         userDTO.setEmail(user.getEmail());
         userDTO.setEnumRole(user.getEnumRole());
+        userDTO.setLastUpdated(user.getLastUpdated());
         //generate token
         String jwtToken = jwtService.generateToken(user);
         jwtUtils.saveUserToken(user,jwtToken);
         userDTO.setToken(jwtToken);
         return userDTO;
     }
+
+    public String userLogout(Long id){
+        Optional<User> optionalUser = userRepository.findById(id);
+        if(optionalUser.isPresent()){
+            User user = optionalUser.get();
+            user.setLastLogout(LocalDateTime.now());
+            userRepository.save(user);
+            return "User logged out successfully";
+        }else{
+            return "Log out unsuccessful";
+        }
+    }
+
 
     //-------------IUService-----------
 

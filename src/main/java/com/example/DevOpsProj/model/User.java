@@ -1,20 +1,16 @@
 package com.example.DevOpsProj.model;
 
 import com.example.DevOpsProj.commons.enumerations.EnumRole;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
-import org.jetbrains.annotations.NotNull;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @Builder
@@ -48,6 +44,12 @@ public class User implements UserDetails{
     @Column(name = "is_deleted")
     private Boolean deleted = false;
 
+    @Column(nullable = false)
+    private LocalDateTime lastUpdated;
+
+    @Column(nullable = false)
+    private LocalDateTime lastLogout;
+
     public Boolean getDeleted() { //getter for deleted
         return deleted;
     }
@@ -57,8 +59,8 @@ public class User implements UserDetails{
 
 
     //linking project entity with user
-@JsonIgnore
-@ManyToMany(mappedBy = "users")
+    @JsonIgnore
+    @ManyToMany(mappedBy = "users")
     private List<Project> projects;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

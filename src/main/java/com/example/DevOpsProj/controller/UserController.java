@@ -4,7 +4,6 @@ import com.example.DevOpsProj.commons.enumerations.EnumRole;
 import com.example.DevOpsProj.dto.requestDto.UserCreationDTO;
 import com.example.DevOpsProj.dto.responseDto.*;
 import com.example.DevOpsProj.model.Figma;
-import com.example.DevOpsProj.model.GitRepository;
 import com.example.DevOpsProj.model.Project;
 import com.example.DevOpsProj.model.User;
 import com.example.DevOpsProj.service.JwtService;
@@ -15,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -52,7 +50,7 @@ public class UserController {
             Optional<User> optionalUser = userService.getUserById(user_id);
             if(optionalUser.isPresent()){
                 User user = optionalUser.get();
-                UserDTO userDTO = new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole());
+                UserDTO userDTO = new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole(), user.getLastUpdated(), user.getLastLogout());
                 return new ResponseEntity<>(userDTO, HttpStatus.OK);
             }
             else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -109,7 +107,7 @@ public class UserController {
             EnumRole userRole = EnumRole.valueOf(role.toUpperCase()); //getting value of role(string)
             List<User> users = userService.getUsersByRole(userRole);
             List<UserDTO> userDTOList = users.stream()
-                    .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
+                    .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole(), user.getLastUpdated(), user.getLastLogout()))
                     .collect(Collectors.toList());
             return new ResponseEntity<>(userDTOList, HttpStatus.OK);
         } else {
@@ -245,7 +243,7 @@ public class UserController {
         }
     }
     @GetMapping("/withoutProject")
-    public ResponseEntity<?> getUserWithoutProject(
+    public ResponseEntity<Object> getUserWithoutProject(
             @RequestParam("role") String role,
             @RequestParam("projectId") Long projectId,
             @RequestHeader("AccessToken") String accessToken) {
@@ -254,6 +252,18 @@ public class UserController {
             EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
             List<UserDTO> userDTOList = userService.getAllUsersWithoutProjects(enumRole, projectId);
             return ResponseEntity.status(HttpStatus.OK).body(userDTOList);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+        }
+    }
+
+    @PostMapping("/{userId}/logout")
+    public ResponseEntity<String> userLogout(@PathVariable("userId") Long id,
+                                             @RequestHeader("AccessToken") String accessToken){
+        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        if (isTokenValid) {
+            String response = userService.userLogout(id);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
         }

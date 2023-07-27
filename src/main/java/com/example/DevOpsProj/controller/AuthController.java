@@ -24,10 +24,9 @@ public class AuthController {
     @Autowired
     private JwtService jwtService;
 
-    @GetMapping("/api/get-email")
+    @GetMapping("/api/get-email") //not this
     public ResponseEntity<Object> getEmailFromToken(@RequestHeader("emailToVerify") String emailToVerify) throws IOException {
         Object object = userService.loginVerification(emailToVerify);
-        System.out.println(object);
         if (object == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }else {
