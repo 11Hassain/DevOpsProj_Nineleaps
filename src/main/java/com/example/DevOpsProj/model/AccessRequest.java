@@ -36,4 +36,6 @@ public class AccessRequest {
 
     private boolean updated = false;
 
+    private boolean pmNotified = false;
+
 }

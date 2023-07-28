@@ -65,17 +65,32 @@ public class AccessRequestController {
     }
 
     @GetMapping("/notiPM")
-    public ResponseEntity<Object> getPMRequests(@RequestParam("pmName") String pmName,
+    public ResponseEntity<Object> getPMRequestsNotification(@RequestParam("pmName") String pmName,
                                                 @RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
-            List<String> listPMRequests = accessRequestService.getPMRequests(pmName);
-            if (listPMRequests.isEmpty()){
+//            List<String> listPMRequests = accessRequestService.getPMRequestsNotification(pmName);
+            List<AccessResponseDTO> accessResponseDTOList = accessRequestService.getPMRequests(pmName);
+            if (accessResponseDTOList.isEmpty()){
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
-            else return ResponseEntity.ok(listPMRequests);
+            else return ResponseEntity.ok(accessResponseDTOList);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+        }
+    }
+
+    @PutMapping("/notifiedPM")
+    public ResponseEntity<String> setPMRequestsNotificationToTrue(
+            @RequestParam("accessRequestId") Long accessRequestId,
+            @RequestHeader("AccessToken") String accessToken
+    ){
+        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        if (isTokenValid){
+            accessRequestService.setPMRequestsNotificationTrue(accessRequestId);
+            return ResponseEntity.ok("Notification read");
+        } else {
+            return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).body("Something went wrong");
         }
     }
 

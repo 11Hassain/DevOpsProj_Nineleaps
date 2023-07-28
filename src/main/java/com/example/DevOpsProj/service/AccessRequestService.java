@@ -81,27 +81,37 @@ public class AccessRequestService {
         return accessResponseDTOList;
     }
 
-    public List<String> getPMRequests(String pmName){
-        List<AccessRequest> accessRequests = accessRequestRepository.findAllPMRequests(pmName);
+
+    public List<AccessResponseDTO> getPMRequests(String pmName){
+        List<AccessRequest> accessRequests = accessRequestRepository.findAllPMRequestsByName(pmName);
         if (accessRequests.isEmpty()){
             return Collections.emptyList();
         }
-//        List<AccessResponseDTO> accessResponseDTOList = new ArrayList<>();
-        List<String> listOfPMRequests = new ArrayList<>();
+        List<AccessResponseDTO> accessResponseDTOList = new ArrayList<>();
+        String listOfPMRequests;
         for (AccessRequest accessRequest : accessRequests) {
-//            AccessResponseDTO accessResponseDTO = new AccessResponseDTO();
-//            accessResponseDTO.setAccessRequestId(accessRequest.getAccessRequestId());
-//            accessResponseDTO.setPmName(accessRequest.getPmName());
-//            accessResponseDTO.setUser(mapUserToUserDTO(accessRequest.getUser()));
-//            accessResponseDTOList.add(accessResponseDTO);
-            if (!accessRequest.isAllowed()){
-                listOfPMRequests.add("Request for adding "+accessRequest.getUser().getName()+" has been granted");
+            AccessResponseDTO accessResponseDTO = new AccessResponseDTO();
+            accessResponseDTO.setAccessRequestId(accessRequest.getAccessRequestId());
+            accessResponseDTO.setPmName(accessRequest.getPmName());
+            if (accessRequest.isAllowed()){
+                listOfPMRequests="Request for adding "+accessRequest.getUser().getName()+" has been granted";
             }
             else {
-                listOfPMRequests.add("Request for adding "+accessRequest.getUser().getName()+" has been denied");
+                listOfPMRequests="Request for adding "+accessRequest.getUser().getName()+" has been denied";
             }
+            accessResponseDTO.setResponse(listOfPMRequests);
+            accessResponseDTOList.add(accessResponseDTO);
         }
-        return listOfPMRequests;
+        return accessResponseDTOList;
+    }
+
+    public void setPMRequestsNotificationTrue(Long accessRequestId){
+        Optional<AccessRequest> optionalAccessRequest = accessRequestRepository.findById(accessRequestId);
+        if (optionalAccessRequest.isPresent()){
+            AccessRequest accessRequest = optionalAccessRequest.get();
+            accessRequest.setPmNotified(true);
+            accessRequestRepository.save(accessRequest);
+        }
     }
 
 

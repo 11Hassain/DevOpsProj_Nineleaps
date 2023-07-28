@@ -4,6 +4,8 @@ import com.example.DevOpsProj.model.Project;
 import com.example.DevOpsProj.model.User;
 import lombok.*;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -16,4 +18,14 @@ public class AccessResponseDTO {
     private ProjectDTO project;
     private String accessDescription;
     private boolean allowed;
+    private String response;
+
+    public AccessResponseDTO(Long accessRequestId, String pmName, UserDTO user, ProjectDTO project, String accessDescription, boolean allowed) {
+        this.accessRequestId = accessRequestId;
+        this.pmName = pmName;
+        this.user = user;
+        this.project = project;
+        this.accessDescription = accessDescription;
+        this.allowed = allowed;
+    }
 }
