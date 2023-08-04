@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @NoArgsConstructor
@@ -13,7 +14,6 @@ import java.util.List;
 @Getter
 @ToString
 public class ProjectDTO {
-
     private Long projectId;
     private String projectName;
     private String projectDescription;
@@ -24,8 +24,6 @@ public class ProjectDTO {
     private FigmaDTO figma;
     private GoogleDriveDTO googleDrive;
 
-
-
     public ProjectDTO(Long projectId, String projectName, String projectDescription, List<GitRepositoryDTO> repositories, FigmaDTO figma, GoogleDriveDTO googleDrive) {
         this.projectId = projectId;
         this.projectName = projectName;
@@ -34,20 +32,17 @@ public class ProjectDTO {
         this.figma = figma;
         this.googleDrive = googleDrive;
     }
-
     public ProjectDTO(Long projectId, String projectName, String projectDescription) {
         this.projectId = projectId;
         this.projectName = projectName;
         this.projectDescription = projectDescription;
     }
-
     public ProjectDTO(Long projectId, String projectName, String projectDescription, LocalDateTime lastUpdated) {
         this.projectId = projectId;
         this.projectName = projectName;
         this.projectDescription = projectDescription;
         this.lastUpdated = lastUpdated;
     }
-
     public ProjectDTO(Long projectId, String projectName, String projectDescription, LocalDateTime lastUpdated, List<User> users) {
         this.projectId = projectId;
         this.projectName = projectName;
@@ -55,7 +50,6 @@ public class ProjectDTO {
         this.lastUpdated = lastUpdated;
         this.users = users;
     }
-
     public ProjectDTO(Long projectId, String projectName, String projectDescription, LocalDateTime lastUpdated, boolean status) {
         this.projectId = projectId;
         this.projectName = projectName;

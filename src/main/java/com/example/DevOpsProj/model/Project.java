@@ -1,5 +1,6 @@
 package com.example.DevOpsProj.model;
 
+import com.example.DevOpsProj.dto.responseDto.UserDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;

@@ -27,6 +27,11 @@ public class UserDTO {
         this.enumRole = enumRole;
     }
 
+    public UserDTO(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public UserDTO(String name, EnumRole enumRole, LocalDateTime lastUpdated) {
         this.name = name;
         this.enumRole = enumRole;

@@ -19,6 +19,7 @@ import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -81,7 +82,7 @@ public class ProjectController {
 
     @PostMapping("/create")
     public ResponseEntity<Object> createProject(@RequestBody ProjectDTO projectDTO,
-                                                @RequestHeader("AccessToken") String accessToken){
+                                                @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
             ProjectDTO createdProjectDTO = projectService.createProject(projectDTO);
@@ -93,13 +94,13 @@ public class ProjectController {
 
     @GetMapping("/{id}") //get project by id
     public ResponseEntity<Object> getProjectById(@PathVariable("id") Long id,
-                                                 @RequestHeader("AccessToken") String accessToken){
+                                                 @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
-            try{
+            try {
                 Optional<Project> checkProject = projectService.getProjectById(id);
                 Project project = checkProject.get();
-                if(project.getDeleted()){
+                if (project.getDeleted()) {
                     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
                 }
                 ProjectDTO projectDTO = new ProjectDTO();
@@ -107,11 +108,11 @@ public class ProjectController {
                 projectDTO.setProjectName(project.getProjectName());
                 projectDTO.setProjectDescription(project.getProjectDescription());
                 return new ResponseEntity<>(projectDTO, HttpStatus.OK);
-            }catch (NotFoundException e){
+            } catch (NotFoundException e) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }catch (IllegalArgumentException e){
+            } catch (IllegalArgumentException e) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }catch (Exception e){
+            } catch (Exception e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else {
@@ -120,19 +121,19 @@ public class ProjectController {
     }
 
     @GetMapping("/all") //retrieve list of all projects
-    public ResponseEntity<Object> getAll(@RequestHeader("AccessToken") String accessToken){
+    public ResponseEntity<Object> getAll(@RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
-            try{
+            try {
                 List<Project> projects = projectService.getAll();
                 List<ProjectDTO> projectDTOs = projects.stream()
-                        .map(project -> new ProjectDTO(project.getProjectId(),project.getProjectName(),project.getProjectDescription(), project.getLastUpdated(), project.getDeleted()))
+                        .map(project -> new ProjectDTO(project.getProjectId(), project.getProjectName(), project.getProjectDescription(), project.getLastUpdated(), project.getDeleted()))
                         .collect(Collectors.toList());
                 return new ResponseEntity<>(projectDTOs, HttpStatus.OK);
 
-            }catch (NotFoundException e){
+            } catch (NotFoundException e) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }catch (Exception e){
+            } catch (Exception e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else {
@@ -140,26 +141,51 @@ public class ProjectController {
         }
     }
 
-    @GetMapping("/allProjects") //retrieve list of projects (only soft deleted)
-    public ResponseEntity<Object> getAllProjects(@RequestHeader("AccessToken") String accessToken){
+    @GetMapping("/allProjects")
+    public ResponseEntity<Object> getAllProjectsWithUsers(@RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
-            try{
+            try {
                 List<Project> projects = projectService.getAllProjects();
-                List<ProjectDTO> projectDTOs = projects.stream()
-                        .map(project -> new ProjectDTO(project.getProjectId(), project.getProjectName(), project.getProjectDescription()))
-                        .collect(Collectors.toList());
-                return new ResponseEntity<>(projectDTOs, HttpStatus.OK);
+                List<ProjectWithUsersDTO> projectsWithUsers = new ArrayList<>();
 
-            }catch (NotFoundException e){
+                for (Project project : projects) {
+                    List<User> userList = projectService.getAllUsersByProjectId(project.getProjectId());
+
+                    // Add null check for userList
+                    if (userList == null) {
+                        userList = new ArrayList<>(); // Or you can choose to skip this project.
+                    }
+
+                    List<UserDTO> userDTOList = userList.stream()
+                            .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
+                            .collect(Collectors.toList());
+
+                    ProjectWithUsersDTO projectWithUsers = new ProjectWithUsersDTO(
+                            project.getProjectId(),
+                            project.getProjectName(),
+                            project.getProjectDescription(),
+                            userDTOList
+                    );
+
+                    projectsWithUsers.add(projectWithUsers);
+                }
+
+                return new ResponseEntity<>(projectsWithUsers, HttpStatus.OK);
+
+            } catch (NotFoundException e) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }catch (Exception e){
+            } catch (Exception e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
         }
     }
+
+
+
+
 
 
     //get list of user in the project
@@ -289,7 +315,7 @@ public class ProjectController {
                     if(projectService.existUserInProject(project.getProjectId(), user.getId())){
                         return new ResponseEntity<>(HttpStatus.CONFLICT);
                     }
-                    project.getUsers().add(user);
+                    project.getUsers().add(new User());
                     projectRepository.save(project);
                     List<UserDTO> userDTOList = project.getUsers().stream()
                             .map(users -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
@@ -437,17 +463,6 @@ public class ProjectController {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
             List<ProjectDTO> projects = projectService.getProjectsWithoutFigmaURL();
-            return ResponseEntity.ok(projects);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
-        }
-    }
-    @GetMapping("/without-google-drive")
-    public ResponseEntity<Object> getProjectsWithoutGoogleDriveLink(
-            @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            List<ProjectDTO> projects = projectService.getProjectsWithoutGoogleDriveLink();
             return ResponseEntity.ok(projects);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
