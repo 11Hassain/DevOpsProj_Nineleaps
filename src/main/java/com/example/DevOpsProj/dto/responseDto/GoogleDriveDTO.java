@@ -12,4 +12,7 @@ public class GoogleDriveDTO {
     private String driveLink;
     private Long driveId;
 
+    public GoogleDriveDTO(String driveLink) {
+        this.driveLink = driveLink;
+    }
 }

@@ -19,6 +19,7 @@ public class AccessResponseDTO {
     private String accessDescription;
     private boolean allowed;
     private String response;
+    private boolean notified;
 
     public AccessResponseDTO(Long accessRequestId, String pmName, UserDTO user, ProjectDTO project, String accessDescription, boolean allowed) {
         this.accessRequestId = accessRequestId;

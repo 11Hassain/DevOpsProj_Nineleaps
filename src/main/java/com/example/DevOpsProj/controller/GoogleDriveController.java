@@ -59,6 +59,19 @@ public class GoogleDriveController {
         } else {
             return ResponseEntity.notFound().build();
         }
+
+    }
+    @GetMapping("/getGoogleDriveByProjectId/{projectId}")
+    public ResponseEntity<GoogleDriveDTO> getGoogleDriveByProjectId(@PathVariable Long projectId) {
+        Optional<GoogleDrive> optionalGoogleDrive = googleDriveService.getGoogleDriveByProjectId(projectId);
+        return optionalGoogleDrive.map(googleDrive -> {
+            GoogleDriveDTO googleDriveDTO = new GoogleDriveDTO(
+                    new ProjectDTO(googleDrive.getProject().getProjectId(), googleDrive.getProject().getProjectName()),
+                    googleDrive.getDriveLink(),
+                    googleDrive.getDriveId()
+            );
+            return ResponseEntity.ok(googleDriveDTO);
+        }).orElse(ResponseEntity.notFound().build());
     }
 
 

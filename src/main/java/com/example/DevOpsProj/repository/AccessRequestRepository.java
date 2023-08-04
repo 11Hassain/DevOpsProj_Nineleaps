@@ -16,10 +16,10 @@ public interface AccessRequestRepository extends JpaRepository<AccessRequest, Lo
 
     @Query("SELECT a FROM AccessRequest a WHERE a.pmName = :pmName AND " +
             "a.updated = true AND a.pmNotified = false")
+    List<AccessRequest> findAllUnreadPMRequestsByName(@Param("pmName") String pmName);
+
+    @Query("SELECT a FROM AccessRequest a WHERE a.pmName = :pmName")
     List<AccessRequest> findAllPMRequestsByName(@Param("pmName") String pmName);
 
-//    @Query("SELECT a FROM AccessRequest a WHERE a.pmName = :pmName AND " +
-//            "a.updated = true AND a.pmNotified = false")
-//    List<AccessRequest> findAllPMRequestsByName(@Param("pmName") String pmName);
 
 }

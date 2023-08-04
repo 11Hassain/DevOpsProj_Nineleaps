@@ -38,6 +38,26 @@ public class AccessRequestService {
     }
 
     public List<AccessRequestDTO> getAllRequests() {
+        List<AccessRequest> accessRequestList = accessRequestRepository.findAll();
+        if (accessRequestList.isEmpty()){
+            return Collections.emptyList();
+        }
+        List<AccessRequestDTO> accessRequestDTOList = new ArrayList<>();
+
+        for (AccessRequest accessRequest : accessRequestList) {
+            AccessRequestDTO accessRequestDTO = new AccessRequestDTO();
+            accessRequestDTO.setAccessRequestId(accessRequest.getAccessRequestId());
+            accessRequestDTO.setPmName(accessRequest.getPmName());
+            accessRequestDTO.setUser(mapUserToUserDTO(accessRequest.getUser()));
+            accessRequestDTO.setProject(mapProjectToProjectDTO(accessRequest.getProject()));
+            accessRequestDTO.setRequestDescription(accessRequest.getRequestDescription());
+            accessRequestDTO.setAllowed(accessRequest.isAllowed());
+            accessRequestDTOList.add(accessRequestDTO);
+        }
+        return accessRequestDTOList;
+    }
+
+    public List<AccessRequestDTO> getAllActiveRequests() {
         List<AccessRequest> accessRequestList = accessRequestRepository.findAllActiveRequests();
         if (accessRequestList.isEmpty()){
             return Collections.emptyList();
@@ -54,7 +74,6 @@ public class AccessRequestService {
             accessRequestDTO.setAllowed(accessRequest.isAllowed());
             accessRequestDTOList.add(accessRequestDTO);
         }
-
         return accessRequestDTOList;
     }
 
@@ -82,6 +101,30 @@ public class AccessRequestService {
     }
 
 
+    public List<AccessResponseDTO> getPMUnreadRequests(String pmName){
+        List<AccessRequest> accessRequests = accessRequestRepository.findAllUnreadPMRequestsByName(pmName);
+        if (accessRequests.isEmpty()){
+            return Collections.emptyList();
+        }
+        List<AccessResponseDTO> accessResponseDTOList = new ArrayList<>();
+        String listOfPMRequests;
+        for (AccessRequest accessRequest : accessRequests) {
+            AccessResponseDTO accessResponseDTO = new AccessResponseDTO();
+            accessResponseDTO.setAccessRequestId(accessRequest.getAccessRequestId());
+            accessResponseDTO.setPmName(accessRequest.getPmName());
+            if (accessRequest.isAllowed()){
+                listOfPMRequests="Request for adding "+accessRequest.getUser().getName()+" has been granted";
+            }
+            else {
+                listOfPMRequests="Request for adding "+accessRequest.getUser().getName()+" has been denied";
+            }
+            accessResponseDTO.setResponse(listOfPMRequests);
+            accessResponseDTO.setNotified(accessRequest.isPmNotified());
+            accessResponseDTOList.add(accessResponseDTO);
+        }
+        return accessResponseDTOList;
+    }
+
     public List<AccessResponseDTO> getPMRequests(String pmName){
         List<AccessRequest> accessRequests = accessRequestRepository.findAllPMRequestsByName(pmName);
         if (accessRequests.isEmpty()){
@@ -100,6 +143,7 @@ public class AccessRequestService {
                 listOfPMRequests="Request for adding "+accessRequest.getUser().getName()+" has been denied";
             }
             accessResponseDTO.setResponse(listOfPMRequests);
+            accessResponseDTO.setNotified(accessRequest.isPmNotified());
             accessResponseDTOList.add(accessResponseDTO);
         }
         return accessResponseDTOList;

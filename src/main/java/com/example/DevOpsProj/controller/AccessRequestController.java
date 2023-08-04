@@ -33,8 +33,22 @@ public class AccessRequestController {
         }
     }
 
-    @GetMapping("/all")
+    @GetMapping("/allActive")
     public ResponseEntity<Object> getAllActiveRequests(@RequestHeader("AccessToken") String accessToken){
+        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        if (isTokenValid) {
+            List<AccessRequestDTO>  accessRequestDTOList= accessRequestService.getAllActiveRequests();
+            if (accessRequestDTOList.isEmpty()){
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No requests");
+            }
+            return ResponseEntity.ok(accessRequestDTOList);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+        }
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<Object> getAllRequests(@RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
             List<AccessRequestDTO>  accessRequestDTOList= accessRequestService.getAllRequests();
@@ -64,12 +78,26 @@ public class AccessRequestController {
         }
     }
 
-    @GetMapping("/notiPM")
-    public ResponseEntity<Object> getPMRequestsNotification(@RequestParam("pmName") String pmName,
+    @GetMapping("/unread/PM")
+    public ResponseEntity<Object> getUnreadPMRequestsNotification(@RequestParam("pmName") String pmName,
                                                 @RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
-//            List<String> listPMRequests = accessRequestService.getPMRequestsNotification(pmName);
+            List<AccessResponseDTO> accessResponseDTOList = accessRequestService.getPMUnreadRequests(pmName);
+            if (accessResponseDTOList.isEmpty()){
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            else return ResponseEntity.ok(accessResponseDTOList);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+        }
+    }
+
+    @GetMapping("/all/PM")
+    public ResponseEntity<Object> getPMRequestsNotification(@RequestParam("pmName") String pmName,
+                                                            @RequestHeader("AccessToken") String accessToken){
+        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        if (isTokenValid) {
             List<AccessResponseDTO> accessResponseDTOList = accessRequestService.getPMRequests(pmName);
             if (accessResponseDTOList.isEmpty()){
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);

@@ -22,13 +22,17 @@ public class ProjectDTO {
     private List<GitRepositoryDTO> repositories;
     private boolean status;
     private FigmaDTO figma;
+    private GoogleDriveDTO googleDrive;
 
-    public ProjectDTO(Long projectId, String projectName, String projectDescription,  List<GitRepositoryDTO> repositories, FigmaDTO figma) {
+
+
+    public ProjectDTO(Long projectId, String projectName, String projectDescription, List<GitRepositoryDTO> repositories, FigmaDTO figma, GoogleDriveDTO googleDrive) {
         this.projectId = projectId;
         this.projectName = projectName;
         this.projectDescription = projectDescription;
         this.repositories = repositories;
         this.figma = figma;
+        this.googleDrive = googleDrive;
     }
 
     public ProjectDTO(Long projectId, String projectName, String projectDescription) {
