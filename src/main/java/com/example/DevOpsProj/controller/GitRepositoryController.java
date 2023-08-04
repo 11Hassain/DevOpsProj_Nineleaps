@@ -1,6 +1,7 @@
 package com.example.DevOpsProj.controller;
 import com.example.DevOpsProj.commons.enumerations.EnumRole;
 import com.example.DevOpsProj.dto.responseDto.GitRepositoryDTO;
+import com.example.DevOpsProj.exceptions.NotFoundException;
 import com.example.DevOpsProj.model.GitRepository;
 import com.example.DevOpsProj.service.GitRepositoryService;
 import com.example.DevOpsProj.service.JwtService;
@@ -97,6 +98,7 @@ public class GitRepositoryController {
         }
     }
 
+
     @DeleteMapping("/delete/{repoId}")
     public ResponseEntity<Object> deleteRepository(
             @PathVariable Long repoId,
@@ -107,11 +109,11 @@ public class GitRepositoryController {
             isTokenValid = jwtService.isTokenTrue(accessToken);
         }
 
-        try {
+//        try {
             gitRepositoryService.deleteRepository(repoId); // Delete the repository
             return ResponseEntity.ok("Deleted successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting repository");
-        }
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting repository");
+//        }
     }
 }

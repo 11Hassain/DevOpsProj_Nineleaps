@@ -27,10 +27,10 @@ public class UserDTO {
         this.enumRole = enumRole;
     }
 
-    public UserDTO(Long id, String name, String email) {
-        this.id = id;
+    public UserDTO(String name, EnumRole enumRole, LocalDateTime lastUpdated) {
         this.name = name;
-        this.email = email;
+        this.enumRole = enumRole;
+        this.lastUpdated = lastUpdated;
     }
 
     public UserDTO(Long id, String name, String email, EnumRole enumRole, String gitHubUsername) {

@@ -119,9 +119,6 @@ public class GitRepositoryService {
         }
     }
 
-
-
-
     public List<GitRepositoryDTO> getAllRepositoriesByProject(Long id) {
         Project project = projectService.getProjectById(id).orElse(null);
         if(project != null){

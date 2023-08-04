@@ -177,6 +177,18 @@ public class ProjectService {
         }
         return projectDTOs;
     }
+    public List<ProjectDTO> getProjectsWithoutGoogleDriveLink() {
+        List<Project> projects = projectRepository.findAll();
+        List<ProjectDTO> projectDTOs = new ArrayList<>();
+
+        for (Project project : projects) {
+            if (project.getGoogleDrive() == null || project.getGoogleDrive().getDriveLink() == null) {
+                ProjectDTO projectDTO = mapProjectToProjectDTO(project);
+                projectDTOs.add(projectDTO);
+            }
+        }
+        return projectDTOs;
+    }
 
     public ProjectDTO mapProjectToProjectDTO(Project project) {
         ProjectDTO projectDTO = new ProjectDTO();

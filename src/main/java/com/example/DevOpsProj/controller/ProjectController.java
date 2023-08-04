@@ -442,6 +442,17 @@ public class ProjectController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
         }
     }
+    @GetMapping("/without-google-drive")
+    public ResponseEntity<Object> getProjectsWithoutGoogleDriveLink(
+            @RequestHeader("AccessToken") String accessToken) {
+        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        if (isTokenValid) {
+            List<ProjectDTO> projects = projectService.getProjectsWithoutGoogleDriveLink();
+            return ResponseEntity.ok(projects);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+        }
+    }
 
     @GetMapping("/count")
     public ResponseEntity<Object> countAllProjects(@RequestHeader("AccessToken") String accessToken){

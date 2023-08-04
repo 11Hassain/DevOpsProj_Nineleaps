@@ -59,4 +59,8 @@ public class ProjectDTO {
         this.lastUpdated = lastUpdated;
         this.status = status;
     }
+    public ProjectDTO(Long projectId, String projectName) {
+        this.projectId = projectId;
+        this.projectName = projectName;
+    }
 }

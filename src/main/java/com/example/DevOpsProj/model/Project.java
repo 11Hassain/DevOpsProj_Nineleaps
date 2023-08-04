@@ -55,6 +55,9 @@ public class Project {
     @OneToOne(mappedBy = "project")
     private Figma figma;
 
+    @OneToOne(mappedBy = "project")
+    private GoogleDrive googleDrive;
+
     public Boolean getDeleted() {
         return deleted;
     }

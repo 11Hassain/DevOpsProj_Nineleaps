@@ -55,6 +55,7 @@ public class UserService implements IUserService {
         user.setEmail(userCreationDTO.getEmail());
         user.setEnumRole(userCreationDTO.getEnumRole());
         user.setLastUpdated(LocalDateTime.now());
+        user.setLastLogout(LocalDateTime.now());
         return userRepository.save(user);
     }
 
@@ -62,13 +63,13 @@ public class UserService implements IUserService {
         Optional<User> optionalUser = userRepository.findById(id);
         if (optionalUser.isPresent()) {
             User existingUser = optionalUser.get();
-            existingUser.setId(userDTO.getId());
+//            existingUser.setId(userDTO.getId());
             existingUser.setName(userDTO.getName());
-            existingUser.setEmail(userDTO.getEmail());
+//            existingUser.setEmail(userDTO.getEmail());
             existingUser.setEnumRole(userDTO.getEnumRole());
             existingUser.setLastUpdated(LocalDateTime.now());
             User updatedUser = userRepository.save(existingUser);
-            return new UserDTO(updatedUser.getId(), updatedUser.getName(), updatedUser.getEmail(), updatedUser.getEnumRole(), updatedUser.getLastUpdated());
+            return new UserDTO(updatedUser.getName(), updatedUser.getEnumRole(), updatedUser.getLastUpdated());
         } else {
             throw new EntityNotFoundException("User not found" + id);
         }
