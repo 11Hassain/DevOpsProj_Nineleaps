@@ -151,12 +151,9 @@ public class ProjectController {
 
                 for (Project project : projects) {
                     List<User> userList = projectService.getAllUsersByProjectId(project.getProjectId());
-
-                    // Add null check for userList
                     if (userList == null) {
-                        userList = new ArrayList<>(); // Or you can choose to skip this project.
+                        userList = new ArrayList<>();
                     }
-
                     List<UserDTO> userDTOList = userList.stream()
                             .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
                             .collect(Collectors.toList());
@@ -165,11 +162,13 @@ public class ProjectController {
                             project.getProjectId(),
                             project.getProjectName(),
                             project.getProjectDescription(),
+                            project.getLastUpdated(), // Assuming 'lastUpdated' is a field in Project class
                             userDTOList
                     );
 
                     projectsWithUsers.add(projectWithUsers);
                 }
+
 
                 return new ResponseEntity<>(projectsWithUsers, HttpStatus.OK);
 
