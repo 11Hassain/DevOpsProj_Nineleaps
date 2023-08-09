@@ -5,7 +5,10 @@ import com.example.DevOpsProj.dto.responseDto.GitRepositoryDTO;
 import com.example.DevOpsProj.model.GitRepository;
 import com.example.DevOpsProj.model.Project;
 //import com.example.DevOpsProj.model.RepositoryEntity;
+import com.example.DevOpsProj.model.User;
 import com.example.DevOpsProj.repository.GitRepositoryRepository;
+import com.example.DevOpsProj.repository.ProjectRepository;
+import com.example.DevOpsProj.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +32,11 @@ public class GitRepositoryService {
     private GitRepositoryRepository gitRepositoryRepository;
     @Autowired
     private ProjectService projectService;
+    @Autowired
+    private ProjectRepository projectRepository;
+    @Autowired
+    private UserRepository userRepository;
+
     @Autowired
     private ModelMapper modelMapper;
 
@@ -94,7 +102,7 @@ public class GitRepositoryService {
         GitRepository repository = gitRepositoryRepository.findByRepoId(repoId)
                 .orElseThrow(() -> new RuntimeException("Repository not found with repoId: " + repoId));
 
-        String repoName = repository.getName();
+        String repoName = repository.getName(); // Get the repository name from the entity
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
@@ -104,7 +112,7 @@ public class GitRepositoryService {
 
         try {
             ResponseEntity<Void> responseEntity = restTemplate.exchange(
-                    API_BASE_URL + REPOS_ENDPOINT + "/" + repoName,
+                    API_BASE_URL + REPOS_ENDPOINT + "/" + repository.getName(), // Use the correct repository name
                     HttpMethod.DELETE,
                     requestEntity,
                     Void.class);
@@ -116,8 +124,12 @@ public class GitRepositoryService {
             gitRepositoryRepository.delete(repository);
         } catch (HttpClientErrorException.NotFound e) {
             throw new RuntimeException("Repository with repoId " + repoId + " not found.", e);
+        } catch (Exception e) {
+            throw new RuntimeException("Error deleting repository with repoId " + repoId, e);
         }
     }
+
+
 
     public List<GitRepositoryDTO> getAllRepositoriesByProject(Long id) {
         Project project = projectService.getProjectById(id).orElse(null);

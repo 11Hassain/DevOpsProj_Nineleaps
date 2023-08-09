@@ -158,6 +158,9 @@ public class AccessRequestService {
         }
     }
 
+    public void clearAllNotifications(){
+        accessRequestRepository.deleteAll();
+    }
 
     private UserDTO mapUserToUserDTO(User user) {
         UserDTO userDTO = new UserDTO();

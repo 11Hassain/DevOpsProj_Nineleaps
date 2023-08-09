@@ -17,9 +17,9 @@ import java.text.ParseException;
 public class SmsService {
 
     private String phoneNumber;
-    private final String ACCOUNT_SID="AC8c6c3d8b0ce326e033b73f4cc28b0a4c";
-    private final String AUTH_TOKEN ="eebc8f3c3e551bbaa0279510107ec2e6";
-    private final String FROM_NUMBER="+12058596617";
+    private final String ACCOUNT_SID="AC699c8c2d7ec00f10c39c35569a54ee8d";
+    private final String AUTH_TOKEN ="ec332bf4cd438e7dff0a7c1108319d47";
+    private final String FROM_NUMBER="+12315974243";
 
     public void send(SmsPojo sms) throws ParseException{
         Twilio.init(ACCOUNT_SID,AUTH_TOKEN);

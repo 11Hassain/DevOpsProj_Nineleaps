@@ -12,6 +12,7 @@ import com.example.DevOpsProj.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.parameters.P;
@@ -314,7 +315,7 @@ public class ProjectController {
                     if(projectService.existUserInProject(project.getProjectId(), user.getId())){
                         return new ResponseEntity<>(HttpStatus.CONFLICT);
                     }
-                    project.getUsers().add(new User());
+                    project.getUsers().add(user);
                     projectRepository.save(project);
                     List<UserDTO> userDTOList = project.getUsers().stream()
                             .map(users -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))

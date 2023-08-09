@@ -38,6 +38,4 @@ public class GitRepository {
     public Long getRepoId() {
         return repoId;
     }
-
-
 }

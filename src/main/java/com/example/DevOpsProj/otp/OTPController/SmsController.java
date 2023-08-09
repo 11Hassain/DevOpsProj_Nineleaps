@@ -8,7 +8,6 @@ import com.example.DevOpsProj.otp.OTPDTO.StoreOTP;
 import com.example.DevOpsProj.otp.OTPDTO.TempOTP;
 import com.example.DevOpsProj.otp.OTPService.IUserService;
 import com.example.DevOpsProj.otp.OTPService.SmsService;
-import io.swagger.annotations.ApiOperation;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -35,8 +34,6 @@ public class SmsController {
     @Autowired
     IUserService userservice;
 
-//    @Autowired
-//    private RefreshTokenService refreshTokenService;
 
     @Autowired
     private SimpMessagingTemplate webSocket;

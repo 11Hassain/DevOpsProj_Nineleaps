@@ -122,4 +122,15 @@ public class AccessRequestController {
         }
     }
 
+    @DeleteMapping("/clearAll")
+    public ResponseEntity<String> deleteAllNotifications(@RequestHeader("AccessToken") String accessToken){
+        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        if(isTokenValid){
+            accessRequestService.clearAllNotifications();
+            return ResponseEntity.ok("All notifications cleared");
+        }else {
+            return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).body("Something went wrong");
+        }
+    }
+
 }
