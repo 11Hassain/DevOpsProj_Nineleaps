@@ -23,6 +23,7 @@ import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -91,6 +92,20 @@ public class HelpDocumentsController {
                 .headers(headers)
                 .body(pdfFile.getData());
     }
-
-
+    @DeleteMapping("/files/{fileId}")
+    public ResponseEntity<String> deleteFile(@PathVariable("fileId") Long fileId,
+                                             @RequestHeader("AccessToken") String accessToken){
+        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        if(isTokenValid){
+            Optional<HelpDocumentsDTO> helpDocumentsDTO = helpDocumentsService.getDocumentById(fileId);
+            if(helpDocumentsDTO.isPresent()){
+                helpDocumentsService.deleteDocument(fileId);
+                return ResponseEntity.ok("Document deleted successfully");
+            }else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Document not found");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+        }
+    }
 }

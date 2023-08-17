@@ -9,5 +9,5 @@ import lombok.*;
 @ToString
 public class FigmaScreenshotDTO {
     private String user;
-    private String screenshotImage;
+    private String screenshotImageURL;
 }

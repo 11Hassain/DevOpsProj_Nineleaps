@@ -1,5 +1,6 @@
 package com.example.DevOpsProj.service;
 
+import com.example.DevOpsProj.dto.responseDto.HelpDocumentsDTO;
 import com.example.DevOpsProj.model.HelpDocuments;
 import com.example.DevOpsProj.model.Project;
 import com.example.DevOpsProj.repository.HelpDocumentsRepository;
@@ -11,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.sql.DataTruncation;
+import java.util.Optional;
 
 @Service
 public class HelpDocumentsService {
@@ -49,5 +51,21 @@ public class HelpDocumentsService {
             }
         }
         return null;
+    }
+    public Optional<HelpDocumentsDTO> getDocumentById(Long fileId){
+        Optional<HelpDocuments> helpDocuments = helpDocumentsRepository.findById(fileId);
+        if (helpDocuments.isPresent()){
+            HelpDocuments documents = helpDocuments.get();
+            HelpDocumentsDTO helpDocumentsDTO = new HelpDocumentsDTO();
+            helpDocumentsDTO.setHelpDocumentId(documents.getHelpDocumentId());
+            helpDocumentsDTO.setFileName(documents.getFileName());
+            return Optional.of(helpDocumentsDTO);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public void deleteDocument(Long fileId) {
+        helpDocumentsRepository.deleteById(fileId);
     }
 }
