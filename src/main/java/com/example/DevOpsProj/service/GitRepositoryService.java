@@ -49,6 +49,8 @@ public class GitRepositoryService {
     private static final String USER_REPOS_ENDPOINT = "/user/repos";
 
     private static final String REPOS_ENDPOINT = "/repos/Bindushree-0906";
+    private static final String OWNER = "Bindushree-0906";
+
 
 
     private final RestTemplate restTemplate;
@@ -131,7 +133,7 @@ public class GitRepositoryService {
 
 
 
-    public List<GitRepositoryDTO> getAllRepositoriesByProject(Long id) {
+        public List<GitRepositoryDTO> getAllRepositoriesByProject(Long id) {
         Project project = projectService.getProjectById(id).orElse(null);
         if(project != null){
             List<GitRepository> repositories = gitRepositoryRepository.findRepositoriesByProject(project);

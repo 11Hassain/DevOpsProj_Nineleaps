@@ -4,7 +4,6 @@ import com.example.DevOpsProj.commons.enumerations.EnumRole;
 import com.example.DevOpsProj.dto.responseDto.*;
 import com.example.DevOpsProj.exceptions.NotFoundException;
 import com.example.DevOpsProj.model.*;
-import com.example.DevOpsProj.repository.FigmaRepository;
 import com.example.DevOpsProj.repository.GitRepositoryRepository;
 import com.example.DevOpsProj.repository.ProjectRepository;
 import com.example.DevOpsProj.repository.UserRepository;
@@ -12,11 +11,8 @@ import com.example.DevOpsProj.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
-import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -50,19 +46,6 @@ public class ProjectController {
 
     @Value("${github.accessToken}")
     private String accessToken;
-
-//    @PostMapping("/") //Save the project
-//    public ResponseEntity<Object> saveProject(@RequestBody ProjectDTO projectDTO){
-////        try{
-//            Project savedProject = projectService.saveProject(projectDTO);
-//            return ResponseEntity.ok("Project created successfully");
-////
-////        }catch (DataIntegrityViolationException e){
-////            return ResponseEntity.status(HttpStatus.CONFLICT).body("Project already exists");
-////        }catch (Exception e){
-////            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unable to create project");
-////        }
-//    }
 
     @PostMapping("/") //Save the project
     public ResponseEntity<String> saveProject(@RequestBody ProjectDTO projectDTO,
