@@ -17,8 +17,16 @@ public class ProjectDTO {
     private Long projectId;
     private String projectName;
     private String projectDescription;
-    private LocalDateTime lastUpdated;
     private List<User> users;
+    private LocalDateTime lastUpdated;
+
+    public ProjectDTO(Long projectId, String projectName, String projectDescription, List<User> users) {
+        this.projectId = projectId;
+        this.projectName = projectName;
+        this.projectDescription = projectDescription;
+        this.users = users;
+    }
+
     private List<GitRepositoryDTO> repositories;
     private boolean status;
     private FigmaDTO figma;

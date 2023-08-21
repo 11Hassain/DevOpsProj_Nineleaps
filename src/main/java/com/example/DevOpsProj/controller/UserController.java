@@ -30,16 +30,10 @@ public class UserController {
     private ModelMapper modelMapper;
 
 
-    @PostMapping("/") //Save the user
-    public ResponseEntity<Object> saveUser(@RequestBody UserCreationDTO userCreationDTO,
-                                         @RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            User savedUser = userService.saveUser(userCreationDTO);
-            return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
-        }
+    @PostMapping("/") // Save the user
+    public ResponseEntity<Object> saveUserWithoutToken(@RequestBody UserCreationDTO userCreationDTO) {
+        User savedUser = userService.saveUser(userCreationDTO);
+        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
     @GetMapping("/{user_id}") //find user by user id

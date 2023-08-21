@@ -17,11 +17,12 @@ import java.util.stream.Collectors;
 public class FigmaService {
     @Autowired
     private FigmaRepository figmaRepository;
-//    @Autowired
+    //    @Autowired
 //    public FigmaService(ProjectRepository projectRepository) {
 //        this.projectRepository = projectRepository;
 //    }
-    @Autowired ProjectRepository projectRepository;
+    @Autowired
+    ProjectRepository projectRepository;
 
 
     public Figma createFigma(FigmaDTO figmaDTO) {
@@ -51,6 +52,7 @@ public class FigmaService {
         projectDTO.setProjectName(project.getProjectName());
         return projectDTO;
     }
+
     public FigmaDTO mapFigmaToFigmatDTO(Figma figma) {
         FigmaDTO figmaDTO = new FigmaDTO();
         figmaDTO.setFigmaId(figma.getFigmaId());
@@ -64,8 +66,9 @@ public class FigmaService {
         project.setProjectName(projectDTO.getProjectName());
         return project;
     }
+
     public Figma mapFigmaDTOToFigma(FigmaDTO figmaDTO) {
-        Figma figma= new Figma();
+        Figma figma = new Figma();
         figma.setFigmaId(figmaDTO.getFigmaId());
         figma.setFigmaURL(figmaDTO.getFigmaURL());
         return figma;
@@ -74,5 +77,4 @@ public class FigmaService {
     public void deleteFigma(Long figmaId) {
         figmaRepository.deleteById(figmaId);
     }
-
 }

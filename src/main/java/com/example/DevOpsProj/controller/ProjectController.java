@@ -140,26 +140,38 @@ public class ProjectController {
         }
     }
 
-    @GetMapping("/allProjects") //retrieve list of projects (only soft deleted)
-    public ResponseEntity<Object> getAllProjects(@RequestHeader("AccessToken") String accessToken){
+    @GetMapping("/allProjects")
+    public ResponseEntity<Object> getAllProjects(@RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
-            try{
+            try {
                 List<Project> projects = projectService.getAllProjects();
                 List<ProjectDTO> projectDTOs = projects.stream()
-                        .map(project -> new ProjectDTO(project.getProjectId(), project.getProjectName(), project.getProjectDescription()))
+                        .map(project -> {
+                            List<User> projectUsers = project.getUsers();
+
+                            // Create a new ProjectDTO with all associated user details
+                            return new ProjectDTO(
+                                    project.getProjectId(),
+                                    project.getProjectName(),
+                                    project.getProjectDescription(),
+                                    projectUsers
+                            );
+                        })
                         .collect(Collectors.toList());
                 return new ResponseEntity<>(projectDTOs, HttpStatus.OK);
 
-            }catch (NotFoundException e){
+            } catch (NotFoundException e) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }catch (Exception e){
+            } catch (Exception e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
         }
     }
+
+
 
 
     //get list of user in the project

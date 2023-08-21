@@ -57,4 +57,9 @@ public class UserDTO {
         this.lastUpdated = lastUpdated;
         this.lastLogout = lastLogout;
     }
+
+    public UserDTO(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
 }

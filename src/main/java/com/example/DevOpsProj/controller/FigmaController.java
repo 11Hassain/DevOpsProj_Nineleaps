@@ -1,6 +1,7 @@
 package com.example.DevOpsProj.controller;
 
 import com.example.DevOpsProj.dto.responseDto.FigmaDTO;
+import com.example.DevOpsProj.dto.responseDto.FigmaScreenshotDTO;
 import com.example.DevOpsProj.model.Figma;
 import com.example.DevOpsProj.repository.FigmaRepository;
 import com.example.DevOpsProj.repository.UserRepository;
@@ -15,10 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -96,30 +94,42 @@ public class FigmaController {
         }
     }
 
-    @PutMapping("/{figmaId}/user")//add user and screenshot to figma
-    public ResponseEntity<String> addUserToFigma(@PathVariable("figmaId") Long figmaId,
-                                                 @RequestBody FigmaDTO figmaDTO,
-                                                 @RequestHeader("AccessToken") String accessToken){
+    @PostMapping("/{figmaId}/user")
+    public ResponseEntity<String> addUserAndScreenshotsToFigma(@PathVariable("figmaId") Long figmaId,
+                                                               @RequestBody FigmaDTO figmaDTO,
+                                                               @RequestHeader("AccessToken") String accessToken) {
+
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
-            try{
+            try {
                 Optional<Figma> optionalFigma = figmaRepository.findById(figmaId);
-                if(optionalFigma.isPresent()){
+                if (optionalFigma.isPresent()) {
                     Figma figma = optionalFigma.get();
-                    figma.setUser(figmaDTO.getUser());
-                    figma.setScreenshotImage(figmaDTO.getScreenshotImage());
+                    String user = figmaDTO.getUser();
+
+                    // Get or create the map of screenshot images by user
+                    Map<String, String> screenshotImagesByUser = figma.getScreenshotImagesByUser();
+                    if (screenshotImagesByUser == null) {
+                        screenshotImagesByUser = new HashMap<>();
+                    }
+
+                    // Add the screenshot image for the specified user
+                    screenshotImagesByUser.put(user, figmaDTO.getScreenshotImage());
+                    figma.setScreenshotImagesByUser(screenshotImagesByUser);
+
                     figmaRepository.save(figma);
-                    return ResponseEntity.ok("User added");
-                }else {
+                    return ResponseEntity.ok("User and screenshot added");
+                } else {
                     return ResponseEntity.notFound().build();
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
         }
     }
+
 
     @DeleteMapping("/{figmaId}")
     public ResponseEntity<String> deleteFigma(@PathVariable Long figmaId) {
@@ -142,6 +152,36 @@ public class FigmaController {
             }
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+        }
+    }
+
+
+    @GetMapping("/{figmaId}/screenshots")
+    public ResponseEntity<List<FigmaScreenshotDTO>> getScreenshotsForFigmaId(@PathVariable("figmaId") Long figmaId) {
+        try {
+            Optional<Figma> optionalFigma = figmaRepository.findById(figmaId);
+            if (optionalFigma.isPresent()) {
+                Figma figma = optionalFigma.get();
+
+                List<FigmaScreenshotDTO> screenshotDTOList = new ArrayList<>();
+                Map<String, String> screenshotImagesByUser = figma.getScreenshotImagesByUser();
+
+                if (screenshotImagesByUser != null && !screenshotImagesByUser.isEmpty()) {
+                    for (Map.Entry<String, String> entry : screenshotImagesByUser.entrySet()) {
+                        FigmaScreenshotDTO screenshotDTO = new FigmaScreenshotDTO();
+                        screenshotDTO.setUser(entry.getKey());
+                        screenshotDTO.setScreenshotImageURL(entry.getValue()); // Set the URL here
+                        screenshotDTOList.add(screenshotDTO);
+                    }
+                    return ResponseEntity.ok(screenshotDTOList);
+                } else {
+                    return ResponseEntity.notFound().build();
+                }
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
