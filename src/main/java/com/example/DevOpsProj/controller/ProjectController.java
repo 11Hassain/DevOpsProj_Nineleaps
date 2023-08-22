@@ -51,18 +51,6 @@ public class ProjectController {
     @Value("${github.accessToken}")
     private String accessToken;
 
-//    @PostMapping("/") //Save the project
-//    public ResponseEntity<Object> saveProject(@RequestBody ProjectDTO projectDTO){
-////        try{
-//            Project savedProject = projectService.saveProject(projectDTO);
-//            return ResponseEntity.ok("Project created successfully");
-////
-////        }catch (DataIntegrityViolationException e){
-////            return ResponseEntity.status(HttpStatus.CONFLICT).body("Project already exists");
-////        }catch (Exception e){
-////            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unable to create project");
-////        }
-//    }
 
     @PostMapping("/") //Save the project
     public ResponseEntity<String> saveProject(@RequestBody ProjectDTO projectDTO,
@@ -463,6 +451,18 @@ public class ProjectController {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
             List<ProjectDTO> projects = projectService.getProjectsWithoutFigmaURL();
+            return ResponseEntity.ok(projects);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+        }
+    }
+
+    @GetMapping("/without-google-drive")
+    public ResponseEntity<Object> getProjectsWithoutGoogleDriveLink(
+            @RequestHeader("AccessToken") String accessToken) {
+        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        if (isTokenValid) {
+            List<ProjectDTO> projects = projectService.getProjectsWithoutGoogleDriveLink();
             return ResponseEntity.ok(projects);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");

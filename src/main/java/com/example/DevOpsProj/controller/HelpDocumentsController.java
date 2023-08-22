@@ -23,6 +23,7 @@ import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -64,19 +65,20 @@ public class HelpDocumentsController {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
             List<HelpDocuments> pdfFiles = helpDocumentsRepository.findAll();
-            List<String> fileNames = pdfFiles.stream()
+            List<HelpDocumentsDTO> fileInfos = pdfFiles.stream()
                     .filter(pdfFile -> pdfFile != null && pdfFile.getProject() != null && pdfFile.getProject().getProjectId() == projectId)
-                    .map(HelpDocuments::getFileName)
-                    .filter(Objects::nonNull) // Filter out any remaining null values
+                    .map(pdfFile -> new HelpDocumentsDTO(pdfFile.getHelpDocumentId(), pdfFile.getFileName()))
+                    .filter(helpDoc -> helpDoc.getFileName() != null) // Filter out any remaining null file names
                     .collect(Collectors.toList());
-            if (fileNames.isEmpty()) {
+            if (fileInfos.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
-            return ResponseEntity.ok().body(fileNames);
+            return ResponseEntity.ok().body(fileInfos);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
         }
     }
+
 
     @GetMapping("/files/{fileName}")
     public ResponseEntity<?> downloadPdfFile(@PathVariable("fileName") String fileName) {
@@ -92,5 +94,21 @@ public class HelpDocumentsController {
                 .body(pdfFile.getData());
     }
 
+    @DeleteMapping("/files/{fileId}")
+    public ResponseEntity<String> deleteFile(@PathVariable("fileId") Long fileId,
+                                             @RequestHeader("AccessToken") String accessToken){
+        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        if(isTokenValid){
+            Optional<HelpDocumentsDTO> helpDocumentsDTO = helpDocumentsService.getDocumentById(fileId);
+            if(helpDocumentsDTO.isPresent()){
+                helpDocumentsService.deleteDocument(fileId);
+                return ResponseEntity.ok("Document deleted successfully");
+            }else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Document not found");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+        }
+    }
 
 }

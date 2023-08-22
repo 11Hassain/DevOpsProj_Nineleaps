@@ -59,6 +59,9 @@ public class Project {
     @OneToOne(mappedBy = "project")
     private GoogleDrive googleDrive;
 
+    @OneToOne(mappedBy = "project")
+    private Jira jira;
+
     public Boolean getDeleted() {
         return deleted;
     }

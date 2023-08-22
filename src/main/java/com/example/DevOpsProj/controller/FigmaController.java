@@ -9,27 +9,14 @@ import com.example.DevOpsProj.service.FigmaService;
 import com.example.DevOpsProj.service.JwtService;
 import com.example.DevOpsProj.service.ProjectService;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.apache.commons.io.IOUtils;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+
 
 @RestController
 @RequestMapping("/api/figmas")
@@ -180,7 +167,7 @@ public class FigmaController {
                     for (Map.Entry<String, String> entry : screenshotImagesByUser.entrySet()) {
                         FigmaScreenshotDTO screenshotDTO = new FigmaScreenshotDTO();
                         screenshotDTO.setUser(entry.getKey());
-                        screenshotDTO.setScreenshotImage(entry.getValue());
+                        screenshotDTO.setScreenshotImageURL(entry.getValue());
                         screenshotDTOList.add(screenshotDTO);
                     }
                     return ResponseEntity.ok(screenshotDTOList);
@@ -195,10 +182,3 @@ public class FigmaController {
         }
     }
 }
-
-
-
-
-
-
-

@@ -177,6 +177,7 @@ public class ProjectService {
         }
         return projectDTOs;
     }
+
     public List<ProjectDTO> getProjectsWithoutGoogleDriveLink() {
         List<Project> projects = projectRepository.findAllProjects();
         List<ProjectDTO> projectDTOs = new ArrayList<>();

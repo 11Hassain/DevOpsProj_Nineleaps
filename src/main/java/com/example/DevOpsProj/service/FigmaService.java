@@ -17,10 +17,7 @@ import java.util.stream.Collectors;
 public class FigmaService {
     @Autowired
     private FigmaRepository figmaRepository;
-//    @Autowired
-//    public FigmaService(ProjectRepository projectRepository) {
-//        this.projectRepository = projectRepository;
-//    }
+
     @Autowired ProjectRepository projectRepository;
 
 

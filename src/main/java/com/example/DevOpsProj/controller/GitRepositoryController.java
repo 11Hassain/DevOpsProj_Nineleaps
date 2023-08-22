@@ -109,11 +109,11 @@ public class GitRepositoryController {
             isTokenValid = jwtService.isTokenTrue(accessToken);
         }
 
-//        try {
+        try {
             gitRepositoryService.deleteRepository(repoId); // Delete the repository
             return ResponseEntity.ok("Deleted successfully");
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting repository");
-//        }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error");
+        }
     }
 }

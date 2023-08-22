@@ -20,17 +20,13 @@ public class FigmaDTO {
     public FigmaDTO(String figmaURL) {
         this.figmaURL = figmaURL;
     }
-//    public String getProjectName() {
-//        return projectName;
-//    }
+
 
     public String getFigmaURL() {
         return figmaURL;
     }
 
-//    public void setProjectName(String projectName) {
-//        this.projectName = projectName;
-//    }
+
 
     public void setFigmaURL(String figmaURL) {
         this.figmaURL = figmaURL;

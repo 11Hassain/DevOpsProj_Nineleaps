@@ -16,9 +16,10 @@ import java.text.ParseException;
 @Setter
 public class SmsService {
 
+    @Getter
     private String phoneNumber;
     private final String ACCOUNT_SID="AC699c8c2d7ec00f10c39c35569a54ee8d";
-    private final String AUTH_TOKEN ="ec332bf4cd438e7dff0a7c1108319d47";
+    private final String AUTH_TOKEN =System.getenv("TWILIO_AUTH_TOKEN");
     private final String FROM_NUMBER="+12315974243";
 
     public void send(SmsPojo sms) throws ParseException{
@@ -32,10 +33,6 @@ public class SmsService {
                 .create();
         StoreOTP.setOtp(number);
         phoneNumber = sms.getPhoneNumber();
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
     }
 
     public void setPhoneNumber(String phoneNumber) {
