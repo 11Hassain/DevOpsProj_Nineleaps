@@ -7,6 +7,7 @@ import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import java.text.ParseException;
@@ -19,7 +20,7 @@ public class SmsService {
     @Getter
     private String phoneNumber;
     private final String ACCOUNT_SID="AC699c8c2d7ec00f10c39c35569a54ee8d";
-    private final String AUTH_TOKEN =System.getenv("TWILIO_AUTH_TOKEN");
+    private final String AUTH_TOKEN = System.getenv("TWILIO_AUTH");
     private final String FROM_NUMBER="+12315974243";
 
     public void send(SmsPojo sms) throws ParseException{

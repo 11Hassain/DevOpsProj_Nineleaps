@@ -63,9 +63,7 @@ public class UserService implements IUserService {
         Optional<User> optionalUser = userRepository.findById(id);
         if (optionalUser.isPresent()) {
             User existingUser = optionalUser.get();
-//            existingUser.setId(userDTO.getId());
             existingUser.setName(userDTO.getName());
-//            existingUser.setEmail(userDTO.getEmail());
             existingUser.setEnumRole(userDTO.getEnumRole());
             existingUser.setLastUpdated(LocalDateTime.now());
             User updatedUser = userRepository.save(existingUser);

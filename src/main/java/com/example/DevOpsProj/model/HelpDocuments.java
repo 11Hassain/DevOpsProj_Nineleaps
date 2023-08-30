@@ -35,12 +35,4 @@ public class HelpDocuments {
     @JoinColumn(name = "project_id")
     private Project project;
 
-//    public static final DocumentCategory PROJECT_FILE = createDefaultCategory(1L, "projectFile");
-//
-//    private static DocumentCategory createDefaultCategory(Long id, String category) {
-//        DocumentCategory documentCategory = new DocumentCategory();
-//        documentCategory.setId(id);
-//        documentCategory.setCategory(category);
-//        return documentCategory;
-//    }
 }

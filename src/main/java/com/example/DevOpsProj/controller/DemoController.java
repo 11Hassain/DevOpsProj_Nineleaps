@@ -31,5 +31,12 @@ public class DemoController {
         }
     }
 
+    @GetMapping("/test")
+    public ResponseEntity<String> test(){
+        String twilioAuthToken = System.getenv("TWILIO_AUTH");
+        System.out.println("Twilio Auth Token: " + twilioAuthToken);
+        return ResponseEntity.ok(twilioAuthToken);
+    }
+
 
 }

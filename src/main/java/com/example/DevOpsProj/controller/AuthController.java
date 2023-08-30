@@ -1,7 +1,6 @@
 package com.example.DevOpsProj.controller;
 
 
-import com.example.DevOpsProj.dto.responseDto.UserDTO;
 import com.example.DevOpsProj.repository.UserRepository;
 import com.example.DevOpsProj.service.JwtService;
 import com.example.DevOpsProj.service.UserService;

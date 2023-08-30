@@ -19,6 +19,7 @@ public class GoogleDrive {
 
     @Column(name = "drive_link", nullable = false)
     private String driveLink;
+
     @OneToOne
     @JoinColumn(name = "project_id")
     private Project project;

@@ -45,8 +45,8 @@ public class Project {
     private LocalDateTime lastUpdated=LocalDateTime.now();
 
     //connecting project with user entity (project is owning side)
-@JsonIgnore
-@ManyToMany
+    @JsonIgnore
+    @ManyToMany
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     @JoinTable(name = "project_user",
             joinColumns = @JoinColumn(name = "project_id"),
@@ -59,8 +59,6 @@ public class Project {
     @OneToOne(mappedBy = "project")
     private GoogleDrive googleDrive;
 
-    @OneToOne(mappedBy = "project")
-    private Jira jira;
 
     public Boolean getDeleted() {
         return deleted;
