@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface FigmaRepository extends JpaRepository<Figma, Long> {
     @Query("SELECT f FROM Figma f WHERE f.project.id = :projectId")
     Optional<Figma> findFigmaByProjectId(@Param("projectId") Long projectId);
+
 }

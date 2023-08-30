@@ -4,7 +4,6 @@ import com.example.DevOpsProj.commons.enumerations.EnumRole;
 import com.example.DevOpsProj.dto.responseDto.*;
 import com.example.DevOpsProj.exceptions.NotFoundException;
 import com.example.DevOpsProj.model.*;
-import com.example.DevOpsProj.repository.FigmaRepository;
 import com.example.DevOpsProj.repository.GitRepositoryRepository;
 import com.example.DevOpsProj.repository.ProjectRepository;
 import com.example.DevOpsProj.repository.UserRepository;
@@ -12,12 +11,13 @@ import com.example.DevOpsProj.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+<<<<<<< HEAD
 import org.springframework.data.repository.support.Repositories;
 import org.springframework.http.HttpEntity;
+=======
+>>>>>>> c66d5cae5148ffa4a0b83af05c7baf47f0d56665
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
-import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -50,7 +50,10 @@ public class ProjectController {
     @Value("${github.accessToken}")
     private String accessToken;
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> c66d5cae5148ffa4a0b83af05c7baf47f0d56665
     @PostMapping("/") //Save the project
     public ResponseEntity<String> saveProject(@RequestBody ProjectDTO projectDTO,
                                               @RequestHeader("AccessToken") String accessToken) {

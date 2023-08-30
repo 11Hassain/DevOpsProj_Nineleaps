@@ -25,7 +25,7 @@ public class GitRepository {
     @Column(name = "repo_description")
     private String description;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "project_id", referencedColumnName = "projectId")
     private Project project;
 

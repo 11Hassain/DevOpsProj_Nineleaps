@@ -110,8 +110,13 @@ public class GitRepositoryController {
         }
 
         try {
+<<<<<<< HEAD
             gitRepositoryService.deleteRepository(repoId); // Delete the repository
             return ResponseEntity.ok("Deleted successfully");
+=======
+        gitRepositoryService.deleteRepository(repoId); // Delete the repository
+        return ResponseEntity.ok("Deleted successfully");
+>>>>>>> c66d5cae5148ffa4a0b83af05c7baf47f0d56665
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error");
         }

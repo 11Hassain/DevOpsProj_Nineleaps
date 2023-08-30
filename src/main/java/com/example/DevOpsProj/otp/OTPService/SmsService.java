@@ -20,7 +20,11 @@ public class SmsService {
     @Getter
     private String phoneNumber;
     private final String ACCOUNT_SID="AC699c8c2d7ec00f10c39c35569a54ee8d";
+<<<<<<< HEAD
     private final String AUTH_TOKEN = System.getenv("TWILIO_AUTH");
+=======
+    private final String AUTH_TOKEN ="9ee567ada870d94ba7b22a853bbbd8d0";
+>>>>>>> c66d5cae5148ffa4a0b83af05c7baf47f0d56665
     private final String FROM_NUMBER="+12315974243";
 
     public void send(SmsPojo sms) throws ParseException{
