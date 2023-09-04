@@ -20,17 +20,9 @@ import java.util.List;
 public class GitRepositoryController {
 
     @Autowired
-    private final GitRepositoryService gitRepositoryService;
+    private GitRepositoryService gitRepositoryService;
     @Autowired
     private JwtService jwtService;
-
-    @Autowired
-    public GitRepositoryController(GitRepositoryService gitRepositoryService) {
-        this.gitRepositoryService = gitRepositoryService;
-    }
-
-    @Value("${github.accessToken}")
-    private String accessToken;
 
     @PostMapping("/add")
     @ResponseStatus(HttpStatus.CREATED)
@@ -110,13 +102,9 @@ public class GitRepositoryController {
         }
 
         try {
-<<<<<<< HEAD
             gitRepositoryService.deleteRepository(repoId); // Delete the repository
             return ResponseEntity.ok("Deleted successfully");
-=======
-        gitRepositoryService.deleteRepository(repoId); // Delete the repository
-        return ResponseEntity.ok("Deleted successfully");
->>>>>>> c66d5cae5148ffa4a0b83af05c7baf47f0d56665
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error");
         }

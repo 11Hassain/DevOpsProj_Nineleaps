@@ -93,10 +93,7 @@ public class HelpDocumentsController {
                 .headers(headers)
                 .body(pdfFile.getData());
     }
-<<<<<<< HEAD
 
-=======
->>>>>>> c66d5cae5148ffa4a0b83af05c7baf47f0d56665
     @DeleteMapping("/files/{fileId}")
     public ResponseEntity<String> deleteFile(@PathVariable("fileId") Long fileId,
                                              @RequestHeader("AccessToken") String accessToken){
@@ -113,8 +110,5 @@ public class HelpDocumentsController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
         }
     }
-<<<<<<< HEAD
 
-=======
->>>>>>> c66d5cae5148ffa4a0b83af05c7baf47f0d56665
 }

@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 @Service
 public class GitRepositoryService {
 
-
     @Autowired
     private GitRepositoryRepository gitRepositoryRepository;
     @Autowired
@@ -40,18 +39,15 @@ public class GitRepositoryService {
     @Autowired
     private ModelMapper modelMapper;
 
-    @Value("${github.accessToken}")
-    private String accessToken;
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     private static final String API_BASE_URL = "https://api.github.com";
     private static final String USER_REPOS_ENDPOINT = "/user/repos";
-
     private static final String REPOS_ENDPOINT = "/repos/Bindushree-0906";
     private static final String OWNER = "Bindushree-0906";
 
-
+    private static final String GITHUB_ACCESS_TOKEN = System.getenv("GITHUB_ACCESS_TOKEN");
 
     private final RestTemplate restTemplate;
 
@@ -60,14 +56,11 @@ public class GitRepositoryService {
         this.restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
     }
 
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
 
     @Transactional
     public GitRepository createRepository(GitRepository gitRepository) {
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
+        headers.setBearerAuth(GITHUB_ACCESS_TOKEN);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<GitRepository> requestEntity = new HttpEntity<>(gitRepository, headers);
@@ -107,7 +100,7 @@ public class GitRepositoryService {
         String repoName = repository.getName(); // Get the repository name from the entity
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
+        headers.setBearerAuth(GITHUB_ACCESS_TOKEN);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<Void> requestEntity = new HttpEntity<>(headers);

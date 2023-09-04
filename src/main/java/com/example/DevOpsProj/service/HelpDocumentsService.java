@@ -53,10 +53,7 @@ public class HelpDocumentsService {
         }
         return null;
     }
-<<<<<<< HEAD
 
-=======
->>>>>>> c66d5cae5148ffa4a0b83af05c7baf47f0d56665
     public Optional<HelpDocumentsDTO> getDocumentById(Long fileId){
         Optional<HelpDocuments> helpDocuments = helpDocumentsRepository.findById(fileId);
         if (helpDocuments.isPresent()){

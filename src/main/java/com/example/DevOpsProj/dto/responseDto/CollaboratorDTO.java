@@ -14,8 +14,6 @@ public class CollaboratorDTO {
     private String username;
     private String accessToken;
 
-    // Getters and setters
-
     // Constructor
     public CollaboratorDTO(String owner, String repo, String username, String accessToken) {
         this.owner = owner;

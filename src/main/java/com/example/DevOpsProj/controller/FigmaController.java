@@ -167,11 +167,8 @@ public class FigmaController {
                     for (Map.Entry<String, String> entry : screenshotImagesByUser.entrySet()) {
                         FigmaScreenshotDTO screenshotDTO = new FigmaScreenshotDTO();
                         screenshotDTO.setUser(entry.getKey());
-<<<<<<< HEAD
                         screenshotDTO.setScreenshotImageURL(entry.getValue());
-=======
-                        screenshotDTO.setScreenshotImageURL(entry.getValue()); // Set the URL here
->>>>>>> c66d5cae5148ffa4a0b83af05c7baf47f0d56665
+
                         screenshotDTOList.add(screenshotDTO);
                     }
                     return ResponseEntity.ok(screenshotDTOList);

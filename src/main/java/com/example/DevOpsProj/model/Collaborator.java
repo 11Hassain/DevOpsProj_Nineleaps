@@ -20,6 +20,7 @@ public class Collaborator {
     @Column(name = "username")
     private String username;
 
+
     public Long getId() {
         return id;
     }
