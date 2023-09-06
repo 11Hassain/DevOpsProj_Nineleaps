@@ -335,7 +335,7 @@ public class ProjectController {
         }
     }
 
-    @DeleteMapping("/{projectId}/users/{userId}/repo") //remove user from the project and repo as well
+    @DeleteMapping("/{projectId}/users/{userId}/repo") //removed user from the project and repo as well
     public ResponseEntity<String> removeUserFromProject(
             @PathVariable("projectId") Long projectId,
             @PathVariable("userId") Long userId,
