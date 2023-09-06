@@ -20,6 +20,7 @@ public class JwtService {
     @Autowired
     private UserRepository userRepository;
     private static final String SECRET_KEY = System.getenv("JWT_SECRET_KEY");
+
     public String extractUsername(String token) {
         Claims claims = extractAllClaims(token);
         return claims.getSubject();

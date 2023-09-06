@@ -28,9 +28,10 @@ public class TokenExchangeController {
     @GetMapping("/token-exchange")
     public ResponseEntity<Object> tokenExchange(@RequestParam("code") String authorizationCode) {
 
-        String clientId = "245489075420-3d7bdsal457ue1385vimlb5anufbpegu.apps.googleusercontent.com";
-        String clientSecret = "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";
+        String clientId = System.getenv("GOOGLE_CLIENT_ID");
+        String clientSecret = System.getenv("GOOGLE_CLIENT_SECRET");
         String redirectUri = "https://www.google.com/";
+
 
         // Create HttpClient
         HttpClient httpClient = HttpClients.createDefault();

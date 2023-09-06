@@ -19,7 +19,7 @@ public class SmsService {
 
     @Getter
     private String phoneNumber;
-//    private final String ACCOUNT_SID="AC699c8c2d7ec00f10c39c35569a54ee8d";
+
     private final String ACCOUNT_SID = System.getenv("TWILIO_ACCOUNT_SID");
     private final String AUTH_TOKEN = System.getenv("TWILIO_AUTH");
     private final String FROM_NUMBER = System.getenv("TWILIO_TRIAL_NUMBER");

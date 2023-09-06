@@ -41,6 +41,8 @@ public class User implements UserDetails{
     @Enumerated(EnumType.STRING)
     private EnumRole enumRole;
 
+    //getter for deleted
+    @Getter
     @Column(name = "is_deleted")
     private Boolean deleted = false;
 
@@ -50,9 +52,6 @@ public class User implements UserDetails{
     @Column(nullable = false)
     private LocalDateTime lastLogout;
 
-    public Boolean getDeleted() { //getter for deleted
-        return deleted;
-    }
     public void setDeleted(boolean deleted) { //setter for deleted
         this.deleted = deleted;
     }

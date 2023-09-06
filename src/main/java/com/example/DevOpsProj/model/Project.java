@@ -25,6 +25,7 @@ public class Project {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long projectId;
 
+    @Getter
     @Column(name = "project_name", nullable = false)
     private String projectName;
 
@@ -37,6 +38,7 @@ public class Project {
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
     private List<AccessRequest> accessRequest;
 
+    @Getter
     @Column(name = "is_deleted")
     private Boolean deleted=false;
 
@@ -60,15 +62,8 @@ public class Project {
     private GoogleDrive googleDrive;
 
 
-    public Boolean getDeleted() {
-        return deleted;
-    }
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
-    }
-
-    public String getProjectName() {
-        return projectName;
     }
 
     public void setProjectName(String projectName) {

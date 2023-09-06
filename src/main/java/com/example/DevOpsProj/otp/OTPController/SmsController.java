@@ -39,6 +39,7 @@ public class SmsController {
     private SimpMessagingTemplate webSocket;
     private String number;
     private final String TOPIC_DESTINATION = "/lesson/sms";
+    private static final String SECRET_KEY = System.getenv("SMS_SECRET_KEY");
 
     @PostMapping("/send")
     public ResponseEntity<String> smsSubmit(@RequestBody SmsPojo sms){
@@ -99,8 +100,6 @@ public class SmsController {
         else
             return false;
     }
-
-    private static final String SECRET_KEY = "HRlELXqpSBssiieeeaqwertyujhgfdszxcASWERFDXCDWqwertyggffAQWSXCFRFFFTYHJkkitrsaafarsrAASSDFQWERQWASDWESDYUNJXCVRTYWSXCDERFVTYHJUK";
 
     public String generateToken(String email, String phoneNumber, HttpServletResponse response) throws IOException {
 
