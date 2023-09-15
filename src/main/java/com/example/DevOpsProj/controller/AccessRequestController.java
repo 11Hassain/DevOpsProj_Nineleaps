@@ -19,6 +19,7 @@ public class AccessRequestController {
     private AccessRequestService accessRequestService;
     @Autowired
     private JwtService jwtService;
+
     private static final String INVALID_TOKEN = "Invalid Token";
 
     @PostMapping("/")
