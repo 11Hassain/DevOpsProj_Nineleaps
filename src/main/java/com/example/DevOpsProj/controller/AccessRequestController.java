@@ -2,11 +2,9 @@ package com.example.DevOpsProj.controller;
 
 import com.example.DevOpsProj.dto.requestDto.AccessRequestDTO;
 import com.example.DevOpsProj.dto.responseDto.AccessResponseDTO;
-import com.example.DevOpsProj.model.AccessRequest;
 import com.example.DevOpsProj.service.AccessRequestService;
 import com.example.DevOpsProj.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,15 +19,15 @@ public class AccessRequestController {
     private AccessRequestService accessRequestService;
     @Autowired
     private JwtService jwtService;
+    private static final String INVALID_TOKEN = "Invalid Token";
 
     @PostMapping("/")
     public ResponseEntity<Object> createAccessRequest(@RequestBody AccessRequestDTO accessRequestDTO, @RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
-            AccessRequestDTO accessRequestDTO1 = accessRequestService.createRequest(accessRequestDTO);
             return ResponseEntity.ok("Request made successfully");
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -43,7 +41,7 @@ public class AccessRequestController {
             }
             return ResponseEntity.ok(accessRequestDTOList);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -57,7 +55,7 @@ public class AccessRequestController {
             }
             return ResponseEntity.ok(accessRequestDTOList);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -74,7 +72,7 @@ public class AccessRequestController {
             }
             else return ResponseEntity.ok(accessResponseDTOList);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -89,7 +87,7 @@ public class AccessRequestController {
             }
             else return ResponseEntity.ok(accessResponseDTOList);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -104,7 +102,7 @@ public class AccessRequestController {
             }
             else return ResponseEntity.ok(accessResponseDTOList);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -118,7 +116,7 @@ public class AccessRequestController {
             accessRequestService.setPMRequestsNotificationTrue(accessRequestId);
             return ResponseEntity.ok("Notification read");
         } else {
-            return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).body("Something went wrong");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -129,7 +127,7 @@ public class AccessRequestController {
             accessRequestService.clearAllNotifications();
             return ResponseEntity.ok("All notifications cleared");
         }else {
-            return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).body("Something went wrong");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 

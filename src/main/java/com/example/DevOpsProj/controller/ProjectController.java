@@ -9,7 +9,6 @@ import com.example.DevOpsProj.repository.ProjectRepository;
 import com.example.DevOpsProj.repository.UserRepository;
 import com.example.DevOpsProj.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import org.springframework.http.HttpStatus;
@@ -34,13 +33,13 @@ public class ProjectController {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private UserService userService;
-    @Autowired
     private GitRepositoryRepository gitRepositoryRepository;
     @Autowired
     private JwtService jwtService;
     @Autowired
     private GitHubCollaboratorService collaboratorService;
+
+    private static final String INVALID_TOKEN = "Invalid Token";
 
 
     @PostMapping("/") //Save the project
@@ -56,7 +55,7 @@ public class ProjectController {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("Project already exists");
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -68,7 +67,7 @@ public class ProjectController {
             ProjectDTO createdProjectDTO = projectService.createProject(projectDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdProjectDTO);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -96,7 +95,7 @@ public class ProjectController {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -117,7 +116,7 @@ public class ProjectController {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -157,7 +156,7 @@ public class ProjectController {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -183,7 +182,7 @@ public class ProjectController {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -216,7 +215,7 @@ public class ProjectController {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -245,7 +244,7 @@ public class ProjectController {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -267,7 +266,7 @@ public class ProjectController {
                 }
             } else return ResponseEntity.ok("Invalid project id");
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -301,7 +300,7 @@ public class ProjectController {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -331,7 +330,7 @@ public class ProjectController {
                 return ResponseEntity.ok("User removed");
             } else return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project or User not found");
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -366,7 +365,7 @@ public class ProjectController {
                 return ResponseEntity.ok("User removed");
             } else return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project or User not found");
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -390,7 +389,7 @@ public class ProjectController {
                     .collect(Collectors.toList());
             return new ResponseEntity<>(userDTOList, HttpStatus.OK);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -409,7 +408,7 @@ public class ProjectController {
                     GitRepository gitRepository = optionalGitRepository.get();
 
                     // Check if the project has been deleted
-                    if (!project.getDeleted()) {
+                    if (Boolean.FALSE.equals(project.getDeleted())) {
                         gitRepository.setProject(project);
                     } else {
                         gitRepository.setProject(null);
@@ -423,7 +422,7 @@ public class ProjectController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -435,7 +434,7 @@ public class ProjectController {
             List<ProjectDTO> projects = projectService.getProjectsWithoutFigmaURL();
             return ResponseEntity.ok(projects);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -447,7 +446,7 @@ public class ProjectController {
             List<ProjectDTO> projects = projectService.getProjectsWithoutGoogleDriveLink();
             return ResponseEntity.ok(projects);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -462,7 +461,7 @@ public class ProjectController {
                 return ResponseEntity.ok(peopleCountDTOs);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -477,7 +476,7 @@ public class ProjectController {
                 return ResponseEntity.ok(countProjects);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -494,7 +493,7 @@ public class ProjectController {
                 return ResponseEntity.ok(countProjects);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -510,7 +509,7 @@ public class ProjectController {
                 return ResponseEntity.ok(countProjects);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -526,7 +525,7 @@ public class ProjectController {
                 return ResponseEntity.ok(countUsers);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -545,7 +544,7 @@ public class ProjectController {
                 return ResponseEntity.ok(countUsers);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -560,7 +559,7 @@ public class ProjectController {
                 return ResponseEntity.ok(countProjects);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -575,7 +574,7 @@ public class ProjectController {
                 return ResponseEntity.ok(countProjects);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -585,65 +584,13 @@ public class ProjectController {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if(isTokenValid){
             try {
-                Optional<Project> optionalProject = projectService.getProjectById(projectId);
-                if (optionalProject.isPresent()) {
-                    Project project = optionalProject.get();
-
-                    // Retrieve the required details from the project object
-                    String projectName = project.getProjectName();
-                    String projectDescription = project.getProjectDescription();
-                    boolean status = project.getDeleted();
-
-                    List<User> users = project.getUsers();
-                    String pmName = null;
-                    for (User user : users){
-                        if(user.getEnumRole()==EnumRole.PROJECT_MANAGER){
-                            pmName = user.getName();
-                            break;
-                        }
-                    }
-
-                    List<GitRepository> repositories = project.getRepositories();
-                    List<GitRepositoryDTO> repositoryDTOS = new ArrayList<>();
-                    for(GitRepository repository : repositories){
-                        GitRepositoryDTO repositoryDTO = new GitRepositoryDTO();
-                        repositoryDTO.setName(repository.getName());
-                        repositoryDTO.setDescription(repository.getDescription());
-                        repositoryDTOS.add(repositoryDTO);
-                    }
-
-                    Figma figma = project.getFigma();
-                    String figmaURL = figma != null ? figma.getFigmaURL() : null; // Retrieve the Figma URL
-                    FigmaDTO figmaDTO = new FigmaDTO(figmaURL);
-
-                    GoogleDrive googleDrive = project.getGoogleDrive();
-                    String driveLink = googleDrive != null ? googleDrive.getDriveLink() : null; // Retrieve the driveLink
-                    GoogleDriveDTO googleDriveDTO = new GoogleDriveDTO(driveLink);
-
-                    LocalDateTime lastUpdated = project.getLastUpdated();
-
-                    // Create and return a ProjectDTO object with the required details
-                    ProjectDTO projectDetailsDTO = new ProjectDTO(
-                            projectName,
-                            projectDescription,
-                            status,
-                            pmName,
-                            repositoryDTOS,
-                            figmaDTO,
-                            new GoogleDriveDTO(driveLink),
-                            lastUpdated
-                    );
-
-                    return new ResponseEntity<>(projectDetailsDTO, HttpStatus.OK);
-                } else {
-                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-                }
+                ProjectDTO projectDetails = projectService.getProjectDetailsById(projectId);
+                return new ResponseEntity<>(projectDetails, HttpStatus.OK);
             } catch (Exception e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 }

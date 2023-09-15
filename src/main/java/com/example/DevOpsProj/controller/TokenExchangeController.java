@@ -9,7 +9,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,9 +58,6 @@ public class TokenExchangeController {
             // Get the response entity and convert it to a string
             HttpEntity entity = response.getEntity();
             String responseBody = EntityUtils.toString(entity);
-
-            // Output the response (access token and refresh token if applicable)
-            System.out.println(responseBody);
 
             return ResponseEntity.ok(responseBody);
         } catch (IOException e) {

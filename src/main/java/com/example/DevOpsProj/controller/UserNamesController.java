@@ -9,9 +9,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.yaml.snakeyaml.constructor.DuplicateKeyException;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/usernames")
@@ -21,11 +18,12 @@ public class UserNamesController {
     private final UserNamesService userNamesService;
     @Autowired
     private JwtService jwtService;
-
     @Autowired
     public UserNamesController(UserNamesService userNamesService) {
         this.userNamesService = userNamesService;
     }
+
+    private static final String INVALID_TOKEN = "Invalid Token";
 
     @PostMapping("/githubUsername")
     public ResponseEntity<Object> saveUsername(@RequestBody UserNamesDTO userNamesDTO,
@@ -44,7 +42,7 @@ public class UserNamesController {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists");
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -55,7 +53,7 @@ public class UserNamesController {
             EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
             return ResponseEntity.ok(userNamesService.getGitHubUserNamesByRole(enumRole));
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 }

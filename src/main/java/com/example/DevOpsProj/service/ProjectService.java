@@ -1,18 +1,16 @@
 package com.example.DevOpsProj.service;
 
 import com.example.DevOpsProj.commons.enumerations.EnumRole;
-import com.example.DevOpsProj.dto.responseDto.ProjectDTO;
-import com.example.DevOpsProj.dto.responseDto.GitRepositoryDTO;
-import com.example.DevOpsProj.dto.responseDto.ProjectNamePeopleCountDTO;
-import com.example.DevOpsProj.model.Project;
-import com.example.DevOpsProj.model.GitRepository;
-import com.example.DevOpsProj.model.User;
+import com.example.DevOpsProj.dto.responseDto.*;
+import com.example.DevOpsProj.model.*;
 import com.example.DevOpsProj.repository.ProjectRepository;
 import com.example.DevOpsProj.repository.GitRepositoryRepository;
 import com.example.DevOpsProj.repository.UserRepository;
 import io.swagger.models.auth.In;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 
@@ -207,10 +205,65 @@ public class ProjectService {
         return projectDTOs;
     }
 
+    public ProjectDTO getProjectDetailsById(Long projectId) {
+        Optional<Project> optionalProject = projectRepository.findById(projectId);
+        if (optionalProject.isPresent()) {
+            Project project = optionalProject.get();
+
+            // Retrieve the required details from the project object
+            String projectName = project.getProjectName();
+            String projectDescription = project.getProjectDescription();
+            boolean status = project.getDeleted();
+
+            List<User> users = project.getUsers();
+            String pmName = null;
+            for (User user : users){
+                if(user.getEnumRole()==EnumRole.PROJECT_MANAGER){
+                    pmName = user.getName();
+                    break;
+                }
+            }
+
+            List<GitRepository> repositories = project.getRepositories();
+            List<GitRepositoryDTO> repositoryDTOS = new ArrayList<>();
+            for(GitRepository repository : repositories){
+                GitRepositoryDTO repositoryDTO = new GitRepositoryDTO();
+                repositoryDTO.setName(repository.getName());
+                repositoryDTO.setDescription(repository.getDescription());
+                repositoryDTOS.add(repositoryDTO);
+            }
+
+            Figma figma = project.getFigma();
+            String figmaURL = figma != null ? figma.getFigmaURL() : null; // Retrieve the Figma URL
+            FigmaDTO figmaDTO = new FigmaDTO(figmaURL);
+
+            GoogleDrive googleDrive = project.getGoogleDrive();
+            String driveLink = googleDrive != null ? googleDrive.getDriveLink() : null; // Retrieve the driveLink
+            GoogleDriveDTO googleDriveDTO = new GoogleDriveDTO(driveLink);
+
+            LocalDateTime lastUpdated = project.getLastUpdated();
+
+            // Create and return a ProjectDTO object with the required details
+            return new ProjectDTO(
+                    projectName,
+                    projectDescription,
+                    status,
+                    pmName,
+                    repositoryDTOS,
+                    figmaDTO,
+                    new GoogleDriveDTO(driveLink),
+                    lastUpdated
+            );
+        } else {
+            return new ProjectDTO();
+        }
+    }
+
     public ProjectDTO mapProjectToProjectDTO(Project project) {
         ProjectDTO projectDTO = new ProjectDTO();
         projectDTO.setProjectId(project.getProjectId());
         projectDTO.setProjectName(project.getProjectName());
         return projectDTO;
     }
+
 }

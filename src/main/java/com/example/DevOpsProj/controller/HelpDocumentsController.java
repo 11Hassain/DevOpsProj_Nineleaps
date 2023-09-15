@@ -39,8 +39,10 @@ public class HelpDocumentsController {
     @Autowired
     private JwtService jwtService;
 
+    private static final String INVALID_TOKEN = "Invalid Token";
+
     @PostMapping("/upload")
-    public ResponseEntity<?> uploadFile(
+    public ResponseEntity<Object> uploadFile(
             @RequestParam("projectId") long projectId,
             @RequestParam(name = "projectFile", required = false) MultipartFile projectFile,
             @RequestHeader("AccessToken") String accessToken)
@@ -54,13 +56,13 @@ public class HelpDocumentsController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid parameters");
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
 
     @GetMapping("/files")
-    public ResponseEntity<?> getPdfFilesList(@RequestParam("projectId") long projectId,
+    public ResponseEntity<Object> getPdfFilesList(@RequestParam("projectId") long projectId,
                                              @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
@@ -75,23 +77,29 @@ public class HelpDocumentsController {
             }
             return ResponseEntity.ok().body(fileInfos);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
 
     @GetMapping("/files/{fileName}")
-    public ResponseEntity<?> downloadPdfFile(@PathVariable("fileName") String fileName) {
-        HelpDocuments pdfFile = helpDocumentsRepository.findByFileName(fileName);
-        if (pdfFile == null) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<Object> downloadPdfFile(@PathVariable("fileName") String fileName,
+                                             @RequestHeader("AccessToken") String accessToken) {
+        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        if (isTokenValid) {
+            HelpDocuments pdfFile = helpDocumentsRepository.findByFileName(fileName);
+            if (pdfFile == null) {
+                return ResponseEntity.notFound().build();
+            }
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", fileName);
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(pdfFile.getData());
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", fileName);
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(pdfFile.getData());
     }
 
     @DeleteMapping("/files/{fileId}")
@@ -107,7 +115,7 @@ public class HelpDocumentsController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Document not found");
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 

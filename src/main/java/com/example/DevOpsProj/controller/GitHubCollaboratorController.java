@@ -1,4 +1,5 @@
 package com.example.DevOpsProj.controller;
+
 import com.example.DevOpsProj.dto.responseDto.CollaboratorDTO;
 import com.example.DevOpsProj.service.GitHubCollaboratorService;
 import com.example.DevOpsProj.service.JwtService;
@@ -14,11 +15,12 @@ public class GitHubCollaboratorController {
     private final GitHubCollaboratorService collaboratorService;
     @Autowired
     private JwtService jwtService;
-
     @Autowired
     public GitHubCollaboratorController(GitHubCollaboratorService collaboratorService) {
         this.collaboratorService = collaboratorService;
     }
+
+    private static final String INVALID_TOKEN = "Invalid Token";
 
     @PostMapping("/add")
     public ResponseEntity<String> addCollaborator(@RequestBody CollaboratorDTO collaboratorDTO,
@@ -32,7 +34,7 @@ public class GitHubCollaboratorController {
                 return ResponseEntity.badRequest().body("Failed to add collaborator.");
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
 
     }
@@ -49,7 +51,7 @@ public class GitHubCollaboratorController {
                 return ResponseEntity.badRequest().body("Failed to remove collaborator.");
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 }

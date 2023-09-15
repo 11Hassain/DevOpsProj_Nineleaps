@@ -4,10 +4,8 @@ import com.example.DevOpsProj.dto.responseDto.FigmaDTO;
 import com.example.DevOpsProj.dto.responseDto.FigmaScreenshotDTO;
 import com.example.DevOpsProj.model.Figma;
 import com.example.DevOpsProj.repository.FigmaRepository;
-import com.example.DevOpsProj.repository.UserRepository;
 import com.example.DevOpsProj.service.FigmaService;
 import com.example.DevOpsProj.service.JwtService;
-import com.example.DevOpsProj.service.ProjectService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -26,11 +24,8 @@ public class FigmaController {
     @Autowired
     private FigmaRepository figmaRepository;
     @Autowired
-    private ProjectService projectService;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
     private JwtService jwtService;
+    private static final String INVALID_TOKEN = "Invalid Token";
 
     @PostMapping("/create")
     public ResponseEntity<String> createFigma(@RequestBody FigmaDTO figmaDTO,
@@ -50,7 +45,7 @@ public class FigmaController {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("Could not create figma");
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -61,7 +56,7 @@ public class FigmaController {
             List<Figma> figmaProjects = figmaService.getAllFigmaProjects();
 
             List<FigmaDTO> figmaDTOs = figmaProjects.stream()
-                    .filter(figma -> figma != null) // Filter out null values
+                    .filter(Objects::nonNull) // Filter out null values
                     .map(figma -> new FigmaDTO(
                             figma.getFigmaId(),
                             figmaService.mapProjectToProjectDTO(figma.getProject()),
@@ -70,10 +65,9 @@ public class FigmaController {
 
             return ResponseEntity.ok(figmaDTOs);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
-
 
     @GetMapping("/get/{figmaId}")
     public ResponseEntity<Object> getFigma(@PathVariable Long figmaId,
@@ -87,15 +81,15 @@ public class FigmaController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
     @PostMapping("/{figmaId}/user")
     public ResponseEntity<String> addUserAndScreenshotsToFigma(@PathVariable("figmaId") Long figmaId,
                                                                @RequestBody FigmaDTO figmaDTO,
-                                                               @RequestHeader("AccessToken") String accessToken) {
-
+                                                               @RequestHeader("AccessToken") String accessToken)
+    {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
             try {
@@ -123,7 +117,7 @@ public class FigmaController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -148,10 +142,9 @@ public class FigmaController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
-
 
     @GetMapping("/{figmaId}/screenshots")
     public ResponseEntity<List<FigmaScreenshotDTO>> getScreenshotsForFigmaId(@PathVariable("figmaId") Long figmaId) {

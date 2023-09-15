@@ -25,7 +25,7 @@ public class HelpDocumentsService {
     @Autowired
     private ProjectService projectService;
 
-    public ResponseEntity<?> uploadFiles(long projectId, MultipartFile projectFile, String fileExtension) throws IOException {
+    public ResponseEntity<Object> uploadFiles(long projectId, MultipartFile projectFile, String fileExtension) throws IOException {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalArgumentException("Project not found"));
         HelpDocuments helpDocuments = new HelpDocuments();

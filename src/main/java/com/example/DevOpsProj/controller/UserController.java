@@ -30,6 +30,7 @@ public class UserController {
 
     private ModelMapper modelMapper;
 
+    private static final String INVALID_TOKEN = "Invalid Token";
 
     @PostMapping("/") //Save the user
     public ResponseEntity<Object> saveUser(@RequestBody UserCreationDTO userCreationDTO,
@@ -39,16 +40,16 @@ public class UserController {
             User savedUser = userService.saveUser(userCreationDTO);
             return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
     @GetMapping("/{user_id}") //find user by user id
-    public ResponseEntity<Object> getUserById(@PathVariable Long user_id,
+    public ResponseEntity<Object> getUserById(@PathVariable Long userId,
                                                @RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
-            Optional<User> optionalUser = userService.getUserById(user_id);
+            Optional<User> optionalUser = userService.getUserById(userId);
             if(optionalUser.isPresent()){
                 User user = optionalUser.get();
                 UserDTO userDTO = new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole(), user.getLastUpdated(), user.getLastLogout());
@@ -56,7 +57,7 @@ public class UserController {
             }
             else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -69,22 +70,22 @@ public class UserController {
             UserDTO userDTOs = userService.updateUser(id, userDTO);
             return new ResponseEntity<>(userDTOs, HttpStatus.OK);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
     @DeleteMapping("/delete/{user_id}") //soft-deleting user
-    public ResponseEntity<String> deleteUserById(@PathVariable Long user_id,
+    public ResponseEntity<String> deleteUserById(@PathVariable Long userId,
                                                  @RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
-            if(userService.existsById(user_id)) {
-                boolean checkIfDeleted = userService.existsByIdIsDeleted(user_id); //check if deleted = true?
+            if(userService.existsById(userId)) {
+                boolean checkIfDeleted = userService.existsByIdIsDeleted(userId); //check if deleted = true?
                 if (checkIfDeleted) {
                     return ResponseEntity.ok("User doesn't exist");
                     //user is present in db but deleted=true(soft deleted)
                 }
-                boolean isDeleted = userService.softDeleteUser(user_id); //soft deletes user with id (yes/no)
+                boolean isDeleted = userService.softDeleteUser(userId); //soft deletes user with id (yes/no)
                 if(isDeleted){
                     return ResponseEntity.ok("User successfully deleted");
                     //successfully deleting user (soft delete) (user exists in db)
@@ -96,7 +97,7 @@ public class UserController {
             }
             else return ResponseEntity.ok("Invalid user ID");
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -112,7 +113,7 @@ public class UserController {
                     .collect(Collectors.toList());
             return new ResponseEntity<>(userDTOList, HttpStatus.OK);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -128,7 +129,7 @@ public class UserController {
                 return ResponseEntity.ok(countUsers);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -146,7 +147,7 @@ public class UserController {
                 return ResponseEntity.ok(countUsersByRole);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -163,7 +164,7 @@ public class UserController {
                 return ResponseEntity.ok(countUsersByProject);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -175,7 +176,7 @@ public class UserController {
             List<ProjectDTO> projects = userService.getAllProjectsAndRepositoriesByUserId(id);
             return ResponseEntity.ok(projects);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -214,7 +215,7 @@ public class UserController {
                     .collect(Collectors.toList());
             return new ResponseEntity<>(projectDTOList, HttpStatus.OK);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -226,7 +227,7 @@ public class UserController {
         if (isTokenValid) {
             return ResponseEntity.ok(userService.getAllUsers());
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -237,7 +238,7 @@ public class UserController {
             List<UserProjectsDTO> userProjectsDTOs = userService.getAllUsersWithProjects();
             return ResponseEntity.ok(userProjectsDTOs);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -248,7 +249,7 @@ public class UserController {
             List<UserProjectsDTO> usersWithMultipleProjects = userService.getUsersWithMultipleProjects();
             return ResponseEntity.ok(usersWithMultipleProjects);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
     @GetMapping("/withoutProject")
@@ -262,7 +263,7 @@ public class UserController {
             List<UserDTO> userDTOList = userService.getAllUsersWithoutProjects(enumRole, projectId);
             return ResponseEntity.status(HttpStatus.OK).body(userDTOList);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 
@@ -274,7 +275,7 @@ public class UserController {
             String response = userService.userLogout(id);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
 }
