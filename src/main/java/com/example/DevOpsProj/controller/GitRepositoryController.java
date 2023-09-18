@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/repositories")
+@RequestMapping("/api/v1/repositories")
 public class GitRepositoryController {
 
     @Autowired

@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/collaborators")
+@RequestMapping("/api/v1/collaborators")
 public class GitHubCollaboratorController {
     @Autowired
     private final GitHubCollaboratorService collaboratorService;

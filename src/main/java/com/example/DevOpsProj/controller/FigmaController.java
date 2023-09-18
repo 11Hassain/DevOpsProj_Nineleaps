@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 
 @RestController
-@RequestMapping("/api/figmas")
+@RequestMapping("/api/v1/figmas")
 public class FigmaController {
     @Autowired
     private FigmaService figmaService;

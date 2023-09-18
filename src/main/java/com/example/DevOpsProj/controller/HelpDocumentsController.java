@@ -5,7 +5,6 @@ import com.example.DevOpsProj.model.HelpDocuments;
 import com.example.DevOpsProj.repository.HelpDocumentsRepository;
 import com.example.DevOpsProj.service.HelpDocumentsService;
 import com.example.DevOpsProj.service.JwtService;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -14,22 +13,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.sql.rowset.serial.SerialBlob;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Blob;
-import java.sql.SQLException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 @RestController
-@RequestMapping("api/projects")
+@RequestMapping("api/v1/projects")
 public class HelpDocumentsController {
 
     @Autowired

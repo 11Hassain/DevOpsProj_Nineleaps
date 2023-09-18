@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/projects")
+@RequestMapping("/api/v1/projects")
 public class ProjectController {
 
     @Autowired
