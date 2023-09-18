@@ -2,7 +2,6 @@ package com.example.DevOpsProj.dto.responseDto;
 
 import lombok.*;
 
-
 @NoArgsConstructor
 @Setter
 @Getter

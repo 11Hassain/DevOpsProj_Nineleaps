@@ -1,7 +1,5 @@
 package com.example.DevOpsProj.dto.responseDto;
 
-import com.example.DevOpsProj.dto.responseDto.UserDTO;
-import com.example.DevOpsProj.model.User;
 import lombok.*;
 
 import java.util.List;

@@ -33,14 +33,10 @@ public class SmsController {
     SmsService service;
     @Autowired
     IUserService userservice;
-
-
     @Autowired
     private SimpMessagingTemplate webSocket;
-    private String number;
-    private final String TOPIC_DESTINATION = "/lesson/sms";
+    private static final String TOPIC_DESTINATION = "/lesson/sms";
     private static final String SECRET_KEY = System.getenv("SMS_SECRET_KEY");
-
 
 
     @PostMapping("/send")
@@ -48,10 +44,10 @@ public class SmsController {
         try{
             service.send(sms);
         }catch (Exception e){
-            return new ResponseEntity<String>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
         }
         webSocket.convertAndSend(TOPIC_DESTINATION,getTimeStamp()+":SMS has been sent "+sms.getPhoneNumber());
-        return new ResponseEntity<String>("OTP sent",HttpStatus.OK);
+        return new ResponseEntity<>("OTP sent",HttpStatus.OK);
     }
 
     @PostMapping("/resend")
@@ -59,13 +55,14 @@ public class SmsController {
         try{
             service.send(resendsms);
         }catch (Exception e){
-            return new ResponseEntity<String>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
         }
         webSocket.convertAndSend(TOPIC_DESTINATION,getTimeStamp()+":SMS has been sent "+resendsms.getPhoneNumber());
-        return new ResponseEntity<String>("OTP sent",HttpStatus.OK);}
+        return new ResponseEntity<>("OTP sent",HttpStatus.OK);
+    }
 
     @PostMapping("/verify/token")
-    public ResponseEntity<?> verifyOTP(@RequestBody TempOTP tempOTP, HttpServletResponse response) throws Exception {
+    public ResponseEntity<Object> verifyOTP(@RequestBody TempOTP tempOTP, HttpServletResponse response) throws Exception {
 
         if (tempOTP.getOtp() == StoreOTP.getOtp()) {
             String phoneNumber = service.getPhoneNumber();
@@ -73,8 +70,6 @@ public class SmsController {
             SmsPojo sms = new SmsPojo();
             sms.setPhoneNumber(phoneNumber);
             User user = userservice.getUserViaPhoneNumber(sms.getPhoneNumber());
-            System.out.println(user);
-//            RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUserMail());
 
             if (user != null) {
                 String email = user.getEmail();
@@ -82,7 +77,6 @@ public class SmsController {
 
                 JwtResponse jwtResponse = new JwtResponse();
                 jwtResponse.setAccessToken(accessToken);
-//                jwtResponse.setRefreshToken(refreshToken.getToken());
                 return ResponseEntity.ok(jwtResponse);}
             else {
                 return ResponseEntity.ok("User not found") ;
@@ -117,15 +111,13 @@ public class SmsController {
 
         // Convert the List<String> to a comma-separated string
         String rolesString = String.join(",", roleNames);
-        String accessToken = JWT.create()
+        return JWT.create()
                 .withSubject(email)
                 .withClaim("phoneNumber", phoneNumber) // Add phone number claim
                 .withClaim("roles", rolesString)
                 .withClaim("userId", userDtls.getId())
-                // .withExpiresAt(new Date(System.currentTimeMillis() + 2 * 24 * 60 * 60 * 1000))
                 .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 *10))
                 .sign(algorithm);
-        return accessToken;
     }
 
     private String getTimeStamp(){

@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
 @RestController
 @RequestMapping("/api/v1/figmas")
 public class FigmaController {

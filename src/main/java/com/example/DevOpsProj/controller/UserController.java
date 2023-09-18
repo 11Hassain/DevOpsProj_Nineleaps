@@ -9,7 +9,6 @@ import com.example.DevOpsProj.model.Project;
 import com.example.DevOpsProj.model.User;
 import com.example.DevOpsProj.service.JwtService;
 import com.example.DevOpsProj.service.UserService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +26,6 @@ public class UserController {
     private UserService userService;
     @Autowired
     private JwtService jwtService;
-
-    private ModelMapper modelMapper;
 
     private static final String INVALID_TOKEN = "Invalid Token";
 
@@ -218,8 +215,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
-
-
 
     @GetMapping("/get")
     public ResponseEntity<Object> getAllUsers(@RequestHeader("AccessToken") String accessToken){

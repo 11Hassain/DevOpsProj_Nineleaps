@@ -1,9 +1,6 @@
 package com.example.DevOpsProj.dto.responseDto;
 
 import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,6 +9,7 @@ import java.util.List;
 @ToString
 public class FigmaDTO {
     private ProjectDTO projectDTO;
+    @Getter
     private String figmaURL;
     private String screenshotImage;
     private String user;
@@ -20,12 +18,6 @@ public class FigmaDTO {
     public FigmaDTO(String figmaURL) {
         this.figmaURL = figmaURL;
     }
-
-
-    public String getFigmaURL() {
-        return figmaURL;
-    }
-
 
 
     public void setFigmaURL(String figmaURL) {

@@ -15,6 +15,7 @@ import java.util.List;
 @Entity
 @Table(name = "repositories")
 public class GitRepository {
+    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long repoId;
@@ -35,7 +36,4 @@ public class GitRepository {
             inverseJoinColumns = @JoinColumn(name = "username_id"))
     private List<UserNames> usernames;
 
-    public Long getRepoId() {
-        return repoId;
-    }
 }

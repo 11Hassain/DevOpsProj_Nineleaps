@@ -17,9 +17,7 @@ import java.util.stream.Collectors;
 public class FigmaService {
     @Autowired
     private FigmaRepository figmaRepository;
-
     @Autowired ProjectRepository projectRepository;
-
 
     public Figma createFigma(FigmaDTO figmaDTO) {
         Figma figma = new Figma();
@@ -33,7 +31,6 @@ public class FigmaService {
         List<Figma> figmaProjects = activeProjects.stream()
                 .map(Project::getFigma)
                 .collect(Collectors.toList());
-
         return figmaProjects;
     }
 

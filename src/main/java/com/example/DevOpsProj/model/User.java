@@ -4,7 +4,6 @@ import com.example.DevOpsProj.commons.enumerations.EnumRole;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -36,11 +35,11 @@ public class User implements UserDetails{
     @Column(name = "phone_number")
     private String phoneNumber;
 
-//    private String password;
-
     @Enumerated(EnumType.STRING)
     private EnumRole enumRole;
 
+    //getter for deleted
+    @Getter
     @Column(name = "is_deleted")
     private Boolean deleted = false;
 
@@ -50,13 +49,9 @@ public class User implements UserDetails{
     @Column(nullable = false)
     private LocalDateTime lastLogout;
 
-    public Boolean getDeleted() { //getter for deleted
-        return deleted;
-    }
     public void setDeleted(boolean deleted) { //setter for deleted
         this.deleted = deleted;
     }
-
 
     //linking project entity with user
     @JsonIgnore

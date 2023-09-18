@@ -1,10 +1,6 @@
 package com.example.DevOpsProj.dto.responseDto;
 
-import com.example.DevOpsProj.model.Project;
-import com.example.DevOpsProj.model.User;
 import lombok.*;
-
-import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor

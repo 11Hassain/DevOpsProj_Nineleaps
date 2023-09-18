@@ -7,7 +7,6 @@ import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import java.text.ParseException;
@@ -19,17 +18,15 @@ public class SmsService {
 
     @Getter
     private String phoneNumber;
-//    private final String ACCOUNT_SID="AC699c8c2d7ec00f10c39c35569a54ee8d";
-    private final String ACCOUNT_SID = System.getenv("TWILIO_ACCOUNT_SID");
-    private final String AUTH_TOKEN = System.getenv("TWILIO_AUTH");
-    private final String FROM_NUMBER = System.getenv("TWILIO_TRIAL_NUMBER");
+    private static final String ACCOUNT_SID = System.getenv("TWILIO_ACCOUNT_SID");
+    private static final String AUTH_TOKEN = System.getenv("TWILIO_AUTH");
+    private static final String FROM_NUMBER = System.getenv("TWILIO_TRIAL_NUMBER");
 
     public void send(SmsPojo sms) throws ParseException{
         Twilio.init(ACCOUNT_SID,AUTH_TOKEN);
         int min = 100000;
         int max = 999999;
         int number  = (int)(Math.random()*(max-min +1)+min);
-        // String msg = "Your OTP - "+number+"please verify this otp";
         String msg = "Your OTP - "+number+" . Please verify this OTP. Do not share with anyone. Thank you!";
         Message message = Message.creator(new PhoneNumber(sms.getPhoneNumber()),new PhoneNumber(FROM_NUMBER),msg)
                 .create();

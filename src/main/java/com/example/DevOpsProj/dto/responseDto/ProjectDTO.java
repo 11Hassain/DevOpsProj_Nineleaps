@@ -1,13 +1,10 @@
 package com.example.DevOpsProj.dto.responseDto;
 
-import com.example.DevOpsProj.model.GitRepository;
 import com.example.DevOpsProj.model.User;
 import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
-
 
 @NoArgsConstructor
 @AllArgsConstructor

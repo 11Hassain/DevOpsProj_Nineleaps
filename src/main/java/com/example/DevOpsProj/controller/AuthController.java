@@ -1,8 +1,5 @@
 package com.example.DevOpsProj.controller;
 
-
-import com.example.DevOpsProj.repository.UserRepository;
-import com.example.DevOpsProj.service.JwtService;
 import com.example.DevOpsProj.service.UserService;
 import com.example.DevOpsProj.utils.JwtUtils;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,10 +15,6 @@ import java.io.IOException;
 public class AuthController {
     @Autowired
     private UserService userService;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private JwtService jwtService;
 
     @GetMapping("/api/get-email") //not this
     public ResponseEntity<Object> getEmailFromToken(@RequestHeader("emailToVerify") String emailToVerify) throws IOException {
@@ -32,7 +25,6 @@ public class AuthController {
             return ResponseEntity.ok(userService.loginVerification(emailToVerify));
         }
     }
-
 
     @GetMapping("/api/getEmail")
     public ResponseEntity<Object> getEmailFromToken(

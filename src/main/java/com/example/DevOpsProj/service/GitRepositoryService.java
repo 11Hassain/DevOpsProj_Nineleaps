@@ -4,14 +4,8 @@ import com.example.DevOpsProj.commons.enumerations.EnumRole;
 import com.example.DevOpsProj.dto.responseDto.GitRepositoryDTO;
 import com.example.DevOpsProj.model.GitRepository;
 import com.example.DevOpsProj.model.Project;
-//import com.example.DevOpsProj.model.RepositoryEntity;
-import com.example.DevOpsProj.model.User;
 import com.example.DevOpsProj.repository.GitRepositoryRepository;
-import com.example.DevOpsProj.repository.ProjectRepository;
-import com.example.DevOpsProj.repository.UserRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -21,7 +15,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,13 +24,6 @@ public class GitRepositoryService {
     private GitRepositoryRepository gitRepositoryRepository;
     @Autowired
     private ProjectService projectService;
-    @Autowired
-    private ProjectRepository projectRepository;
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private ModelMapper modelMapper;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

@@ -57,12 +57,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findByPhoneNumber(String phoneNumber);
 
-//    @Query("SELECT u FROM User u WHERE u.deleted = false AND u.enumRole = :role")
-//    List<User> findAllUsersByRole(@Param("role") EnumRole role);
-
-//    @Query("SELECT u FROM User u WHERE u NOT IN (SELECT DISTINCT pu.user FROM Project p JOIN p.users pu) " +
-//            "AND u.enumRole = :role")
-//    List<User> findUsersWithoutProjects(EnumRole role);
 
 
 }
