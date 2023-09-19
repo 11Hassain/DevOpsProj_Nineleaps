@@ -16,7 +16,7 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/api/get-email") //not this
+    @GetMapping("/api/v1/get-email")
     public ResponseEntity<Object> getEmailFromToken(@RequestHeader("emailToVerify") String emailToVerify) throws IOException {
         Object object = userService.loginVerification(emailToVerify);
         if (object == null){
@@ -26,7 +26,7 @@ public class AuthController {
         }
     }
 
-    @GetMapping("/api/getEmail")
+    @GetMapping("/api/v1/getEmail")
     public ResponseEntity<Object> getEmailFromToken(
             @RequestHeader("Authorization") String authHeader,
             HttpServletResponse response) throws IOException{

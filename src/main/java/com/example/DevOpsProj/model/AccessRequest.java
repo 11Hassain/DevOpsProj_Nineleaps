@@ -16,7 +16,7 @@ public class AccessRequest {
     @GeneratedValue
     private Long accessRequestId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String pmName;
 
     @JsonIgnore

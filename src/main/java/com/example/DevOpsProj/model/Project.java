@@ -23,7 +23,7 @@ public class Project {
     private Long projectId;
 
     @Getter
-    @Column(name = "project_name", nullable = false)
+    @Column(name = "project_name", nullable = false, length = 50)
     private String projectName;
 
     @Column(name = "project_description")

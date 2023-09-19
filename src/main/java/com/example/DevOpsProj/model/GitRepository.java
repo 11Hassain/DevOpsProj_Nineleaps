@@ -20,7 +20,7 @@ public class GitRepository {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long repoId;
 
-    @Column(name = "repo_name", nullable = false)
+    @Column(name = "repo_name", nullable = false, length = 50)
     private String name;
 
     @Column(name = "repo_description")

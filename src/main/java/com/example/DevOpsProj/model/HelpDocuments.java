@@ -9,8 +9,7 @@ import lombok.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "help_documents",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"file_name"}))
+@Table(name = "help_documents")
 public class HelpDocuments {
 
     @Id
@@ -22,7 +21,7 @@ public class HelpDocuments {
     @Column(name = "data", columnDefinition = "BLOB")
     private byte[] data;
 
-    @Column(name = "file_name", unique = true)  // Add unique constraint annotation
+    @Column(name = "file_name", unique = true, length = 50)  // Add unique constraint annotation
     private String fileName;
 
     @Column(name = "category")
