@@ -1,6 +1,10 @@
 package com.exAmple.DevOpsProj.dto.responseDto;
 
 import com.exAmple.DevOpsProj.model.User;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -12,11 +16,21 @@ import java.util.List;
 @Getter
 @ToString
 public class ProjectDTO {
+    @Positive(message = "projectId should be a positive number")
     private Long projectId;
+
+    @NotBlank(message = "projectName cannot be blank")
+    @Size(max = 255, message = "projectName should not exceed 255 characters")
     private String projectName;
+
+    @Size(max = 255, message = "projectDescription should not exceed 255 characters")
     private String projectDescription;
+
+    @NotNull(message = "lastUpdated cannot be null")
     private LocalDateTime lastUpdated;
+
     private List<User> users;
+
     private String pmName;
     private List<GitRepositoryDTO> repositories;
     private boolean status;

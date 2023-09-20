@@ -50,7 +50,7 @@ public class Project {
     @JoinTable(name = "project_user",
             joinColumns = @JoinColumn(name = "project_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private List<User> users; //change into list
+    private List<User> users;
 
     @OneToOne(mappedBy = "project")
     private Figma figma;

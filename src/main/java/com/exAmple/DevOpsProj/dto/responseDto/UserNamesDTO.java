@@ -1,6 +1,8 @@
 package com.exAmple.DevOpsProj.dto.responseDto;
 
 import com.exAmple.DevOpsProj.model.User;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @NoArgsConstructor
@@ -9,7 +11,11 @@ import lombok.*;
 @Getter
 @ToString
 public class UserNamesDTO {
+
+    @NotNull(message = "username cannot be null")
+    @Size(max = 100, message = "username should not exceed 100 characters")
     private String username;
+
     private User user;
     private String accessToken;
 }
