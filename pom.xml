@@ -18,119 +18,147 @@
 	</properties>
 
 	<dependencies>
+		<!-- Spring Boot Starter for Data JPA -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
+
+		<!-- Spring Boot Starter for JDBC -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jdbc</artifactId>
 		</dependency>
+
+		<!-- Spring Boot Starter for Web -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
+		<!-- Lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
-		<!-- Spring Security -->
+
+		<!-- Spring Boot Starter for Security -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
+
+		<!-- JSON Web Token (JWT) API -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
 			<version>0.11.5</version>
 		</dependency>
+
+		<!-- JSON Web Token (JWT) Implementation -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-impl</artifactId>
 			<version>0.11.5</version>
 		</dependency>
+
+		<!-- JSON Web Token (JWT) Jackson Integration -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-jackson</artifactId>
 			<version>0.11.5</version>
 		</dependency>
+
+		<!-- Spring Boot Starter for Testing (Scope: test) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 
+		<!-- MySQL Connector/J -->
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>8.0.32</version>
 		</dependency>
+
+		<!-- Hibernate Core (POM Dependency) -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
 			<version>6.2.0.CR4</version>
 			<type>pom</type>
 		</dependency>
+
+		<!-- ModelMapper -->
 		<dependency>
 			<groupId>org.modelmapper</groupId>
 			<artifactId>modelmapper</artifactId>
 			<version>2.4.4</version>
 		</dependency>
 
-
+		<!-- Auth0 Java JWT -->
 		<dependency>
 			<groupId>com.auth0</groupId>
 			<artifactId>java-jwt</artifactId>
 			<version>4.4.0</version>
 		</dependency>
 
-
+		<!-- Kohsuke GitHub API -->
 		<dependency>
 			<groupId>org.kohsuke</groupId>
 			<artifactId>github-api</artifactId>
 			<version>1.314</version>
 		</dependency>
 
+		<!-- OkHttp -->
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>okhttp</artifactId>
 			<version>4.9.1</version>
 		</dependency>
 
+		<!-- Spring Security Web -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-web</artifactId>
 			<version>6.0.3</version>
 		</dependency>
 
+		<!-- Spring Boot Starter for Mail -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 
+		<!-- Spring Boot Starter for WebSocket -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-websocket</artifactId>
 		</dependency>
 
+		<!-- Spring Boot Starter for Web Services -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web-services</artifactId>
 		</dependency>
 
+		<!-- Spring Boot Starter for WebFlux -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webflux</artifactId>
 		</dependency>
 
+		<!-- Jackson Data Bind -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<version>2.13.4.1</version>
 		</dependency>
 
+		<!-- Springdoc OpenAPI Starter for WebMVC UI -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
@@ -138,6 +166,7 @@
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-validator -->
+		<!-- Hibernate Validator -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
@@ -145,12 +174,14 @@
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.springframework/spring-webflux -->
+		<!-- Spring WebFlux -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webflux</artifactId>
 			<version>6.0.10</version>
 		</dependency>
 
+		<!-- Twilio -->
 		<dependency>
 			<groupId>com.twilio.sdk</groupId>
 			<artifactId>twilio</artifactId>
@@ -158,6 +189,7 @@
 			<scope>compile</scope>
 		</dependency>
 
+		<!-- Springfox Swagger 2 -->
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger2</artifactId>
@@ -165,17 +197,21 @@
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.springframework/spring-messaging -->
+		<!-- Spring Messaging -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-messaging</artifactId>
 			<version>6.0.9</version>
 		</dependency>
 
+		<!-- SonarQube Scanner for Maven -->
 		<dependency>
 			<groupId>org.sonarsource.scanner.maven</groupId>
 			<artifactId>sonar-maven-plugin</artifactId>
 			<version>3.9.1.2184</version>
 		</dependency>
+
+		<!-- JaCoCo Code Coverage Agent (Scope: test) -->
 		<dependency>
 			<groupId>org.jacoco</groupId>
 			<artifactId>org.jacoco.agent</artifactId>
@@ -185,13 +221,14 @@
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor -->
+		<!-- Spring Boot Configuration Processor -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<version>3.1.2</version>
 		</dependency>
 
-		<!-- For Google Drive -->
+		<!-- Apache HttpClient for Google Drive -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
@@ -202,17 +239,19 @@
 
 	<build>
 		<plugins>
+			<!-- JaCoCo Maven Plugin -->
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.8.8</version>
 				<executions>
+					<!-- Prepares the agent for code coverage -->
 					<execution>
 						<goals>
 							<goal>prepare-agent</goal>
 						</goals>
 					</execution>
-					<!-- attached to Maven test phase -->
+					<!-- Generates code coverage report during the test phase -->
 					<execution>
 						<id>report</id>
 						<phase>test</phase>
@@ -220,6 +259,7 @@
 							<goal>report</goal>
 						</goals>
 					</execution>
+					<!-- Checks code coverage against specified rules -->
 					<execution>
 						<id>jacoco-check</id>
 						<goals>
@@ -228,9 +268,11 @@
 						<configuration>
 							<rules>
 								<rule>
+									<!-- Defines coverage checking at the package level -->
 									<element>PACKAGE</element>
 									<limits>
 										<limit>
+											<!-- Sets the minimum required line coverage to 0% -->
 											<counter>LINE</counter>
 											<value>COVEREDRATIO</value>
 											<minimum>0</minimum>
@@ -242,10 +284,12 @@
 					</execution>
 				</executions>
 			</plugin>
+			<!-- Spring Boot Maven Plugin -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
+					<!-- Excludes Lombok from the Spring Boot repackage process -->
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
