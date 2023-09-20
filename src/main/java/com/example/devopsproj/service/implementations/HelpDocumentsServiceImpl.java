@@ -7,7 +7,7 @@ import com.example.devopsproj.repository.HelpDocumentsRepository;
 import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.service.interfaces.HelpDocumentsService;
 import com.example.devopsproj.service.interfaces.ProjectService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,21 +16,12 @@ import java.io.IOException;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class HelpDocumentsServiceImpl implements HelpDocumentsService {
 
     private final ProjectRepository projectRepository;
     private final HelpDocumentsRepository helpDocumentsRepository;
     private final ProjectService projectService;
-
-    @Autowired
-    public HelpDocumentsServiceImpl(
-            ProjectRepository projectRepository,
-            HelpDocumentsRepository helpDocumentsRepository,
-            ProjectService projectService) {
-        this.projectRepository = projectRepository;
-        this.helpDocumentsRepository = helpDocumentsRepository;
-        this.projectService = projectService;
-    }
 
     @Override
     public ResponseEntity<Object> uploadFiles(long projectId, MultipartFile projectFile, String fileExtension) throws IOException {

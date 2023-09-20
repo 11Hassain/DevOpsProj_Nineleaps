@@ -7,10 +7,9 @@ import com.example.devopsproj.model.Figma;
 import com.example.devopsproj.model.GoogleDrive;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.model.User;
-//import com.example.devopsproj.service.JwtService;
 import com.example.devopsproj.service.interfaces.IUserService;
-import com.example.devopsproj.service.JwtService;
-//import com.example.devopsproj.service.UserService;
+import com.example.devopsproj.service.interfaces.JwtService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,12 +21,11 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/users")
+@RequiredArgsConstructor
 public class UserController {
 
-    @Autowired
-    private IUserService userService;
-    @Autowired
-    private JwtService jwtService;
+    private final IUserService userService;
+    private final JwtService jwtService;
 
     private static final String INVALID_TOKEN = "Invalid Token";
 

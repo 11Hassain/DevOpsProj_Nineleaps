@@ -1,7 +1,8 @@
 package com.example.devopsproj.config;
 
 import com.example.devopsproj.repository.TokenRepository;
-import com.example.devopsproj.service.JwtService;
+//import com.example.devopsproj.service.JwtService;
+import com.example.devopsproj.service.interfaces.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

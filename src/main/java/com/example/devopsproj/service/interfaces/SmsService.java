@@ -1,6 +1,5 @@
 package com.example.devopsproj.service.interfaces;
 
-//package com.example.devopsproj.otp.OTPService;
 
 import com.example.devopsproj.otp.OTPDTO.SmsPojo;
 import com.example.devopsproj.otp.OTPDTO.StoreOTP;

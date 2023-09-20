@@ -1,16 +1,13 @@
 package com.example.devopsproj.service.implementations;
-
-//package com.example.devopsproj.service;
-
 import com.example.devopsproj.model.User;
 import com.example.devopsproj.repository.UserRepository;
-import com.example.devopsproj.service.JwtService;
+import com.example.devopsproj.service.interfaces.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -21,10 +18,10 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
+@RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     private static final String SECRET_KEY = System.getenv("JWT_SECRET_KEY");
 

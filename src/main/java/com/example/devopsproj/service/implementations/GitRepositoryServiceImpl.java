@@ -8,6 +8,7 @@ import com.example.devopsproj.repository.GitRepositoryRepository;
 import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.service.interfaces.GitRepositoryService;
 import com.example.devopsproj.service.interfaces.ProjectService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class GitRepositoryServiceImpl implements GitRepositoryService {
 
     private static final String API_BASE_URL = "https://api.github.com";
@@ -34,17 +36,6 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
     private final ProjectRepository projectRepository;
     private final ProjectService projectService;
 
-    @Autowired
-    public GitRepositoryServiceImpl(GitRepositoryRepository gitRepositoryRepository,
-                                    ProjectRepository projectRepository,
-                                    ProjectService projectService) {
-        this.gitRepositoryRepository = gitRepositoryRepository;
-        this.projectRepository = projectRepository;
-        this.projectService = projectService;
-
-        this.restTemplate = new RestTemplate();
-        this.restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-    }
 
     @Override
     @Transactional

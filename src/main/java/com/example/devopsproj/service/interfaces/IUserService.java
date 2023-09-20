@@ -1,9 +1,4 @@
 package com.example.devopsproj.service.interfaces;
-
-//package com.example.devopsproj.interfaces;
-
-//package com.example.devopsproj.otp.OTPService;
-
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.dto.requestDto.UserCreationDTO;
 import com.example.devopsproj.dto.responseDto.ProjectDTO;

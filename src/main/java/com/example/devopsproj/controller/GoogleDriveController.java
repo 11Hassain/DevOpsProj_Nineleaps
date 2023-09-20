@@ -4,7 +4,8 @@ import com.example.devopsproj.dto.responseDto.GoogleDriveDTO;
 import com.example.devopsproj.dto.responseDto.ProjectDTO;
 import com.example.devopsproj.model.GoogleDrive;
 import com.example.devopsproj.service.interfaces.GoogleDriveService;
-import com.example.devopsproj.service.JwtService;
+import com.example.devopsproj.service.interfaces.JwtService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,12 +17,10 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/googledrive")
+@RequiredArgsConstructor
 public class GoogleDriveController {
-
-    @Autowired
-    private GoogleDriveService googleDriveService;
-    @Autowired
-    private JwtService jwtService;
+    private final GoogleDriveService googleDriveService;
+    private final JwtService jwtService;
 
     private static final String INVALID_TOKEN = "Invalid Token";
 

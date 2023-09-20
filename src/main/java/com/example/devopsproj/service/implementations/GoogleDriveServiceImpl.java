@@ -6,6 +6,7 @@ import com.example.devopsproj.model.GoogleDrive;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.repository.GoogleDriveRepository;
 import com.example.devopsproj.service.interfaces.GoogleDriveService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,14 +14,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class GoogleDriveServiceImpl implements GoogleDriveService {
 
     private final GoogleDriveRepository googleDriveRepository;
 
-    @Autowired
-    public GoogleDriveServiceImpl(GoogleDriveRepository googleDriveRepository) {
-        this.googleDriveRepository = googleDriveRepository;
-    }
 
     @Override
     public GoogleDrive createGoogleDrive(GoogleDriveDTO googleDriveDTO) {

@@ -1,23 +1,19 @@
 package com.example.devopsproj.controller;
 
-//package com.example.devopsproj.otp.OTPController;
-
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.model.User;
 import com.example.devopsproj.otp.OTPDTO.JwtResponse;
 import com.example.devopsproj.otp.OTPDTO.SmsPojo;
 import com.example.devopsproj.otp.OTPDTO.StoreOTP;
 import com.example.devopsproj.otp.OTPDTO.TempOTP;
-//import com.example.devopsproj.otp.OTPService.IUserService;
-//import com.example.devopsproj.otp.OTPService.SmsService;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-//import com.example.devopsproj.service.ISmsService;
 import com.example.devopsproj.service.interfaces.IUserService;
 import com.example.devopsproj.service.interfaces.SmsService;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,14 +28,12 @@ import java.io.IOException;
 
 @RequestMapping("/api/v1/OTP")
 @RestController
+@RequiredArgsConstructor
 public class SmsController {
 
-    @Autowired
-    private SmsService service;
-    @Autowired
-    IUserService userservice;
-    @Autowired
-    private SimpMessagingTemplate webSocket;
+    private final SmsService service;
+    private final IUserService userservice;
+    private final SimpMessagingTemplate webSocket;
     private static final String TOPIC_DESTINATION = "/lesson/sms";
     private static final String SECRET_KEY = System.getenv("SMS_SECRET_KEY");
 

@@ -2,10 +2,9 @@ package com.example.devopsproj.controller;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.dto.responseDto.UserNamesDTO;
-//import com.example.devopsproj.service.JwtService;
-import com.example.devopsproj.service.JwtService;
+import com.example.devopsproj.service.interfaces.JwtService;
 import com.example.devopsproj.service.interfaces.UserNamesService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,17 +12,11 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/usernames")
+@RequiredArgsConstructor
 public class UserNamesController {
 
-    @Autowired
     private final UserNamesService userNamesService;
-    @Autowired
-    private JwtService jwtService;
-    @Autowired
-    public UserNamesController(UserNamesService userNamesService) {
-        this.userNamesService = userNamesService;
-    }
-
+    private final JwtService jwtService;
     private static final String INVALID_TOKEN = "Invalid Token";
 
     @PostMapping("/githubUsername")

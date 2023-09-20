@@ -4,8 +4,8 @@ import com.example.devopsproj.dto.responseDto.HelpDocumentsDTO;
 import com.example.devopsproj.model.HelpDocuments;
 import com.example.devopsproj.repository.HelpDocumentsRepository;
 import com.example.devopsproj.service.interfaces.HelpDocumentsService;
-//import com.example.devopsproj.service.JwtService;
-import com.example.devopsproj.service.JwtService;
+import com.example.devopsproj.service.interfaces.JwtService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,15 +19,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("api/v1/helpdocuments")
+@RequestMapping("/api/v1/helpdocuments")
+@RequiredArgsConstructor
 public class HelpDocumentsController {
-
-    @Autowired
-    private HelpDocumentsService helpDocumentsService;
-    @Autowired
-    private HelpDocumentsRepository helpDocumentsRepository;
-    @Autowired
-    private JwtService jwtService;
+    private final HelpDocumentsService helpDocumentsService;
+    private final HelpDocumentsRepository helpDocumentsRepository;
+    private final JwtService jwtService;
 
     private static final String INVALID_TOKEN = "Invalid Token";
 

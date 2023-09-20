@@ -1,7 +1,5 @@
 package com.example.devopsproj.service.implementations;
 
-//package com.example.devopsproj.service;
-
 import com.example.devopsproj.dto.responseDto.FigmaDTO;
 import com.example.devopsproj.dto.responseDto.ProjectDTO;
 import com.example.devopsproj.model.Figma;

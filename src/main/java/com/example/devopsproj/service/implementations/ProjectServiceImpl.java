@@ -7,8 +7,8 @@ import com.example.devopsproj.repository.GitRepositoryRepository;
 import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.repository.UserRepository;
 import com.example.devopsproj.service.interfaces.ProjectService;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,19 +18,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ProjectServiceImpl implements ProjectService {
 
-    @Autowired
-    private ProjectRepository projectRepository;
+    private final ProjectRepository projectRepository;
+    private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
+    private final GitRepositoryRepository gitRepositoryRepository;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private ModelMapper modelMapper;
-
-    @Autowired
-    private GitRepositoryRepository gitRepositoryRepository;
 
     @Override
     public Project saveProject(ProjectDTO projectDTO) {

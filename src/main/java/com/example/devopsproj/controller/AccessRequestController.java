@@ -3,7 +3,7 @@ package com.example.devopsproj.controller;
 import com.example.devopsproj.dto.requestDto.AccessRequestDTO;
 import com.example.devopsproj.dto.responseDto.AccessResponseDTO;
 import com.example.devopsproj.service.interfaces.AccessRequestService;
-import com.example.devopsproj.service.JwtService;
+import com.example.devopsproj.service.interfaces.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

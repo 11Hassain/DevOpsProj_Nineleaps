@@ -3,8 +3,8 @@ import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.dto.responseDto.GitRepositoryDTO;
 import com.example.devopsproj.model.GitRepository;
 import com.example.devopsproj.service.interfaces.GitRepositoryService;
-//import com.example.devopsproj.service.JwtService;
-import com.example.devopsproj.service.JwtService;
+import com.example.devopsproj.service.interfaces.JwtService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.HttpStatus;
@@ -17,12 +17,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/repositories")
+@RequiredArgsConstructor
 public class GitRepositoryController {
-
-    @Autowired
-    private GitRepositoryService gitRepositoryService;
-    @Autowired
-    private JwtService jwtService;
+    private final GitRepositoryService gitRepositoryService;
+    private final JwtService jwtService;
 
     private static final String INVALID_TOKEN = "Invalid Token";
 

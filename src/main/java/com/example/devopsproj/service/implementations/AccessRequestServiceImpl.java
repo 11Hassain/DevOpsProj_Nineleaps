@@ -8,6 +8,7 @@ import com.example.devopsproj.model.Project;
 import com.example.devopsproj.model.User;
 import com.example.devopsproj.repository.AccessRequestRepository;
 import com.example.devopsproj.service.interfaces.AccessRequestService;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,13 +20,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class AccessRequestServiceImpl implements AccessRequestService {
 
-    @Autowired
-    private AccessRequestRepository accessRequestRepository;
-
-    @Autowired
-    private ModelMapper modelMapper;
+    private final AccessRequestRepository accessRequestRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     public AccessRequestDTO createRequest(AccessRequestDTO accessRequestDTO) {

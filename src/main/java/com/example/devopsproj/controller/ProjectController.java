@@ -7,10 +7,11 @@ import com.example.devopsproj.model.*;
 import com.example.devopsproj.repository.GitRepositoryRepository;
 import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.repository.UserRepository;
-import com.example.devopsproj.service.*;
 import com.example.devopsproj.service.interfaces.GitHubCollaboratorService;
 import com.example.devopsproj.service.interfaces.IUserService;
+import com.example.devopsproj.service.interfaces.JwtService;
 import com.example.devopsproj.service.interfaces.ProjectService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 
@@ -27,22 +28,15 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/projects")
+@RequiredArgsConstructor
 public class ProjectController {
-
-    @Autowired
-    private ProjectService projectService;
-    @Autowired
-    private ProjectRepository projectRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private IUserService userService;
-    @Autowired
-    private GitRepositoryRepository gitRepositoryRepository;
-    @Autowired
-    private JwtService jwtService;
-    @Autowired
-    private GitHubCollaboratorService collaboratorService;
+    private final ProjectService projectService;
+    private final ProjectRepository projectRepository;
+    private final UserRepository userRepository;
+    private final IUserService userService;
+    private final GitRepositoryRepository gitRepositoryRepository;
+    private final JwtService jwtService;
+    private final GitHubCollaboratorService collaboratorService;
 
     private static final String INVALID_TOKEN = "Invalid Token";
 

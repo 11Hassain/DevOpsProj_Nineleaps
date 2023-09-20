@@ -5,8 +5,8 @@ import com.example.devopsproj.dto.responseDto.FigmaScreenshotDTO;
 import com.example.devopsproj.model.Figma;
 import com.example.devopsproj.repository.FigmaRepository;
 import com.example.devopsproj.service.interfaces.FigmaService;
-import com.example.devopsproj.service.JwtService;
-//import com.example.devopsproj.service.JwtService;
+import com.example.devopsproj.service.interfaces.JwtService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -19,13 +19,11 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/figmas")
+@RequiredArgsConstructor
 public class FigmaController {
-    @Autowired
-    private FigmaService figmaService;
-    @Autowired
-    private FigmaRepository figmaRepository;
-    @Autowired
-    private JwtService jwtService;
+    private final FigmaService figmaService;
+    private final FigmaRepository figmaRepository;
+    private final JwtService jwtService;
     private static final String INVALID_TOKEN = "Invalid Token";
 
     @PostMapping("/create")

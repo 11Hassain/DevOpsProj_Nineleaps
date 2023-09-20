@@ -1,7 +1,6 @@
 package com.example.devopsproj.controller;
 
 import com.example.devopsproj.service.interfaces.IUserService;
-//import com.example.devopsproj.service.UserService;
 import com.example.devopsproj.utils.JwtUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;

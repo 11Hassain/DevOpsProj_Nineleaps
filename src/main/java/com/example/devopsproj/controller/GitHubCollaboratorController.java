@@ -1,8 +1,8 @@
 package com.example.devopsproj.controller;
 import com.example.devopsproj.dto.responseDto.CollaboratorDTO;
 import com.example.devopsproj.service.interfaces.GitHubCollaboratorService;
-//import com.example.devopsproj.service.JwtService;
-import com.example.devopsproj.service.JwtService;
+import com.example.devopsproj.service.interfaces.JwtService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,16 +10,10 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/collaborators")
+@RequiredArgsConstructor
 public class GitHubCollaboratorController {
-    @Autowired
     private final GitHubCollaboratorService collaboratorService;
-    @Autowired
-    private JwtService jwtService;
-    @Autowired
-    public GitHubCollaboratorController(GitHubCollaboratorService collaboratorService) {
-        this.collaboratorService = collaboratorService;
-    }
-
+    private final JwtService jwtService;
     private static final String INVALID_TOKEN = "Invalid Token";
 
     @PostMapping("/add")

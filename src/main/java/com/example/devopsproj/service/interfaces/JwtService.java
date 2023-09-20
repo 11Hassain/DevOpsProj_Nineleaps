@@ -1,8 +1,5 @@
 package com.example.devopsproj.service.interfaces;
 
-//package com.example.devopsproj.service;
-//package com.example.devopsproj.service;
-
 import io.jsonwebtoken.Claims;
 import org.springframework.security.core.userdetails.UserDetails;
 

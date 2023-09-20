@@ -1,26 +1,20 @@
 package com.example.devopsproj.service.implementations;
 
-//package com.example.devopsproj.service;
-
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.dto.requestDto.UserCreationDTO;
 import com.example.devopsproj.dto.responseDto.*;
 import com.example.devopsproj.model.GitRepository;
 import com.example.devopsproj.model.Project;
-//import com.example.devopsproj.model.RefreshToken;
 import com.example.devopsproj.model.User;
-//import com.example.devopsproj.otp.OTPService.IUserService;
 import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.repository.UserRepository;
-//import com.example.devopsproj.utils.JwtUtils;
 import com.example.devopsproj.service.interfaces.IUserService;
-import com.example.devopsproj.service.JwtService;
+import com.example.devopsproj.service.interfaces.JwtService;
 import com.example.devopsproj.service.interfaces.ProjectService;
 import com.example.devopsproj.utils.JwtUtils;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import java.time.LocalDateTime;
@@ -33,25 +27,19 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService implements IUserService {
 
-
     private final UserRepository userRepository;
-    @Autowired
-    private ProjectService projectService;
-    @Autowired
-    private JwtService jwtService;
-    @Autowired
-    private JwtUtils jwtUtils;
-    @Autowired
-    private ProjectRepository projectRepository;
-//    @Autowired
-//    private RefreshTokenService refreshTokenService;
-//    @Autowired
-//    private JwtUserDetailsService userDetailsService;
 
-    private ModelMapper modelMapper;
+    private final ProjectService projectService;
+
+    private final JwtService jwtService;
+
+    private final JwtUtils jwtUtils;
+
+    private final ProjectRepository projectRepository;
+
+    private final ModelMapper modelMapper;
 
 
-    //implementing user creation using DTO pattern
     public User saveUser(@RequestBody UserCreationDTO userCreationDTO) {
         User user = new User();
         user.setId(userCreationDTO.getId());
@@ -167,10 +155,7 @@ public class UserService implements IUserService {
 
         for (User user : users) {
             List<Project> projects = user.getProjects();
-//            if (projects.isEmpty()){
-//                UserDTO userDTO = new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole());
-//                userDTOs.add(userDTO);
-//            }
+
             if (projects.stream().noneMatch(project -> project.getProjectId() == projectId)) {
                 UserDTO userDTO = new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole());
                 userDTOs.add(userDTO);
@@ -187,17 +172,14 @@ public class UserService implements IUserService {
             List<String> projectNames = userProjectsDTO.getProjectNames();
             List<String> validProjectNames = new ArrayList<>();
 
-            // Check if each project exists in the database
             for (String projectName : projectNames) {
                 if (projectExists(projectName)) {
                     validProjectNames.add(projectName);
                 }
             }
 
-            // Update the UserProjectsDTO with valid project names
             userProjectsDTO.setProjectNames(validProjectNames);
 
-            // Add the UserProjectsDTO to the list if it has multiple projects
             if (validProjectNames.size() > 1) {
                 usersWithMultipleProjects.add(userProjectsDTO);
             }
@@ -287,50 +269,10 @@ public class UserService implements IUserService {
         return userRepository.findByPhoneNumber(phoneNumber);
     }
 
-//    @Override
-//    public User updateUser(User user) {
-//        return userRepository.save(user);
-//    }
-
     @Override
     public User getUserByMail(String userMai) {
         return userRepository.findByEmail(userMai);
     }
-
-//    @Override
-//    public User insertuser(UserDTO newSsoUser) {
-//        User user = new User();
-//        user.setName(newSsoUser.getName());
-//        user.setEmail(newSsoUser.getEmail());
-//        return userRepository.save(user);
-//    }
-
-//    @Override
-//    public User findUserByEmail(String userMail) {
-//        return userRepository.findByEmail(userMail);
-//    }
-
-
-
-
-//    public ResponseEntity<?> insertSsoUser(SSOUserDTO newSsoUser) {
-//        User existingUser = findUserByEmail(newSsoUser.getEmail());
-//        if (existingUser != null) {
-//            RefreshToken refreshToken = refreshTokenService.createRefreshToken(newSsoUser.getEmail());
-//
-//            UserDetails userDetails = userDetailsService.loadUserByUsername(existingUser.getEmail());
-//            String accessToken = jwtUtils.generateToken(userDetails);
-//            JwtResponse jwtResponse = new JwtResponse();
-//            jwtResponse.setAccessToken(accessToken);
-//            jwtResponse.setRefreshToken(refreshToken.getToken());
-//            System.out.println(accessToken);
-//            return ResponseEntity.ok(jwtResponse);
-//        } else {
-//             {
-//                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Doesn't exist.");
-//            }
-//        }
-//    }
 
 
 }
