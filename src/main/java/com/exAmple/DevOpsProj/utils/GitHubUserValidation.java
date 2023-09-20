@@ -1,11 +1,16 @@
 package com.exAmple.DevOpsProj.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class GitHubUserValidation {
+
+    private static final Logger logger = LoggerFactory.getLogger(GitHubUserValidation.class);
 
     public static boolean isGitHubUserValid(String username, String accessToken) {
         String apiUrl = "https://api.github.com/users/" + username;
@@ -22,7 +27,9 @@ public class GitHubUserValidation {
 
             return statusCode == 200;
         } catch (Exception e) {
-            e.printStackTrace();
+            // Restore the interrupted status
+            Thread.currentThread().interrupt();
+            logger.error("An error occurred: ", e);
             return false;
         }
     }

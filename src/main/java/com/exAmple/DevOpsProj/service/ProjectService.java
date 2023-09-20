@@ -4,14 +4,11 @@ import com.exAmple.DevOpsProj.commons.enumerations.EnumRole;
 import com.exAmple.DevOpsProj.dto.responseDto.*;
 import com.exAmple.DevOpsProj.model.*;
 import com.exAmple.DevOpsProj.repository.UserRepository;
-import com.example.DevOpsProj.dto.responseDto.*;
-import com.example.DevOpsProj.model.*;
 import com.exAmple.DevOpsProj.repository.ProjectRepository;
 import com.exAmple.DevOpsProj.repository.GitRepositoryRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -34,7 +31,7 @@ public class ProjectService {
 
 
     //implementing DTO pattern for project for saving project
-    public Project saveProject(ProjectDTO projectDTO){ //save project
+    public void saveProject(ProjectDTO projectDTO){ //save project
         Project project = new Project();
         project.setProjectId(projectDTO.getProjectId());
         project.setProjectName(projectDTO.getProjectName());
@@ -44,7 +41,7 @@ public class ProjectService {
                 .map(userDTO -> modelMapper.map(userDTO, User.class))
                 .collect(Collectors.toList());
         project.setUsers(users);
-        return projectRepository.save(project);
+        projectRepository.save(project);
     }
 
 
@@ -79,7 +76,7 @@ public class ProjectService {
     public List<User> getAllUsersByProjectId(Long projectId){
         List<User> users = projectRepository.findAllUsersByProjectId(projectId);
         if(users.isEmpty()){
-            return null;
+            return Collections.emptyList();
         }
         else {
             return users;
@@ -89,7 +86,7 @@ public class ProjectService {
     public List<User> getAllUsersByProjectIdAndRole(Long projectId, EnumRole role){
         List<User> users = projectRepository.findAllUsersByProjectIdAndRole(projectId, role);
         if(users.isEmpty()){
-            return null;
+            return Collections.emptyList();
         }
         else {
             return users;
@@ -99,6 +96,9 @@ public class ProjectService {
     //to check if the project has already been deleted
     public boolean existsByIdIsDeleted(Long id){
         Optional<Project> checkProject = projectRepository.findById(id);
+        if (checkProject.isEmpty()){
+            return true;
+        }
         Project cproject = checkProject.get();
         return cproject.getDeleted(); //true if deleted=1, else false
     }

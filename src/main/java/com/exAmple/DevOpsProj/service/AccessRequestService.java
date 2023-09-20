@@ -85,21 +85,14 @@ public class AccessRequestService {
             existingAccessRequest.setAllowed(accessRequestDTO.isAllowed());
             existingAccessRequest.setUpdated(true);
             AccessRequest updatedAccessRequest = accessRequestRepository.save(existingAccessRequest);
-            AccessResponseDTO accessResponseDTO = new AccessResponseDTO(
-                    updatedAccessRequest.getAccessRequestId(),
-                    updatedAccessRequest.getPmName(),
-                    mapUserToUserDTO(updatedAccessRequest.getUser()),
-                    mapProjectToProjectDTO(updatedAccessRequest.getProject()),
-                    updatedAccessRequest.getRequestDescription(),
-                    updatedAccessRequest.isAllowed());
         }
         List<AccessRequest> accessRequests = accessRequestRepository.findAllActiveRequests();
-        List<AccessResponseDTO> accessResponseDTOList = accessRequests.stream()
+        return accessRequests.stream()
                 .map(accessRequest -> new AccessResponseDTO(accessRequest.getAccessRequestId(), accessRequest.getPmName(), mapUserToUserDTO(accessRequest.getUser()), mapProjectToProjectDTO(accessRequest.getProject()), accessRequest.getRequestDescription(), accessRequest.isAllowed()))
                 .collect(Collectors.toList());
-        return accessResponseDTOList;
     }
 
+    private static final String RESPONSE = "Request for adding ";
 
     public List<AccessResponseDTO> getPMUnreadRequests(String pmName){
         List<AccessRequest> accessRequests = accessRequestRepository.findAllUnreadPMRequestsByName(pmName);
@@ -113,10 +106,10 @@ public class AccessRequestService {
             accessResponseDTO.setAccessRequestId(accessRequest.getAccessRequestId());
             accessResponseDTO.setPmName(accessRequest.getPmName());
             if (accessRequest.isAllowed()){
-                listOfPMRequests="Request for adding "+accessRequest.getUser().getName()+" has been granted";
+                listOfPMRequests=RESPONSE+accessRequest.getUser().getName()+" has been granted";
             }
             else {
-                listOfPMRequests="Request for adding "+accessRequest.getUser().getName()+" has been denied";
+                listOfPMRequests=RESPONSE+accessRequest.getUser().getName()+" has been denied";
             }
             accessResponseDTO.setResponse(listOfPMRequests);
             accessResponseDTO.setNotified(accessRequest.isPmNotified());
@@ -137,10 +130,10 @@ public class AccessRequestService {
             accessResponseDTO.setAccessRequestId(accessRequest.getAccessRequestId());
             accessResponseDTO.setPmName(accessRequest.getPmName());
             if (accessRequest.isAllowed()){
-                listOfPMRequests="Request for adding "+accessRequest.getUser().getName()+" has been granted";
+                listOfPMRequests=RESPONSE+accessRequest.getUser().getName()+" has been granted";
             }
             else {
-                listOfPMRequests="Request for adding "+accessRequest.getUser().getName()+" has been denied";
+                listOfPMRequests=RESPONSE+accessRequest.getUser().getName()+" has been denied";
             }
             accessResponseDTO.setResponse(listOfPMRequests);
             accessResponseDTO.setNotified(accessRequest.isPmNotified());

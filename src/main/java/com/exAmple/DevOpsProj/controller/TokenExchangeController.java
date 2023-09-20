@@ -3,12 +3,14 @@ package com.exAmple.DevOpsProj.controller;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +26,8 @@ import java.util.List;
 @RequestMapping("/api/v1")
 public class TokenExchangeController {
 
+    private static final Logger logger = LoggerFactory.getLogger(TokenExchangeController.class);
+
     @GetMapping("/token-exchange")
     public ResponseEntity<Object> tokenExchange(@RequestParam("code") String authorizationCode) {
 
@@ -31,24 +35,22 @@ public class TokenExchangeController {
         String clientSecret = System.getenv("GOOGLE_SECRET_KEY");
         String redirectUri = "https://www.google.com/";
 
-        // Create HttpClient
-        HttpClient httpClient = HttpClients.createDefault();
+        try(CloseableHttpClient httpClient = HttpClients.createDefault()){
 
-        // Construct token endpoint URL
-        String tokenEndpointUrl = "https://oauth2.googleapis.com/token";
+            // Construct token endpoint URL
+            String tokenEndpointUrl = "https://oauth2.googleapis.com/token";
 
-        // Create a POST request to the token endpoint
-        HttpPost httpPost = new HttpPost(tokenEndpointUrl);
+            // Create a POST request to the token endpoint
+            HttpPost httpPost = new HttpPost(tokenEndpointUrl);
 
-        // Set request parameters
-        List<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair("client_id", clientId));
-        params.add(new BasicNameValuePair("client_secret", clientSecret));
-        params.add(new BasicNameValuePair("redirect_uri", redirectUri));
-        params.add(new BasicNameValuePair("code", authorizationCode));
-        params.add(new BasicNameValuePair("grant_type", "authorization_code"));
+            // Set request parameters
+            List<NameValuePair> params = new ArrayList<>();
+            params.add(new BasicNameValuePair("client_id", clientId));
+            params.add(new BasicNameValuePair("client_secret", clientSecret));
+            params.add(new BasicNameValuePair("redirect_uri", redirectUri));
+            params.add(new BasicNameValuePair("code", authorizationCode));
+            params.add(new BasicNameValuePair("grant_type", "authorization_code"));
 
-        try {
             // Set the request body with the parameters
             httpPost.setEntity(new UrlEncodedFormEntity(params));
 
@@ -60,9 +62,11 @@ public class TokenExchangeController {
             String responseBody = EntityUtils.toString(entity);
 
             return ResponseEntity.ok(responseBody);
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        } catch (IOException e){
+            logger.error("An error occurred: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
         }
+
     }
 }

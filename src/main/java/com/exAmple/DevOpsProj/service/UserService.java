@@ -77,6 +77,9 @@ public class UserService implements IUserService {
     //this function says whether id is soft-deleted or not
     public boolean existsByIdIsDeleted(Long id) {
         Optional<User> checkUser = userRepository.findById(id);
+        if (checkUser.isEmpty()){
+            return true;
+        }
         User cuser = checkUser.get();
         return cuser.getDeleted(); //true if deleted=1, false otherwise
     }
@@ -95,15 +98,14 @@ public class UserService implements IUserService {
         return userRepository.existsById(id);
     }
 
-    //editing
+
     //get all user based on role id
     public List<User> getUsersByRole(EnumRole enumRole) {
         return userRepository.findByRole(enumRole);
     }
 
     private UserDTO convertToUserDto(User user) {
-        UserDTO userDTO = modelMapper.map(user, UserDTO.class);
-        return userDTO;
+        return modelMapper.map(user, UserDTO.class);
     }
 
     public User getUserByEmail(String userEmail) {
@@ -158,10 +160,7 @@ public class UserService implements IUserService {
 
         for (User user : users) {
             List<Project> projects = user.getProjects();
-//            if (projects.isEmpty()){
-//                UserDTO userDTO = new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole());
-//                userDTOs.add(userDTO);
-//            }
+
             if (projects.stream().noneMatch(project -> project.getProjectId() == projectId)) {
                 UserDTO userDTO = new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole());
                 userDTOs.add(userDTO);
@@ -205,10 +204,9 @@ public class UserService implements IUserService {
 
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
-        List<UserDTO> userDTOList = users.stream()
+        return users.stream()
                 .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
                 .toList();
-        return userDTOList;
     }
 
     public List<ProjectDTO> getAllProjectsAndRepositoriesByUserId(Long userId) {
@@ -278,34 +276,8 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User updateUser(User user) {
-        return userRepository.save(user);
-    }
-
-    @Override
     public User getUserByMail(String userMai) {
         return userRepository.findByEmail(userMai);
-    }
-
-    @Override
-    public User insertuser(UserDTO newSsoUser) {
-        User user = new User();
-        user.setName(newSsoUser.getName());
-        user.setEmail(newSsoUser.getEmail());
-        return userRepository.save(user);
-    }
-
-    @Override
-    public User findUserByEmail(String userMail) {
-        return userRepository.findByEmail(userMail);
-    }
-
-    @Override
-    public User insertUser(UserDTO newSsoUser) {
-        User user = new User();
-        user.setName(newSsoUser.getName());
-        user.setEmail(newSsoUser.getEmail());
-        return userRepository.save(user);
     }
 
 

@@ -5,7 +5,6 @@ import com.exAmple.DevOpsProj.dto.responseDto.*;
 import com.exAmple.DevOpsProj.model.Figma;
 import com.exAmple.DevOpsProj.model.GoogleDrive;
 import com.exAmple.DevOpsProj.dto.requestDto.UserCreationDTO;
-import com.example.DevOpsProj.dto.responseDto.*;
 import com.exAmple.DevOpsProj.model.Project;
 import com.exAmple.DevOpsProj.model.User;
 import com.exAmple.DevOpsProj.service.JwtService;

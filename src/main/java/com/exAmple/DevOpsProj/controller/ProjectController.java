@@ -10,12 +10,9 @@ import com.exAmple.DevOpsProj.repository.UserRepository;
 import com.exAmple.DevOpsProj.service.GitHubCollaboratorService;
 import com.exAmple.DevOpsProj.service.JwtService;
 import com.exAmple.DevOpsProj.service.ProjectService;
-import com.example.DevOpsProj.dto.responseDto.*;
 import com.exAmple.DevOpsProj.exceptions.NotFoundException;
-import com.example.DevOpsProj.model.*;
 import com.exAmple.DevOpsProj.repository.GitRepositoryRepository;
 import com.exAmple.DevOpsProj.repository.ProjectRepository;
-import com.example.DevOpsProj.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 
@@ -142,7 +139,7 @@ public class ProjectController {
 
                 for (Project project : projects) {
                     List<User> userList = projectService.getAllUsersByProjectId(project.getProjectId());
-                    if (userList == null) {
+                    if (userList.isEmpty()) {
                         userList = new ArrayList<>();
                     }
                     List<UserDTO> userDTOList = userList.stream()
@@ -181,7 +178,7 @@ public class ProjectController {
         if (isTokenValid) {
             try {
                 List<User> userList = projectService.getAllUsersByProjectId(projectId);
-                if (userList == null) {
+                if (userList.isEmpty()) {
                     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
                 }
                 List<UserDTO> userDTOList = userList.stream()
@@ -208,7 +205,7 @@ public class ProjectController {
             try {
                 EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
                 List<User> userList = projectService.getAllUsersByProjectIdAndRole(projectId, enumRole);
-                if (userList == null) {
+                if (userList.isEmpty()) {
                     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
                 }
 

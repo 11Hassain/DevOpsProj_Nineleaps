@@ -1,6 +1,5 @@
 package com.exAmple.DevOpsProj.model;
 
-
 import com.exAmple.DevOpsProj.commons.enumerations.TokenType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
