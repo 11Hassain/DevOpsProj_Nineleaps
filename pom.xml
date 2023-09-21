@@ -158,7 +158,7 @@
 			<version>2.13.4.1</version>
 		</dependency>
 
-		<!-- Springdoc OpenAPI Starter for WebMVC UI -->
+		<!-- SpringDoc OpenAPI Starter for WebMVC UI -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>

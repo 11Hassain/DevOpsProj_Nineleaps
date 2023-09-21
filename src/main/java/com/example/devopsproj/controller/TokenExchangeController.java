@@ -1,5 +1,7 @@
 package com.example.devopsproj.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -13,10 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,6 +28,16 @@ public class TokenExchangeController {
     private static final Logger logger = LoggerFactory.getLogger(TokenExchangeController.class);
 
     @GetMapping("/token-exchange")
+    @Operation(
+            description = "Exchange authorization code for access token",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Access token obtained successfully"),
+                    @ApiResponse(responseCode = "400", description = "Bad Request - Invalid parameters"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> tokenExchange(@RequestParam("code") String authorizationCode) {
 
         String clientId = System.getenv("GOOGLE_CLIENT_ID");

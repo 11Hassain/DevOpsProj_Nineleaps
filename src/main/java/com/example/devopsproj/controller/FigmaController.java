@@ -6,6 +6,8 @@ import com.example.devopsproj.service.JwtService;
 import com.example.devopsproj.dto.responseDto.FigmaDTO;
 import com.example.devopsproj.dto.responseDto.FigmaScreenshotDTO;
 import com.example.devopsproj.repository.FigmaRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +29,15 @@ public class FigmaController {
     private static final String INVALID_TOKEN = "Invalid Token";
 
     @PostMapping("/create")
+    @Operation(
+            description = "Create Figma",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Figma created successfully"),
+                    @ApiResponse(responseCode = "409", description = "Conflict"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> createFigma(@RequestBody FigmaDTO figmaDTO,
                                               @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -49,6 +60,14 @@ public class FigmaController {
     }
 
     @GetMapping("/getAll")
+    @Operation(
+            description = "Get All Figma Projects",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Figma projects retrieved successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getAllFigmaProjects(@RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
@@ -69,6 +88,15 @@ public class FigmaController {
     }
 
     @GetMapping("/get/{figmaId}")
+    @Operation(
+            description = "Get Figma by ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Figma retrieved successfully"),
+                    @ApiResponse(responseCode = "404", description = "Figma not found"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getFigma(@PathVariable Long figmaId,
                                            @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -85,6 +113,16 @@ public class FigmaController {
     }
 
     @PostMapping("/{figmaId}/user")
+    @Operation(
+            description = "Add User and Screenshots to Figma",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "User and screenshot added"),
+                    @ApiResponse(responseCode = "404", description = "Figma not found"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "500", description = "Internal server error")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> addUserAndScreenshotsToFigma(@PathVariable("figmaId") Long figmaId,
                                                                @RequestBody FigmaDTO figmaDTO,
                                                                @RequestHeader("AccessToken") String accessToken)
@@ -122,12 +160,29 @@ public class FigmaController {
 
 
     @DeleteMapping("/{figmaId}")
+    @Operation(
+            description = "Delete Figma by ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Figma deleted successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> deleteFigma(@PathVariable Long figmaId) {
         figmaService.deleteFigma(figmaId);
         return ResponseEntity.ok("Figma deleted successfully");
     }
 
     @GetMapping("/project/{projectId}")
+    @Operation(
+            description = "Get Figma by Project ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Figma URL retrieved successfully"),
+                    @ApiResponse(responseCode = "404", description = "Figma not found"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getFigmaByProjectId(@PathVariable Long projectId,
                                                       @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -146,6 +201,16 @@ public class FigmaController {
     }
 
     @GetMapping("/{figmaId}/screenshots")
+    @Operation(
+            description = "Get Screenshots for Figma by ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Screenshots retrieved successfully"),
+                    @ApiResponse(responseCode = "404", description = "Figma not found"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "500", description = "Internal server error")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<FigmaScreenshotDTO>> getScreenshotsForFigmaId(@PathVariable("figmaId") Long figmaId) {
         try {
             Optional<Figma> optionalFigma = figmaRepository.findById(figmaId);

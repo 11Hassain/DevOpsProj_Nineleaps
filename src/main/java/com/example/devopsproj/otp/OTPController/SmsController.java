@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,10 +22,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import java.io.IOException;
 
 @RequestMapping("/api/v1/OTP")
@@ -41,6 +41,14 @@ public class SmsController {
 
 
     @PostMapping("/send")
+    @Operation(
+            description = "Submit SMS",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "SMS sent successfully"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error - Something went wrong")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> smsSubmit(@RequestBody SmsPojo sms){
         try{
             service.send(sms);
@@ -52,6 +60,14 @@ public class SmsController {
     }
 
     @PostMapping("/resend")
+    @Operation(
+            description = "Resend SMS",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "SMS resent successfully"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error - Something went wrong")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> smsSub(@RequestBody SmsPojo resendsms){
         try{
             service.send(resendsms);
@@ -63,6 +79,15 @@ public class SmsController {
     }
 
     @PostMapping("/verify/token")
+    @Operation(
+            description = "Verify OTP with token",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OTP verified successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized - Incorrect OTP"),
+                    @ApiResponse(responseCode = "200", description = "User not found"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
     public ResponseEntity<Object> verifyOTP(@RequestBody TempOTP tempOTP, HttpServletResponse response) throws Exception {
 
         if (tempOTP.getOtp() == StoreOTP.getOtp()) {
@@ -89,6 +114,14 @@ public class SmsController {
     }
 
     @PostMapping("/verify")
+    @Operation(
+            description = "Verify OTP for signup",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OTP verified successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized - Incorrect OTP")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public Boolean verifyOTPsignup(@RequestBody TempOTP sms,HttpServletResponse response) throws Exception{
 
         if(sms.getOtp()== StoreOTP.getOtp()) {

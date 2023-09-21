@@ -4,6 +4,9 @@ import com.example.devopsproj.service.AccessRequestService;
 import com.example.devopsproj.service.JwtService;
 import com.example.devopsproj.dto.requestDto.AccessRequestDTO;
 import com.example.devopsproj.dto.responseDto.AccessResponseDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +26,13 @@ public class AccessRequestController {
     private static final String INVALID_TOKEN = "Invalid Token";
 
     @PostMapping("/")
+    @Operation(
+            description = "Create Access Request",
+            responses = {
+            @ApiResponse(responseCode = "200", description = "Request made successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> createAccessRequest(@RequestBody AccessRequestDTO accessRequestDTO, @RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
@@ -33,6 +43,15 @@ public class AccessRequestController {
     }
 
     @GetMapping("/allActive")
+    @Operation(
+            description = "Get All Active Requests",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Active requests retrieved successfully"),
+                    @ApiResponse(responseCode = "204", description = "No active requests"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getAllActiveRequests(@RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
@@ -47,6 +66,15 @@ public class AccessRequestController {
     }
 
     @GetMapping("/all")
+    @Operation(
+            description = "Get All Requests",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Requests retrieved successfully"),
+                    @ApiResponse(responseCode = "204", description = "No requests"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getAllRequests(@RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
@@ -61,6 +89,15 @@ public class AccessRequestController {
     }
 
     @PutMapping("/update/{accessRequestId}")
+    @Operation(
+            description = "Update Access Request",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Access request updated successfully"),
+                    @ApiResponse(responseCode = "204", description = "No updated requests"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> updateAccessRequest(
             @PathVariable("accessRequestId") Long requestId,
             @RequestBody AccessRequestDTO accessRequestDTO,
@@ -78,6 +115,15 @@ public class AccessRequestController {
     }
 
     @GetMapping("/unread/PM")
+    @Operation(
+            description = "Get Unread PM Requests Notification",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Unread PM requests retrieved successfully"),
+                    @ApiResponse(responseCode = "204", description = "No unread PM requests"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getUnreadPMRequestsNotification(@RequestParam("pmName") String pmName,
                                                 @RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -93,6 +139,15 @@ public class AccessRequestController {
     }
 
     @GetMapping("/all/PM")
+    @Operation(
+            description = "Get All PM Requests Notification",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "All PM requests retrieved successfully"),
+                    @ApiResponse(responseCode = "204", description = "No PM requests"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getPMRequestsNotification(@RequestParam("pmName") String pmName,
                                                             @RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -108,6 +163,14 @@ public class AccessRequestController {
     }
 
     @PutMapping("/notifiedPM")
+    @Operation(
+            description = "Set PM Requests Notification to True",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Notification read"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> setPMRequestsNotificationToTrue(
             @RequestParam("accessRequestId") Long accessRequestId,
             @RequestHeader("AccessToken") String accessToken
@@ -122,6 +185,14 @@ public class AccessRequestController {
     }
 
     @DeleteMapping("/clearAll")
+    @Operation(
+            description = "Clear All Notifications",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "All notifications cleared"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> deleteAllNotifications(@RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if(isTokenValid){

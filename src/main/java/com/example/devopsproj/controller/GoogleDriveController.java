@@ -5,6 +5,8 @@ import com.example.devopsproj.model.GoogleDrive;
 import com.example.devopsproj.service.GoogleDriveService;
 import com.example.devopsproj.service.JwtService;
 import com.example.devopsproj.dto.responseDto.GoogleDriveDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,14 @@ public class GoogleDriveController {
     private static final String INVALID_TOKEN = "Invalid Token";
 
     @PostMapping("/createGoogleDrive")
+    @Operation(
+            description = "Create Google Drive",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Google Drive created successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> createGoogleDrive(@RequestBody GoogleDriveDTO googleDriveDTO,
                                                             @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -42,6 +52,14 @@ public class GoogleDriveController {
     }
 
     @GetMapping("/getAllGoogleDrives")
+    @Operation(
+            description = "Get All Google Drives",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Google Drives retrieved successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getAllGoogleDrives(@RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
@@ -61,6 +79,15 @@ public class GoogleDriveController {
     }
 
     @GetMapping("/getGoogleDriveById/{driveId}")
+    @Operation(
+            description = "Get Google Drive by ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Google Drive retrieved successfully"),
+                    @ApiResponse(responseCode = "404", description = "Google Drive not found"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<GoogleDriveDTO> getGoogleDriveById(@PathVariable Long driveId,
                                                      @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -77,6 +104,15 @@ public class GoogleDriveController {
     }
 
     @DeleteMapping("/deleteGoogleDriveById/{driveId}")
+    @Operation(
+            description = "Delete Google Drive by ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Google Drive deleted successfully"),
+                    @ApiResponse(responseCode = "404", description = "Google Drive not found"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> deleteGoogleDriveById(@PathVariable Long driveId,
                                                         @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -93,6 +129,15 @@ public class GoogleDriveController {
     }
 
     @GetMapping("/getGoogleDriveByProjectId/{projectId}")
+    @Operation(
+            description = "Get Google Drive by Project ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Google Drive retrieved successfully"),
+                    @ApiResponse(responseCode = "404", description = "Google Drive not found"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<GoogleDriveDTO> getGoogleDriveByProjectId(@PathVariable Long projectId,
                                                                     @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -112,6 +157,5 @@ public class GoogleDriveController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorDTO);
         }
     }
-
 
 }

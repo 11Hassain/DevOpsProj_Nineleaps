@@ -9,6 +9,8 @@ import com.example.devopsproj.model.Project;
 import com.example.devopsproj.model.User;
 import com.example.devopsproj.service.JwtService;
 import com.example.devopsproj.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +31,15 @@ public class UserController {
 
     private static final String INVALID_TOKEN = "Invalid Token";
 
-    @PostMapping("/") //Save the user
+    @PostMapping("/") // Save the user
+    @Operation(
+            description = "Save the user",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "User saved successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
+            }
+    )
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> saveUser(@RequestBody UserCreationDTO userCreationDTO,
                                          @RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -41,7 +51,15 @@ public class UserController {
         }
     }
 
-    @GetMapping("/{user_id}") //find user by user id
+    @GetMapping("/{user_id}") // Find user by user id
+    @Operation(
+            description = "Find user by user id",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "User found successfully"),
+                    @ApiResponse(responseCode = "404", description = "User not found"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
+            }
+    )
     public ResponseEntity<Object> getUserById(@PathVariable Long userId,
                                                @RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -58,7 +76,14 @@ public class UserController {
         }
     }
 
-    @PutMapping("/update/{id}")//update user by id
+    @PutMapping("/update/{id}") // Update user by id
+    @Operation(
+            description = "Update user by id",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "User updated successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
+            }
+    )
     public ResponseEntity<Object> updateUser(@PathVariable("id") Long id,
                                              @RequestBody UserDTO userDTO,
                                              @RequestHeader("AccessToken") String accessToken){
@@ -71,7 +96,15 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/delete/{user_id}") //soft-deleting user
+    @DeleteMapping("/delete/{user_id}") // Soft-deleting user
+    @Operation(
+            description = "Soft-delete user by id",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "User successfully soft-deleted"),
+                    @ApiResponse(responseCode = "404", description = "User not found"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
+            }
+    )
     public ResponseEntity<String> deleteUserById(@PathVariable Long userId,
                                                  @RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -98,7 +131,14 @@ public class UserController {
         }
     }
 
-    @GetMapping("/role/{role}") //get list of user by role
+    @GetMapping("/role/{role}") // Get list of users by role
+    @Operation(
+            description = "Get list of users by role",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Users by role found successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
+            }
+    )
     public ResponseEntity<Object> getUserByRoleId(@PathVariable("role") String role,
                                                        @RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -114,7 +154,14 @@ public class UserController {
         }
     }
 
-    @GetMapping("/count") //get count of all the users
+    @GetMapping("/count") // Get count of all the users
+    @Operation(
+            description = "Get count of all users",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Count of all users obtained successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
+            }
+    )
     public ResponseEntity<Object> getCountAllUsers(@RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
@@ -130,7 +177,14 @@ public class UserController {
         }
     }
 
-    @GetMapping("/count/{role}")
+    @GetMapping("/count/{role}") // Get count of users by role
+    @Operation(
+            description = "Get count of users by role",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Count of users by role obtained successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
+            }
+    )
     public ResponseEntity<Object> getCountAllUsersByRole(@PathVariable String role,
                                           @RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -148,7 +202,14 @@ public class UserController {
         }
     }
 
-    @GetMapping("/count/project/{projectId}")
+    @GetMapping("/count/project/{projectId}") // Get count of users by project ID
+    @Operation(
+            description = "Get count of users by project ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Count of users by project ID obtained successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
+            }
+    )
     public ResponseEntity<Object> getCountAllUsersByProjectId(@PathVariable Long projectId,
                                                               @RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -166,6 +227,13 @@ public class UserController {
     }
 
     @GetMapping("/{id}/projects")
+    @Operation(
+            description = "Get all projects by user ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Projects obtained successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
+            }
+    )
     public ResponseEntity<Object> getAllProjectsByUserId(@PathVariable Long id,
                                                          @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -177,7 +245,15 @@ public class UserController {
         }
     }
 
-    @GetMapping("{id}/role/{role}/projects") // Get list of project for particular employee
+    @GetMapping("{id}/role/{role}/projects")
+    @Operation(
+            description = "Get projects by role and user ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Projects obtained successfully"),
+                    @ApiResponse(responseCode = "204", description = "No Content - No projects found"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
+            }
+    )
     public ResponseEntity<Object> getProjectsByRoleIdAndUserId(
             @PathVariable("id") Long userId,
             @PathVariable("role") String role,
@@ -217,6 +293,13 @@ public class UserController {
     }
 
     @GetMapping("/get")
+    @Operation(
+            description = "Get all users",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Users obtained successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
+            }
+    )
     public ResponseEntity<Object> getAllUsers(@RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
@@ -227,6 +310,13 @@ public class UserController {
     }
 
     @GetMapping("/getAll")
+    @Operation(
+            description = "Get all users with projects",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Users with projects obtained successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
+            }
+    )
     public ResponseEntity<Object> getAllUsersWithProjects(@RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
@@ -238,6 +328,13 @@ public class UserController {
     }
 
     @GetMapping("/getMultiple")
+    @Operation(
+            description = "Get users with multiple projects",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Users with multiple projects obtained successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
+            }
+    )
     public ResponseEntity<Object> getUsersWithMultipleProjects(@RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
@@ -248,6 +345,13 @@ public class UserController {
         }
     }
     @GetMapping("/withoutProject")
+    @Operation(
+            description = "Get users without a project",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Users without a project obtained successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
+            }
+    )
     public ResponseEntity<Object> getUserWithoutProject(
             @RequestParam("role") String role,
             @RequestParam("projectId") Long projectId,
@@ -263,6 +367,13 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/logout")
+    @Operation(
+            description = "Logout a user by user ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "User logged out successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
+            }
+    )
     public ResponseEntity<String> userLogout(@PathVariable("userId") Long id,
                                              @RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);

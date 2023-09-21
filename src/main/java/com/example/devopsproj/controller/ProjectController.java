@@ -13,6 +13,8 @@ import com.example.devopsproj.service.ProjectService;
 import com.example.devopsproj.exceptions.NotFoundException;
 import com.example.devopsproj.repository.GitRepositoryRepository;
 import com.example.devopsproj.repository.ProjectRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 
@@ -47,7 +49,16 @@ public class ProjectController {
     private static final String INVALID_TOKEN = "Invalid Token";
 
 
-    @PostMapping("/") //Save the project
+    @PostMapping("/") // Save the project
+    @Operation(
+            description = "Save Project",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Project created successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "409", description = "Conflict - Project already exists")
+            }
+    )
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> saveProject(@RequestBody ProjectDTO projectDTO,
                                               @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -65,6 +76,14 @@ public class ProjectController {
     }
 
     @PostMapping("/create")
+    @Operation(
+            description = "Create Project",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Project created successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> createProject(@RequestBody ProjectDTO projectDTO,
                                                 @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -76,7 +95,17 @@ public class ProjectController {
         }
     }
 
-    @GetMapping("/{id}") //get project by id
+    @GetMapping("/{id}") // Get project by id
+    @Operation(
+            description = "Get Project by ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Project retrieved successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "Project not found"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getProjectById(@PathVariable("id") Long id,
                                                  @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -108,7 +137,17 @@ public class ProjectController {
         }
     }
 
-    @GetMapping("/all") //retrieve list of all projects
+    @GetMapping("/all") // Retrieve a list of all projects
+    @Operation(
+            description = "Retrieve a list of all projects",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Projects retrieved successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "No projects found"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getAll(@RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
@@ -130,6 +169,16 @@ public class ProjectController {
     }
 
     @GetMapping("/allProjects")
+    @Operation(
+            description = "Retrieve a list of all projects with users",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Projects retrieved successfully with users"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "No projects found"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getAllProjectsWithUsers(@RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
@@ -170,8 +219,18 @@ public class ProjectController {
     }
 
 
-    //get list of user in the project
+    // Get a list of users in the project
     @GetMapping("/{projectId}/users")
+    @Operation(
+            description = "Retrieve a list of users in the project",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Users retrieved successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "204", description = "No users found"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getAllUsersByProjectId(@PathVariable Long projectId,
                                                          @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -196,6 +255,17 @@ public class ProjectController {
     }
 
     @GetMapping("/{projectId}/users/{role}")
+    @Operation(
+            description = "Retrieve a list of users in the project by role",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Users retrieved successfully by role"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "204", description = "No users found by role"),
+                    @ApiResponse(responseCode = "404", description = "Role not found"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getAllUsersByProjectIdByRole(
             @PathVariable Long projectId,
             @PathVariable String role,
@@ -228,7 +298,17 @@ public class ProjectController {
         }
     }
 
-    @PutMapping("/update/{projectId}") //update project
+    @PutMapping("/update/{projectId}") // Update project
+    @Operation(
+            description = "Update a project",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Project updated successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "Project not found"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> updateProject(@PathVariable("projectId") Long projectId,
                                                 @RequestBody ProjectDTO projectDTO,
                                                 @RequestHeader("AccessToken") String accessToken) {
@@ -257,7 +337,17 @@ public class ProjectController {
         }
     }
 
-    @DeleteMapping("/delete/{id}") //delete project (soft)
+    @DeleteMapping("/delete/{id}") // Delete project (soft)
+    @Operation(
+            description = "Delete a project (soft)",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Project deleted successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "Project not found"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> deleteProject(@PathVariable("id") Long id,
                                                 @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -279,7 +369,18 @@ public class ProjectController {
         }
     }
 
-    @PutMapping("/{projectId}/users/{userId}") //add user to project
+    @PutMapping("/{projectId}/users/{userId}") // Add user to project
+    @Operation(
+            description = "Add a user to the project",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "User added to project successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "Project or User not found"),
+                    @ApiResponse(responseCode = "409", description = "Conflict - User already in project"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> addUserToProject(
             @PathVariable("projectId") Long projectId,
             @PathVariable("userId") Long userId,
@@ -313,7 +414,17 @@ public class ProjectController {
         }
     }
 
-    @DeleteMapping("/{projectId}/users/{userId}") //remove user from the project
+    @DeleteMapping("/{projectId}/users/{userId}") // Remove user from the project
+    @Operation(
+            description = "Remove a user from the project",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "User removed from project successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "Project or User not found"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> removeUserFromProject(
             @PathVariable("projectId") Long projectId,
             @PathVariable("userId") Long userId,
@@ -339,7 +450,17 @@ public class ProjectController {
         }
     }
 
-    @DeleteMapping("/{projectId}/users/{userId}/repo") //remove user from the project and repo as well
+    @DeleteMapping("/{projectId}/users/{userId}/repo") // Remove user from the project and repo as well
+    @Operation(
+            description = "Remove a user from the project and repo as well",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "User removed from project and repo successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "Project or User not found"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> removeUserFromProject(
             @PathVariable("projectId") Long projectId,
             @PathVariable("userId") Long userId,
@@ -372,11 +493,30 @@ public class ProjectController {
 
 
     @DeleteMapping("/{projectId}/users/{userId}/roles/{roleId}")
+    @Operation(
+            description = "Remove a role from a user in the project",
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "Role removed from user in project"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "Project, User, or Role not found")
+            }
+    )
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> removeRoleFromUserInProject(@PathVariable("projectId") Long projectId, @PathVariable("userId") Long userId, @PathVariable("roleId") Long roleId) {
-        return null;
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{projectId}/users/role/{role}")
+    @Operation(
+            description = "Get users by role in the project",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Users retrieved successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "Project not found"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getUsersByProjectIdAndRole(
             @PathVariable("projectId") Long projectId,
             @PathVariable("role") String role,
@@ -394,7 +534,17 @@ public class ProjectController {
         }
     }
 
-    @PutMapping("/{projectId}/repository/{repoId}") // add repository to project
+    @PutMapping("/{projectId}/repository/{repoId}")
+    @Operation(
+            description = "Add a repository to the project",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Repository added to project successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "Project or Repository not found"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> addRepositoryToProject(
             @PathVariable("projectId") Long projectId,
             @PathVariable("repoId") Long repoId,
@@ -428,6 +578,15 @@ public class ProjectController {
     }
 
     @GetMapping("/without-figma-url")
+    @Operation(
+            description = "Get projects without Figma URL",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Projects retrieved successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getProjectsWithoutFigmaURL(
             @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -440,6 +599,15 @@ public class ProjectController {
     }
 
     @GetMapping("/without-google-drive")
+    @Operation(
+            description = "Get projects without Google Drive Link",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Projects retrieved successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getProjectsWithoutGoogleDriveLink(
             @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -452,6 +620,15 @@ public class ProjectController {
     }
 
     @GetMapping("/countPeople")
+    @Operation(
+            description = "Count people by project name",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "People count retrieved successfully"),
+                    @ApiResponse(responseCode = "204", description = "No Content - Empty result"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
     public ResponseEntity<Object> countAllPeopleByProjectIdAndName(@RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
@@ -467,6 +644,15 @@ public class ProjectController {
     }
 
     @GetMapping("/count")
+    @Operation(
+            description = "Count all projects",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Projects count retrieved successfully"),
+                    @ApiResponse(responseCode = "204", description = "No Content - Empty result"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
     public ResponseEntity<Object> countAllProjects(@RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
@@ -482,6 +668,15 @@ public class ProjectController {
     }
 
     @GetMapping("/count/role/{role}")
+    @Operation(
+            description = "Count all projects by role",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Projects count retrieved successfully"),
+                    @ApiResponse(responseCode = "204", description = "No Content - Empty result"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
     public ResponseEntity<Object> countAllProjectsByRole(@PathVariable("role") String role,
                                                          @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -499,6 +694,15 @@ public class ProjectController {
     }
 
     @GetMapping("/count/user/{userId}")
+    @Operation(
+            description = "Count all projects by user ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Projects count retrieved successfully"),
+                    @ApiResponse(responseCode = "204", description = "No Content - Empty result"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
     public ResponseEntity<Object> countAllProjectsByUserId(@PathVariable("userId") Long id,
                                                            @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -515,6 +719,15 @@ public class ProjectController {
     }
 
     @GetMapping("/{projectId}/count")
+    @Operation(
+            description = "Count all users in a project by project ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Users count retrieved successfully"),
+                    @ApiResponse(responseCode = "204", description = "No Content - Empty result"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
     public ResponseEntity<Object> countAllUsersByProjectId(@PathVariable Long projectId,
                                                            @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -531,6 +744,15 @@ public class ProjectController {
     }
 
     @GetMapping("/{projectId}/count/{role}")
+    @Operation(
+            description = "Count all users in a project by role and project ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Users count retrieved successfully"),
+                    @ApiResponse(responseCode = "204", description = "No Content - Empty result"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
     public ResponseEntity<Object> countAllUsersByProjectIdByRole(
             @PathVariable Long projectId,
             @PathVariable String role,
@@ -550,6 +772,15 @@ public class ProjectController {
     }
 
     @GetMapping("/count/active")
+    @Operation(
+            description = "Count all active projects",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Projects count retrieved successfully"),
+                    @ApiResponse(responseCode = "204", description = "No Content - Empty result"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
     public ResponseEntity<Object> countAllActiveProjects(@RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
@@ -565,6 +796,15 @@ public class ProjectController {
     }
 
     @GetMapping("/count/inactive")
+    @Operation(
+            description = "Count all inactive projects",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Projects count retrieved successfully"),
+                    @ApiResponse(responseCode = "204", description = "No Content - Empty result"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
     public ResponseEntity<Object> countAllInActiveProjects(@RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
@@ -580,6 +820,14 @@ public class ProjectController {
     }
 
     @GetMapping("/{projectId}/details")
+    @Operation(
+            description = "Get project details by project ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Project details retrieved successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
     public ResponseEntity<Object> getProjectDetailsById(@RequestHeader("AccessToken") String accessToken,
                                                         @PathVariable Long projectId) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);

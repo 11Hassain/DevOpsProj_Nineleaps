@@ -5,6 +5,8 @@ import com.example.devopsproj.model.HelpDocuments;
 import com.example.devopsproj.service.HelpDocumentsService;
 import com.example.devopsproj.service.JwtService;
 import com.example.devopsproj.repository.HelpDocumentsRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -33,6 +35,15 @@ public class HelpDocumentsController {
     private static final String INVALID_TOKEN = "Invalid Token";
 
     @PostMapping("/upload")
+    @Operation(
+            description = "Upload Project File",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "File uploaded successfully"),
+                    @ApiResponse(responseCode = "400", description = "Bad Request"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> uploadFile(
             @RequestParam("projectId") long projectId,
             @RequestParam(name = "projectFile", required = false) MultipartFile projectFile,
@@ -53,6 +64,15 @@ public class HelpDocumentsController {
 
 
     @GetMapping("/files")
+    @Operation(
+            description = "Get List of PDF Files",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "PDF files retrieved successfully"),
+                    @ApiResponse(responseCode = "404", description = "No PDF files found"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getPdfFilesList(@RequestParam("projectId") long projectId,
                                              @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -74,6 +94,15 @@ public class HelpDocumentsController {
 
 
     @GetMapping("/files/{fileName}")
+    @Operation(
+            description = "Download PDF File by Name",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "PDF file downloaded successfully"),
+                    @ApiResponse(responseCode = "404", description = "PDF file not found"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> downloadPdfFile(@PathVariable("fileName") String fileName,
                                              @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -94,6 +123,14 @@ public class HelpDocumentsController {
     }
 
     @DeleteMapping("/files/{fileId}")
+    @Operation(
+            description = "Delete PDF File by ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "PDF file deleted successfully"),
+                    @ApiResponse(responseCode = "404", description = "PDF file not found"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
     public ResponseEntity<String> deleteFile(@PathVariable("fileId") Long fileId,
                                              @RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);

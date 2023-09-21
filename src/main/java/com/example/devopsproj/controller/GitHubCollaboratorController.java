@@ -3,6 +3,8 @@ package com.example.devopsproj.controller;
 import com.example.devopsproj.service.GitHubCollaboratorService;
 import com.example.devopsproj.service.JwtService;
 import com.example.devopsproj.dto.responseDto.CollaboratorDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,15 @@ public class GitHubCollaboratorController {
     private static final String INVALID_TOKEN = "Invalid Token";
 
     @PostMapping("/add")
+    @Operation(
+            description = "Add Collaborator",
+            responses = {
+                   @ApiResponse(responseCode = "200", description = "Invitation to add collaborator sent successfully"),
+                    @ApiResponse(responseCode = "400", description = "Failed to add collaborator"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> addCollaborator(@RequestBody CollaboratorDTO collaboratorDTO,
                                                   @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -40,6 +51,15 @@ public class GitHubCollaboratorController {
     }
 
     @DeleteMapping("/delete")
+    @Operation(
+            description = "Delete Collaborator",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Collaborator removed successfully"),
+                    @ApiResponse(responseCode = "400", description = "Failed to remove collaborator"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> deleteCollaborator(@RequestBody CollaboratorDTO collaboratorDTO,
                                                      @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
