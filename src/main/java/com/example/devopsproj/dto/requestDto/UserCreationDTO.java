@@ -15,11 +15,9 @@ public class UserCreationDTO {
     private Long id;
 
     @Size(max = 50, message = "projectName should not exceed 50 characters")
-    @NotNull(message = "name cannot be null")
     @NotBlank(message = "name cannot be black")
     private String name;
 
-    @NotNull(message = "email cannot be null")
     @NotBlank(message = "email cannot be blank")
     private String email;
 

@@ -63,6 +63,4 @@ public class SmsService {
         StoreOTP.setOtp(number);
     }
 
-    public void recieve (MultiValueMap<String,String> smscallback){
-    }
 }
