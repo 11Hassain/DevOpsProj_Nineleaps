@@ -15,7 +15,7 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "user_names")
-public class UserNames{
+public class UserNames implements Serializable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

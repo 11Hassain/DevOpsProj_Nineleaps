@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.Map;
 
 @AllArgsConstructor
@@ -14,7 +15,7 @@ import java.util.Map;
 @Setter
 @Entity
 @Table(name = "figma")
-public class Figma {
+public class Figma implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

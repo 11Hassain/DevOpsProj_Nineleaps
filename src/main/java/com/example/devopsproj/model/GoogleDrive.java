@@ -6,13 +6,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Entity
 @Table(name = "google_drive")
-public class GoogleDrive {
+public class GoogleDrive implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long driveId;

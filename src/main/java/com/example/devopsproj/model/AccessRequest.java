@@ -12,7 +12,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class AccessRequest {
+public class AccessRequest implements Serializable{
 
     @Id
     @GeneratedValue
