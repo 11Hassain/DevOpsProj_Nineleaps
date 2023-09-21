@@ -24,10 +24,12 @@ public class GitRepositoryController {
 
     private static final String INVALID_TOKEN = "Invalid Token";
 
+    // Create a new Git repository.
     @PostMapping("/add")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> createRepository(@RequestBody GitRepository gitRepository,
                                                    @RequestHeader("AccessToken") String accessToken) {
+        // Check if the provided access token is valid.
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
             return ResponseEntity.ok(gitRepositoryService.createRepository(gitRepository));
@@ -36,8 +38,10 @@ public class GitRepositoryController {
         }
     }
 
+    // Get a list of all Git repositories.
     @GetMapping("/get")
     public ResponseEntity<Object> getAllRepositories(@RequestHeader("AccessToken") String accessToken) {
+        // Check if the provided access token is valid.
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
             return ResponseEntity.ok(gitRepositoryService.getAllRepositories());
@@ -46,10 +50,12 @@ public class GitRepositoryController {
         }
     }
 
+    // Get a list of Git repositories by project ID.
     @GetMapping("/project/{id}")
     public ResponseEntity<Object> getAllReposByProject(
             @PathVariable Long id,
-            @RequestHeader("AccessToken") String accessToken){
+            @RequestHeader("AccessToken") String accessToken) {
+        // Check if the provided access token is valid.
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
             List<GitRepositoryDTO> gitRepositoryDTOS = gitRepositoryService.getAllRepositoriesByProject(id);
@@ -59,10 +65,12 @@ public class GitRepositoryController {
         }
     }
 
+    // Get a list of Git repositories by role.
     @GetMapping("/get/role/{role}")
     public ResponseEntity<Object> getAllReposByRole(
             @PathVariable("role") String role,
             @RequestHeader("AccessToken") String accessToken) {
+        // Check if the provided access token is valid.
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
             EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
@@ -72,10 +80,12 @@ public class GitRepositoryController {
         }
     }
 
+    // Get a Git repository by ID.
     @GetMapping("/get/{id}")
     public ResponseEntity<Object> getRepositoryById(
             @PathVariable Long id,
             @RequestHeader("AccessToken") String accessToken) {
+        // Check if the provided access token is valid.
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
             GitRepository repository = gitRepositoryService.getRepositoryById(id);
@@ -90,11 +100,13 @@ public class GitRepositoryController {
         }
     }
 
+    // Delete a Git repository by ID.
     @DeleteMapping("/delete/{repoId}")
     public ResponseEntity<Object> deleteRepository(
             @PathVariable Long repoId,
             @RequestHeader(value = "AccessToken", required = false) String accessToken
     ) {
+        // Check if the provided access token is valid.
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if(isTokenValid) {
             try {

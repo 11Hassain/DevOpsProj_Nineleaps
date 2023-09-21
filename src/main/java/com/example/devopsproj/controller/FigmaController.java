@@ -26,16 +26,18 @@ public class FigmaController {
     private final JwtService jwtService;
     private static final String INVALID_TOKEN = "Invalid Token";
 
+    // Create a new Figma project.
     @PostMapping("/create")
     public ResponseEntity<String> createFigma(@RequestBody FigmaDTO figmaDTO,
                                               @RequestHeader("AccessToken") String accessToken) {
+        // Check if the provided access token is valid.
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
             try {
-                // Create a new Figma entity using the provided projectName and figmaURL
+                // Create a new Figma entity using the provided projectName and figmaURL.
                 Figma figma = figmaService.createFigma(figmaDTO);
 
-                // Optionally, you can access the generated figmaId if needed
+                // Optionally, you can access the generated figmaId if needed.
                 Long figmaId = figma.getFigmaId();
 
                 return ResponseEntity.ok("Figma created successfully");
@@ -48,10 +50,13 @@ public class FigmaController {
         }
     }
 
+    // Get all Figma projects.
     @GetMapping("/getAll")
     public ResponseEntity<Object> getAllFigmaProjects(@RequestHeader("AccessToken") String accessToken) {
+        // Check if the provided access token is valid.
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
+            // Retrieve all Figma projects and map them to FigmaDTOs.
             List<Figma> figmaProjects = figmaService.getAllFigmaProjects();
 
             List<FigmaDTO> figmaDTOs = figmaProjects.stream()
@@ -68,11 +73,14 @@ public class FigmaController {
         }
     }
 
+    // Get a specific Figma project by its ID.
     @GetMapping("/get/{figmaId}")
     public ResponseEntity<Object> getFigma(@PathVariable Long figmaId,
                                            @RequestHeader("AccessToken") String accessToken) {
+        // Check if the provided access token is valid.
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
+            // Retrieve the Figma project by its ID.
             Optional<FigmaDTO> optionalFigmaDTO = figmaService.getFigmaById(figmaId);
             if (optionalFigmaDTO.isPresent()) {
                 return ResponseEntity.ok(optionalFigmaDTO);
@@ -84,26 +92,28 @@ public class FigmaController {
         }
     }
 
+    // Add a user and screenshots to a Figma project.
     @PostMapping("/{figmaId}/user")
     public ResponseEntity<String> addUserAndScreenshotsToFigma(@PathVariable("figmaId") Long figmaId,
                                                                @RequestBody FigmaDTO figmaDTO,
-                                                               @RequestHeader("AccessToken") String accessToken)
-    {
+                                                               @RequestHeader("AccessToken") String accessToken) {
+        // Check if the provided access token is valid.
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
             try {
+                // Retrieve the Figma project by its ID.
                 Optional<Figma> optionalFigma = figmaRepository.findById(figmaId);
                 if (optionalFigma.isPresent()) {
                     Figma figma = optionalFigma.get();
                     String user = figmaDTO.getUser();
 
-                    // Get or create the map of screenshot images by user
+                    // Get or create the map of screenshot images by user.
                     Map<String, String> screenshotImagesByUser = figma.getScreenshotImagesByUser();
                     if (screenshotImagesByUser == null) {
                         screenshotImagesByUser = new HashMap<>();
                     }
 
-                    // Add the screenshot image for the specified user
+                    // Add the screenshot image for the specified user.
                     screenshotImagesByUser.put(user, figmaDTO.getScreenshotImage());
                     figma.setScreenshotImagesByUser(screenshotImagesByUser);
 
@@ -120,18 +130,22 @@ public class FigmaController {
         }
     }
 
-
+    // Delete a Figma project by its ID.
     @DeleteMapping("/{figmaId}")
     public ResponseEntity<String> deleteFigma(@PathVariable Long figmaId) {
+        // Call the deleteFigma method to delete the Figma project.
         figmaService.deleteFigma(figmaId);
         return ResponseEntity.ok("Figma deleted successfully");
     }
 
+    // Get the Figma URL by the project ID.
     @GetMapping("/project/{projectId}")
     public ResponseEntity<Object> getFigmaByProjectId(@PathVariable Long projectId,
                                                       @RequestHeader("AccessToken") String accessToken) {
+        // Check if the provided access token is valid.
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
+            // Retrieve the Figma project by the project ID and return its URL.
             Optional<Figma> optionalFigma = figmaRepository.findFigmaByProjectId(projectId);
             if (optionalFigma.isPresent()) {
                 Figma figma = optionalFigma.get();
@@ -145,9 +159,11 @@ public class FigmaController {
         }
     }
 
+    // Get screenshots for a specific Figma project by its ID.
     @GetMapping("/{figmaId}/screenshots")
     public ResponseEntity<List<FigmaScreenshotDTO>> getScreenshotsForFigmaId(@PathVariable("figmaId") Long figmaId) {
         try {
+            // Retrieve the Figma project by its ID.
             Optional<Figma> optionalFigma = figmaRepository.findById(figmaId);
             if (optionalFigma.isPresent()) {
                 Figma figma = optionalFigma.get();
@@ -156,6 +172,7 @@ public class FigmaController {
                 Map<String, String> screenshotImagesByUser = figma.getScreenshotImagesByUser();
 
                 if (screenshotImagesByUser != null && !screenshotImagesByUser.isEmpty()) {
+                    // Create FigmaScreenshotDTOs from the screenshot images by user.
                     for (Map.Entry<String, String> entry : screenshotImagesByUser.entrySet()) {
                         FigmaScreenshotDTO screenshotDTO = new FigmaScreenshotDTO();
                         screenshotDTO.setUser(entry.getKey());

@@ -14,7 +14,6 @@ import com.example.devopsproj.service.interfaces.IUserService;
 import com.example.devopsproj.service.interfaces.SmsService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -38,28 +37,35 @@ public class SmsController {
     private static final String SECRET_KEY = System.getenv("SMS_SECRET_KEY");
 
 
+    // Endpoint to send an SMS.
     @PostMapping("/send")
-    public ResponseEntity<String> smsSubmit(@RequestBody SmsPojo sms){
-        try{
+    public ResponseEntity<String> smsSubmit(@RequestBody SmsPojo sms) {
+        try {
+            // Call the service to send the SMS.
             service.send(sms);
-        }catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        webSocket.convertAndSend(TOPIC_DESTINATION,getTimeStamp()+":SMS has been sent "+sms.getPhoneNumber());
-        return new ResponseEntity<>("OTP sent",HttpStatus.OK);
+        // Notify via WebSocket that the SMS has been sent.
+        webSocket.convertAndSend(TOPIC_DESTINATION, getTimeStamp() + ": SMS has been sent " + sms.getPhoneNumber());
+        return new ResponseEntity<>("OTP sent", HttpStatus.OK);
     }
 
+    // Endpoint to resend an SMS.
     @PostMapping("/resend")
-    public ResponseEntity<String> smsSub(@RequestBody SmsPojo resendsms){
-        try{
+    public ResponseEntity<String> smsSub(@RequestBody SmsPojo resendsms) {
+        try {
+            // Call the service to resend the SMS.
             service.send(resendsms);
-        }catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        webSocket.convertAndSend(TOPIC_DESTINATION,getTimeStamp()+":SMS has been sent "+resendsms.getPhoneNumber());
-        return new ResponseEntity<>("OTP sent",HttpStatus.OK);
+        // Notify via WebSocket that the SMS has been sent again.
+        webSocket.convertAndSend(TOPIC_DESTINATION, getTimeStamp() + ": SMS has been sent " + resendsms.getPhoneNumber());
+        return new ResponseEntity<>("OTP sent", HttpStatus.OK);
     }
 
+    // Endpoint to verify OTP and generate an access token.
     @PostMapping("/verify/token")
     public ResponseEntity<Object> verifyOTP(@RequestBody TempOTP tempOTP, HttpServletResponse response) throws Exception {
 
@@ -83,18 +89,19 @@ public class SmsController {
         }
     }
 
+    // Endpoint to verify OTP during signup.
     @PostMapping("/verify")
-    public Boolean verifyOTPsignup(@RequestBody TempOTP sms,HttpServletResponse response) throws Exception{
+    public Boolean verifyOTPsignup(@RequestBody TempOTP sms, HttpServletResponse response) throws Exception {
 
-        if(sms.getOtp()== StoreOTP.getOtp()) {
+        if (sms.getOtp() == StoreOTP.getOtp()) {
             return true;
-        }
-        else
+        } else {
             return false;
+        }
     }
 
+    // Generate a JWT token with claims.
     public String generateToken(String email, String phoneNumber, HttpServletResponse response) throws IOException {
-
         User userDtls = userservice.getUserByMail(email.trim());
         Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY.getBytes());
         Set<EnumRole> roles = Collections.singleton(userDtls.getEnumRole());
@@ -112,12 +119,12 @@ public class SmsController {
                 .withClaim("phoneNumber", phoneNumber) // Add phone number claim
                 .withClaim("roles", rolesString)
                 .withClaim("userId", userDtls.getId())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 *10))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 10)) // Set token expiration time
                 .sign(algorithm);
     }
 
-    private String getTimeStamp(){
+    // Helper method to get the current timestamp.
+    private String getTimeStamp() {
         return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now());
     }
-
 }

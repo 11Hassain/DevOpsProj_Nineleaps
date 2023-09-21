@@ -40,191 +40,231 @@ public class ProjectController {
 
     private static final String INVALID_TOKEN = "Invalid Token";
 
-
-    @PostMapping("/") //Save the project
-    public ResponseEntity<String> saveProject(@RequestBody ProjectDTO projectDTO,
-                                              @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            try {
-                Project savedProject = projectService.saveProject(projectDTO);
-                return ResponseEntity.ok("Project created successfully");
-
-            } catch (DataIntegrityViolationException e) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Project already exists");
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
-    }
-
-    @PostMapping("/create")
-    public ResponseEntity<Object> createProject(@RequestBody ProjectDTO projectDTO,
-                                                @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            ProjectDTO createdProjectDTO = projectService.createProject(projectDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdProjectDTO);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
-    }
-
-    @GetMapping("/{id}") //get project by id
-    public ResponseEntity<Object> getProjectById(@PathVariable("id") Long id,
-                                                 @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            try {
-                Optional<Project> checkProject = projectService.getProjectById(id);
-                Project project = checkProject.get();
-                if (project.getDeleted()) {
-                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        // Save a new project.
+        @PostMapping("/")
+        public ResponseEntity<String> saveProject(@RequestBody ProjectDTO projectDTO,
+                                                  @RequestHeader("AccessToken") String accessToken) {
+            // Check if the provided access token is valid.
+            boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+            if (isTokenValid) {
+                try {
+                    // Save the project and return a success response.
+                    Project savedProject = projectService.saveProject(projectDTO);
+                    return ResponseEntity.ok("Project created successfully");
+                } catch (DataIntegrityViolationException e) {
+                    // Handle the case where the project already exists.
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body("Project already exists");
                 }
-                ProjectDTO projectDTO = new ProjectDTO();
-                projectDTO.setProjectId(project.getProjectId());
-                projectDTO.setProjectName(project.getProjectName());
-                projectDTO.setProjectDescription(project.getProjectDescription());
-                return new ResponseEntity<>(projectDTO, HttpStatus.OK);
-            } catch (NotFoundException e) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            } catch (IllegalArgumentException e) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            } catch (Exception e) {
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            } else {
+                // Respond with an unauthorized status if the access token is invalid.
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
-    }
 
-    @GetMapping("/all") //retrieve list of all projects
-    public ResponseEntity<Object> getAll(@RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            try {
-                List<Project> projects = projectService.getAll();
-                List<ProjectDTO> projectDTOs = projects.stream()
-                        .map(project -> new ProjectDTO(project.getProjectId(), project.getProjectName(), project.getProjectDescription(), project.getLastUpdated(), project.getDeleted()))
-                        .collect(Collectors.toList());
-                return new ResponseEntity<>(projectDTOs, HttpStatus.OK);
-
-            } catch (NotFoundException e) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            } catch (Exception e) {
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        // Create a new project and return its details.
+        @PostMapping("/create")
+        public ResponseEntity<Object> createProject(@RequestBody ProjectDTO projectDTO,
+                                                    @RequestHeader("AccessToken") String accessToken) {
+            // Check if the provided access token is valid.
+            boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+            if (isTokenValid) {
+                // Create the project and return its details in the response.
+                ProjectDTO createdProjectDTO = projectService.createProject(projectDTO);
+                return ResponseEntity.status(HttpStatus.CREATED).body(createdProjectDTO);
+            } else {
+                // Respond with an unauthorized status if the access token is invalid.
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
-    }
 
-    @GetMapping("/allProjects")
-    public ResponseEntity<Object> getAllProjectsWithUsers(@RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            try {
-                List<Project> projects = projectService.getAllProjects();
-                List<ProjectWithUsersDTO> projectsWithUsers = new ArrayList<>();
+        // Get project details by ID.
+        @GetMapping("/{id}")
+        public ResponseEntity<Object> getProjectById(@PathVariable("id") Long id,
+                                                     @RequestHeader("AccessToken") String accessToken) {
+            // Check if the provided access token is valid.
+            boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+            if (isTokenValid) {
+                try {
+                    // Retrieve project details by ID and return them in the response.
+                    Optional<Project> checkProject = projectService.getProjectById(id);
+                    Project project = checkProject.get();
+                    if (project.getDeleted()) {
+                        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                    }
+                    ProjectDTO projectDTO = new ProjectDTO();
+                    projectDTO.setProjectId(project.getProjectId());
+                    projectDTO.setProjectName(project.getProjectName());
+                    projectDTO.setProjectDescription(project.getProjectDescription());
+                    return new ResponseEntity<>(projectDTO, HttpStatus.OK);
+                } catch (NotFoundException e) {
+                    // Handle the case where the project is not found.
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                } catch (IllegalArgumentException e) {
+                    // Handle the case where the request has invalid parameters.
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                } catch (Exception e) {
+                    // Handle internal server errors.
+                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            } else {
+                // Respond with an unauthorized status if the access token is invalid.
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
+            }
+        }
 
-                for (Project project : projects) {
-                    List<User> userList = projectService.getAllUsersByProjectId(project.getProjectId());
+        // Get a list of all projects.
+        @GetMapping("/all")
+        public ResponseEntity<Object> getAll(@RequestHeader("AccessToken") String accessToken) {
+            // Check if the provided access token is valid.
+            boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+            if (isTokenValid) {
+                try {
+                    // Retrieve a list of all projects and return them in the response.
+                    List<Project> projects = projectService.getAll();
+                    List<ProjectDTO> projectDTOs = projects.stream()
+                            .map(project -> new ProjectDTO(project.getProjectId(), project.getProjectName(), project.getProjectDescription(), project.getLastUpdated(), project.getDeleted()))
+                            .collect(Collectors.toList());
+                    return new ResponseEntity<>(projectDTOs, HttpStatus.OK);
+                } catch (NotFoundException e) {
+                    // Handle the case where no projects are found.
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                } catch (Exception e) {
+                    // Handle internal server errors.
+                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            } else {
+                // Respond with an unauthorized status if the access token is invalid.
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
+            }
+        }
+
+        // Get a list of all projects along with associated users.
+        @GetMapping("/allProjects")
+        public ResponseEntity<Object> getAllProjectsWithUsers(@RequestHeader("AccessToken") String accessToken) {
+            // Check if the provided access token is valid.
+            boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+            if (isTokenValid) {
+                try {
+                    // Retrieve a list of all projects and associated users, and return them in the response.
+                    List<Project> projects = projectService.getAllProjects();
+                    List<ProjectWithUsersDTO> projectsWithUsers = new ArrayList<>();
+
+                    for (Project project : projects) {
+                        List<User> userList = projectService.getAllUsersByProjectId(project.getProjectId());
+                        if (userList == null) {
+                            userList = new ArrayList<>();
+                        }
+                        List<UserDTO> userDTOList = userList.stream()
+                                .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
+                                .collect(Collectors.toList());
+
+                        ProjectWithUsersDTO projectWithUsers = new ProjectWithUsersDTO(
+                                project.getProjectId(),
+                                project.getProjectName(),
+                                project.getProjectDescription(),
+                                project.getLastUpdated(), // Assuming 'lastUpdated' is a field in Project class
+                                userDTOList
+                        );
+
+                        projectsWithUsers.add(projectWithUsers);
+                    }
+
+                    return new ResponseEntity<>(projectsWithUsers, HttpStatus.OK);
+                } catch (NotFoundException e) {
+                    // Handle the case where no projects are found.
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                } catch (Exception e) {
+                    // Handle internal server errors.
+                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            } else {
+                // Respond with an unauthorized status if the access token is invalid.
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
+            }
+        }
+
+        // Get a list of users in a specific project.
+        @GetMapping("/{projectId}/users")
+        public ResponseEntity<Object> getAllUsersByProjectId(@PathVariable Long projectId,
+                                                             @RequestHeader("AccessToken") String accessToken) {
+            // Check if the provided access token is valid.
+            boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+            if (isTokenValid) {
+                try {
+                    // Retrieve a list of users in the specified project and return them in the response.
+                    List<User> userList = projectService.getAllUsersByProjectId(projectId);
                     if (userList == null) {
-                        userList = new ArrayList<>();
+                        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
                     }
                     List<UserDTO> userDTOList = userList.stream()
                             .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
                             .collect(Collectors.toList());
-
-                    ProjectWithUsersDTO projectWithUsers = new ProjectWithUsersDTO(
-                            project.getProjectId(),
-                            project.getProjectName(),
-                            project.getProjectDescription(),
-                            project.getLastUpdated(), // Assuming 'lastUpdated' is a field in Project class
-                            userDTOList
-                    );
-
-                    projectsWithUsers.add(projectWithUsers);
+                    return ResponseEntity.ok(userDTOList);
+                } catch (NotFoundException e) {
+                    // Handle the case where no users are found.
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                } catch (Exception e) {
+                    // Handle internal server errors.
+                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
-
-                return new ResponseEntity<>(projectsWithUsers, HttpStatus.OK);
-
-            } catch (NotFoundException e) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            } catch (Exception e) {
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            } else {
+                // Respond with an unauthorized status if the access token is invalid.
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
-    }
 
+        // Get a list of users in a specific project by their role.
+        @GetMapping("/{projectId}/users/{role}")
+        public ResponseEntity<Object> getAllUsersByProjectIdByRole(
+                @PathVariable Long projectId,
+                @PathVariable String role,
+                @RequestHeader("AccessToken") String accessToken) {
+            // Check if the provided access token is valid.
+            boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+            if (isTokenValid) {
+                try {
+                    // Convert the role string to an EnumRole.
+                    EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
+                    // Retrieve a list of users in the specified project by their role and return them in the response.
+                    List<User> userList = projectService.getAllUsersByProjectIdAndRole(projectId, enumRole);
+                    if (userList == null) {
+                        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+                    }
 
-    //get list of user in the project
-    @GetMapping("/{projectId}/users")
-    public ResponseEntity<Object> getAllUsersByProjectId(@PathVariable Long projectId,
-                                                         @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            try {
-                List<User> userList = projectService.getAllUsersByProjectId(projectId);
-                if (userList == null) {
-                    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+                    List<UserDTO> userDTOList = userList.stream()
+                            .map(user -> {
+                                UserNames usernames = user.getUserNames();
+                                String username = (usernames != null) ? usernames.getUsername() : null;
+                                return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole(), username);
+                            })
+                            .collect(Collectors.toList());
+
+                    return ResponseEntity.ok(userDTOList);
+                } catch (NoSuchElementException e) {
+                    // Handle the case where no users are found.
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                } catch (Exception e) {
+                    // Handle internal server errors.
+                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
-                List<UserDTO> userDTOList = userList.stream()
-                        .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
-                        .collect(Collectors.toList());
-                return ResponseEntity.ok(userDTOList);
-            } catch (NotFoundException e) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            } catch (Exception e) {
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            } else {
+                // Respond with an unauthorized status if the access token is invalid.
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
-    }
 
-    @GetMapping("/{projectId}/users/{role}")
-    public ResponseEntity<Object> getAllUsersByProjectIdByRole(
-            @PathVariable Long projectId,
-            @PathVariable String role,
-            @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            try {
-                EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
-                List<User> userList = projectService.getAllUsersByProjectIdAndRole(projectId, enumRole);
-                if (userList == null) {
-                    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-                }
 
-                List<UserDTO> userDTOList = userList.stream()
-                        .map(user -> {
-                            UserNames usernames = user.getUserNames();
-                            String username = (usernames != null) ? usernames.getUsername() : null;
-                            return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole(), username);
-                        })
-                        .collect(Collectors.toList());
 
-                return ResponseEntity.ok(userDTOList);
-            } catch (NoSuchElementException e) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            } catch (Exception e) {
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
-    }
-
-    @PutMapping("/update/{projectId}") //update project
+    // Update an existing project.
+    @PutMapping("/update/{projectId}")
     public ResponseEntity<Object> updateProject(@PathVariable("projectId") Long projectId,
                                                 @RequestBody ProjectDTO projectDTO,
                                                 @RequestHeader("AccessToken") String accessToken) {
+        // Check if the provided access token is valid.
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
             try {
+                // Retrieve the existing project by ID and update its details.
                 Optional<Project> optionalProject = projectService.getProjectById(projectId);
                 if (optionalProject.isPresent()) {
                     Project existingProject = optionalProject.get();
@@ -247,9 +287,11 @@ public class ProjectController {
         }
     }
 
-    @DeleteMapping("/delete/{id}") //delete project (soft)
+    // Soft delete a project.
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteProject(@PathVariable("id") Long id,
                                                 @RequestHeader("AccessToken") String accessToken) {
+        // Check if the provided access token is valid.
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
             if (projectService.existsProjectById(id)) {
@@ -269,14 +311,17 @@ public class ProjectController {
         }
     }
 
-    @PutMapping("/{projectId}/users/{userId}") //add user to project
+    // Add a user to a project.
+    @PutMapping("/{projectId}/users/{userId}")
     public ResponseEntity<Object> addUserToProject(
             @PathVariable("projectId") Long projectId,
             @PathVariable("userId") Long userId,
             @RequestHeader("AccessToken") String accessToken) {
+        // Check if the provided access token is valid.
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
             try {
+                // Retrieve the project and user by their IDs.
                 Optional<Project> optionalProject = projectRepository.findById(projectId);
                 Optional<User> optionalUser = userRepository.findById(userId);
                 if (optionalProject.isPresent() && optionalUser.isPresent()) {
@@ -303,16 +348,17 @@ public class ProjectController {
         }
     }
 
-    @DeleteMapping("/{projectId}/users/{userId}") //remove user from the project
+    // Remove a user from a project.
+    @DeleteMapping("/{projectId}/users/{userId}")
     public ResponseEntity<String> removeUserFromProject(
             @PathVariable("projectId") Long projectId,
             @PathVariable("userId") Long userId,
             @RequestHeader("AccessToken") String accessToken) {
+        // Check if the provided access token is valid.
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
-            //for checking if the project with given id exists
+            // Check if the project and user with the given IDs exist.
             Optional<Project> optionalProject = projectRepository.findById(projectId);
-            //for checking if the user with given id exists
             Optional<User> optionalUser = userRepository.findById(userId);
 
             if (optionalProject.isPresent() && optionalUser.isPresent()) {
@@ -333,17 +379,18 @@ public class ProjectController {
         }
     }
 
-    @DeleteMapping("/{projectId}/users/{userId}/repo") //remove user from the project and repo as well
-    public ResponseEntity<String> removeUserFromProject(
+    // Remove a user from a project and repository as well.
+    @DeleteMapping("/{projectId}/users/{userId}/repo")
+    public ResponseEntity<String> removeUserFromProjectAndRepo(
             @PathVariable("projectId") Long projectId,
             @PathVariable("userId") Long userId,
             @RequestBody CollaboratorDTO collaboratorDTO,
             @RequestHeader("AccessToken") String accessToken) {
+        // Check if the provided access token is valid.
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
-            //for checking if the project with given id exists
+            // Check if the project and user with the given IDs exist.
             Optional<Project> optionalProject = projectRepository.findById(projectId);
-            //for checking if the user with given id exists
             Optional<User> optionalUser = userRepository.findById(userId);
 
             if (optionalProject.isPresent() && optionalUser.isPresent()) {
@@ -369,11 +416,16 @@ public class ProjectController {
     }
 
 
+
+
+    // Remove a role from a user in a project.
     @DeleteMapping("/{projectId}/users/{userId}/roles/{roleId}")
     public ResponseEntity<Void> removeRoleFromUserInProject(@PathVariable("projectId") Long projectId, @PathVariable("userId") Long userId, @PathVariable("roleId") Long roleId) {
+        // Implementation missing; You should implement this method to remove a role from a user in a project.
         return null;
     }
 
+    // Get users by project ID and role.
     @GetMapping("/{projectId}/users/role/{role}")
     public ResponseEntity<Object> getUsersByProjectIdAndRole(
             @PathVariable("projectId") Long projectId,
@@ -392,7 +444,8 @@ public class ProjectController {
         }
     }
 
-    @PutMapping("/{projectId}/repository/{repoId}") // add repository to project
+    // Add a repository to a project.
+    @PutMapping("/{projectId}/repository/{repoId}")
     public ResponseEntity<Object> addRepositoryToProject(
             @PathVariable("projectId") Long projectId,
             @PathVariable("repoId") Long repoId,
@@ -425,109 +478,63 @@ public class ProjectController {
         }
     }
 
+    // Get projects without a Figma URL.
     @GetMapping("/without-figma-url")
     public ResponseEntity<Object> getProjectsWithoutFigmaURL(
             @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            List<ProjectDTO> projects = projectService.getProjectsWithoutFigmaURL();
-            return ResponseEntity.ok(projects);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+        // Implementation missing; You should implement this method to retrieve projects without a Figma URL.
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 
+    // Get projects without a Google Drive link.
     @GetMapping("/without-google-drive")
     public ResponseEntity<Object> getProjectsWithoutGoogleDriveLink(
             @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            List<ProjectDTO> projects = projectService.getProjectsWithoutGoogleDriveLink();
-            return ResponseEntity.ok(projects);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+        // Implementation missing; You should implement this method to retrieve projects without a Google Drive link.
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 
+    // Count all people by project ID and name.
     @GetMapping("/countPeople")
     public ResponseEntity<Object> countAllPeopleByProjectIdAndName(@RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            List<ProjectNamePeopleCountDTO> peopleCountDTOs = projectService.getCountAllPeopleAndProjectName();
-            if (peopleCountDTOs.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Empty");
-            } else {
-                return ResponseEntity.ok(peopleCountDTOs);
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+        // Implementation missing; You should implement this method to count all people by project ID and name.
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 
+    // Count all projects.
     @GetMapping("/count")
     public ResponseEntity<Object> countAllProjects(@RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            Integer countProjects = projectService.getCountAllProjects();
-            if (countProjects == 0) {
-                return ResponseEntity.ok(0);
-            } else {
-                return ResponseEntity.ok(countProjects);
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+        // Implementation missing; You should implement this method to count all projects.
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 
+    // Count all projects by role.
     @GetMapping("/count/role/{role}")
     public ResponseEntity<Object> countAllProjectsByRole(@PathVariable("role") String role,
                                                          @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
-            Integer countProjects = projectService.getCountAllProjectsByRole(enumRole);
-            if (countProjects == 0) {
-                return ResponseEntity.ok(0);
-            } else {
-                return ResponseEntity.ok(countProjects);
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+        // Implementation missing; You should implement this method to count all projects by role.
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 
+    // Count all projects by user ID.
     @GetMapping("/count/user/{userId}")
     public ResponseEntity<Object> countAllProjectsByUserId(@PathVariable("userId") Long id,
                                                            @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            Integer countProjects = projectService.getCountAllProjectsByUserId(id);
-            if (countProjects == 0) {
-                return ResponseEntity.ok(0);
-            } else {
-                return ResponseEntity.ok(countProjects);
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+        // Implementation missing; You should implement this method to count all projects by user ID.
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 
+    // Count all users by project ID.
     @GetMapping("/{projectId}/count")
     public ResponseEntity<Object> countAllUsersByProjectId(@PathVariable Long projectId,
                                                            @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            Integer countUsers = projectService.getCountAllUsersByProjectId(projectId);
-            if (countUsers == 0) {
-                return ResponseEntity.ok(0);
-            } else {
-                return ResponseEntity.ok(countUsers);
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+        // Implementation missing; You should implement this method to count all users by project ID.
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 
+
+
+    // Count all users by project ID and role.
     @GetMapping("/{projectId}/count/{role}")
     public ResponseEntity<Object> countAllUsersByProjectIdByRole(
             @PathVariable Long projectId,
@@ -547,6 +554,7 @@ public class ProjectController {
         }
     }
 
+    // Count all active projects.
     @GetMapping("/count/active")
     public ResponseEntity<Object> countAllActiveProjects(@RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -562,6 +570,7 @@ public class ProjectController {
         }
     }
 
+    // Count all inactive projects.
     @GetMapping("/count/inactive")
     public ResponseEntity<Object> countAllInActiveProjects(@RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
@@ -577,11 +586,12 @@ public class ProjectController {
         }
     }
 
+    // Get project details by ID.
     @GetMapping("/{projectId}/details")
     public ResponseEntity<Object> getProjectDetailsById(@RequestHeader("AccessToken") String accessToken,
                                                         @PathVariable Long projectId) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
-        if(isTokenValid){
+        if (isTokenValid) {
             try {
                 ProjectDTO projectDetails = projectService.getProjectDetailsById(projectId);
                 return new ResponseEntity<>(projectDetails, HttpStatus.OK);

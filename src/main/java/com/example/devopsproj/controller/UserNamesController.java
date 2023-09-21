@@ -19,20 +19,23 @@ public class UserNamesController {
     private final JwtService jwtService;
     private static final String INVALID_TOKEN = "Invalid Token";
 
+    // Endpoint to save a GitHub username.
     @PostMapping("/githubUsername")
     public ResponseEntity<Object> saveUsername(@RequestBody UserNamesDTO userNamesDTO,
                                                @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
-            try{
+            try {
                 UserNamesDTO savedUserNames = userNamesService.saveUsername(userNamesDTO);
-                if (savedUserNames == null){
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Github user not found");
-                }
-                else {
+
+                // Check if the GitHub user was not found.
+                if (savedUserNames == null) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("GitHub user not found");
+                } else {
                     return ResponseEntity.status(HttpStatus.CREATED).body(savedUserNames);
                 }
-            }catch (DataIntegrityViolationException e){
+            } catch (DataIntegrityViolationException e) {
+                // Handle the case where the username already exists.
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists");
             }
         } else {
@@ -40,14 +43,17 @@ public class UserNamesController {
         }
     }
 
+    // Endpoint to get GitHub usernames by role.
     @GetMapping("/role/{role}")
-    public ResponseEntity<Object> getUserNamesByRole(@PathVariable String role, @RequestHeader("AccessToken") String accessToken) {
+    public ResponseEntity<Object> getUserNamesByRole(@PathVariable String role,
+                                                     @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
-            EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
+            EnumRole enumRole = EnumRole.valueOf(role.toUpperCase()); // Convert role to EnumRole
             return ResponseEntity.ok(userNamesService.getGitHubUserNamesByRole(enumRole));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
+
 }
