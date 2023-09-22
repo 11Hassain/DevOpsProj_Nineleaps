@@ -6,6 +6,7 @@ import com.example.devopsproj.dto.requestDto.AccessRequestDTO;
 import com.example.devopsproj.dto.responseDto.AccessResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,7 @@ public class AccessRequestController {
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> createAccessRequest(@RequestBody AccessRequestDTO accessRequestDTO, @RequestHeader("AccessToken") String accessToken){
+    public ResponseEntity<Object> createAccessRequest(@Valid @RequestBody AccessRequestDTO accessRequestDTO, @RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
             return ResponseEntity.ok("Request made successfully");
@@ -101,7 +102,7 @@ public class AccessRequestController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> updateAccessRequest(
             @PathVariable("accessRequestId") Long requestId,
-            @RequestBody AccessRequestDTO accessRequestDTO,
+            @Valid @RequestBody AccessRequestDTO accessRequestDTO,
             @RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {

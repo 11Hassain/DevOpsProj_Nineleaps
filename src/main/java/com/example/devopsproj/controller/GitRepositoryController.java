@@ -7,6 +7,7 @@ import com.example.devopsproj.service.JwtService;
 import com.example.devopsproj.dto.responseDto.GitRepositoryDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +37,7 @@ public class GitRepositoryController {
             }
     )
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> createRepository(@RequestBody GitRepository gitRepository,
+    public ResponseEntity<Object> createRepository(@Valid @RequestBody GitRepository gitRepository,
                                           @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {

@@ -16,18 +16,21 @@ import java.util.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
 @RequestMapping("/api/v1/OTP")
 @RestController
+@Validated
 public class SmsController {
 
     @Autowired
@@ -49,7 +52,7 @@ public class SmsController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> smsSubmit(@RequestBody SmsPojo sms){
+    public ResponseEntity<String> smsSubmit(@Valid @RequestBody SmsPojo sms){
         try{
             service.send(sms);
         }catch (Exception e){
@@ -68,7 +71,7 @@ public class SmsController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> smsSub(@RequestBody SmsPojo resendsms){
+    public ResponseEntity<String> smsSub(@Valid @RequestBody SmsPojo resendsms){
         try{
             service.send(resendsms);
         }catch (Exception e){
@@ -88,7 +91,7 @@ public class SmsController {
                     @ApiResponse(responseCode = "500", description = "Internal Server Error")
             }
     )
-    public ResponseEntity<Object> verifyOTP(@RequestBody TempOTP tempOTP, HttpServletResponse response) throws Exception {
+    public ResponseEntity<Object> verifyOTP(@Valid @RequestBody TempOTP tempOTP, HttpServletResponse response) throws Exception {
 
         if (tempOTP.getOtp() == StoreOTP.getOtp()) {
             String phoneNumber = service.getPhoneNumber();
@@ -122,7 +125,7 @@ public class SmsController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public Boolean verifyOTPsignup(@RequestBody TempOTP sms,HttpServletResponse response) throws Exception{
+    public Boolean verifyOTPsignup(@Valid @RequestBody TempOTP sms,HttpServletResponse response) throws Exception{
 
         if(sms.getOtp()== StoreOTP.getOtp()) {
             return true;

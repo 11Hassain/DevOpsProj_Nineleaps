@@ -11,6 +11,7 @@ import com.example.devopsproj.service.JwtService;
 import com.example.devopsproj.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +43,7 @@ public class UserController {
             }
     )
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> saveUser(@RequestBody UserCreationDTO userCreationDTO,
+    public ResponseEntity<Object> saveUser(@Valid @RequestBody UserCreationDTO userCreationDTO,
                                          @RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
@@ -87,7 +88,7 @@ public class UserController {
             }
     )
     public ResponseEntity<Object> updateUser(@PathVariable("id") Long id,
-                                             @RequestBody UserDTO userDTO,
+                                             @Valid @RequestBody UserDTO userDTO,
                                              @RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {

@@ -8,6 +8,7 @@ import com.example.devopsproj.dto.responseDto.FigmaScreenshotDTO;
 import com.example.devopsproj.repository.FigmaRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -40,7 +41,7 @@ public class FigmaController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> createFigma(@RequestBody FigmaDTO figmaDTO,
+    public ResponseEntity<String> createFigma(@Valid @RequestBody FigmaDTO figmaDTO,
                                               @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
@@ -126,7 +127,7 @@ public class FigmaController {
     )
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> addUserAndScreenshotsToFigma(@PathVariable("figmaId") Long figmaId,
-                                                               @RequestBody FigmaDTO figmaDTO,
+                                                               @Valid @RequestBody FigmaDTO figmaDTO,
                                                                @RequestHeader("AccessToken") String accessToken)
     {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);

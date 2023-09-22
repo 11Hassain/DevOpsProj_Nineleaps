@@ -15,6 +15,7 @@ import com.example.devopsproj.repository.GitRepositoryRepository;
 import com.example.devopsproj.repository.ProjectRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 
@@ -61,7 +62,7 @@ public class ProjectController {
             }
     )
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<String> saveProject(@RequestBody ProjectDTO projectDTO,
+    public ResponseEntity<String> saveProject(@Valid @RequestBody ProjectDTO projectDTO,
                                               @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
@@ -86,7 +87,7 @@ public class ProjectController {
             }
     )
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> createProject(@RequestBody ProjectDTO projectDTO,
+    public ResponseEntity<Object> createProject(@Valid @RequestBody ProjectDTO projectDTO,
                                                 @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
@@ -312,7 +313,7 @@ public class ProjectController {
     )
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> updateProject(@PathVariable("projectId") Long projectId,
-                                                @RequestBody ProjectDTO projectDTO,
+                                                @Valid @RequestBody ProjectDTO projectDTO,
                                                 @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
@@ -466,7 +467,7 @@ public class ProjectController {
     public ResponseEntity<String> removeUserFromProject(
             @PathVariable("projectId") Long projectId,
             @PathVariable("userId") Long userId,
-            @RequestBody CollaboratorDTO collaboratorDTO,
+            @Valid @RequestBody CollaboratorDTO collaboratorDTO,
             @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
@@ -504,7 +505,9 @@ public class ProjectController {
             }
     )
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> removeRoleFromUserInProject(@PathVariable("projectId") Long projectId, @PathVariable("userId") Long userId, @PathVariable("roleId") Long roleId) {
+    public ResponseEntity<Void> removeRoleFromUserInProject(@PathVariable("projectId") Long projectId,
+                                                            @PathVariable("userId") Long userId,
+                                                            @PathVariable("roleId") Long roleId) {
         return ResponseEntity.noContent().build();
     }
 

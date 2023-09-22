@@ -6,6 +6,7 @@ import com.example.devopsproj.service.UserNamesService;
 import com.example.devopsproj.dto.responseDto.UserNamesDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -42,7 +43,7 @@ public class UserNamesController {
             }
     )
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> saveUsername(@RequestBody UserNamesDTO userNamesDTO,
+    public ResponseEntity<Object> saveUsername(@Valid @RequestBody UserNamesDTO userNamesDTO,
                                                @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
@@ -71,7 +72,8 @@ public class UserNamesController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getUserNamesByRole(@PathVariable String role, @RequestHeader("AccessToken") String accessToken) {
+    public ResponseEntity<Object> getUserNamesByRole(@PathVariable String role,
+                                                     @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtService.isTokenTrue(accessToken);
         if (isTokenValid) {
             EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
