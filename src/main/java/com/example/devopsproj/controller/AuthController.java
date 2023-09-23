@@ -1,6 +1,6 @@
 package com.example.devopsproj.controller;
 
-import com.example.devopsproj.service.UserService;
+import com.example.devopsproj.service.implementations.UserServiceImpl;
 import com.example.devopsproj.utils.JwtUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -18,7 +18,7 @@ import java.io.IOException;
 @Validated
 public class AuthController {
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @GetMapping("/api/v1/get-email")
     @Operation(
@@ -30,11 +30,11 @@ public class AuthController {
     )
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getEmailFromToken(@RequestHeader("emailToVerify") String emailToVerify) throws IOException {
-        Object object = userService.loginVerification(emailToVerify);
+        Object object = userServiceImpl.loginVerification(emailToVerify);
         if (object == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }else {
-            return ResponseEntity.ok(userService.loginVerification(emailToVerify));
+            return ResponseEntity.ok(userServiceImpl.loginVerification(emailToVerify));
         }
     }
 
@@ -53,7 +53,7 @@ public class AuthController {
         try {
             String jwt = authHeader.replace("Bearer", "");
             String emailToVerify = JwtUtils.getEmailFromJwt(jwt);
-            return new ResponseEntity<>(userService.loginVerification(emailToVerify), HttpStatus.OK);
+            return new ResponseEntity<>(userServiceImpl.loginVerification(emailToVerify), HttpStatus.OK);
         }catch (IllegalArgumentException e){
             return ResponseEntity.notFound().build();
         }

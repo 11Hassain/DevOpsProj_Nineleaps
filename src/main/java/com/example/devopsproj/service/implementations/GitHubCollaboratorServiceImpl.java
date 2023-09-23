@@ -1,12 +1,14 @@
-package com.example.devopsproj.service;
+package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.dto.responseDto.CollaboratorDTO;
+import com.example.devopsproj.service.interfaces.GitHubCollaboratorService;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 @Service
-public class GitHubCollaboratorService {
+public class GitHubCollaboratorServiceImpl implements GitHubCollaboratorService {
 
+    @Override
     public boolean addCollaborator(CollaboratorDTO collaboratorDTO) {
         String apiUrl = String.format("https://api.github.com/repos/%s/%s/collaborators/%s",
                 collaboratorDTO.getOwner(), collaboratorDTO.getRepo(), collaboratorDTO.getUsername());
@@ -21,6 +23,7 @@ public class GitHubCollaboratorService {
         return responseEntity.getStatusCode().is2xxSuccessful();
     }
 
+    @Override
     public boolean deleteCollaborator(CollaboratorDTO collaboratorDTO) {
         String apiUrl = String.format("https://api.github.com/repos/%s/%s/collaborators/%s",
                 collaboratorDTO.getOwner(), collaboratorDTO.getRepo(), collaboratorDTO.getUsername());
@@ -35,7 +38,8 @@ public class GitHubCollaboratorService {
         return responseEntity.getStatusCode().is2xxSuccessful();
     }
 
-    private HttpHeaders createHttpHeaders(String accessToken) {
+    @Override
+    public HttpHeaders createHttpHeaders(String accessToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
         headers.set("Accept", "application/vnd.github+json");

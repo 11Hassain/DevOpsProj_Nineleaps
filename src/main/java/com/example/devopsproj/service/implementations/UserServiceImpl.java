@@ -1,4 +1,4 @@
-package com.example.devopsproj.service;
+package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.dto.responseDto.ProjectDTO;
@@ -12,6 +12,7 @@ import com.example.devopsproj.model.Project;
 import com.example.devopsproj.model.User;
 import com.example.devopsproj.otp.OTPService.IUserService;
 import com.example.devopsproj.repository.ProjectRepository;
+import com.example.devopsproj.service.interfaces.UserService;
 import com.example.devopsproj.utils.JwtUtils;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
@@ -26,14 +27,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class UserService implements IUserService {
+public class UserServiceImpl implements IUserService, UserService {
 
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private ProjectService projectService;
+    private ProjectServiceImpl projectServiceImpl;
     @Autowired
-    private JwtService jwtService;
+    private JwtServiceImpl jwtServiceImpl;
     @Autowired
     private JwtUtils jwtUtils;
     @Autowired
@@ -43,6 +44,7 @@ public class UserService implements IUserService {
 
 
     //implementing user creation using DTO pattern
+    @Override
     public User saveUser(@RequestBody UserCreationDTO userCreationDTO) {
         User user = new User();
         user.setId(userCreationDTO.getId());
@@ -54,6 +56,7 @@ public class UserService implements IUserService {
         return userRepository.save(user);
     }
 
+    @Override
     public UserDTO updateUser(Long id, UserDTO userDTO) {
         Optional<User> optionalUser = userRepository.findById(id);
         if (optionalUser.isPresent()) {
@@ -69,12 +72,13 @@ public class UserService implements IUserService {
     }
 
     //find user by user id
+    @Override
     public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
     }
 
-
     //this function says whether id is soft-deleted or not
+    @Override
     public boolean existsByIdIsDeleted(Long id) {
         Optional<User> checkUser = userRepository.findById(id);
         if (checkUser.isEmpty()){
@@ -85,6 +89,7 @@ public class UserService implements IUserService {
     }
 
     //Soft deleting the user
+    @Override
     public boolean softDeleteUser(Long id) {
         try {
             userRepository.softDelete(id);
@@ -94,34 +99,30 @@ public class UserService implements IUserService {
         }
     }
 
+    @Override
     public boolean existsById(Long id) {
         return userRepository.existsById(id);
     }
 
-
     //get all user based on role id
+    @Override
     public List<User> getUsersByRole(EnumRole enumRole) {
         return userRepository.findByRole(enumRole);
     }
 
-    private UserDTO convertToUserDto(User user) {
-        return modelMapper.map(user, UserDTO.class);
-    }
-
-    public User getUserByEmail(String userEmail) {
-        return userRepository.findByEmail(userEmail);
-    }
-
+    @Override
     public Integer getCountAllUsers() {
         return userRepository.countAllUsers();
     }
 
+    @Override
     public Integer getCountAllUsersByRole(EnumRole role) {
         return userRepository.countAllUsersByRole(role);
     }
 
+    @Override
     public Integer getCountAllUsersByProjectId(Long projectId) {
-        Optional<Project> project = projectService.getProjectById(projectId);
+        Optional<Project> project = projectServiceImpl.getProjectById(projectId);
         if (project.isPresent()) {
             return userRepository.countAllUsersByProjectId(projectId);
         } else {
@@ -129,6 +130,7 @@ public class UserService implements IUserService {
         }
     }
 
+    @Override
     public List<UserProjectsDTO> getAllUsersWithProjects() {
         List<User> users = userRepository.findAllUsers();
         List<UserProjectsDTO> userProjectsDTOs = new ArrayList<>();
@@ -152,8 +154,7 @@ public class UserService implements IUserService {
         return userProjectsDTOs;
     }
 
-
-
+    @Override
     public List<UserDTO> getAllUsersWithoutProjects(EnumRole role, Long projectId) {
         List<User> users = userRepository.findAllUsersByRole(role);
         List<UserDTO> userDTOs = new ArrayList<>();
@@ -169,6 +170,7 @@ public class UserService implements IUserService {
         return userDTOs;
     }
 
+    @Override
     public List<UserProjectsDTO> getUsersWithMultipleProjects() {
         List<UserProjectsDTO> allUsersWithProjects = getAllUsersWithProjects();
         List<UserProjectsDTO> usersWithMultipleProjects = new ArrayList<>();
@@ -196,12 +198,14 @@ public class UserService implements IUserService {
         return usersWithMultipleProjects;
     }
 
-    private boolean projectExists(String projectName) {
+    @Override
+    public boolean projectExists(String projectName) {
         List<Project> projects = projectRepository.findAllProjects();
         return projects.stream()
                 .anyMatch(project -> project.getProjectName().equals(projectName));
     }
 
+    @Override
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream()
@@ -209,6 +213,7 @@ public class UserService implements IUserService {
                 .toList();
     }
 
+    @Override
     public List<ProjectDTO> getAllProjectsAndRepositoriesByUserId(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
@@ -231,10 +236,12 @@ public class UserService implements IUserService {
         return projectDTOs;
     }
 
+    @Override
     public List<Project> getUsersByRoleAndUserId(Long userId, EnumRole userRole) {
         return userRepository.findByRoleAndUserId(userId, userRole);
     }
 
+    @Override
     public UserDTO loginVerification(String email){
         UserDTO userDTO = new UserDTO();
         User user = userRepository.existsByEmail(email);
@@ -249,12 +256,13 @@ public class UserService implements IUserService {
         userDTO.setEnumRole(user.getEnumRole());
         userDTO.setLastUpdated(user.getLastUpdated());
         //generate token
-        String jwtToken = jwtService.generateToken(user);
+        String jwtToken = jwtServiceImpl.generateToken(user);
         jwtUtils.saveUserToken(user,jwtToken);
         userDTO.setToken(jwtToken);
         return userDTO;
     }
 
+    @Override
     public String userLogout(Long id){
         Optional<User> optionalUser = userRepository.findById(id);
         if(optionalUser.isPresent()){
@@ -267,6 +275,11 @@ public class UserService implements IUserService {
         }
     }
 
+    // ------- Other methods --------
+
+    private UserDTO convertToUserDto(User user) {
+        return modelMapper.map(user, UserDTO.class);
+    }
 
     //-------------IUService-----------
 

@@ -7,8 +7,8 @@ import com.example.devopsproj.model.GoogleDrive;
 import com.example.devopsproj.dto.requestDto.UserCreationDTO;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.model.User;
-import com.example.devopsproj.service.JwtService;
-import com.example.devopsproj.service.UserService;
+import com.example.devopsproj.service.implementations.JwtServiceImpl;
+import com.example.devopsproj.service.implementations.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
@@ -28,9 +28,9 @@ import java.util.stream.Collectors;
 public class UserController {
 
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
     @Autowired
-    private JwtService jwtService;
+    private JwtServiceImpl jwtServiceImpl;
 
     private static final String INVALID_TOKEN = "Invalid Token";
 
@@ -45,9 +45,9 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> saveUser(@Valid @RequestBody UserCreationDTO userCreationDTO,
                                          @RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            User savedUser = userService.saveUser(userCreationDTO);
+            User savedUser = userServiceImpl.saveUser(userCreationDTO);
             return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
@@ -65,9 +65,9 @@ public class UserController {
     )
     public ResponseEntity<Object> getUserById(@PathVariable Long userId,
                                                @RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            Optional<User> optionalUser = userService.getUserById(userId);
+            Optional<User> optionalUser = userServiceImpl.getUserById(userId);
             if(optionalUser.isPresent()){
                 User user = optionalUser.get();
                 UserDTO userDTO = new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole(), user.getLastUpdated(), user.getLastLogout());
@@ -90,9 +90,9 @@ public class UserController {
     public ResponseEntity<Object> updateUser(@PathVariable("id") Long id,
                                              @Valid @RequestBody UserDTO userDTO,
                                              @RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            UserDTO userDTOs = userService.updateUser(id, userDTO);
+            UserDTO userDTOs = userServiceImpl.updateUser(id, userDTO);
             return new ResponseEntity<>(userDTOs, HttpStatus.OK);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
@@ -110,15 +110,15 @@ public class UserController {
     )
     public ResponseEntity<String> deleteUserById(@PathVariable Long userId,
                                                  @RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            if(userService.existsById(userId)) {
-                boolean checkIfDeleted = userService.existsByIdIsDeleted(userId); //check if deleted = true?
+            if(userServiceImpl.existsById(userId)) {
+                boolean checkIfDeleted = userServiceImpl.existsByIdIsDeleted(userId); //check if deleted = true?
                 if (checkIfDeleted) {
                     return ResponseEntity.ok("User doesn't exist");
                     //user is present in db but deleted=true(soft deleted)
                 }
-                boolean isDeleted = userService.softDeleteUser(userId); //soft deletes user with id (yes/no)
+                boolean isDeleted = userServiceImpl.softDeleteUser(userId); //soft deletes user with id (yes/no)
                 if(isDeleted){
                     return ResponseEntity.ok("User successfully deleted");
                     //successfully deleting user (soft delete) (user exists in db)
@@ -144,10 +144,10 @@ public class UserController {
     )
     public ResponseEntity<Object> getUserByRoleId(@PathVariable("role") String role,
                                                        @RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             EnumRole userRole = EnumRole.valueOf(role.toUpperCase()); //getting value of role(string)
-            List<User> users = userService.getUsersByRole(userRole);
+            List<User> users = userServiceImpl.getUsersByRole(userRole);
             List<UserDTO> userDTOList = users.stream()
                     .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole(), user.getLastUpdated(), user.getLastLogout()))
                     .collect(Collectors.toList());
@@ -166,9 +166,9 @@ public class UserController {
             }
     )
     public ResponseEntity<Object> getCountAllUsers(@RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            Integer countUsers = userService.getCountAllUsers();
+            Integer countUsers = userServiceImpl.getCountAllUsers();
             if (countUsers == 0){
                 return ResponseEntity.ok(0);
             }
@@ -190,10 +190,10 @@ public class UserController {
     )
     public ResponseEntity<Object> getCountAllUsersByRole(@PathVariable String role,
                                           @RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             EnumRole userRole = EnumRole.valueOf(role.toUpperCase());
-            Integer countUsersByRole = userService.getCountAllUsersByRole(userRole);
+            Integer countUsersByRole = userServiceImpl.getCountAllUsersByRole(userRole);
             if(countUsersByRole == 0){
                 return ResponseEntity.ok(0);
             }
@@ -215,9 +215,9 @@ public class UserController {
     )
     public ResponseEntity<Object> getCountAllUsersByProjectId(@PathVariable Long projectId,
                                                               @RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            Integer countUsersByProject = userService.getCountAllUsersByProjectId(projectId);
+            Integer countUsersByProject = userServiceImpl.getCountAllUsersByProjectId(projectId);
             if (countUsersByProject == 0){
                 return ResponseEntity.ok(0);
             }
@@ -239,9 +239,9 @@ public class UserController {
     )
     public ResponseEntity<Object> getAllProjectsByUserId(@PathVariable Long id,
                                                          @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            List<ProjectDTO> projects = userService.getAllProjectsAndRepositoriesByUserId(id);
+            List<ProjectDTO> projects = userServiceImpl.getAllProjectsAndRepositoriesByUserId(id);
             return ResponseEntity.ok(projects);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
@@ -261,10 +261,10 @@ public class UserController {
             @PathVariable("id") Long userId,
             @PathVariable("role") String role,
             @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             EnumRole userRole = EnumRole.valueOf(role.toUpperCase()); // Getting value of role(string)
-            List<Project> projects = userService.getUsersByRoleAndUserId(userId, userRole);
+            List<Project> projects = userServiceImpl.getUsersByRoleAndUserId(userId, userRole);
             if (projects.isEmpty()){
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
@@ -304,9 +304,9 @@ public class UserController {
             }
     )
     public ResponseEntity<Object> getAllUsers(@RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            return ResponseEntity.ok(userService.getAllUsers());
+            return ResponseEntity.ok(userServiceImpl.getAllUsers());
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
@@ -321,9 +321,9 @@ public class UserController {
             }
     )
     public ResponseEntity<Object> getAllUsersWithProjects(@RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            List<UserProjectsDTO> userProjectsDTOs = userService.getAllUsersWithProjects();
+            List<UserProjectsDTO> userProjectsDTOs = userServiceImpl.getAllUsersWithProjects();
             return ResponseEntity.ok(userProjectsDTOs);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
@@ -339,9 +339,9 @@ public class UserController {
             }
     )
     public ResponseEntity<Object> getUsersWithMultipleProjects(@RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            List<UserProjectsDTO> usersWithMultipleProjects = userService.getUsersWithMultipleProjects();
+            List<UserProjectsDTO> usersWithMultipleProjects = userServiceImpl.getUsersWithMultipleProjects();
             return ResponseEntity.ok(usersWithMultipleProjects);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
@@ -359,10 +359,10 @@ public class UserController {
             @RequestParam("role") String role,
             @RequestParam("projectId") Long projectId,
             @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
-            List<UserDTO> userDTOList = userService.getAllUsersWithoutProjects(enumRole, projectId);
+            List<UserDTO> userDTOList = userServiceImpl.getAllUsersWithoutProjects(enumRole, projectId);
             return ResponseEntity.status(HttpStatus.OK).body(userDTOList);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
@@ -379,9 +379,9 @@ public class UserController {
     )
     public ResponseEntity<String> userLogout(@PathVariable("userId") Long id,
                                              @RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            String response = userService.userLogout(id);
+            String response = userServiceImpl.userLogout(id);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);

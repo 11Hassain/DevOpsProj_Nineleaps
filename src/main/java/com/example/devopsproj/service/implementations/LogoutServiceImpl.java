@@ -1,4 +1,4 @@
-package com.example.devopsproj.service;
+package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.repository.TokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class LogoutService implements LogoutHandler {
+public class LogoutServiceImpl implements LogoutHandler {
 
     private final TokenRepository tokenRepository;
     @Override

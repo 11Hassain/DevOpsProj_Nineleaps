@@ -1,10 +1,11 @@
-package com.example.devopsproj.service;
+package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.model.GitRepository;
 import com.example.devopsproj.dto.responseDto.GitRepositoryDTO;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.repository.GitRepositoryRepository;
+import com.example.devopsproj.service.interfaces.GitRepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -18,13 +19,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class GitRepositoryService {
+public class GitRepositoryServiceImpl implements GitRepositoryService {
 
     @Autowired
     private GitRepositoryRepository gitRepositoryRepository;
     @Autowired
-    private ProjectService projectService;
-
+    private ProjectServiceImpl projectServiceImpl;
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -37,12 +37,12 @@ public class GitRepositoryService {
 
     private final RestTemplate restTemplate;
 
-    public GitRepositoryService() {
+    public GitRepositoryServiceImpl() {
         this.restTemplate = new RestTemplate();
         this.restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
     }
 
-
+    @Override
     @Transactional
     public GitRepository createRepository(GitRepository gitRepository) {
         HttpHeaders headers = new HttpHeaders();
@@ -65,6 +65,8 @@ public class GitRepositoryService {
             throw new RuntimeException("Error creating repository " + gitRepository.getName() + ". Response: " + responseEntity.getBody());
         }
     }
+
+    @Override
     @Transactional(readOnly = true)
     public List<GitRepositoryDTO> getAllRepositories() {
         List<GitRepository> gitRepositories = gitRepositoryRepository.findAll();
@@ -76,8 +78,7 @@ public class GitRepositoryService {
         return gitRepositoriesDTO;
     }
 
-
-
+    @Override
     @Transactional
     public void deleteRepository(Long repoId) {
         GitRepository repository = gitRepositoryRepository.findByRepoId(repoId)
@@ -110,10 +111,9 @@ public class GitRepositoryService {
         }
     }
 
-
-
-        public List<GitRepositoryDTO> getAllRepositoriesByProject(Long id) {
-        Project project = projectService.getProjectById(id).orElse(null);
+    @Override
+    public List<GitRepositoryDTO> getAllRepositoriesByProject(Long id) {
+        Project project = projectServiceImpl.getProjectById(id).orElse(null);
         if(project != null){
             List<GitRepository> repositories = gitRepositoryRepository.findRepositoriesByProject(project);
             List<GitRepositoryDTO> gitRepositoryDTOS = repositories.stream()
@@ -124,16 +124,7 @@ public class GitRepositoryService {
         else return null;
     }
 
-    private GitRepositoryDTO convertToDto(GitRepository gitRepository) {
-        // Perform the mapping logic from GitRepository to GitRepositoryDTO
-        GitRepositoryDTO gitRepositoryDTO = new GitRepositoryDTO();
-        gitRepositoryDTO.setRepoId(gitRepository.getRepoId());
-        gitRepositoryDTO.setName(gitRepository.getName());
-        gitRepositoryDTO.setDescription(gitRepository.getDescription());
-
-        return gitRepositoryDTO;
-    }
-
+    @Override
     public List<GitRepositoryDTO> getAllReposByRole(EnumRole enumRole) {
         List<GitRepository> gitRepositories = gitRepositoryRepository.findAllByRole(enumRole);
         List<GitRepositoryDTO> gitRepositoryDTOS = gitRepositories.stream()
@@ -142,10 +133,14 @@ public class GitRepositoryService {
         return gitRepositoryDTOS;
     }
 
+    @Override
     @Transactional(readOnly = true)
     public GitRepository getRepositoryById(Long id) {
         return gitRepositoryRepository.findById(id).orElse(null);
     }
+
+
+    // ---- Other methods ------
 
     public boolean isAccessTokenValid(String accessToken) {
         HttpHeaders headers = new HttpHeaders();
@@ -169,5 +164,15 @@ public class GitRepositoryService {
         }
 
         return false;
+    }
+
+    private GitRepositoryDTO convertToDto(GitRepository gitRepository) {
+        // Perform the mapping logic from GitRepository to GitRepositoryDTO
+        GitRepositoryDTO gitRepositoryDTO = new GitRepositoryDTO();
+        gitRepositoryDTO.setRepoId(gitRepository.getRepoId());
+        gitRepositoryDTO.setName(gitRepository.getName());
+        gitRepositoryDTO.setDescription(gitRepository.getDescription());
+
+        return gitRepositoryDTO;
     }
 }

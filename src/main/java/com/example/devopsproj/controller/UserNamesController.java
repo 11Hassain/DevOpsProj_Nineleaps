@@ -1,8 +1,8 @@
 package com.example.devopsproj.controller;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
-import com.example.devopsproj.service.JwtService;
-import com.example.devopsproj.service.UserNamesService;
+import com.example.devopsproj.service.implementations.JwtServiceImpl;
+import com.example.devopsproj.service.implementations.UserNamesServiceImpl;
 import com.example.devopsproj.dto.responseDto.UserNamesDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -20,12 +20,12 @@ import org.springframework.web.bind.annotation.*;
 public class UserNamesController {
 
     @Autowired
-    private final UserNamesService userNamesService;
+    private final UserNamesServiceImpl userNamesServiceImpl;
     @Autowired
-    private JwtService jwtService;
+    private JwtServiceImpl jwtServiceImpl;
     @Autowired
-    public UserNamesController(UserNamesService userNamesService) {
-        this.userNamesService = userNamesService;
+    public UserNamesController(UserNamesServiceImpl userNamesServiceImpl) {
+        this.userNamesServiceImpl = userNamesServiceImpl;
     }
 
     private static final String INVALID_TOKEN = "Invalid Token";
@@ -45,10 +45,10 @@ public class UserNamesController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> saveUsername(@Valid @RequestBody UserNamesDTO userNamesDTO,
                                                @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             try{
-                UserNamesDTO savedUserNames = userNamesService.saveUsername(userNamesDTO);
+                UserNamesDTO savedUserNames = userNamesServiceImpl.saveUsername(userNamesDTO);
                 if (savedUserNames == null){
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Github user not found");
                 }
@@ -74,10 +74,10 @@ public class UserNamesController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getUserNamesByRole(@PathVariable String role,
                                                      @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
-            return ResponseEntity.ok(userNamesService.getGitHubUserNamesByRole(enumRole));
+            return ResponseEntity.ok(userNamesServiceImpl.getGitHubUserNamesByRole(enumRole));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }

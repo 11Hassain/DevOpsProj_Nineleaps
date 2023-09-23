@@ -1,4 +1,4 @@
-package com.example.devopsproj.service;
+package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.dto.responseDto.ProjectDTO;
 import com.example.devopsproj.dto.responseDto.UserDTO;
@@ -8,18 +8,19 @@ import com.example.devopsproj.dto.requestDto.AccessRequestDTO;
 import com.example.devopsproj.dto.responseDto.AccessResponseDTO;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.repository.AccessRequestRepository;
+import com.example.devopsproj.service.interfaces.AccessRequestService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class AccessRequestService {
+public class AccessRequestServiceImpl implements AccessRequestService {
 
     @Autowired
     private AccessRequestRepository accessRequestRepository;
@@ -27,23 +28,26 @@ public class AccessRequestService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Override
     public AccessRequestDTO createRequest(AccessRequestDTO accessRequestDTO) {
         AccessRequest accessRequest = mapDTOToAccessRequest(accessRequestDTO);
         accessRequestRepository.save(accessRequest);
         return mapAccessRequestToDTO(accessRequest);
     }
 
+    @Override
     public List<AccessRequestDTO> getAllRequests() {
         List<AccessRequest> accessRequestList = accessRequestRepository.findAll();
         return mapAccessRequestListToDTOList(accessRequestList);
     }
 
+    @Override
     public List<AccessRequestDTO> getAllActiveRequests() {
         List<AccessRequest> accessRequestList = accessRequestRepository.findAllActiveRequests();
         return mapAccessRequestListToDTOList(accessRequestList);
     }
 
-
+    @Override
     public List<AccessResponseDTO> getUpdatedRequests(Long id, AccessRequestDTO accessRequestDTO) {
         Optional<AccessRequest> optionalAccessRequest = accessRequestRepository.findById(id);
         if (optionalAccessRequest.isPresent()) {
@@ -58,17 +62,20 @@ public class AccessRequestService {
 
     private static final String RESPONSE = "Request for adding ";
 
+    @Override
     public List<AccessResponseDTO> getPMUnreadRequests(String pmName) {
         List<AccessRequest> accessRequests = accessRequestRepository.findAllUnreadPMRequestsByName(pmName);
         return mapAccessRequestsToResponseDTOs(accessRequests);
     }
 
+    @Override
     public List<AccessResponseDTO> getPMRequests(String pmName) {
         List<AccessRequest> accessRequests = accessRequestRepository.findAllPMRequestsByName(pmName);
         return mapAccessRequestsToResponseDTOs(accessRequests);
     }
 
-    private List<AccessResponseDTO> mapAccessRequestsToResponseDTOs(List<AccessRequest> accessRequests) {
+    @Override
+    public List<AccessResponseDTO> mapAccessRequestsToResponseDTOs(List<AccessRequest> accessRequests) {
         List<AccessResponseDTO> accessResponseDTOList = new ArrayList<>();
 
         for (AccessRequest accessRequest : accessRequests) {
@@ -89,6 +96,7 @@ public class AccessRequestService {
         return accessResponseDTOList;
     }
 
+    @Override
     public void setPMRequestsNotificationTrue(Long accessRequestId) {
         Optional<AccessRequest> optionalAccessRequest = accessRequestRepository.findById(accessRequestId);
         if (optionalAccessRequest.isPresent()) {
@@ -98,6 +106,8 @@ public class AccessRequestService {
         }
     }
 
+    @Override
+    @Transactional
     public void clearAllNotifications(){
         accessRequestRepository.deleteAll();
     }

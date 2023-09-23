@@ -1,7 +1,7 @@
 package com.example.devopsproj.controller;
 
-import com.example.devopsproj.service.GitHubCollaboratorService;
-import com.example.devopsproj.service.JwtService;
+import com.example.devopsproj.service.implementations.GitHubCollaboratorServiceImpl;
+import com.example.devopsproj.service.implementations.JwtServiceImpl;
 import com.example.devopsproj.dto.responseDto.CollaboratorDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -17,11 +17,11 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 public class GitHubCollaboratorController {
     @Autowired
-    private final GitHubCollaboratorService collaboratorService;
+    private final GitHubCollaboratorServiceImpl collaboratorService;
     @Autowired
-    private JwtService jwtService;
+    private JwtServiceImpl jwtServiceImpl;
     @Autowired
-    public GitHubCollaboratorController(GitHubCollaboratorService collaboratorService) {
+    public GitHubCollaboratorController(GitHubCollaboratorServiceImpl collaboratorService) {
         this.collaboratorService = collaboratorService;
     }
 
@@ -39,7 +39,7 @@ public class GitHubCollaboratorController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> addCollaborator(@Valid @RequestBody CollaboratorDTO collaboratorDTO,
                                                   @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             boolean added = collaboratorService.addCollaborator(collaboratorDTO);
             if (added) {
@@ -65,7 +65,7 @@ public class GitHubCollaboratorController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> deleteCollaborator(@Valid @RequestBody CollaboratorDTO collaboratorDTO,
                                                      @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             boolean deleted = collaboratorService.deleteCollaborator(collaboratorDTO);
             if (deleted) {

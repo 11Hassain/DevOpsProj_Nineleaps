@@ -2,8 +2,8 @@ package com.example.devopsproj.controller;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.model.GitRepository;
-import com.example.devopsproj.service.GitRepositoryService;
-import com.example.devopsproj.service.JwtService;
+import com.example.devopsproj.service.implementations.GitRepositoryServiceImpl;
+import com.example.devopsproj.service.implementations.JwtServiceImpl;
 import com.example.devopsproj.dto.responseDto.GitRepositoryDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -22,9 +22,9 @@ import java.util.List;
 public class GitRepositoryController {
 
     @Autowired
-    private GitRepositoryService gitRepositoryService;
+    private GitRepositoryServiceImpl gitRepositoryServiceImpl;
     @Autowired
-    private JwtService jwtService;
+    private JwtServiceImpl jwtServiceImpl;
 
     private static final String INVALID_TOKEN = "Invalid Token";
 
@@ -39,9 +39,9 @@ public class GitRepositoryController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> createRepository(@Valid @RequestBody GitRepository gitRepository,
                                           @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            return ResponseEntity.ok(gitRepositoryService.createRepository(gitRepository));
+            return ResponseEntity.ok(gitRepositoryServiceImpl.createRepository(gitRepository));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
@@ -57,9 +57,9 @@ public class GitRepositoryController {
     )
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getAllRepositories(@RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            return ResponseEntity.ok(gitRepositoryService.getAllRepositories());
+            return ResponseEntity.ok(gitRepositoryServiceImpl.getAllRepositories());
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
@@ -77,9 +77,9 @@ public class GitRepositoryController {
     public ResponseEntity<Object> getAllReposByProject(
             @PathVariable Long id,
             @RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            List<GitRepositoryDTO> gitRepositoryDTOS = gitRepositoryService.getAllRepositoriesByProject(id);
+            List<GitRepositoryDTO> gitRepositoryDTOS = gitRepositoryServiceImpl.getAllRepositoriesByProject(id);
             return new ResponseEntity<>(gitRepositoryDTOS, HttpStatus.OK);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
@@ -98,10 +98,10 @@ public class GitRepositoryController {
     public ResponseEntity<Object> getAllReposByRole(
             @PathVariable("role") String role,
             @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
-            return ResponseEntity.ok(gitRepositoryService.getAllReposByRole(enumRole));
+            return ResponseEntity.ok(gitRepositoryServiceImpl.getAllReposByRole(enumRole));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
@@ -120,9 +120,9 @@ public class GitRepositoryController {
     public ResponseEntity<Object> getRepositoryById(
             @PathVariable Long id,
             @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            GitRepository repository = gitRepositoryService.getRepositoryById(id);
+            GitRepository repository = gitRepositoryServiceImpl.getRepositoryById(id);
             if (repository != null) {
                 GitRepositoryDTO repositoryDTO = new GitRepositoryDTO(repository.getName(), repository.getDescription());
                 return ResponseEntity.ok(repositoryDTO);
@@ -148,10 +148,10 @@ public class GitRepositoryController {
             @PathVariable Long repoId,
             @RequestHeader(value = "AccessToken", required = false) String accessToken
     ) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if(isTokenValid) {
             try {
-                gitRepositoryService.deleteRepository(repoId); // Delete the repository
+                gitRepositoryServiceImpl.deleteRepository(repoId); // Delete the repository
                 return ResponseEntity.ok("Deleted successfully");
 
             } catch (Exception e) {

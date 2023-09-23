@@ -7,9 +7,9 @@ import com.example.devopsproj.model.Project;
 import com.example.devopsproj.model.User;
 import com.example.devopsproj.model.UserNames;
 import com.example.devopsproj.repository.UserRepository;
-import com.example.devopsproj.service.GitHubCollaboratorService;
-import com.example.devopsproj.service.JwtService;
-import com.example.devopsproj.service.ProjectService;
+import com.example.devopsproj.service.implementations.GitHubCollaboratorServiceImpl;
+import com.example.devopsproj.service.implementations.JwtServiceImpl;
+import com.example.devopsproj.service.implementations.ProjectServiceImpl;
 import com.example.devopsproj.exceptions.NotFoundException;
 import com.example.devopsproj.repository.GitRepositoryRepository;
 import com.example.devopsproj.repository.ProjectRepository;
@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 public class ProjectController {
 
     @Autowired
-    private ProjectService projectService;
+    private ProjectServiceImpl projectServiceImpl;
     @Autowired
     private ProjectRepository projectRepository;
     @Autowired
@@ -45,9 +45,9 @@ public class ProjectController {
     @Autowired
     private GitRepositoryRepository gitRepositoryRepository;
     @Autowired
-    private JwtService jwtService;
+    private JwtServiceImpl jwtServiceImpl;
     @Autowired
-    private GitHubCollaboratorService collaboratorService;
+    private GitHubCollaboratorServiceImpl collaboratorService;
 
     private static final String INVALID_TOKEN = "Invalid Token";
 
@@ -64,10 +64,10 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> saveProject(@Valid @RequestBody ProjectDTO projectDTO,
                                               @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             try {
-                projectService.saveProject(projectDTO);
+                projectServiceImpl.saveProject(projectDTO);
                 return ResponseEntity.ok("Project created successfully");
 
             } catch (DataIntegrityViolationException e) {
@@ -89,9 +89,9 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> createProject(@Valid @RequestBody ProjectDTO projectDTO,
                                                 @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            ProjectDTO createdProjectDTO = projectService.createProject(projectDTO);
+            ProjectDTO createdProjectDTO = projectServiceImpl.createProject(projectDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdProjectDTO);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
@@ -111,10 +111,10 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getProjectById(@PathVariable("id") Long id,
                                                  @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             try {
-                Optional<Project> checkProject = projectService.getProjectById(id);
+                Optional<Project> checkProject = projectServiceImpl.getProjectById(id);
                 if (checkProject.isPresent()) {
                     Project project = checkProject.get();
                     if (Boolean.TRUE.equals(project.getDeleted())) {
@@ -152,10 +152,10 @@ public class ProjectController {
     )
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getAll(@RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             try {
-                List<Project> projects = projectService.getAll();
+                List<Project> projects = projectServiceImpl.getAll();
                 List<ProjectDTO> projectDTOs = projects.stream()
                         .map(project -> new ProjectDTO(project.getProjectId(), project.getProjectName(), project.getProjectDescription(), project.getLastUpdated(), project.getDeleted()))
                         .collect(Collectors.toList());
@@ -183,14 +183,14 @@ public class ProjectController {
     )
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getAllProjectsWithUsers(@RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             try {
-                List<Project> projects = projectService.getAllProjects();
+                List<Project> projects = projectServiceImpl.getAllProjects();
                 List<ProjectWithUsersDTO> projectsWithUsers = new ArrayList<>();
 
                 for (Project project : projects) {
-                    List<User> userList = projectService.getAllUsersByProjectId(project.getProjectId());
+                    List<User> userList = projectServiceImpl.getAllUsersByProjectId(project.getProjectId());
                     if (userList.isEmpty()) {
                         userList = new ArrayList<>();
                     }
@@ -236,10 +236,10 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getAllUsersByProjectId(@PathVariable Long projectId,
                                                          @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             try {
-                List<User> userList = projectService.getAllUsersByProjectId(projectId);
+                List<User> userList = projectServiceImpl.getAllUsersByProjectId(projectId);
                 if (userList.isEmpty()) {
                     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
                 }
@@ -273,11 +273,11 @@ public class ProjectController {
             @PathVariable Long projectId,
             @PathVariable String role,
             @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             try {
                 EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
-                List<User> userList = projectService.getAllUsersByProjectIdAndRole(projectId, enumRole);
+                List<User> userList = projectServiceImpl.getAllUsersByProjectIdAndRole(projectId, enumRole);
                 if (userList.isEmpty()) {
                     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
                 }
@@ -315,16 +315,16 @@ public class ProjectController {
     public ResponseEntity<Object> updateProject(@PathVariable("projectId") Long projectId,
                                                 @Valid @RequestBody ProjectDTO projectDTO,
                                                 @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             try {
-                Optional<Project> optionalProject = projectService.getProjectById(projectId);
+                Optional<Project> optionalProject = projectServiceImpl.getProjectById(projectId);
                 if (optionalProject.isPresent()) {
                     Project existingProject = optionalProject.get();
                     existingProject.setProjectName(projectDTO.getProjectName());
                     existingProject.setProjectDescription(projectDTO.getProjectDescription());
                     existingProject.setLastUpdated(LocalDateTime.now());
-                    Project updatedProject = projectService.updateProject(existingProject);
+                    Project updatedProject = projectServiceImpl.updateProject(existingProject);
                     ProjectDTO updatedProjectDTO = new ProjectDTO(updatedProject.getProjectId(), updatedProject.getProjectName(), updatedProject.getProjectDescription(), updatedProject.getLastUpdated());
                     return new ResponseEntity<>(updatedProjectDTO, HttpStatus.OK);
                 } else {
@@ -353,14 +353,14 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> deleteProject(@PathVariable("id") Long id,
                                                 @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            if (projectService.existsProjectById(id)) {
-                boolean checkIfDeleted = projectService.existsByIdIsDeleted(id);
+            if (projectServiceImpl.existsProjectById(id)) {
+                boolean checkIfDeleted = projectServiceImpl.existsByIdIsDeleted(id);
                 if (checkIfDeleted) {
                     return ResponseEntity.ok("Project doesn't exist");
                 }
-                boolean isDeleted = projectService.softDeleteProject(id);
+                boolean isDeleted = projectServiceImpl.softDeleteProject(id);
                 if (isDeleted) {
                     return ResponseEntity.ok("Deleted project successfully");
                 } else {
@@ -388,7 +388,7 @@ public class ProjectController {
             @PathVariable("projectId") Long projectId,
             @PathVariable("userId") Long userId,
             @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             try {
                 Optional<Project> optionalProject = projectRepository.findById(projectId);
@@ -396,7 +396,7 @@ public class ProjectController {
                 if (optionalProject.isPresent() && optionalUser.isPresent()) {
                     Project project = optionalProject.get();
                     User user = optionalUser.get();
-                    if (projectService.existUserInProject(project.getProjectId(), user.getId())) {
+                    if (projectServiceImpl.existUserInProject(project.getProjectId(), user.getId())) {
                         return new ResponseEntity<>(HttpStatus.CONFLICT);
                     }
                     project.getUsers().add(user);
@@ -432,7 +432,7 @@ public class ProjectController {
             @PathVariable("projectId") Long projectId,
             @PathVariable("userId") Long userId,
             @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             //for checking if the project with given id exists
             Optional<Project> optionalProject = projectRepository.findById(projectId);
@@ -469,7 +469,7 @@ public class ProjectController {
             @PathVariable("userId") Long userId,
             @Valid @RequestBody CollaboratorDTO collaboratorDTO,
             @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             //for checking if the project with given id exists
             Optional<Project> optionalProject = projectRepository.findById(projectId);
@@ -526,10 +526,10 @@ public class ProjectController {
             @PathVariable("projectId") Long projectId,
             @PathVariable("role") String role,
             @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             EnumRole userRole = EnumRole.valueOf(role.toUpperCase());
-            List<User> users = projectService.getUsersByProjectIdAndRole(projectId, userRole);
+            List<User> users = projectServiceImpl.getUsersByProjectIdAndRole(projectId, userRole);
             List<UserDTO> userDTOList = users.stream()
                     .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
                     .collect(Collectors.toList());
@@ -554,7 +554,7 @@ public class ProjectController {
             @PathVariable("projectId") Long projectId,
             @PathVariable("repoId") Long repoId,
             @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             try {
                 Optional<Project> optionalProject = projectRepository.findById(projectId);
@@ -594,9 +594,9 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getProjectsWithoutFigmaURL(
             @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            List<ProjectDTO> projects = projectService.getProjectsWithoutFigmaURL();
+            List<ProjectDTO> projects = projectServiceImpl.getProjectsWithoutFigmaURL();
             return ResponseEntity.ok(projects);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
@@ -615,9 +615,9 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getProjectsWithoutGoogleDriveLink(
             @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            List<ProjectDTO> projects = projectService.getProjectsWithoutGoogleDriveLink();
+            List<ProjectDTO> projects = projectServiceImpl.getProjectsWithoutGoogleDriveLink();
             return ResponseEntity.ok(projects);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
@@ -635,9 +635,9 @@ public class ProjectController {
             }
     )
     public ResponseEntity<Object> countAllPeopleByProjectIdAndName(@RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            List<ProjectNamePeopleCountDTO> peopleCountDTOs = projectService.getCountAllPeopleAndProjectName();
+            List<ProjectNamePeopleCountDTO> peopleCountDTOs = projectServiceImpl.getCountAllPeopleAndProjectName();
             if (peopleCountDTOs.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Empty");
             } else {
@@ -659,9 +659,9 @@ public class ProjectController {
             }
     )
     public ResponseEntity<Object> countAllProjects(@RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            Integer countProjects = projectService.getCountAllProjects();
+            Integer countProjects = projectServiceImpl.getCountAllProjects();
             if (countProjects == 0) {
                 return ResponseEntity.ok(0);
             } else {
@@ -684,10 +684,10 @@ public class ProjectController {
     )
     public ResponseEntity<Object> countAllProjectsByRole(@PathVariable("role") String role,
                                                          @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
-            Integer countProjects = projectService.getCountAllProjectsByRole(enumRole);
+            Integer countProjects = projectServiceImpl.getCountAllProjectsByRole(enumRole);
             if (countProjects == 0) {
                 return ResponseEntity.ok(0);
             } else {
@@ -710,9 +710,9 @@ public class ProjectController {
     )
     public ResponseEntity<Object> countAllProjectsByUserId(@PathVariable("userId") Long id,
                                                            @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            Integer countProjects = projectService.getCountAllProjectsByUserId(id);
+            Integer countProjects = projectServiceImpl.getCountAllProjectsByUserId(id);
             if (countProjects == 0) {
                 return ResponseEntity.ok(0);
             } else {
@@ -735,9 +735,9 @@ public class ProjectController {
     )
     public ResponseEntity<Object> countAllUsersByProjectId(@PathVariable Long projectId,
                                                            @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            Integer countUsers = projectService.getCountAllUsersByProjectId(projectId);
+            Integer countUsers = projectServiceImpl.getCountAllUsersByProjectId(projectId);
             if (countUsers == 0) {
                 return ResponseEntity.ok(0);
             } else {
@@ -762,10 +762,10 @@ public class ProjectController {
             @PathVariable Long projectId,
             @PathVariable String role,
             @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
-            Integer countUsers = projectService.getCountAllUsersByProjectIdAndRole(projectId, enumRole);
+            Integer countUsers = projectServiceImpl.getCountAllUsersByProjectIdAndRole(projectId, enumRole);
             if (countUsers == 0) {
                 return ResponseEntity.ok(0);
             } else {
@@ -787,9 +787,9 @@ public class ProjectController {
             }
     )
     public ResponseEntity<Object> countAllActiveProjects(@RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            Integer countProjects = projectService.getCountAllActiveProjects();
+            Integer countProjects = projectServiceImpl.getCountAllActiveProjects();
             if (countProjects == 0) {
                 return ResponseEntity.ok(0);
             } else {
@@ -811,9 +811,9 @@ public class ProjectController {
             }
     )
     public ResponseEntity<Object> countAllInActiveProjects(@RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            Integer countProjects = projectService.getCountAllInActiveProjects();
+            Integer countProjects = projectServiceImpl.getCountAllInActiveProjects();
             if (countProjects == 0) {
                 return ResponseEntity.ok(0);
             } else {
@@ -835,10 +835,10 @@ public class ProjectController {
     )
     public ResponseEntity<Object> getProjectDetailsById(@RequestHeader("AccessToken") String accessToken,
                                                         @PathVariable Long projectId) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if(isTokenValid){
             try {
-                ProjectDTO projectDetails = projectService.getProjectDetailsById(projectId);
+                ProjectDTO projectDetails = projectServiceImpl.getProjectDetailsById(projectId);
                 return new ResponseEntity<>(projectDetails, HttpStatus.OK);
             } catch (Exception e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

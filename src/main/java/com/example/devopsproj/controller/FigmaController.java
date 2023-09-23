@@ -1,8 +1,8 @@
 package com.example.devopsproj.controller;
 
 import com.example.devopsproj.model.Figma;
-import com.example.devopsproj.service.FigmaService;
-import com.example.devopsproj.service.JwtService;
+import com.example.devopsproj.service.implementations.FigmaServiceImpl;
+import com.example.devopsproj.service.implementations.JwtServiceImpl;
 import com.example.devopsproj.dto.responseDto.FigmaDTO;
 import com.example.devopsproj.dto.responseDto.FigmaScreenshotDTO;
 import com.example.devopsproj.repository.FigmaRepository;
@@ -24,11 +24,11 @@ import java.util.stream.Collectors;
 @Validated
 public class FigmaController {
     @Autowired
-    private FigmaService figmaService;
+    private FigmaServiceImpl figmaServiceImpl;
     @Autowired
     private FigmaRepository figmaRepository;
     @Autowired
-    private JwtService jwtService;
+    private JwtServiceImpl jwtServiceImpl;
     private static final String INVALID_TOKEN = "Invalid Token";
 
     @PostMapping("/create")
@@ -43,11 +43,11 @@ public class FigmaController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> createFigma(@Valid @RequestBody FigmaDTO figmaDTO,
                                               @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             try {
                 // Create a new Figma entity using the provided projectName and figmaURL
-                Figma figma = figmaService.createFigma(figmaDTO);
+                Figma figma = figmaServiceImpl.createFigma(figmaDTO);
 
                 // Optionally, you can access the generated figmaId if needed
                 Long figmaId = figma.getFigmaId();
@@ -72,15 +72,15 @@ public class FigmaController {
     )
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getAllFigmaProjects(@RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            List<Figma> figmaProjects = figmaService.getAllFigmaProjects();
+            List<Figma> figmaProjects = figmaServiceImpl.getAllFigmaProjects();
 
             List<FigmaDTO> figmaDTOs = figmaProjects.stream()
                     .filter(Objects::nonNull) // Filter out null values
                     .map(figma -> new FigmaDTO(
                             figma.getFigmaId(),
-                            figmaService.mapProjectToProjectDTO(figma.getProject()),
+                            figmaServiceImpl.mapProjectToProjectDTO(figma.getProject()),
                             figma.getFigmaURL()))
                     .collect(Collectors.toList());
 
@@ -102,9 +102,9 @@ public class FigmaController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getFigma(@PathVariable Long figmaId,
                                            @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            Optional<FigmaDTO> optionalFigmaDTO = figmaService.getFigmaById(figmaId);
+            Optional<FigmaDTO> optionalFigmaDTO = figmaServiceImpl.getFigmaById(figmaId);
             if (optionalFigmaDTO.isPresent()) {
                 return ResponseEntity.ok(optionalFigmaDTO);
             } else {
@@ -130,7 +130,7 @@ public class FigmaController {
                                                                @Valid @RequestBody FigmaDTO figmaDTO,
                                                                @RequestHeader("AccessToken") String accessToken)
     {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             try {
                 Optional<Figma> optionalFigma = figmaRepository.findById(figmaId);
@@ -172,7 +172,7 @@ public class FigmaController {
     )
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> deleteFigma(@PathVariable Long figmaId) {
-        figmaService.deleteFigma(figmaId);
+        figmaServiceImpl.deleteFigma(figmaId);
         return ResponseEntity.ok("Figma deleted successfully");
     }
 
@@ -188,7 +188,7 @@ public class FigmaController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getFigmaByProjectId(@PathVariable Long projectId,
                                                       @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             Optional<Figma> optionalFigma = figmaRepository.findFigmaByProjectId(projectId);
             if (optionalFigma.isPresent()) {

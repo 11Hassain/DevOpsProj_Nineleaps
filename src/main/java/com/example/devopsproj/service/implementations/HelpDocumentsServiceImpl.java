@@ -1,10 +1,11 @@
-package com.example.devopsproj.service;
+package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.model.HelpDocuments;
 import com.example.devopsproj.dto.responseDto.HelpDocumentsDTO;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.repository.HelpDocumentsRepository;
 import com.example.devopsproj.repository.ProjectRepository;
+import com.example.devopsproj.service.interfaces.HelpDocumentsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -14,15 +15,16 @@ import java.io.IOException;
 import java.util.Optional;
 
 @Service
-public class HelpDocumentsService {
+public class HelpDocumentsServiceImpl implements HelpDocumentsService {
 
     @Autowired
     private ProjectRepository projectRepository;
     @Autowired
     private HelpDocumentsRepository helpDocumentsRepository;
     @Autowired
-    private ProjectService projectService;
+    private ProjectServiceImpl projectServiceImpl;
 
+    @Override
     public ResponseEntity<Object> uploadFiles(long projectId, MultipartFile projectFile, String fileExtension) throws IOException {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalArgumentException("Project not found"));
@@ -33,7 +35,8 @@ public class HelpDocumentsService {
         return ResponseEntity.ok("File uploaded successfully");
     }
 
-    private void saveFile(HelpDocuments helpDocuments, MultipartFile file, String fileExtension) throws IOException {
+    @Override
+    public void saveFile(HelpDocuments helpDocuments, MultipartFile file, String fileExtension) throws IOException {
         if (file != null && !file.isEmpty()) {
             helpDocuments.setFileName(file.getOriginalFilename());
             helpDocuments.setData(file.getBytes());
@@ -41,6 +44,7 @@ public class HelpDocumentsService {
         }
     }
 
+    @Override
     public String getFileExtension(MultipartFile file) {
         String originalFilename = file.getOriginalFilename();
         if (originalFilename != null) {
@@ -52,6 +56,7 @@ public class HelpDocumentsService {
         return null;
     }
 
+    @Override
     public Optional<HelpDocumentsDTO> getDocumentById(Long fileId){
         Optional<HelpDocuments> helpDocuments = helpDocumentsRepository.findById(fileId);
         if (helpDocuments.isPresent()){
@@ -65,6 +70,7 @@ public class HelpDocumentsService {
         }
     }
 
+    @Override
     public void deleteDocument(Long fileId) {
         helpDocumentsRepository.deleteById(fileId);
     }

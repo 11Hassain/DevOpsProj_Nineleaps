@@ -1,21 +1,23 @@
-package com.example.devopsproj.service;
+package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.dto.responseDto.ProjectDTO;
 import com.example.devopsproj.model.GoogleDrive;
 import com.example.devopsproj.dto.responseDto.GoogleDriveDTO;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.repository.GoogleDriveRepository;
+import com.example.devopsproj.service.interfaces.GoogleDriveService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 @Service
-public class GoogleDriveService {
+public class GoogleDriveServiceImpl implements GoogleDriveService {
 
     @Autowired
     private GoogleDriveRepository googleDriveRepository;
 
+    @Override
     public GoogleDrive createGoogleDrive(GoogleDriveDTO googleDriveDTO) {
         GoogleDrive googleDrive = new GoogleDrive();
         googleDrive.setProject(mapProjectDTOToProject(googleDriveDTO.getProjectDTO()));
@@ -23,6 +25,7 @@ public class GoogleDriveService {
         return googleDriveRepository.save(googleDrive);
     }
 
+    @Override
     public List<GoogleDrive> getAllGoogleDrives() {
         return googleDriveRepository.findAll();
     }
@@ -36,6 +39,7 @@ public class GoogleDriveService {
         ));
     }
 
+    @Override
     public boolean deleteGoogleDriveById(Long driveId) {
         Optional<GoogleDrive> optionalGoogleDrive = googleDriveRepository.findById(driveId);
         if (optionalGoogleDrive.isPresent()) {
@@ -46,22 +50,18 @@ public class GoogleDriveService {
         }
     }
 
+    @Override
     public Optional<GoogleDrive> getGoogleDriveByProjectId(Long projectId) {
         return googleDriveRepository.findGoogleDriveByProjectId(projectId);
     }
+
+    // ----- Other methods -----
 
     public ProjectDTO mapProjectToProjectDTO(Project project) {
         ProjectDTO projectDTO = new ProjectDTO();
         projectDTO.setProjectId(project.getProjectId());
         projectDTO.setProjectName(project.getProjectName());
         return projectDTO;
-    }
-
-    public GoogleDrive mapGoogleDriveDTOToGoogleDrive(GoogleDriveDTO googleDriveDTO, GoogleDrive googleDrive) {
-        googleDrive.setDriveId(googleDriveDTO.getDriveId());
-        googleDrive.setDriveLink(googleDriveDTO.getDriveLink());
-        googleDrive.setProject(mapProjectDTOToProject(googleDriveDTO.getProjectDTO()));
-        return googleDrive;
     }
 
     public Project mapProjectDTOToProject(ProjectDTO projectDTO) {

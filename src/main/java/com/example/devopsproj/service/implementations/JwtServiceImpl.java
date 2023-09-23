@@ -1,7 +1,8 @@
-package com.example.devopsproj.service;
+package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.model.User;
 import com.example.devopsproj.repository.UserRepository;
+import com.example.devopsproj.service.interfaces.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -16,22 +17,30 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 @Service
-public class JwtService {
+public class JwtServiceImpl implements JwtService {
     @Autowired
     private UserRepository userRepository;
+
     private static final String SECRET_KEY = System.getenv("JWT_SECRET_KEY");
+
+    @Override
     public String extractUsername(String token) {
         Claims claims = extractAllClaims(token);
         return claims.getSubject();
     }
+
+    @Override
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
+
+    @Override
     public String generateToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);
     }
-    //change it
+
+    @Override
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         Key signingKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
         return Jwts.builder()
@@ -42,6 +51,8 @@ public class JwtService {
                 .signWith(signingKey, SignatureAlgorithm.HS512)
                 .compact();
     }
+
+    @Override
     public boolean isTokenTrue(String token) {
         User user = userRepository.findUserByToken(token);
         if (user != null ) {
@@ -51,6 +62,8 @@ public class JwtService {
         // Token is invalid
         return false;
     }
+
+    @Override
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         User user = userRepository.findUserByToken(token);
@@ -61,13 +74,19 @@ public class JwtService {
         // Token is invalid
         return false;
     }
-    private boolean isTokenExpired(String token) {
+
+    @Override
+    public boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
-    private Date extractExpiration(String token) {
+
+    @Override
+    public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
-    private Claims extractAllClaims(String token) {
+
+    @Override
+    public Claims extractAllClaims(String token) {
         return Jwts
                 .parserBuilder()
                 .setSigningKey(getSignInKey())
@@ -75,7 +94,9 @@ public class JwtService {
                 .parseClaimsJws(token)
                 .getBody();
     }
-    private Key getSignInKey() {
+
+    @Override
+    public Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }

@@ -2,8 +2,8 @@ package com.example.devopsproj.controller;
 
 import com.example.devopsproj.dto.responseDto.HelpDocumentsDTO;
 import com.example.devopsproj.model.HelpDocuments;
-import com.example.devopsproj.service.HelpDocumentsService;
-import com.example.devopsproj.service.JwtService;
+import com.example.devopsproj.service.implementations.HelpDocumentsServiceImpl;
+import com.example.devopsproj.service.implementations.JwtServiceImpl;
 import com.example.devopsproj.repository.HelpDocumentsRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -28,11 +28,11 @@ import java.util.stream.Collectors;
 public class HelpDocumentsController {
 
     @Autowired
-    private HelpDocumentsService helpDocumentsService;
+    private HelpDocumentsServiceImpl helpDocumentsServiceImpl;
     @Autowired
     private HelpDocumentsRepository helpDocumentsRepository;
     @Autowired
-    private JwtService jwtService;
+    private JwtServiceImpl jwtServiceImpl;
 
     private static final String INVALID_TOKEN = "Invalid Token";
 
@@ -51,11 +51,11 @@ public class HelpDocumentsController {
             @RequestParam(name = "projectFile", required = false) MultipartFile projectFile,
             @RequestHeader("AccessToken") String accessToken)
             throws IOException {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             try {
-                String fileExtension = helpDocumentsService.getFileExtension(projectFile);
-                return helpDocumentsService.uploadFiles(projectId, projectFile, fileExtension);
+                String fileExtension = helpDocumentsServiceImpl.getFileExtension(projectFile);
+                return helpDocumentsServiceImpl.uploadFiles(projectId, projectFile, fileExtension);
             } catch (IllegalArgumentException e) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid parameters");
             }
@@ -77,7 +77,7 @@ public class HelpDocumentsController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getPdfFilesList(@RequestParam("projectId") long projectId,
                                              @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             List<HelpDocuments> pdfFiles = helpDocumentsRepository.findAll();
             List<HelpDocumentsDTO> fileInfos = pdfFiles.stream()
@@ -107,7 +107,7 @@ public class HelpDocumentsController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> downloadPdfFile(@PathVariable("fileName") String fileName,
                                              @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             HelpDocuments pdfFile = helpDocumentsRepository.findByFileName(fileName);
             if (pdfFile == null) {
@@ -135,11 +135,11 @@ public class HelpDocumentsController {
     )
     public ResponseEntity<String> deleteFile(@PathVariable("fileId") Long fileId,
                                              @RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if(isTokenValid){
-            Optional<HelpDocumentsDTO> helpDocumentsDTO = helpDocumentsService.getDocumentById(fileId);
+            Optional<HelpDocumentsDTO> helpDocumentsDTO = helpDocumentsServiceImpl.getDocumentById(fileId);
             if(helpDocumentsDTO.isPresent()){
-                helpDocumentsService.deleteDocument(fileId);
+                helpDocumentsServiceImpl.deleteDocument(fileId);
                 return ResponseEntity.ok("Document deleted successfully");
             }else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Document not found");
