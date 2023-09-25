@@ -2,7 +2,6 @@ package com.example.devopsproj.dto.requestDto;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -11,7 +10,6 @@ import lombok.Data;
 public class UserCreationDTO {
 
     @Positive(message = "id should be a positive number")
-    @NotNull(message = "id cannot be null")
     private Long id;
 
     @Size(max = 50, message = "projectName should not exceed 50 characters")

@@ -56,6 +56,7 @@ public class Project implements Serializable{
     @OneToOne(mappedBy = "project")
     private Figma figma;
 
+    @JsonIgnore
     @OneToOne(mappedBy = "project")
     private GoogleDrive googleDrive;
 
