@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import com.example.devopsproj.service.interfaces.IUserService;
-import com.example.devopsproj.service.interfaces.SmsService;
+import com.example.devopsproj.service.implementations.SmsService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

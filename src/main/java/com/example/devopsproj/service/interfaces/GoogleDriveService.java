@@ -1,7 +1,7 @@
 package com.example.devopsproj.service.interfaces;
 
-import com.example.devopsproj.dto.responseDto.GoogleDriveDTO;
-import com.example.devopsproj.dto.responseDto.ProjectDTO;
+import com.example.devopsproj.dto.responsedto.GoogleDriveDTO;
+import com.example.devopsproj.dto.responsedto.ProjectDTO;
 import com.example.devopsproj.model.GoogleDrive;
 import com.example.devopsproj.model.Project;
 

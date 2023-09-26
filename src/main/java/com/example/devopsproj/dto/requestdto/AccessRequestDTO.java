@@ -1,7 +1,7 @@
-package com.example.devopsproj.dto.requestDto;
+package com.example.devopsproj.dto.requestdto;
 
-import com.example.devopsproj.dto.responseDto.ProjectDTO;
-import com.example.devopsproj.dto.responseDto.UserDTO;
+import com.example.devopsproj.dto.responsedto.ProjectDTO;
+import com.example.devopsproj.dto.responsedto.UserDTO;
 import lombok.*;
 
 @AllArgsConstructor

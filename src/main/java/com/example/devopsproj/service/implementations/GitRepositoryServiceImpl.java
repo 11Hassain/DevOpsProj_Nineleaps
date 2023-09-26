@@ -1,6 +1,7 @@
 package com.example.devopsproj.service.implementations;
 
-import com.example.devopsproj.dto.responseDto.GitRepositoryDTO;
+import com.example.devopsproj.dto.responsedto.GitRepositoryDTO;
+import com.example.devopsproj.exceptions.NotFoundException;
 import com.example.devopsproj.model.GitRepository;
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.model.Project;
@@ -9,9 +10,7 @@ import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.service.interfaces.GitRepositoryService;
 import com.example.devopsproj.service.interfaces.ProjectService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
@@ -160,8 +159,13 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
     @Override
     @Transactional(readOnly = true)
     public GitRepository getRepositoryById(Long id) {
-        // Retrieve the Git repository by its ID from the local repository
-        return gitRepositoryRepository.findById(id).orElse(null);
+        try {
+            // Retrieve the Git repository by its ID from the local repository
+            return gitRepositoryRepository.findById(id).orElse(null);
+        } catch (Exception e) {
+            // Handle exceptions here if needed
+            throw new NotFoundException("An error occurred while retrieving the Git repository by ID");
+        }
     }
 
     // Check if a GitHub access token is valid

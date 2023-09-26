@@ -1,6 +1,6 @@
 package com.example.devopsproj.service.implementations;
 
-import com.example.devopsproj.dto.responseDto.HelpDocumentsDTO;
+import com.example.devopsproj.dto.responsedto.HelpDocumentsDTO;
 import com.example.devopsproj.model.HelpDocuments;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.repository.HelpDocumentsRepository;
@@ -48,17 +48,22 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
 
     // Extract and return the file extension from a multipart file
     @Override
-    public String getFileExtension(MultipartFile file) {
-        String originalFilename = file.getOriginalFilename();
-        if (originalFilename != null) {
-            int dotIndex = originalFilename.lastIndexOf('.');
-            if (dotIndex >= 0 && dotIndex < originalFilename.length() - 1) {
-                return originalFilename.substring(dotIndex + 1).toLowerCase();
-            }
-        }
-        return null;
-    }
 
+    public String getFileExtension(MultipartFile file) {
+        try {
+            String originalFilename = file.getOriginalFilename();
+            if (originalFilename != null) {
+                int dotIndex = originalFilename.lastIndexOf('.');
+                if (dotIndex >= 0 && dotIndex < originalFilename.length() - 1) {
+                    return originalFilename.substring(dotIndex + 1).toLowerCase();
+                }
+            }
+            return null;
+        } catch (IllegalArgumentException e) {
+            // Log the exception or perform any necessary error handling here
+            throw new IllegalArgumentException("Invalid parameters");
+        }
+    }
     // Get information about a document by its ID
     @Override
     public Optional<HelpDocumentsDTO> getDocumentById(Long fileId) {

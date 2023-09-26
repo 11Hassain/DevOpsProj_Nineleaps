@@ -1,6 +1,6 @@
 package com.example.devopsproj.service.interfaces;
 
-import com.example.devopsproj.dto.responseDto.HelpDocumentsDTO;
+import com.example.devopsproj.dto.responsedto.HelpDocumentsDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 

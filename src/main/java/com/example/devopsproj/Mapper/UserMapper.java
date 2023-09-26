@@ -1,6 +1,6 @@
 package com.example.devopsproj.Mapper;
 
-import com.example.devopsproj.dto.responseDto.UserDTO;
+import com.example.devopsproj.dto.responsedto.UserDTO;
 import com.example.devopsproj.model.User;
 
 public class UserMapper {

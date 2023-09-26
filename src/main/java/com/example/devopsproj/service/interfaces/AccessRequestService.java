@@ -1,13 +1,19 @@
 package com.example.devopsproj.service.interfaces;
 
-import com.example.devopsproj.dto.requestDto.AccessRequestDTO;
-import com.example.devopsproj.dto.responseDto.AccessResponseDTO;
+import com.example.devopsproj.dto.requestdto.AccessRequestDTO;
+import com.example.devopsproj.dto.responsedto.AccessResponseDTO;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface AccessRequestService {
 
-    AccessRequestDTO createRequest(AccessRequestDTO accessRequestDTO);
+//    AccessRequestDTO createRequest(AccessRequestDTO accessRequestDTO, String accessToken);
+
+//    Optional<AccessRequestDTO> createRequest(AccessRequestDTO accessRequestDTO, String accessToken);
+
+    // Create a new access request
+    Optional<AccessRequestDTO> createRequest(AccessRequestDTO accessRequestDTO, String accessToken);
 
     List<AccessRequestDTO> getAllRequests();
 

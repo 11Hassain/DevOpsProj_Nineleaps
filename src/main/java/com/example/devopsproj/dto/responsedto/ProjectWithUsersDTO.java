@@ -1,19 +1,32 @@
-package com.example.devopsproj.dto.responseDto;
+package com.example.devopsproj.dto.responsedto;
 
 import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter
 @Getter
 @ToString
 public class ProjectWithUsersDTO {
+
+    @Positive(message = "projectId should be a positive number")
     private Long projectId;
+
+    @Size(max = 255, message = "projectName should not exceed 255 characters")
     private String projectName;
+
     private String projectDescription;
+
+    @NotBlank(message = "lastUpdated cannot be blank")
     private LocalDateTime lastUpdated;
+
     private List<UserDTO> users;
     private List<GitRepositoryDTO> repositories;
     private boolean status;
@@ -35,5 +48,7 @@ public class ProjectWithUsersDTO {
         this.projectDescription = projectDescription;
     }
 
-    }
+}
+
+
 

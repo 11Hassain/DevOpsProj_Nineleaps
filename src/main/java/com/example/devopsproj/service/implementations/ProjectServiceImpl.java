@@ -1,7 +1,7 @@
 package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
-import com.example.devopsproj.dto.responseDto.*;
+import com.example.devopsproj.dto.responsedto.*;
 import com.example.devopsproj.model.*;
 import com.example.devopsproj.repository.GitRepositoryRepository;
 import com.example.devopsproj.repository.ProjectRepository;

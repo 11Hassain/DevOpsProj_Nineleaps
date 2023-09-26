@@ -1,4 +1,4 @@
-package com.example.devopsproj.dto.requestDto;
+package com.example.devopsproj.dto.requestdto;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import lombok.Data;

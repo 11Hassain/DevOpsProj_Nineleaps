@@ -1,7 +1,7 @@
 package com.example.devopsproj.controller;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
-import com.example.devopsproj.dto.responseDto.UserNamesDTO;
+import com.example.devopsproj.dto.responsedto.UserNamesDTO;
 import com.example.devopsproj.service.interfaces.JwtService;
 import com.example.devopsproj.service.interfaces.UserNamesService;
 import lombok.RequiredArgsConstructor;

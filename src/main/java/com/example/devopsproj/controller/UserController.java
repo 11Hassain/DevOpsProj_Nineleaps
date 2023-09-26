@@ -1,8 +1,8 @@
 package com.example.devopsproj.controller;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
-import com.example.devopsproj.dto.requestDto.UserCreationDTO;
-import com.example.devopsproj.dto.responseDto.*;
+import com.example.devopsproj.dto.requestdto.UserCreationDTO;
+import com.example.devopsproj.dto.responsedto.*;
 import com.example.devopsproj.model.Figma;
 import com.example.devopsproj.model.GoogleDrive;
 import com.example.devopsproj.model.Project;
@@ -10,7 +10,6 @@ import com.example.devopsproj.model.User;
 import com.example.devopsproj.service.interfaces.IUserService;
 import com.example.devopsproj.service.interfaces.JwtService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

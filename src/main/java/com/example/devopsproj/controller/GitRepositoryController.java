@@ -1,11 +1,10 @@
 package com.example.devopsproj.controller;
 import com.example.devopsproj.commons.enumerations.EnumRole;
-import com.example.devopsproj.dto.responseDto.GitRepositoryDTO;
+import com.example.devopsproj.dto.responsedto.GitRepositoryDTO;
 import com.example.devopsproj.model.GitRepository;
 import com.example.devopsproj.service.interfaces.GitRepositoryService;
 import com.example.devopsproj.service.interfaces.JwtService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,104 +19,46 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GitRepositoryController {
     private final GitRepositoryService gitRepositoryService;
-    private final JwtService jwtService;
-
-    private static final String INVALID_TOKEN = "Invalid Token";
 
     // Create a new Git repository.
     @PostMapping("/add")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> createRepository(@RequestBody GitRepository gitRepository,
-                                                   @RequestHeader("AccessToken") String accessToken) {
-        // Check if the provided access token is valid.
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            return ResponseEntity.ok(gitRepositoryService.createRepository(gitRepository));
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+    public ResponseEntity<Object> createRepository(@RequestBody GitRepository gitRepository) {
+        return ResponseEntity.ok(gitRepositoryService.createRepository(gitRepository));
     }
 
     // Get a list of all Git repositories.
     @GetMapping("/get")
-    public ResponseEntity<Object> getAllRepositories(@RequestHeader("AccessToken") String accessToken) {
-        // Check if the provided access token is valid.
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            return ResponseEntity.ok(gitRepositoryService.getAllRepositories());
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+    public ResponseEntity<Object> getAllRepositories() {
+        return ResponseEntity.ok(gitRepositoryService.getAllRepositories());
     }
 
     // Get a list of Git repositories by project ID.
     @GetMapping("/project/{id}")
-    public ResponseEntity<Object> getAllReposByProject(
-            @PathVariable Long id,
-            @RequestHeader("AccessToken") String accessToken) {
-        // Check if the provided access token is valid.
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            List<GitRepositoryDTO> gitRepositoryDTOS = gitRepositoryService.getAllRepositoriesByProject(id);
-            return new ResponseEntity<>(gitRepositoryDTOS, HttpStatus.OK);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+    public ResponseEntity<Object> getAllReposByProject(@PathVariable Long id) {
+        List<GitRepositoryDTO> gitRepositoryDTOS = gitRepositoryService.getAllRepositoriesByProject(id);
+        return new ResponseEntity<>(gitRepositoryDTOS, HttpStatus.OK);
     }
 
     // Get a list of Git repositories by role.
     @GetMapping("/get/role/{role}")
-    public ResponseEntity<Object> getAllReposByRole(
-            @PathVariable("role") String role,
-            @RequestHeader("AccessToken") String accessToken) {
-        // Check if the provided access token is valid.
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
-            return ResponseEntity.ok(gitRepositoryService.getAllReposByRole(enumRole));
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+    public ResponseEntity<Object> getAllReposByRole(@PathVariable("role") String role) {
+        EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
+        return ResponseEntity.ok(gitRepositoryService.getAllReposByRole(enumRole));
     }
 
     // Get a Git repository by ID.
     @GetMapping("/get/{id}")
-    public ResponseEntity<Object> getRepositoryById(
-            @PathVariable Long id,
-            @RequestHeader("AccessToken") String accessToken) {
-        // Check if the provided access token is valid.
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            GitRepository repository = gitRepositoryService.getRepositoryById(id);
-            if (repository != null) {
-                GitRepositoryDTO repositoryDTO = new GitRepositoryDTO(repository.getName(), repository.getDescription());
-                return ResponseEntity.ok(repositoryDTO);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+    public ResponseEntity<Object> getRepositoryById(@PathVariable Long id) {
+        GitRepository repository = gitRepositoryService.getRepositoryById(id);
+        GitRepositoryDTO repositoryDTO = new GitRepositoryDTO(repository.getName(), repository.getDescription());
+        return ResponseEntity.ok(repositoryDTO);
     }
 
     // Delete a Git repository by ID.
     @DeleteMapping("/delete/{repoId}")
-    public ResponseEntity<Object> deleteRepository(
-            @PathVariable Long repoId,
-            @RequestHeader(value = "AccessToken", required = false) String accessToken
-    ) {
-        // Check if the provided access token is valid.
-        boolean isTokenValid = jwtService.isTokenTrue(accessToken);
-        if(isTokenValid) {
-            try {
-                gitRepositoryService.deleteRepository(repoId); // Delete the repository
-                return ResponseEntity.ok("Deleted successfully");
-
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error");
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+    public ResponseEntity<Object> deleteRepository(@PathVariable Long repoId) {
+        gitRepositoryService.deleteRepository(repoId);
+        return ResponseEntity.ok("Deleted successfully");
     }
 }

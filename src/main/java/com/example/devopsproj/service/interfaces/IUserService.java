@@ -1,9 +1,9 @@
 package com.example.devopsproj.service.interfaces;
 import com.example.devopsproj.commons.enumerations.EnumRole;
-import com.example.devopsproj.dto.requestDto.UserCreationDTO;
-import com.example.devopsproj.dto.responseDto.ProjectDTO;
-import com.example.devopsproj.dto.responseDto.UserDTO;
-import com.example.devopsproj.dto.responseDto.UserProjectsDTO;
+import com.example.devopsproj.dto.requestdto.UserCreationDTO;
+import com.example.devopsproj.dto.responsedto.ProjectDTO;
+import com.example.devopsproj.dto.responsedto.UserDTO;
+import com.example.devopsproj.dto.responsedto.UserProjectsDTO;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.model.User;
 

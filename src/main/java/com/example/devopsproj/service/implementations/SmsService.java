@@ -1,4 +1,4 @@
-package com.example.devopsproj.service.interfaces;
+package com.example.devopsproj.service.implementations;
 
 
 import com.example.devopsproj.otp.OTPDTO.SmsPojo;

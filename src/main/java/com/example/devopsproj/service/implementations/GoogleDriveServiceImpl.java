@@ -1,13 +1,12 @@
 package com.example.devopsproj.service.implementations;
 
-import com.example.devopsproj.dto.responseDto.GoogleDriveDTO;
-import com.example.devopsproj.dto.responseDto.ProjectDTO;
+import com.example.devopsproj.dto.responsedto.GoogleDriveDTO;
+import com.example.devopsproj.dto.responsedto.ProjectDTO;
 import com.example.devopsproj.model.GoogleDrive;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.repository.GoogleDriveRepository;
 import com.example.devopsproj.service.interfaces.GoogleDriveService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

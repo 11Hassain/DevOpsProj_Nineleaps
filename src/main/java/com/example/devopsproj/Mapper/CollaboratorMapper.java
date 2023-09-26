@@ -1,6 +1,6 @@
 package com.example.devopsproj.Mapper;
 
-import com.example.devopsproj.dto.responseDto.CollaboratorDTO;
+import com.example.devopsproj.dto.responsedto.CollaboratorDTO;
 import com.example.devopsproj.model.Collaborator;
 import org.springframework.stereotype.Component;
 

@@ -1,6 +1,15 @@
-package com.example.devopsproj.dto.responseDto;
+package com.example.devopsproj.dto.responsedto;
 
 import com.example.devopsproj.model.User;
+import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -12,17 +21,28 @@ import java.util.List;
 @Getter
 @ToString
 public class ProjectDTO {
+    @Positive(message = "projectId should be a positive number")
     private Long projectId;
+
+    @NotBlank(message = "projectName cannot be blank")
+    @Size(max = 255, message = "projectName should not exceed 255 characters")
     private String projectName;
+
+    @Size(max = 255, message = "projectDescription should not exceed 255 characters")
     private String projectDescription;
+
+    @NotNull(message = "lastUpdated cannot be null")
     private LocalDateTime lastUpdated;
+
     private List<User> users;
+
     private String pmName;
     private List<GitRepositoryDTO> repositories;
     private boolean status;
     private FigmaDTO figma;
     private GoogleDriveDTO googleDrive;
     private String helpDocuments;
+
 
     public ProjectDTO(Long projectId, String projectName, String projectDescription, List<GitRepositoryDTO> repositories, FigmaDTO figma, GoogleDriveDTO googleDrive) {
         this.projectId = projectId;

@@ -1,7 +1,7 @@
 package com.example.devopsproj.controller;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
-import com.example.devopsproj.dto.responseDto.*;
+import com.example.devopsproj.dto.responsedto.*;
 import com.example.devopsproj.exceptions.NotFoundException;
 import com.example.devopsproj.model.*;
 import com.example.devopsproj.repository.GitRepositoryRepository;
@@ -12,7 +12,6 @@ import com.example.devopsproj.service.interfaces.IUserService;
 import com.example.devopsproj.service.interfaces.JwtService;
 import com.example.devopsproj.service.interfaces.ProjectService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import org.springframework.http.HttpStatus;

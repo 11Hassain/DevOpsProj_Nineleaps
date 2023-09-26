@@ -1,7 +1,8 @@
 package com.example.devopsproj.service.interfaces;
 
-import com.example.devopsproj.dto.responseDto.FigmaDTO;
-import com.example.devopsproj.dto.responseDto.ProjectDTO;
+import com.example.devopsproj.dto.responsedto.FigmaDTO;
+import com.example.devopsproj.dto.responsedto.FigmaScreenshotDTO;
+import com.example.devopsproj.dto.responsedto.ProjectDTO;
 import com.example.devopsproj.model.Figma;
 import com.example.devopsproj.model.Project;
 
@@ -19,5 +20,14 @@ public interface FigmaService {
     void deleteFigma(Long figmaId);
 
     ProjectDTO mapProjectToProjectDTO(Project project);
+
+    String getFigmaURLByProjectId(Long projectId);
+
+
+    void addUserAndScreenshots(Long figmaId, FigmaDTO figmaDTO);
+
+
+    List<FigmaScreenshotDTO> getScreenshotsForFigmaId(Long figmaId);
+    public List<FigmaDTO> getAllFigmaDTOs();
 
 }

@@ -1,24 +1,28 @@
-package com.example.devopsproj.dto.responseDto;
+package com.example.devopsproj.dto.responsedto;
 
 import lombok.*;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
+
 @NoArgsConstructor
-@AllArgsConstructor
 @Setter
 @Getter
 @ToString
 public class GoogleDriveDTO {
-    private ProjectDTO projectDTO;
-    private String driveLink;
-    private Long driveId;
-    private String message;
 
+    @NotNull(message = "projectDTO cannot be null")
+    private ProjectDTO projectDTO;
+
+    @NotBlank(message = "driveLink cannot be blank")
+    private String driveLink;
+
+    @Positive(message = "driveId should be a positive number")
+    private Long driveId;
     public GoogleDriveDTO(String driveLink) {
         this.driveLink = driveLink;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
     }
 
     public GoogleDriveDTO(ProjectDTO projectDTO, String driveLink, Long driveId) {
