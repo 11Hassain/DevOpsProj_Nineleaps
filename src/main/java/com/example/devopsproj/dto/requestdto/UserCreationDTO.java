@@ -19,5 +19,5 @@ public class UserCreationDTO {
     @NotBlank(message = "email cannot be blank")
     private String email;
 
-    private EnumRole enumRole;
+    private EnumRole enumRole; // Role
 }
