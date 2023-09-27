@@ -1,7 +1,7 @@
 package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
-import com.example.devopsproj.dto.responseDto.*;
+import com.example.devopsproj.dto.responsedto.*;
 import com.example.devopsproj.repository.UserRepository;
 import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.repository.GitRepositoryRepository;
@@ -130,12 +130,8 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public boolean existUserInProject(Long projectId, Long userId){
         List<User> userList = projectRepository.existUserInProject(projectId, userId);
-        if(userList.isEmpty()){
-            return false;
-        }
-        else {
-            return true;
-        }
+        // False if user is present in project
+        return !userList.isEmpty();
     }
 
     @Override
@@ -260,7 +256,6 @@ public class ProjectServiceImpl implements ProjectService {
 
             GoogleDrive googleDrive = project.getGoogleDrive();
             String driveLink = googleDrive != null ? googleDrive.getDriveLink() : null; // Retrieve the driveLink
-            GoogleDriveDTO googleDriveDTO = new GoogleDriveDTO(driveLink);
 
             LocalDateTime lastUpdated = project.getLastUpdated();
 

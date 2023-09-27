@@ -1,6 +1,6 @@
 package com.example.devopsproj.service.interfaces;
 
-import com.example.devopsproj.dto.responseDto.FigmaDTO;
+import com.example.devopsproj.dto.responsedto.FigmaDTO;
 import com.example.devopsproj.model.Figma;
 
 import java.util.List;

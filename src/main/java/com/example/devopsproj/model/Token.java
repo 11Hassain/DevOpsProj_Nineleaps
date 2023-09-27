@@ -2,10 +2,8 @@ package com.example.devopsproj.model;
 
 import com.example.devopsproj.commons.enumerations.TokenType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -18,14 +16,18 @@ public class Token {
     public Integer id;
 
     @Column(unique = true)
-    public String token;
+    public String tokenId;
 
     @Enumerated(EnumType.STRING)
     public TokenType tokenType = TokenType.BEARER;
 
-    public boolean revoked;
+    @Getter
+    @Setter
+    private boolean revoked;
 
-    public boolean expired;
+    @Getter
+    @Setter
+    private boolean expired;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

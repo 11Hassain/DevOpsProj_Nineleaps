@@ -10,6 +10,7 @@ import java.net.http.HttpResponse;
 
 public class GitHubUserValidation {
 
+
     private static final Logger logger = LoggerFactory.getLogger(GitHubUserValidation.class);
 
     public static boolean isGitHubUserValid(String username, String accessToken) {

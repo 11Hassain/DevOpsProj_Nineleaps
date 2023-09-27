@@ -1,7 +1,7 @@
 package com.example.devopsproj.controller;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
-import com.example.devopsproj.dto.responseDto.*;
+import com.example.devopsproj.dto.responsedto.*;
 import com.example.devopsproj.model.GitRepository;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.model.User;
@@ -151,14 +151,14 @@ public class ProjectController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getAll() {
-//        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-//        if (isTokenValid) {
+    public ResponseEntity<Object> getAll(@RequestHeader("AccessToken") String accessToken) {
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
+        if (isTokenValid) {
             try {
                 List<Project> projects = projectServiceImpl.getAll();
                 List<ProjectDTO> projectDTOs = projects.stream()
                         .map(project -> new ProjectDTO(project.getProjectId(), project.getProjectName(), project.getProjectDescription(), project.getLastUpdated(), project.getDeleted()))
-                        .collect(Collectors.toList());
+                        .toList();
                 return new ResponseEntity<>(projectDTOs, HttpStatus.OK);
 
             } catch (NotFoundException e) {
@@ -166,9 +166,9 @@ public class ProjectController {
             } catch (Exception e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
-//        } else {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-//        }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
+        }
     }
 
     @GetMapping("/allProjects")
@@ -196,7 +196,7 @@ public class ProjectController {
                     }
                     List<UserDTO> userDTOList = userList.stream()
                             .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
-                            .collect(Collectors.toList());
+                            .toList();
 
                     ProjectWithUsersDTO projectWithUsers = new ProjectWithUsersDTO(
                             project.getProjectId(),
@@ -245,7 +245,7 @@ public class ProjectController {
                 }
                 List<UserDTO> userDTOList = userList.stream()
                         .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
-                        .collect(Collectors.toList());
+                        .toList();
                 return ResponseEntity.ok(userDTOList);
             } catch (NotFoundException e) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -288,7 +288,7 @@ public class ProjectController {
                             String username = (usernames != null) ? usernames.getUsername() : null;
                             return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole(), username);
                         })
-                        .collect(Collectors.toList());
+                        .toList();
 
                 return ResponseEntity.ok(userDTOList);
             } catch (NoSuchElementException e) {
@@ -532,7 +532,7 @@ public class ProjectController {
             List<User> users = projectServiceImpl.getUsersByProjectIdAndRole(projectId, userRole);
             List<UserDTO> userDTOList = users.stream()
                     .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
-                    .collect(Collectors.toList());
+                    .toList();
             return new ResponseEntity<>(userDTOList, HttpStatus.OK);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);

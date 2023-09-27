@@ -3,7 +3,7 @@ package com.example.devopsproj.controller;
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.service.implementations.JwtServiceImpl;
 import com.example.devopsproj.service.implementations.UserNamesServiceImpl;
-import com.example.devopsproj.dto.responseDto.UserNamesDTO;
+import com.example.devopsproj.dto.responsedto.UserNamesDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;

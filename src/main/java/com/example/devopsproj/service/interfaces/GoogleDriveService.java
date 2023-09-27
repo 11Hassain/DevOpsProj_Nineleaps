@@ -1,6 +1,6 @@
 package com.example.devopsproj.service.interfaces;
 
-import com.example.devopsproj.dto.responseDto.GoogleDriveDTO;
+import com.example.devopsproj.dto.responsedto.GoogleDriveDTO;
 import com.example.devopsproj.model.GoogleDrive;
 
 import java.util.List;

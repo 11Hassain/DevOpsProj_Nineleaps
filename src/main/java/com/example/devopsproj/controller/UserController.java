@@ -1,10 +1,10 @@
 package com.example.devopsproj.controller;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
-import com.example.devopsproj.dto.responseDto.*;
+import com.example.devopsproj.dto.responsedto.*;
 import com.example.devopsproj.model.Figma;
 import com.example.devopsproj.model.GoogleDrive;
-import com.example.devopsproj.dto.requestDto.UserCreationDTO;
+import com.example.devopsproj.dto.requestdto.UserCreationDTO;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.model.User;
 import com.example.devopsproj.service.implementations.JwtServiceImpl;
@@ -150,7 +150,7 @@ public class UserController {
             List<User> users = userServiceImpl.getUsersByRole(userRole);
             List<UserDTO> userDTOList = users.stream()
                     .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole(), user.getLastUpdated(), user.getLastLogout()))
-                    .collect(Collectors.toList());
+                    .toList();
             return new ResponseEntity<>(userDTOList, HttpStatus.OK);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
@@ -288,7 +288,7 @@ public class UserController {
                                 new GoogleDriveDTO(driveLink) // Pass the GoogleDriveDTO object with driveLink value
                         );
                     })
-                    .collect(Collectors.toList());
+                    .toList();
             return new ResponseEntity<>(projectDTOList, HttpStatus.OK);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);

@@ -1,26 +1,26 @@
 package com.example.devopsproj.service.implementations;
 
-import com.example.devopsproj.dto.responseDto.ProjectDTO;
 import com.example.devopsproj.model.GoogleDrive;
-import com.example.devopsproj.dto.responseDto.GoogleDriveDTO;
-import com.example.devopsproj.model.Project;
+import com.example.devopsproj.dto.responsedto.GoogleDriveDTO;
 import com.example.devopsproj.repository.GoogleDriveRepository;
 import com.example.devopsproj.service.interfaces.GoogleDriveService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.devopsproj.utils.DTOModelMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+
 @Service
+@RequiredArgsConstructor
 public class GoogleDriveServiceImpl implements GoogleDriveService {
 
-    @Autowired
-    private GoogleDriveRepository googleDriveRepository;
+    private final GoogleDriveRepository googleDriveRepository;
 
     @Override
     public GoogleDrive createGoogleDrive(GoogleDriveDTO googleDriveDTO) {
         GoogleDrive googleDrive = new GoogleDrive();
-        googleDrive.setProject(mapProjectDTOToProject(googleDriveDTO.getProjectDTO()));
+        googleDrive.setProject(DTOModelMapper.mapProjectDTOToProject(googleDriveDTO.getProjectDTO()));
         googleDrive.setDriveLink(googleDriveDTO.getDriveLink());
         return googleDriveRepository.save(googleDrive);
     }
@@ -32,11 +32,7 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
 
     public Optional<GoogleDriveDTO> getGoogleDriveById(Long driveId) {
         Optional<GoogleDrive> optionalGoogleDrive = googleDriveRepository.findById(driveId);
-        return optionalGoogleDrive.map(googleDrive -> new GoogleDriveDTO(
-                mapProjectToProjectDTO(googleDrive.getProject()),
-                googleDrive.getDriveLink(),
-                googleDrive.getDriveId()
-        ));
+        return optionalGoogleDrive.map(this::mapGoogleDriveToDTO);
     }
 
     @Override
@@ -55,19 +51,9 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
         return googleDriveRepository.findGoogleDriveByProjectId(projectId);
     }
 
-    // ----- Other methods -----
-
-    public ProjectDTO mapProjectToProjectDTO(Project project) {
-        ProjectDTO projectDTO = new ProjectDTO();
-        projectDTO.setProjectId(project.getProjectId());
-        projectDTO.setProjectName(project.getProjectName());
-        return projectDTO;
+    private GoogleDriveDTO mapGoogleDriveToDTO(GoogleDrive googleDrive) {
+        return new GoogleDriveDTO(DTOModelMapper.mapProjectToProjectDTO(googleDrive.getProject()), googleDrive.getDriveLink(), googleDrive.getDriveId());
     }
 
-    public Project mapProjectDTOToProject(ProjectDTO projectDTO) {
-        Project project = new Project();
-        project.setProjectId(projectDTO.getProjectId());
-        project.setProjectName(projectDTO.getProjectName());
-        return project;
-    }
+
 }

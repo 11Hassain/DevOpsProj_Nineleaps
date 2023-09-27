@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/auth")
@@ -29,7 +28,7 @@ public class AuthController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getEmailFromToken(@RequestHeader("emailToVerify") String emailToVerify) throws IOException {
+    public ResponseEntity<Object> getEmailFromToken(@RequestHeader("emailToVerify") String emailToVerify) {
         Object object = userServiceImpl.loginVerification(emailToVerify);
         if (object == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -49,7 +48,7 @@ public class AuthController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getEmailFromToken(
             @RequestHeader("Authorization") String authHeader,
-            HttpServletResponse response) throws IOException{
+            HttpServletResponse response){
         try {
             String jwt = authHeader.replace("Bearer", "");
             String emailToVerify = JwtUtils.getEmailFromJwt(jwt);

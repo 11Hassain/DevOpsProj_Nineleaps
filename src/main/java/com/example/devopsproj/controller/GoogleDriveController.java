@@ -1,10 +1,11 @@
 package com.example.devopsproj.controller;
 
-import com.example.devopsproj.dto.responseDto.ProjectDTO;
+import com.example.devopsproj.dto.responsedto.ProjectDTO;
 import com.example.devopsproj.model.GoogleDrive;
 import com.example.devopsproj.service.implementations.GoogleDriveServiceImpl;
 import com.example.devopsproj.service.implementations.JwtServiceImpl;
-import com.example.devopsproj.dto.responseDto.GoogleDriveDTO;
+import com.example.devopsproj.dto.responsedto.GoogleDriveDTO;
+import com.example.devopsproj.utils.DTOModelMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
@@ -45,7 +46,7 @@ public class GoogleDriveController {
         if (isTokenValid) {
             GoogleDrive googleDrive = googleDriveServiceImpl.createGoogleDrive(googleDriveDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(new GoogleDriveDTO(
-                    googleDriveServiceImpl.mapProjectToProjectDTO(googleDrive.getProject()),
+                    DTOModelMapper.mapProjectToProjectDTO(googleDrive.getProject()),
                     googleDrive.getDriveLink(),
                     googleDrive.getDriveId()
             ));

@@ -2,8 +2,8 @@ package com.example.devopsproj.controller;
 
 import com.example.devopsproj.service.implementations.AccessRequestServiceImpl;
 import com.example.devopsproj.service.implementations.JwtServiceImpl;
-import com.example.devopsproj.dto.requestDto.AccessRequestDTO;
-import com.example.devopsproj.dto.responseDto.AccessResponseDTO;
+import com.example.devopsproj.dto.requestdto.AccessRequestDTO;
+import com.example.devopsproj.dto.responsedto.AccessResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;

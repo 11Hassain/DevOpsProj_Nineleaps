@@ -2,7 +2,7 @@ package com.example.devopsproj.controller;
 
 import com.example.devopsproj.service.implementations.GitHubCollaboratorServiceImpl;
 import com.example.devopsproj.service.implementations.JwtServiceImpl;
-import com.example.devopsproj.dto.responseDto.CollaboratorDTO;
+import com.example.devopsproj.dto.responsedto.CollaboratorDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;

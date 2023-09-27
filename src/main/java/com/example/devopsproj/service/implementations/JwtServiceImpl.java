@@ -25,7 +25,7 @@ public class JwtServiceImpl implements JwtService {
 
     private static final String SECRET_KEY =System.getenv("JWT_SECRET_KEY");
 
-    private static Logger logger = LoggerFactory.getLogger(JwtServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(JwtServiceImpl.class);
 
     @Override
     public String extractUsername(String token) {
@@ -59,24 +59,16 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public boolean isTokenTrue(String token) {
         User user = userRepository.findUserByToken(token);
-        if (user != null ) {
-            // Token is valid
-            return true;
-        }
-        // Token is invalid
-        return false;
+        // True if the token is true
+        return user != null;
     }
 
     @Override
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         User user = userRepository.findUserByToken(token);
-        if (user != null && username.equals(userDetails.getUsername()) && !isTokenExpired(token)) {
-            // Token is valid
-            return true;
-        }
-        // Token is invalid
-        return false;
+        // True if token is valid
+        return user != null && username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
     @Override

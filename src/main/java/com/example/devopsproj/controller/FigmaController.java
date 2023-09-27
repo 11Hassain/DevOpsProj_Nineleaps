@@ -3,9 +3,10 @@ package com.example.devopsproj.controller;
 import com.example.devopsproj.model.Figma;
 import com.example.devopsproj.service.implementations.FigmaServiceImpl;
 import com.example.devopsproj.service.implementations.JwtServiceImpl;
-import com.example.devopsproj.dto.responseDto.FigmaDTO;
-import com.example.devopsproj.dto.responseDto.FigmaScreenshotDTO;
+import com.example.devopsproj.dto.responsedto.FigmaDTO;
+import com.example.devopsproj.dto.responsedto.FigmaScreenshotDTO;
 import com.example.devopsproj.repository.FigmaRepository;
+import com.example.devopsproj.utils.DTOModelMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
@@ -17,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/figmas")
@@ -46,11 +46,7 @@ public class FigmaController {
         boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
             try {
-                // Create a new Figma entity using the provided projectName and figmaURL
-                Figma figma = figmaServiceImpl.createFigma(figmaDTO);
-
-                // Optionally, you can access the generated figmaId if needed
-                Long figmaId = figma.getFigmaId();
+                figmaServiceImpl.createFigma(figmaDTO);
 
                 return ResponseEntity.ok("Figma created successfully");
 
@@ -80,9 +76,9 @@ public class FigmaController {
                     .filter(Objects::nonNull) // Filter out null values
                     .map(figma -> new FigmaDTO(
                             figma.getFigmaId(),
-                            figmaServiceImpl.mapProjectToProjectDTO(figma.getProject()),
+                            DTOModelMapper.mapProjectToProjectDTO(figma.getProject()),
                             figma.getFigmaURL()))
-                    .collect(Collectors.toList());
+                    .toList();
 
             return ResponseEntity.ok(figmaDTOs);
         } else {

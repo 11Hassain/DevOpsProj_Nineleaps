@@ -1,16 +1,16 @@
 package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
-import com.example.devopsproj.dto.responseDto.ProjectDTO;
+import com.example.devopsproj.dto.responsedto.ProjectDTO;
 import com.example.devopsproj.model.GitRepository;
 import com.example.devopsproj.repository.UserRepository;
-import com.example.devopsproj.dto.requestDto.UserCreationDTO;
-import com.example.devopsproj.dto.responseDto.GitRepositoryDTO;
-import com.example.devopsproj.dto.responseDto.UserDTO;
-import com.example.devopsproj.dto.responseDto.UserProjectsDTO;
+import com.example.devopsproj.dto.requestdto.UserCreationDTO;
+import com.example.devopsproj.dto.responsedto.GitRepositoryDTO;
+import com.example.devopsproj.dto.responsedto.UserDTO;
+import com.example.devopsproj.dto.responsedto.UserProjectsDTO;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.model.User;
-import com.example.devopsproj.otp.OTPService.IUserService;
+import com.example.devopsproj.otp.otpservice.IUserService;
 import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.service.interfaces.UserService;
 import com.example.devopsproj.utils.JwtUtils;
@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -141,7 +142,7 @@ public class UserServiceImpl implements IUserService, UserService {
             // Remove any projects that are marked as deleted
             List<Project> existingProjects = projects.stream()
                     .filter(project -> !project.getDeleted())
-                    .collect(Collectors.toList());
+                    .toList();
 
             List<String> projectNames = existingProjects.stream()
                     .map(Project::getProjectName)
@@ -162,7 +163,7 @@ public class UserServiceImpl implements IUserService, UserService {
         for (User user : users) {
             List<Project> projects = user.getProjects();
 
-            if (projects.stream().noneMatch(project -> project.getProjectId() == projectId)) {
+            if (projects.stream().noneMatch(project -> Objects.equals(project.getProjectId(), projectId))) {
                 UserDTO userDTO = new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole());
                 userDTOs.add(userDTO);
             }
@@ -275,11 +276,6 @@ public class UserServiceImpl implements IUserService, UserService {
         }
     }
 
-    // ------- Other methods --------
-
-    private UserDTO convertToUserDto(User user) {
-        return modelMapper.map(user, UserDTO.class);
-    }
 
     //-------------IUService-----------
 

@@ -1,11 +1,11 @@
 package com.example.devopsproj.service.implementations;
 
-import com.example.devopsproj.dto.responseDto.ProjectDTO;
-import com.example.devopsproj.dto.responseDto.UserDTO;
+import com.example.devopsproj.dto.responsedto.ProjectDTO;
+import com.example.devopsproj.dto.responsedto.UserDTO;
 import com.example.devopsproj.model.AccessRequest;
 import com.example.devopsproj.model.User;
-import com.example.devopsproj.dto.requestDto.AccessRequestDTO;
-import com.example.devopsproj.dto.responseDto.AccessResponseDTO;
+import com.example.devopsproj.dto.requestdto.AccessRequestDTO;
+import com.example.devopsproj.dto.responsedto.AccessResponseDTO;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.repository.AccessRequestRepository;
 import com.example.devopsproj.service.interfaces.AccessRequestService;
@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +33,7 @@ public class AccessRequestServiceImpl implements AccessRequestService {
     @Autowired
     private ModelMapper modelMapper;
     private final JwtService jwtService;
-    
+
     @Override
     public AccessRequestDTO createRequest(AccessRequestDTO accessRequestDTO) {
         AccessRequest accessRequest = mapDTOToAccessRequest(accessRequestDTO);
@@ -129,7 +128,7 @@ public class AccessRequestServiceImpl implements AccessRequestService {
     private List<AccessRequestDTO> mapAccessRequestListToDTOList(List<AccessRequest> accessRequestList) {
         return accessRequestList.stream()
                 .map(this::mapAccessRequestToDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private List<AccessResponseDTO> mapAccessRequestListToResponseDTOList(List<AccessRequest> accessRequestList) {
@@ -141,7 +140,7 @@ public class AccessRequestServiceImpl implements AccessRequestService {
                         mapProjectToProjectDTO(accessRequest.getProject()),
                         accessRequest.getRequestDescription(),
                         accessRequest.isAllowed()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private UserDTO mapUserToUserDTO(User user) {

@@ -1,6 +1,6 @@
 package com.example.devopsproj.controller;
 
-import com.example.devopsproj.dto.responseDto.HelpDocumentsDTO;
+import com.example.devopsproj.dto.responsedto.HelpDocumentsDTO;
 import com.example.devopsproj.model.HelpDocuments;
 import com.example.devopsproj.service.implementations.HelpDocumentsServiceImpl;
 import com.example.devopsproj.service.implementations.JwtServiceImpl;
@@ -20,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/v1/projects")
@@ -84,7 +83,7 @@ public class HelpDocumentsController {
                     .filter(pdfFile -> pdfFile != null && pdfFile.getProject() != null && pdfFile.getProject().getProjectId() == projectId)
                     .map(pdfFile -> new HelpDocumentsDTO(pdfFile.getHelpDocumentId(), pdfFile.getFileName()))
                     .filter(helpDoc -> helpDoc.getFileName() != null) // Filter out any remaining null file names
-                    .collect(Collectors.toList());
+                    .toList();
             if (fileInfos.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }

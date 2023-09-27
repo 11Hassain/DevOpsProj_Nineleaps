@@ -1,7 +1,7 @@
 package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.model.HelpDocuments;
-import com.example.devopsproj.dto.responseDto.HelpDocumentsDTO;
+import com.example.devopsproj.dto.responsedto.HelpDocumentsDTO;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.repository.HelpDocumentsRepository;
 import com.example.devopsproj.repository.ProjectRepository;

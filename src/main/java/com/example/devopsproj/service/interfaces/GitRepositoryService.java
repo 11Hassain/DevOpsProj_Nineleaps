@@ -1,7 +1,7 @@
 package com.example.devopsproj.service.interfaces;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
-import com.example.devopsproj.dto.responseDto.GitRepositoryDTO;
+import com.example.devopsproj.dto.responsedto.GitRepositoryDTO;
 import com.example.devopsproj.model.GitRepository;
 import org.springframework.transaction.annotation.Transactional;
 

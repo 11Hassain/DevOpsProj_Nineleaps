@@ -1,7 +1,7 @@
 package com.example.devopsproj.service.interfaces;
 
-import com.example.devopsproj.dto.requestDto.AccessRequestDTO;
-import com.example.devopsproj.dto.responseDto.AccessResponseDTO;
+import com.example.devopsproj.dto.requestdto.AccessRequestDTO;
+import com.example.devopsproj.dto.responsedto.AccessResponseDTO;
 import com.example.devopsproj.model.AccessRequest;
 import org.springframework.transaction.annotation.Transactional;
 

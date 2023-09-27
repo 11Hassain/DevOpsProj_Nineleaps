@@ -4,7 +4,7 @@ import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.model.GitRepository;
 import com.example.devopsproj.service.implementations.GitRepositoryServiceImpl;
 import com.example.devopsproj.service.implementations.JwtServiceImpl;
-import com.example.devopsproj.dto.responseDto.GitRepositoryDTO;
+import com.example.devopsproj.dto.responsedto.GitRepositoryDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;

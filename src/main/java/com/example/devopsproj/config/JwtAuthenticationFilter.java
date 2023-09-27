@@ -29,26 +29,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,//THIS REQUEST IS OUR REQUEST
             @NonNull HttpServletResponse response,// THIS RESPONSE IS ALSO OUR RESPONSE
-            @NonNull FilterChain filterChain//THIS BASICALLY CONATAIN THE LIST OF THE FILTER
+            @NonNull FilterChain filterChain//THIS BASICALLY CONTAIN THE LIST OF THE FILTER
     ) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String userEmail;
-        //HERE WE ARE CHECKING THAT OUR TOKEN EXCIT OR NOT
+        //HERE WE ARE CHECKING THAT OUR TOKEN EXIST OR NOT
         if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
-        //HERE WE ARE EXTRACTING THE JWT TOKEN AND USER NAME IN THE NEXT LINE
+        //HERE WE ARE EXTRACTING THE JWT TOKEN AND USERNAME IN THE NEXT LINE
         jwt = authHeader.substring(7);
         userEmail = jwtServiceImpl.extractUsername(jwt);
         //NOW WE EXTRACTING THE USER FRO TH DATABASE FOR THE VERIFICATION
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-            var isTokenValid = tokenRepository.findByToken(jwt)
+            var isTokenValid = tokenRepository.findByTokenId(jwt)
                     .map(t -> !t.isExpired() && !t.isRevoked())
                     .orElse(false);
-            if (jwtServiceImpl.isTokenValid(jwt, userDetails) && isTokenValid) {
+            if (jwtServiceImpl.isTokenValid(jwt, userDetails) && Boolean.TRUE.equals(isTokenValid)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,

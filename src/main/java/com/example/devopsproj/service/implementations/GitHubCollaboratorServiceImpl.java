@@ -1,6 +1,6 @@
 package com.example.devopsproj.service.implementations;
 
-import com.example.devopsproj.dto.responseDto.CollaboratorDTO;
+import com.example.devopsproj.dto.responsedto.CollaboratorDTO;
 import com.example.devopsproj.service.interfaces.GitHubCollaboratorService;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;

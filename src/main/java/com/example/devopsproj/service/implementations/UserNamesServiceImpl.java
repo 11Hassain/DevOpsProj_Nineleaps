@@ -2,7 +2,7 @@ package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.model.UserNames;
-import com.example.devopsproj.dto.responseDto.UserNamesDTO;
+import com.example.devopsproj.dto.responsedto.UserNamesDTO;
 import com.example.devopsproj.repository.UserNamesRepository;
 import com.example.devopsproj.service.interfaces.UserNamesService;
 import com.example.devopsproj.utils.GitHubUserValidation;
