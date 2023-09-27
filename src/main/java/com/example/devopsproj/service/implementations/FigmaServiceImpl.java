@@ -7,6 +7,7 @@ import com.example.devopsproj.model.Project;
 import com.example.devopsproj.repository.FigmaRepository;
 import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.service.interfaces.FigmaService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +16,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class FigmaServiceImpl implements FigmaService {
     @Autowired
     private FigmaRepository figmaRepository;
-    @Autowired ProjectRepository projectRepository;
+    @Autowired
+    private ProjectRepository projectRepository;
 
     @Override
     public Figma createFigma(FigmaDTO figmaDTO) {
@@ -31,10 +34,9 @@ public class FigmaServiceImpl implements FigmaService {
     @Override
     public List<Figma> getAllFigmaProjects() {
         List<Project> activeProjects = projectRepository.findAllProjects();
-        List<Figma> figmaProjects = activeProjects.stream()
+        return activeProjects.stream()
                 .map(Project::getFigma)
                 .collect(Collectors.toList());
-        return figmaProjects;
     }
 
     @Override

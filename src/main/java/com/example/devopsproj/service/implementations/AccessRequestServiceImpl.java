@@ -9,7 +9,11 @@ import com.example.devopsproj.dto.responseDto.AccessResponseDTO;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.repository.AccessRequestRepository;
 import com.example.devopsproj.service.interfaces.AccessRequestService;
+import com.example.devopsproj.service.interfaces.JwtService;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,14 +24,17 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class AccessRequestServiceImpl implements AccessRequestService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AccessRequestServiceImpl.class);
 
     @Autowired
     private AccessRequestRepository accessRequestRepository;
-
     @Autowired
     private ModelMapper modelMapper;
-
+    private final JwtService jwtService;
+    
     @Override
     public AccessRequestDTO createRequest(AccessRequestDTO accessRequestDTO) {
         AccessRequest accessRequest = mapDTOToAccessRequest(accessRequestDTO);

@@ -31,7 +31,6 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
     private static final String API_BASE_URL = "https://api.github.com";
     private static final String USER_REPOS_ENDPOINT = "/user/repos";
     private static final String REPOS_ENDPOINT = "/repos/Bindushree-0906";
-    private static final String OWNER = "Bindushree-0906";
 
     private static final String GITHUB_ACCESS_TOKEN = System.getenv("GITHUB_ACCESS_TOKEN");
 

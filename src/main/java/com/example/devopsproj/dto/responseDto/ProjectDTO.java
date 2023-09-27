@@ -2,7 +2,6 @@ package com.example.devopsproj.dto.responseDto;
 
 import com.example.devopsproj.model.User;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -26,7 +25,6 @@ public class ProjectDTO {
     @Size(max = 255, message = "projectDescription should not exceed 255 characters")
     private String projectDescription;
 
-    @NotNull(message = "lastUpdated cannot be null")
     private LocalDateTime lastUpdated;
 
     private List<User> users;

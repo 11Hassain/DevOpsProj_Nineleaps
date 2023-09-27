@@ -151,9 +151,9 @@ public class ProjectController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getAll(@RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<Object> getAll() {
+//        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
+//        if (isTokenValid) {
             try {
                 List<Project> projects = projectServiceImpl.getAll();
                 List<ProjectDTO> projectDTOs = projects.stream()
@@ -166,9 +166,9 @@ public class ProjectController {
             } catch (Exception e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+//        } else {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
+//        }
     }
 
     @GetMapping("/allProjects")
