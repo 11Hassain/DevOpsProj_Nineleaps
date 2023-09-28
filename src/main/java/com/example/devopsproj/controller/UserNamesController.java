@@ -7,7 +7,7 @@ import com.example.devopsproj.dto.responsedto.UserNamesDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,16 +17,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/usernames")
 @Validated
+@RequiredArgsConstructor
 public class UserNamesController {
 
-    @Autowired
     private final UserNamesServiceImpl userNamesServiceImpl;
-    @Autowired
-    private JwtServiceImpl jwtServiceImpl;
-    @Autowired
-    public UserNamesController(UserNamesServiceImpl userNamesServiceImpl) {
-        this.userNamesServiceImpl = userNamesServiceImpl;
-    }
+    private final JwtServiceImpl jwtServiceImpl;
 
     private static final String INVALID_TOKEN = "Invalid Token";
 

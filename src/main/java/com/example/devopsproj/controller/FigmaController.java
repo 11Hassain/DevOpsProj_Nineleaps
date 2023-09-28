@@ -10,11 +10,11 @@ import com.example.devopsproj.utils.DTOModelMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
 import java.util.*;
@@ -22,13 +22,13 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/v1/figmas")
 @Validated
+@RequiredArgsConstructor
 public class FigmaController {
-    @Autowired
-    private FigmaServiceImpl figmaServiceImpl;
-    @Autowired
-    private FigmaRepository figmaRepository;
-    @Autowired
-    private JwtServiceImpl jwtServiceImpl;
+
+    private final FigmaServiceImpl figmaServiceImpl;
+    private final FigmaRepository figmaRepository;
+    private final JwtServiceImpl jwtServiceImpl;
+
     private static final String INVALID_TOKEN = "Invalid Token";
 
     @PostMapping("/create")

@@ -7,7 +7,7 @@ import com.example.devopsproj.dto.responsedto.AccessResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -18,12 +18,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/request")
 @Validated
+@RequiredArgsConstructor
 public class AccessRequestController {
 
-    @Autowired
-    private AccessRequestServiceImpl accessRequestServiceImpl;
-    @Autowired
-    private JwtServiceImpl jwtServiceImpl;
+    private final AccessRequestServiceImpl accessRequestServiceImpl;
+    private final JwtServiceImpl jwtServiceImpl;
 
     private static final String INVALID_TOKEN = "Invalid Token";
 
@@ -32,13 +31,19 @@ public class AccessRequestController {
             description = "Create Access Request",
             responses = {
             @ApiResponse(responseCode = "200", description = "Request made successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> createAccessRequest(@Valid @RequestBody AccessRequestDTO accessRequestDTO, @RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            return ResponseEntity.ok("Request made successfully");
+            AccessRequestDTO accessRequestDTO1 = accessRequestServiceImpl.createRequest(accessRequestDTO);
+            if (accessRequestDTO1 == null){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid RequestDTO");
+
+            }
+            return ResponseEntity.ok(accessRequestDTO1);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
@@ -66,6 +71,7 @@ public class AccessRequestController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
+
 
     @GetMapping("/all")
     @Operation(

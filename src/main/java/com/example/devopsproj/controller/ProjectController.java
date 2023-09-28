@@ -16,7 +16,7 @@ import com.example.devopsproj.repository.ProjectRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import org.springframework.http.HttpStatus;
@@ -34,20 +34,15 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/projects")
 @Validated
+@RequiredArgsConstructor
 public class ProjectController {
 
-    @Autowired
-    private ProjectServiceImpl projectServiceImpl;
-    @Autowired
-    private ProjectRepository projectRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private GitRepositoryRepository gitRepositoryRepository;
-    @Autowired
-    private JwtServiceImpl jwtServiceImpl;
-    @Autowired
-    private GitHubCollaboratorServiceImpl collaboratorService;
+    private final ProjectServiceImpl projectServiceImpl;
+    private final ProjectRepository projectRepository;
+    private final UserRepository userRepository;
+    private final GitRepositoryRepository gitRepositoryRepository;
+    private final JwtServiceImpl jwtServiceImpl;
+    private final GitHubCollaboratorServiceImpl collaboratorService;
 
     private static final String INVALID_TOKEN = "Invalid Token";
 

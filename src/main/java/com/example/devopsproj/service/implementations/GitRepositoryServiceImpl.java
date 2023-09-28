@@ -10,9 +10,9 @@ import com.example.devopsproj.model.Project;
 import com.example.devopsproj.repository.GitRepositoryRepository;
 import com.example.devopsproj.service.interfaces.GitRepositoryService;
 import java.util.Collections;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,28 +22,20 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class GitRepositoryServiceImpl implements GitRepositoryService {
 
-    @Autowired
-    private GitRepositoryRepository gitRepositoryRepository;
-    @Autowired
-    private ProjectServiceImpl projectServiceImpl;
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final GitRepositoryRepository gitRepositoryRepository;
+    private final ProjectServiceImpl projectServiceImpl;
+    private final JdbcTemplate jdbcTemplate;
 
     private static final String API_BASE_URL = "https://api.github.com";
     private static final String USER_REPOS_ENDPOINT = "/user/repos";
     private static final String REPOS_ENDPOINT = "/repos/sahilanna";
-
-
     private static final String GITHUB_ACCESS_TOKEN = System.getenv("GITHUB_ACCESS_TOKEN");
 
     private final RestTemplate restTemplate;
 
-    public GitRepositoryServiceImpl() {
-        this.restTemplate = new RestTemplate();
-        this.restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-    }
 
     @Override
     @Transactional

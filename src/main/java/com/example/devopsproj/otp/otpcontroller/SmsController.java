@@ -17,7 +17,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -30,14 +30,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/OTP")
 @RestController
 @Validated
+@RequiredArgsConstructor
 public class SmsController {
 
-    @Autowired
-    SmsService service;
-    @Autowired
-    IUserService userService;
-    @Autowired
-    private SimpMessagingTemplate webSocket;
+    final SmsService service;
+    final IUserService userService;
+    private final SimpMessagingTemplate webSocket;
+
     private static final String TOPIC_DESTINATION = "/lesson/sms";
     private static final String SECRET_KEY = System.getenv("SMS_SECRET_KEY");
 

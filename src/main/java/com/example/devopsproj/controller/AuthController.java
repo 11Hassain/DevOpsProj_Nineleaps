@@ -5,7 +5,7 @@ import com.example.devopsproj.utils.JwtUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -15,9 +15,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/auth")
 @Validated
+@RequiredArgsConstructor
 public class AuthController {
-    @Autowired
-    private UserServiceImpl userServiceImpl;
+
+    private final UserServiceImpl userServiceImpl;
 
     @GetMapping("/api/v1/get-email")
     @Operation(

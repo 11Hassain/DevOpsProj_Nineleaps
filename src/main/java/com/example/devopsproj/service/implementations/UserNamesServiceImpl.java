@@ -6,24 +6,19 @@ import com.example.devopsproj.dto.responsedto.UserNamesDTO;
 import com.example.devopsproj.repository.UserNamesRepository;
 import com.example.devopsproj.service.interfaces.UserNamesService;
 import com.example.devopsproj.utils.GitHubUserValidation;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserNamesServiceImpl implements UserNamesService {
-    @Autowired
-    private UserNamesRepository userNamesRepository;
 
-    @Autowired
-    public UserNamesServiceImpl(UserNamesRepository userNamesRepository) {
-        this.userNamesRepository = userNamesRepository;
-    }
+    private final UserNamesRepository userNamesRepository;
 
-    @Autowired
-    public GitHubUserValidation gitHubUserValidation;
+    public final GitHubUserValidation gitHubUserValidation;
 
     @Override
     public UserNamesDTO saveUsername(UserNamesDTO userNamesDTO) {

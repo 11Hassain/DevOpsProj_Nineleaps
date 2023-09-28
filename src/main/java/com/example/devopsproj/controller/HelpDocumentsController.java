@@ -7,6 +7,7 @@ import com.example.devopsproj.service.implementations.JwtServiceImpl;
 import com.example.devopsproj.repository.HelpDocumentsRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -24,14 +25,12 @@ import java.util.Optional;
 @RestController
 @RequestMapping("api/v1/projects")
 @Validated
+@RequiredArgsConstructor
 public class HelpDocumentsController {
 
-    @Autowired
-    private HelpDocumentsServiceImpl helpDocumentsServiceImpl;
-    @Autowired
-    private HelpDocumentsRepository helpDocumentsRepository;
-    @Autowired
-    private JwtServiceImpl jwtServiceImpl;
+    private final HelpDocumentsServiceImpl helpDocumentsServiceImpl;
+    private final HelpDocumentsRepository helpDocumentsRepository;
+    private final JwtServiceImpl jwtServiceImpl;
 
     private static final String INVALID_TOKEN = "Invalid Token";
 

@@ -8,7 +8,7 @@ import com.example.devopsproj.dto.responsedto.GitRepositoryDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -19,12 +19,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/repositories")
 @Validated
+@RequiredArgsConstructor
 public class GitRepositoryController {
 
-    @Autowired
-    private GitRepositoryServiceImpl gitRepositoryServiceImpl;
-    @Autowired
-    private JwtServiceImpl jwtServiceImpl;
+    private final GitRepositoryServiceImpl gitRepositoryServiceImpl;
+    private final JwtServiceImpl jwtServiceImpl;
 
     private static final String INVALID_TOKEN = "Invalid Token";
 

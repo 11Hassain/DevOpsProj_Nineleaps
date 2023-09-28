@@ -15,8 +15,8 @@ import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.service.interfaces.UserService;
 import com.example.devopsproj.utils.JwtUtils;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -28,20 +28,15 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements IUserService, UserService {
 
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private ProjectServiceImpl projectServiceImpl;
-    @Autowired
-    private JwtServiceImpl jwtServiceImpl;
-    @Autowired
-    private JwtUtils jwtUtils;
-    @Autowired
-    private ProjectRepository projectRepository;
-
-    private ModelMapper modelMapper;
+    private final UserRepository userRepository;
+    private final ProjectServiceImpl projectServiceImpl;
+    private final JwtServiceImpl jwtServiceImpl;
+    private final JwtUtils jwtUtils;
+    private final ProjectRepository projectRepository;
+    private final ModelMapper modelMapper;
 
 
     //implementing user creation using DTO pattern

@@ -6,7 +6,7 @@ import com.example.devopsproj.dto.responsedto.CollaboratorDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -15,15 +15,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/collaborators")
 @Validated
+@RequiredArgsConstructor
 public class GitHubCollaboratorController {
-    @Autowired
+
     private final GitHubCollaboratorServiceImpl collaboratorService;
-    @Autowired
-    private JwtServiceImpl jwtServiceImpl;
-    @Autowired
-    public GitHubCollaboratorController(GitHubCollaboratorServiceImpl collaboratorService) {
-        this.collaboratorService = collaboratorService;
-    }
+    private final JwtServiceImpl jwtServiceImpl;
 
     private static final String INVALID_TOKEN = "Invalid Token";
 

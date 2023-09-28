@@ -9,7 +9,7 @@ import com.example.devopsproj.utils.DTOModelMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -22,12 +22,11 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/v1")
 @Validated
+@RequiredArgsConstructor
 public class GoogleDriveController {
 
-    @Autowired
-    private GoogleDriveServiceImpl googleDriveServiceImpl;
-    @Autowired
-    private JwtServiceImpl jwtServiceImpl;
+    private final GoogleDriveServiceImpl googleDriveServiceImpl;
+    private final JwtServiceImpl jwtServiceImpl;
 
     private static final String INVALID_TOKEN = "Invalid Token";
 

@@ -12,9 +12,6 @@ import com.example.devopsproj.service.interfaces.AccessRequestService;
 import com.example.devopsproj.service.interfaces.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,12 +23,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AccessRequestServiceImpl implements AccessRequestService {
 
-    private static final Logger logger = LoggerFactory.getLogger(AccessRequestServiceImpl.class);
+    private final AccessRequestRepository accessRequestRepository;
+    private final ModelMapper modelMapper;
 
-    @Autowired
-    private AccessRequestRepository accessRequestRepository;
-    @Autowired
-    private ModelMapper modelMapper;
     private final JwtService jwtService;
 
     @Override

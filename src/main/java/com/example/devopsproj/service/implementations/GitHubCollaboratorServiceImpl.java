@@ -5,6 +5,7 @@ import com.example.devopsproj.service.interfaces.GitHubCollaboratorService;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
 @Service
 public class GitHubCollaboratorServiceImpl implements GitHubCollaboratorService {
 
