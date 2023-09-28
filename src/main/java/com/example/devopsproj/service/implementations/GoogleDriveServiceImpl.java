@@ -7,8 +7,10 @@ import com.example.devopsproj.model.Project;
 import com.example.devopsproj.repository.GoogleDriveRepository;
 import com.example.devopsproj.service.interfaces.GoogleDriveService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,30 +23,39 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
 
     // Create a new Google Drive entry
     @Override
-    public GoogleDrive createGoogleDrive(GoogleDriveDTO googleDriveDTO) {
-        // Create a new GoogleDrive object and populate it with data from the DTO
+    public GoogleDriveDTO createGoogleDrive(GoogleDriveDTO googleDriveDTO) {
         GoogleDrive googleDrive = new GoogleDrive();
         googleDrive.setProject(mapProjectDTOToProject(googleDriveDTO.getProjectDTO()));
         googleDrive.setDriveLink(googleDriveDTO.getDriveLink());
 
-        // Save the new Google Drive entry to the repository
-        return googleDriveRepository.save(googleDrive);
-    }
+        GoogleDrive savedGoogleDrive = googleDriveRepository.save(googleDrive);
 
+        return new GoogleDriveDTO(
+                mapProjectToProjectDTO(savedGoogleDrive.getProject()),
+                savedGoogleDrive.getDriveLink(),
+                savedGoogleDrive.getDriveId()
+        );
+    }
     // Get a list of all Google Drive entries
     @Override
-    public List<GoogleDrive> getAllGoogleDrives() {
-        // Retrieve all Google Drive entries from the repository
-        return googleDriveRepository.findAll();
+    public List<GoogleDriveDTO> getAllGoogleDrives() {
+        List<GoogleDrive> googleDrives = googleDriveRepository.findAll();
+        List<GoogleDriveDTO> googleDriveDTOs = new ArrayList<>();
+        for (GoogleDrive googleDrive : googleDrives) {
+            googleDriveDTOs.add(new GoogleDriveDTO(
+                    mapProjectToProjectDTO(googleDrive.getProject()),
+                    googleDrive.getDriveLink(),
+                    googleDrive.getDriveId()
+            ));
+        }
+        return googleDriveDTOs;
     }
 
     // Get a Google Drive entry by its ID
     @Override
     public Optional<GoogleDriveDTO> getGoogleDriveById(Long driveId) {
-        // Retrieve the Google Drive entry by its ID
         Optional<GoogleDrive> optionalGoogleDrive = googleDriveRepository.findById(driveId);
 
-        // Map the Google Drive entry to a GoogleDriveDTO if it exists
         return optionalGoogleDrive.map(googleDrive -> new GoogleDriveDTO(
                 mapProjectToProjectDTO(googleDrive.getProject()),
                 googleDrive.getDriveLink(),
@@ -54,24 +65,37 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
 
     // Delete a Google Drive entry by its ID
     @Override
-    public boolean deleteGoogleDriveById(Long driveId) {
+    public ResponseEntity<String> deleteGoogleDriveById(Long driveId) {
         // Check if a Google Drive entry with the specified ID exists
         Optional<GoogleDrive> optionalGoogleDrive = googleDriveRepository.findById(driveId);
         if (optionalGoogleDrive.isPresent()) {
-            // If it exists, delete it from the repository and return true
+            // If it exists, delete it from the repository and return a success response
             googleDriveRepository.deleteById(driveId);
-            return true;
+            return ResponseEntity.ok("Google Drive with ID: " + driveId + " deleted successfully.");
         } else {
-            // If it doesn't exist, return false
-            return false;
+            // If it doesn't exist, return a not found response
+            return ResponseEntity.notFound().build();
         }
     }
 
+
+
     // Get a Google Drive entry by its associated Project ID
     @Override
-    public Optional<GoogleDrive> getGoogleDriveByProjectId(Long projectId) {
-        // Retrieve the Google Drive entry associated with the specified Project ID
-        return googleDriveRepository.findGoogleDriveByProjectId(projectId);
+    public ResponseEntity<GoogleDriveDTO> getGoogleDriveByProjectId(Long projectId) {
+        Optional<GoogleDrive> optionalGoogleDrive = googleDriveRepository.findGoogleDriveByProjectId(projectId);
+
+        return optionalGoogleDrive.map(this::mapToGoogleDriveDTO)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    private ResponseEntity<GoogleDriveDTO> mapToGoogleDriveDTO(GoogleDrive googleDrive) {
+        GoogleDriveDTO googleDriveDTO = new GoogleDriveDTO(
+                new ProjectDTO(googleDrive.getProject().getProjectId(), googleDrive.getProject().getProjectName()),
+                googleDrive.getDriveLink(),
+                googleDrive.getDriveId()
+        );
+        return ResponseEntity.ok(googleDriveDTO);
     }
 
     // Helper method to map Project to ProjectDTO
