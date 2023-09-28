@@ -11,6 +11,7 @@ import com.example.devopsproj.service.interfaces.AccessRequestService;
 import com.example.devopsproj.service.interfaces.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -32,14 +33,9 @@ public class AccessRequestServiceImpl implements AccessRequestService {
 
     // Create a new access request
     @Override
-    public Optional<AccessRequestDTO> createRequest(AccessRequestDTO accessRequestDTO, String accessToken) {
+    public Optional<AccessRequestDTO> createRequest(AccessRequestDTO accessRequestDTO) {
         try {
-            // Check if the access token is valid.
-            boolean isTokenValid = jwtService.isTokenTrue(accessToken);
-            if (!isTokenValid) {
-                // Return an empty optional to indicate token validation failure
-                return Optional.empty();
-            }
+            // You should remove the access token-related code here as it's not needed in this method.
 
             // Create a new AccessRequest object and populate it with data from the DTO
             AccessRequest accessRequest = new AccessRequest();
@@ -63,8 +59,6 @@ public class AccessRequestServiceImpl implements AccessRequestService {
             return Optional.empty();
         }
     }
-
-
 
     @Override
     public List<AccessRequestDTO> getAllRequests() {
@@ -177,11 +171,6 @@ public class AccessRequestServiceImpl implements AccessRequestService {
             // Retrieve all unread access requests for the given project manager
             List<AccessRequest> accessRequests = accessRequestRepository.findAllUnreadPMRequestsByName(pmName);
 
-            // If there are no unread requests, return an empty list
-            if (accessRequests.isEmpty()) {
-                return Collections.emptyList();
-            }
-
             // Create a list to store DTOs and map each unread AccessRequest to a DTO
             List<AccessResponseDTO> accessResponseDTOList = new ArrayList<>();
             String listOfPMRequests;
@@ -203,14 +192,15 @@ public class AccessRequestServiceImpl implements AccessRequestService {
                 accessResponseDTOList.add(accessResponseDTO);
             }
 
-            // Return the list of unread request DTOs
             return accessResponseDTOList;
         } catch (Exception e) {
             // Log and handle any exceptions
             logger.error("An error occurred while retrieving PM's unread requests: " + e.getMessage(), e);
-            return Collections.emptyList();
+            return Collections.emptyList(); // Return an empty list in case of an exception
         }
     }
+
+
 
     @Override
     public List<AccessResponseDTO> getPMRequests(String pmName) {
@@ -256,7 +246,7 @@ public class AccessRequestServiceImpl implements AccessRequestService {
 
     // Set the notification flag for a PM request to true
     @Override
-    public void setPMRequestsNotificationTrue(Long accessRequestId) {
+    public ResponseEntity<String> setPMRequestsNotificationTrue(Long accessRequestId) {
         try {
             // Retrieve the access request by ID
             Optional<AccessRequest> optionalAccessRequest = accessRequestRepository.findById(accessRequestId);
@@ -276,6 +266,7 @@ public class AccessRequestServiceImpl implements AccessRequestService {
             // Log and handle any exceptions
             logger.error("An error occurred while setting PM notification flag: " + e.getMessage(), e);
         }
+        return null;
     }
 
     @Override

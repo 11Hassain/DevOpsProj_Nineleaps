@@ -22,7 +22,6 @@ public class GitHubUserValidation {
 
             return statusCode == 200;
         } catch (Exception e) {
-            e.printStackTrace();
             return false;
         }
     }

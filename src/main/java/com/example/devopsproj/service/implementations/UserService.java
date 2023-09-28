@@ -90,8 +90,13 @@ public class UserService implements IUserService {
     // Check if a user with the given ID has been soft-deleted.
     public boolean existsByIdIsDeleted(Long id) {
         Optional<User> checkUser = userRepository.findById(id);
-        User cuser = checkUser.get();
-        return cuser.getDeleted(); // true if deleted=1, false otherwise
+
+        if (checkUser.isPresent()) {
+            User cuser = checkUser.get();
+            return cuser.getDeleted(); // true if deleted=1, false otherwise
+        } else {
+            return false; // User with the given ID does not exist
+        }
     }
 
     // Soft delete a user by setting their deleted status to true.

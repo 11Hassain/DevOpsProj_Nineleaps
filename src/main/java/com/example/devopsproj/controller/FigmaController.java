@@ -4,6 +4,7 @@ import com.example.devopsproj.dto.responsedto.FigmaDTO;
 import com.example.devopsproj.dto.responsedto.FigmaScreenshotDTO;
 import com.example.devopsproj.model.Figma;
 import com.example.devopsproj.repository.FigmaRepository;
+import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.service.interfaces.FigmaService;
 import com.example.devopsproj.service.interfaces.JwtService;
 import io.swagger.annotations.ApiResponse;
@@ -19,12 +20,18 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/figmas")
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class FigmaController {
     private final FigmaService figmaService;
-    private final FigmaRepository figmaRepository;
-    private final JwtService jwtService;
-    private static final String INVALID_TOKEN = "Invalid Token";
+    private final ProjectRepository projectRepository;
+
+    public FigmaController(FigmaService figmaService, ProjectRepository projectRepository) {
+        this.figmaService = figmaService;
+        this.projectRepository = projectRepository;
+    }
+
+
+
 
     // Create a new Figma project.
     @PostMapping("/create")
@@ -40,11 +47,20 @@ public class FigmaController {
         return ResponseEntity.ok(figmaDTOs);
     }
 
+
+
+
     @DeleteMapping("/{figmaId}")
     public ResponseEntity<String> deleteFigma(@PathVariable Long figmaId) {
         figmaService.deleteFigma(figmaId);
         return ResponseEntity.ok("Figma deleted successfully");
     }
+
+
+
+
+
+
 
     @GetMapping("/project/{projectId}")
     @ResponseStatus(HttpStatus.OK)
@@ -52,6 +68,10 @@ public class FigmaController {
         String figmaURL = figmaService.getFigmaURLByProjectId(projectId);
         return ResponseEntity.ok(figmaURL);
     }
+
+
+
+
 
     // Get a specific Figma project by its ID.
     @GetMapping("/figma/{figmaId}")
@@ -61,6 +81,7 @@ public class FigmaController {
         Optional<FigmaDTO> optionalFigmaDTO = figmaService.getFigmaById(figmaId);
         return ResponseEntity.of(Optional.ofNullable(optionalFigmaDTO));
     }
+
 
     // Add a user and screenshots to a Figma project.
     @PostMapping("/{figmaId}/user")

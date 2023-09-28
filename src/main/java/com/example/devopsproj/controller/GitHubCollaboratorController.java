@@ -3,7 +3,6 @@ import com.example.devopsproj.dto.responsedto.CollaboratorDTO;
 import com.example.devopsproj.service.interfaces.GitHubCollaboratorService;
 import com.example.devopsproj.service.interfaces.JwtService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

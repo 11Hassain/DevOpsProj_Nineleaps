@@ -34,7 +34,7 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService(){
-        return username -> repository.findByEmail(username);
+        return repository::findByEmail;
     }
 
     @Bean

@@ -30,12 +30,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProjectController {
     private final ProjectService projectService;
-    private final ProjectRepository projectRepository;
-    private final UserRepository userRepository;
-    private final IUserService userService;
-    private final GitRepositoryRepository gitRepositoryRepository;
-    private final JwtService jwtService;
-    private final GitHubCollaboratorService collaboratorService;
+
 
     // Create a new project and return its details.
     @PostMapping("/create")
