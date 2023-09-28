@@ -12,8 +12,13 @@ public interface HelpDocumentsService {
     ResponseEntity<Object> uploadFiles(long projectId, MultipartFile projectFile, String fileExtension) throws IOException;
 
     String getFileExtension(MultipartFile file);
+    ResponseEntity<?> downloadPdfFile(String fileName);
+
+    ResponseEntity<Object> getPdfFilesList(long projectId);
+
 
     Optional<HelpDocumentsDTO> getDocumentById(Long fileId);
+    ResponseEntity<String> deleteDocument(Long fileId);
 
-    void deleteDocument(Long fileId);
 }
+

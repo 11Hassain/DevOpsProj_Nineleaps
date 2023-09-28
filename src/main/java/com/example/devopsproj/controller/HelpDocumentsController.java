@@ -36,46 +36,19 @@ public class HelpDocumentsController {
     // Get a list of PDF files associated with a specific project.
     @GetMapping("/files")
     public ResponseEntity<Object> getPdfFilesList(@RequestParam("projectId") long projectId) {
-        // Retrieve PDF files from the repository and filter them by the specified project ID.
-        List<HelpDocuments> pdfFiles = helpDocumentsRepository.findAll();
-        List<HelpDocumentsDTO> fileInfos = pdfFiles.stream()
-                .filter(pdfFile -> pdfFile != null && pdfFile.getProject() != null && pdfFile.getProject().getProjectId() == projectId)
-                .map(pdfFile -> new HelpDocumentsDTO(pdfFile.getHelpDocumentId(), pdfFile.getFileName()))
-                .filter(helpDoc -> helpDoc.getFileName() != null) // Filter out any remaining null file names
-                .collect(Collectors.toList());
-        if (fileInfos.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok().body(fileInfos);
+        return helpDocumentsService.getPdfFilesList(projectId);
     }
+
 
     // Download a PDF file by its file name.
     @GetMapping("/files/{fileName}")
-    public ResponseEntity<Object> downloadPdfFile(@PathVariable("fileName") String fileName) {
-        // Retrieve the PDF file by its file name from the repository.
-        HelpDocuments pdfFile = helpDocumentsRepository.findByFileName(fileName);
-        if (pdfFile == null) {
-            return ResponseEntity.notFound().build();
-        }
-        // Set headers for downloading the file as an attachment.
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", fileName);
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(pdfFile.getData());
+    public ResponseEntity<?> downloadPdfFile(@PathVariable("fileName") String fileName) {
+        return helpDocumentsService.downloadPdfFile(fileName);
     }
 
     // Delete a document by its file ID.
     @DeleteMapping("/files/{fileId}")
     public ResponseEntity<String> deleteFile(@PathVariable("fileId") Long fileId) {
-        // Attempt to retrieve the document by its ID and delete it if found.
-        Optional<HelpDocumentsDTO> helpDocumentsDTO = helpDocumentsService.getDocumentById(fileId);
-        if (helpDocumentsDTO.isPresent()) {
-            helpDocumentsService.deleteDocument(fileId);
-            return ResponseEntity.ok("Document deleted successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Document not found");
-        }
+        return helpDocumentsService.deleteDocument(fileId);
     }
 }

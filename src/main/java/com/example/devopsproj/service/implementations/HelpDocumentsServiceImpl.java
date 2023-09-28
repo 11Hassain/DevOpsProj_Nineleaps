@@ -1,19 +1,28 @@
 package com.example.devopsproj.service.implementations;
 
+import com.example.devopsproj.dto.responsedto.GoogleDriveDTO;
 import com.example.devopsproj.dto.responsedto.HelpDocumentsDTO;
+import com.example.devopsproj.dto.responsedto.ProjectDTO;
+import com.example.devopsproj.model.GoogleDrive;
 import com.example.devopsproj.model.HelpDocuments;
 import com.example.devopsproj.model.Project;
+import com.example.devopsproj.repository.GoogleDriveRepository;
 import com.example.devopsproj.repository.HelpDocumentsRepository;
 import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.service.interfaces.HelpDocumentsService;
 import com.example.devopsproj.service.interfaces.ProjectService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +31,7 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
     private final ProjectRepository projectRepository;
     private final HelpDocumentsRepository helpDocumentsRepository;
     private final ProjectService projectService;
+    private final GoogleDriveRepository googleDriveRepository;
 
     // Upload a file associated with a project
     @Override
@@ -64,6 +74,51 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
             throw new IllegalArgumentException("Invalid parameters");
         }
     }
+
+    @Override
+    public ResponseEntity<Object> getPdfFilesList(long projectId) {
+        List<HelpDocuments> pdfFiles = helpDocumentsRepository.findAll();
+
+        List<HelpDocumentsDTO> fileInfos = pdfFiles.stream()
+                .filter(pdfFile -> pdfFile != null && pdfFile.getProject() != null && pdfFile.getProject().getProjectId() == projectId)
+                .map(pdfFile -> new HelpDocumentsDTO(pdfFile.getHelpDocumentId(), pdfFile.getFileName()))
+                .filter(helpDoc -> helpDoc.getFileName() != null) // Filter out any remaining null file names
+                .collect(Collectors.toList());
+
+        if (fileInfos.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok().body(fileInfos);
+    }
+
+    @Override
+    public ResponseEntity<Object> downloadPdfFile(String fileName) {
+        HelpDocuments pdfFile = helpDocumentsRepository.findByFileName(fileName);
+        if (pdfFile == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", fileName);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(pdfFile.getData());
+    }
+
+    private ResponseEntity<GoogleDriveDTO> mapToGoogleDriveDTO(GoogleDrive googleDrive) {
+        GoogleDriveDTO googleDriveDTO = new GoogleDriveDTO(
+                new ProjectDTO(googleDrive.getProject().getProjectId(), googleDrive.getProject().getProjectName()),
+                googleDrive.getDriveLink(),
+                googleDrive.getDriveId()
+        );
+        return ResponseEntity.ok(googleDriveDTO);
+    }
+
+
+
     // Get information about a document by its ID
     @Override
     public Optional<HelpDocumentsDTO> getDocumentById(Long fileId) {
@@ -82,9 +137,16 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
 
     // Delete a document by its ID
     @Override
-    public void deleteDocument(Long fileId) {
-        // Delete the HelpDocuments object by its ID from the repository
-        helpDocumentsRepository.deleteById(fileId);
+    public ResponseEntity<String> deleteDocument(Long fileId) {
+        // Retrieve the HelpDocuments object by its ID
+        Optional<HelpDocuments> helpDocuments = helpDocumentsRepository.findById(fileId);
+
+        if (helpDocuments.isPresent()) {
+            helpDocumentsRepository.deleteById(fileId);
+            return ResponseEntity.ok("Document deleted successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Document not found");
+        }
     }
 
     // Helper method to save file data to a HelpDocuments object
