@@ -11,7 +11,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
 @ComponentScan(basePackages = "com.example.devopsproj")
-public class DevOpsProjApplication {
+public class  DevOpsProjApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(DevOpsProjApplication.class, args);
 	}
