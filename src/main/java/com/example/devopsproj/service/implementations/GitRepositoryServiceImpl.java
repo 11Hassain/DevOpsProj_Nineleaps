@@ -1,10 +1,14 @@
 package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.dto.responsedto.GitRepositoryDTO;
-import com.example.devopsproj.exceptions.NotFoundException;
+
+//import com.example.devopsproj.exceptions.NotFoundException;
+//import com.example.devopsproj.exceptions.FigmaNotFoundException;
+import com.example.devopsproj.exceptions.FigmaNotFoundException;
 import com.example.devopsproj.model.GitRepository;
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.model.Project;
+//import com.example.devopsproj.repository.GitRepositoryRepository;
 import com.example.devopsproj.repository.GitRepositoryRepository;
 import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.service.interfaces.GitRepositoryService;
@@ -15,8 +19,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+//import com.example.devopsproj.repository.GitRepositoryRepository;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -123,24 +130,36 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
         }
     }
 
-    // Get a list of all Git repositories associated with a project
     @Override
-    @Transactional(readOnly = true)
     public List<GitRepositoryDTO> getAllRepositoriesByProject(Long id) {
-        // Retrieve the project by its ID
-        Project project = projectService.getProjectById(id).orElse(null);
-        if (project != null) {
-            // Find the Git repositories associated with the project
-            List<GitRepository> repositories = gitRepositoryRepository.findRepositoriesByProject(project);
-            // Convert the GitRepository entities to GitRepositoryDTOs
-            List<GitRepositoryDTO> gitRepositoryDTOS = repositories.stream()
-                    .map(repository -> new GitRepositoryDTO(repository.getName(), repository.getDescription()))
-                    .collect(Collectors.toList());
-            return gitRepositoryDTOS;
-        } else {
-            return null;
-        }
+        return null;
     }
+
+    // Get a list of all Git repositories associated with a project
+//    @Override
+//    @Transactional(readOnly = true)
+//    public List<GitRepositoryDTO> getAllRepositoriesByProject(Long id) {
+//        // Retrieve the project by its ID
+//        Optional<Project> projectOptional = projectService.getProjectById(id);
+//        if (projectOptional.isPresent()) {
+//            Project project = projectOptional.get();
+//
+//            // Find the Git repositories associated with the project
+//            List<GitRepository> repositories = gitRepositoryRepository.findRepositoriesByProject(project);
+//
+//            // Convert the GitRepository entities to GitRepositoryDTOs
+//            List<GitRepositoryDTO> gitRepositoryDTOS = repositories.stream()
+//                    .map(repository -> new GitRepositoryDTO(repository.getName(), repository.getDescription()))
+//                    .collect(Collectors.toList());
+//
+//            return gitRepositoryDTOS;
+//        } else {
+//            // Handle the case where the project with the given ID doesn't exist
+//            return Collections.emptyList(); // Return an empty list or handle it as needed
+//        }
+//    }
+
+
 
     // Get a list of Git repositories by role
     @Override
@@ -164,7 +183,7 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
             return gitRepositoryRepository.findById(id).orElse(null);
         } catch (Exception e) {
             // Handle exceptions here if needed
-            throw new NotFoundException("An error occurred while retrieving the Git repository by ID");
+            throw new FigmaNotFoundException("An error occurred while retrieving the Git repository by ID");
         }
     }
 

@@ -3,11 +3,14 @@ package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.dto.responsedto.UserNamesDTO;
+import com.example.devopsproj.exceptions.DuplicateUsernameException;
+import com.example.devopsproj.exceptions.GitHubUserNotFoundException;
 import com.example.devopsproj.model.UserNames;
 import com.example.devopsproj.repository.UserNamesRepository;
 import com.example.devopsproj.service.interfaces.UserNamesService;
 import com.example.devopsproj.utils.GitHubUserValidation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,18 +26,27 @@ public class UserNamesServiceImpl implements UserNamesService {
     // Save a GitHub username in the database if it's valid
     @Override
     public UserNamesDTO saveUsername(UserNamesDTO userNamesDTO) {
-        // Check if the GitHub user is valid using GitHubUserValidation
-        boolean isValid = gitHubUserValidation.isGitHubUserValid(userNamesDTO.getUsername(), userNamesDTO.getAccessToken());
-        if (isValid) {
-            UserNames userNames = new UserNames();
-            userNames.setUsername(userNamesDTO.getUsername());
-            userNames.setUser(userNamesDTO.getUser());
-            userNamesRepository.save(userNames);
-            return userNamesDTO; // Return the saved UserNamesDTO
-        } else {
-            return null; // Return null if the GitHub user is not valid
+        try {
+            // Check if the GitHub user is valid using GitHubUserValidation
+            boolean isValid = GitHubUserValidation.isGitHubUserValid(userNamesDTO.getUsername(), userNamesDTO.getAccessToken());
+            if (isValid) {
+                UserNames userNames = new UserNames();
+                userNames.setUsername(userNamesDTO.getUsername());
+                userNames.setUser(userNamesDTO.getUser());
+                userNamesRepository.save(userNames);
+                return userNamesDTO; // Return the saved UserNamesDTO
+            } else {
+                throw new GitHubUserNotFoundException("GitHub user not found");
+            }
+        } catch (DataIntegrityViolationException e) {
+            // Handle the case where the username already exists.
+            throw new DuplicateUsernameException("Username already exists");
+        } catch (Exception e) {
+            // Handle other exceptions generically or as needed.
+            throw new RuntimeException("An error occurred", e);
         }
     }
+
 
     // Get a list of GitHub usernames by their role
     @Override

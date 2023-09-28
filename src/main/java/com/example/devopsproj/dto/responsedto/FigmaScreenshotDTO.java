@@ -4,11 +4,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
+@NoArgsConstructor
+@ToString
 @Setter
 @Getter
-@ToString
 public class FigmaScreenshotDTO {
 
     @Size(max = 255, message = "User should not exceed 255 characters")

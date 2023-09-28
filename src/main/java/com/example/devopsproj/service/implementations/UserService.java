@@ -135,15 +135,20 @@ public class UserService implements IUserService {
         return userRepository.countAllUsersByRole(role);
     }
 
-    // Get the count of users associated with a specific project by project ID.
+    @Override
     public Integer getCountAllUsersByProjectId(Long projectId) {
-        Optional<Project> project = projectService.getProjectById(projectId);
-        if (project.isPresent()) {
-            return userRepository.countAllUsersByProjectId(projectId);
-        } else {
-            return 0;
-        }
+        return null;
     }
+
+    // Get the count of users associated with a specific project by project ID.
+//    public Integer getCountAllUsersByProjectId(Long projectId) {
+//        Optional<Project> project = projectService.getProjectById(projectId);
+//        if (project.isPresent()) {
+//            return userRepository.countAllUsersByProjectId(projectId);
+//        } else {
+//            return 0;
+//        }
+//    }
 
     // Get a list of users with associated project names.
     public List<UserProjectsDTO> getAllUsersWithProjects() {

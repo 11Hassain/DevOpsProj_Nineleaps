@@ -3,28 +3,36 @@ package com.example.devopsproj.service.interfaces;
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.dto.responsedto.*;
 import com.example.devopsproj.model.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public interface ProjectService {
-    Project saveProject(ProjectDTO projectDTO);
 
     ProjectDTO createProject(ProjectDTO projectDTO);
 
-    Optional<Project> getProjectById(Long id);
+    ProjectDTO getProjectById(Long id);
 
-    List<Project> getAll();
+    List<ProjectDTO> getAll();
+
 
     List<Project> getAllProjects();
 
+    List<ProjectWithUsersDTO> getAllProjectsWithUsers();
+
+
     Project updateProject(Project updatedProject);
 
-    List<User> getAllUsersByProjectId(Long projectId); // Add this method
-
-    List<User> getAllUsersByProjectIdAndRole(Long projectId, EnumRole role);
+//    List<User> getAllUsersByProjectId(Long projectId); // Add this method
+    List<UserDTO> getAllUsersByProjectId(Long projectId);
+    List<UserDTO> getAllUsersByProjectIdAndRole(Long projectId, EnumRole role);
+    ProjectDTO updateProject(Long projectId, ProjectDTO projectDTO);
+    ResponseEntity<String> deleteProject(Long id);
+    ResponseEntity<Object> addUserToProject(Long projectId, Long userId);
+    ResponseEntity<String> removeUserFromProject(Long projectId, Long userId);
+    ResponseEntity<String> removeUserFromProjectAndRepo(Long projectId, Long userId, CollaboratorDTO collaboratorDTO);
 
     boolean existsByIdIsDeleted(Long id);
 
@@ -50,11 +58,14 @@ public interface ProjectService {
 
     Integer getCountAllInActiveProjects();
 
-    List<User> getUsersByProjectIdAndRole(Long projectId, EnumRole role);
+    List<UserDTO> getUsersByProjectIdAndRole(Long projectId, String role);
+    ResponseEntity<Object> addRepositoryToProject(Long projectId, Long repoId);
+
 
     List<ProjectDTO> getProjectsWithoutFigmaURL();
 
     List<ProjectDTO> getProjectsWithoutGoogleDriveLink();
+
 
     ProjectDTO getProjectDetailsById(Long projectId);
 

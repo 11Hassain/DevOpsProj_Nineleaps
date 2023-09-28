@@ -18,7 +18,7 @@ public interface GitRepositoryService {
 
     List<GitRepositoryDTO> getAllReposByRole(EnumRole enumRole);
 
-    GitRepository getRepositoryById(Long id);
+   GitRepository getRepositoryById(Long id);
 
     boolean isAccessTokenValid(String accessToken);
 }

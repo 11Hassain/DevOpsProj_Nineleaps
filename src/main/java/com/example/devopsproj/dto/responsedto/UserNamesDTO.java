@@ -2,11 +2,9 @@ package com.example.devopsproj.dto.responsedto;
 
 import com.example.devopsproj.model.User;
 import lombok.*;
-
-import com.example.devopsproj.model.User;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+
 
 @NoArgsConstructor
 @AllArgsConstructor

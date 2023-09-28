@@ -1,9 +1,14 @@
 package com.example.devopsproj.dto.requestdto;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
-import lombok.Data;
+import lombok.*;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
+@Setter
+@Getter
 public class UserCreationDTO {
     private Long id;
     private String name;

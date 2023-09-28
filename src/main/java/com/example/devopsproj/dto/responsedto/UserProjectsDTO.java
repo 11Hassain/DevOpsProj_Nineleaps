@@ -3,17 +3,16 @@ package com.example.devopsproj.dto.responsedto;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
+@ToString
 @Setter
+@Getter
 public class UserProjectsDTO {
 
     @Positive(message = "userId should be a positive number")

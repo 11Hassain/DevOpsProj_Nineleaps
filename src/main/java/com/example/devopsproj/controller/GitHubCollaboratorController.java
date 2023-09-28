@@ -16,7 +16,6 @@ public class GitHubCollaboratorController {
     private static final String INVALID_TOKEN = "Invalid Token";
 
     // Add a collaborator to a GitHub repository.
-    // Add a collaborator to a GitHub repository.
     @PostMapping("/add")
     public ResponseEntity<String> addCollaborator(@RequestBody CollaboratorDTO collaboratorDTO) {
         collaboratorService.addCollaborator(collaboratorDTO);
