@@ -49,10 +49,14 @@ public interface UserService {
     List<UserDTO> getAllUsers();
 
     List<ProjectDTO> getAllProjectsAndRepositoriesByUserId(Long userId);
+    String deleteUserById(Long userId);
+
 
     List<Project> getUsersByRoleAndUserId(Long userId, EnumRole userRole);
 
     UserDTO loginVerification(String email);
 
     String userLogout(Long id);
+    List<ProjectDTO> getProjectsByRoleIdAndUserId(Long userId, String role);
+
 }

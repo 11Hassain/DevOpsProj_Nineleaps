@@ -1,15 +1,10 @@
 package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
-import com.example.devopsproj.dto.responsedto.ProjectDTO;
-import com.example.devopsproj.model.GitRepository;
+import com.example.devopsproj.dto.responsedto.*;
+import com.example.devopsproj.model.*;
 import com.example.devopsproj.repository.UserRepository;
 import com.example.devopsproj.dto.requestdto.UserCreationDTO;
-import com.example.devopsproj.dto.responsedto.GitRepositoryDTO;
-import com.example.devopsproj.dto.responsedto.UserDTO;
-import com.example.devopsproj.dto.responsedto.UserProjectsDTO;
-import com.example.devopsproj.model.Project;
-import com.example.devopsproj.model.User;
 
 import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.service.interfaces.IUserService;
@@ -74,15 +69,16 @@ public class UserServiceImpl implements IUserService, UserService {
         return userRepository.findById(id);
     }
 
-    //this function says whether id is soft-deleted or not
+
+
     @Override
     public boolean existsByIdIsDeleted(Long id) {
         Optional<User> checkUser = userRepository.findById(id);
-        if (checkUser.isEmpty()){
+        if (checkUser.isEmpty()) {
             return true;
         }
         User cuser = checkUser.get();
-        return cuser.getDeleted(); //true if deleted=1, false otherwise
+        return cuser.getDeleted(); // true if deleted=1, false otherwise
     }
 
     //Soft deleting the user
@@ -232,6 +228,25 @@ public class UserServiceImpl implements IUserService, UserService {
     }
 
     @Override
+    public String deleteUserById(Long userId) {
+            Optional<User> userOptional = userRepository.findById(userId);
+
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+                if (user.getDeleted()) {
+                    return "User doesn't exist";
+                } else {
+                    boolean isDeleted = softDeleteUser(userId);
+                    return isDeleted ? "User successfully deleted" : "404 Not found";
+                }
+            } else {
+                return "Invalid user ID";
+            }
+        }
+
+
+
+    @Override
     public List<Project> getUsersByRoleAndUserId(Long userId, EnumRole userRole) {
         return userRepository.findByRoleAndUserId(userId, userRole);
     }
@@ -271,6 +286,35 @@ public class UserServiceImpl implements IUserService, UserService {
             return "Log out unsuccessful";
         }
     }
+
+    @Override
+    public List<ProjectDTO> getProjectsByRoleIdAndUserId(Long userId, String role) {
+        EnumRole userRole = EnumRole.valueOf(role.toUpperCase()); // Getting value of role(string)
+        List<Project> projects = getUsersByRoleAndUserId(userId, userRole);
+
+        return projects.stream()
+                .map(project -> {
+                    List<GitRepositoryDTO> repositoryDTOList = project.getRepositories().stream()
+                            .map(repository -> new GitRepositoryDTO(repository.getName(), repository.getDescription()))
+                            .collect(Collectors.toList());
+                    Figma figma = project.getFigma();
+                    String figmaURL = figma != null ? figma.getFigmaURL() : null; // Retrieve the Figma URL
+                    FigmaDTO figmaDTO = new FigmaDTO(figmaURL);
+                    GoogleDrive googleDrive = project.getGoogleDrive();
+                    String driveLink = googleDrive != null ? googleDrive.getDriveLink() : null; // Retrieve the driveLink
+
+                    return new ProjectDTO(
+                            project.getProjectId(),
+                            project.getProjectName(),
+                            project.getProjectDescription(),
+                            repositoryDTOList,
+                            figmaDTO,
+                            new GoogleDriveDTO(driveLink) // Pass the GoogleDriveDTO object with driveLink value
+                    );
+                })
+                .toList();
+    }
+
 
 
     //-------------IUService-----------
