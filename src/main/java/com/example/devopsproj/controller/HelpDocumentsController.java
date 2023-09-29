@@ -1,14 +1,13 @@
 package com.example.devopsproj.controller;
 
 import com.example.devopsproj.dto.responsedto.HelpDocumentsDTO;
+import com.example.devopsproj.exceptions.NotFoundException;
 import com.example.devopsproj.model.HelpDocuments;
 import com.example.devopsproj.service.implementations.HelpDocumentsServiceImpl;
 import com.example.devopsproj.service.implementations.JwtServiceImpl;
-import com.example.devopsproj.repository.HelpDocumentsRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,7 +28,6 @@ import java.util.Optional;
 public class HelpDocumentsController {
 
     private final HelpDocumentsServiceImpl helpDocumentsServiceImpl;
-    private final HelpDocumentsRepository helpDocumentsRepository;
     private final JwtServiceImpl jwtServiceImpl;
 
     private static final String INVALID_TOKEN = "Invalid Token";
@@ -77,21 +75,16 @@ public class HelpDocumentsController {
                                              @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            List<HelpDocuments> pdfFiles = helpDocumentsRepository.findAll();
-            List<HelpDocumentsDTO> fileInfos = pdfFiles.stream()
-                    .filter(pdfFile -> pdfFile != null && pdfFile.getProject() != null && pdfFile.getProject().getProjectId() == projectId)
-                    .map(pdfFile -> new HelpDocumentsDTO(pdfFile.getHelpDocumentId(), pdfFile.getFileName()))
-                    .filter(helpDoc -> helpDoc.getFileName() != null) // Filter out any remaining null file names
-                    .toList();
-            if (fileInfos.isEmpty()) {
-                return ResponseEntity.notFound().build();
+            try{
+                List<HelpDocumentsDTO> fileInfos = helpDocumentsServiceImpl.getAllDocumentsByProjectId(projectId);
+                return ResponseEntity.ok().body(fileInfos);
+            }catch (NotFoundException e){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No PDF files found");
             }
-            return ResponseEntity.ok().body(fileInfos);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
     }
-
 
     @GetMapping("/files/{fileName}")
     @Operation(
@@ -107,7 +100,7 @@ public class HelpDocumentsController {
                                              @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if (isTokenValid) {
-            HelpDocuments pdfFile = helpDocumentsRepository.findByFileName(fileName);
+            HelpDocuments pdfFile = helpDocumentsServiceImpl.getPdfFile(fileName);
             if (pdfFile == null) {
                 return ResponseEntity.notFound().build();
             }

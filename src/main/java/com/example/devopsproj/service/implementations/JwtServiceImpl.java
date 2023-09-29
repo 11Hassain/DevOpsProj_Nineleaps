@@ -22,6 +22,7 @@ import java.util.function.Function;
 @Service
 @RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
+
     private final UserRepository userRepository;
 
     private static final String SECRET_KEY =System.getenv("JWT_SECRET_KEY");

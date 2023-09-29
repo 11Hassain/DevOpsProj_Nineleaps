@@ -1,5 +1,6 @@
 package com.example.devopsproj.service.implementations;
 
+import com.example.devopsproj.exceptions.NotFoundException;
 import com.example.devopsproj.model.HelpDocuments;
 import com.example.devopsproj.dto.responsedto.HelpDocumentsDTO;
 import com.example.devopsproj.model.Project;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -55,6 +58,20 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
     }
 
     @Override
+    public List<HelpDocumentsDTO> getAllDocumentsByProjectId(Long projectId){
+        List<HelpDocuments> pdfFiles = helpDocumentsRepository.findAll();
+        List<HelpDocumentsDTO> fileInfos = pdfFiles.stream()
+                .filter(pdfFile -> pdfFile != null && pdfFile.getProject() != null && Objects.equals(pdfFile.getProject().getProjectId(), projectId))
+                .map(pdfFile -> new HelpDocumentsDTO(pdfFile.getHelpDocumentId(), pdfFile.getFileName()))
+                .filter(helpDoc -> helpDoc.getFileName() != null) // Filter out any remaining null file names
+                .toList();
+        if (fileInfos.isEmpty()) {
+            throw new NotFoundException("Files Not Found");
+        }
+        return fileInfos;
+    }
+
+    @Override
     public Optional<HelpDocumentsDTO> getDocumentById(Long fileId){
         Optional<HelpDocuments> helpDocuments = helpDocumentsRepository.findById(fileId);
         if (helpDocuments.isPresent()){
@@ -66,6 +83,11 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
         } else {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public HelpDocuments getPdfFile(String fileName) {
+        return helpDocumentsRepository.findByFileName(fileName);
     }
 
     @Override

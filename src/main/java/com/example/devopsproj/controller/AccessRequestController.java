@@ -41,7 +41,6 @@ public class AccessRequestController {
             AccessRequestDTO accessRequestDTO1 = accessRequestServiceImpl.createRequest(accessRequestDTO);
             if (accessRequestDTO1 == null){
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid RequestDTO");
-
             }
             return ResponseEntity.ok(accessRequestDTO1);
         } else {
@@ -201,11 +200,11 @@ public class AccessRequestController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> deleteAllNotifications(@RequestHeader("AccessToken") String accessToken){
+    public ResponseEntity<Object> deleteAllNotifications(@RequestHeader("AccessToken") String accessToken){
         boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if(isTokenValid){
             accessRequestServiceImpl.clearAllNotifications();
-            return ResponseEntity.ok("All notifications cleared");
+            return ResponseEntity.noContent().build();
         }else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }

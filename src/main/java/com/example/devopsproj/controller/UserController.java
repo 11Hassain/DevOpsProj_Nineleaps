@@ -2,10 +2,7 @@ package com.example.devopsproj.controller;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.dto.responsedto.*;
-import com.example.devopsproj.model.Figma;
-import com.example.devopsproj.model.GoogleDrive;
 import com.example.devopsproj.dto.requestdto.UserCreationDTO;
-import com.example.devopsproj.model.Project;
 import com.example.devopsproj.model.User;
 import com.example.devopsproj.service.implementations.JwtServiceImpl;
 import com.example.devopsproj.service.implementations.UserServiceImpl;
@@ -20,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -261,36 +257,16 @@ public class UserController {
             @PathVariable("role") String role,
             @RequestHeader("AccessToken") String accessToken) {
         boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            EnumRole userRole = EnumRole.valueOf(role.toUpperCase()); // Getting value of role(string)
-            List<Project> projects = userServiceImpl.getUsersByRoleAndUserId(userId, userRole);
-            if (projects.isEmpty()){
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-            List<ProjectDTO> projectDTOList = projects.stream()
-                    .map(project -> {
-                        List<GitRepositoryDTO> repositoryDTOList = project.getRepositories().stream()
-                                .map(repository -> new GitRepositoryDTO( repository.getName(), repository.getDescription()))
-                                .collect(Collectors.toList());
-                        Figma figma = project.getFigma();
-                        String figmaURL = figma != null ? figma.getFigmaURL() : null; // Retrieve the Figma URL
-                        FigmaDTO figmaDTO = new FigmaDTO(figmaURL);
-                        GoogleDrive googleDrive = project.getGoogleDrive();
-                        String driveLink = googleDrive != null ? googleDrive.getDriveLink() : null; // Retrieve the driveLink
-
-                        return new ProjectDTO(
-                                project.getProjectId(),
-                                project.getProjectName(),
-                                project.getProjectDescription(),
-                                repositoryDTOList,
-                                figmaDTO,
-                                new GoogleDriveDTO(driveLink) // Pass the GoogleDriveDTO object with driveLink value
-                        );
-                    })
-                    .toList();
-            return new ResponseEntity<>(projectDTOList, HttpStatus.OK);
-        } else {
+        if (!isTokenValid) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
+        }
+
+        ResponseEntity<Object> response = userServiceImpl.getProjectsByRoleAndUserId(userId, role);
+
+        if (response.getStatusCode() == HttpStatus.OK) {
+            return ResponseEntity.ok().body(response.getBody());
+        } else {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No Projects Found");
         }
     }
 

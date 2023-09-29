@@ -1,7 +1,6 @@
 package com.example.devopsproj.utils;
 
 import com.example.devopsproj.dto.responsedto.ProjectDTO;
-import com.example.devopsproj.dto.responsedto.ProjectUserDTO;
 import com.example.devopsproj.model.Project;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -9,12 +8,7 @@ import org.mockito.Mock;
 
 import java.lang.reflect.Constructor;
 
-import static org.mockito.Mockito.when;
-
 class DTOModelMapperTest {
-
-    @Mock
-    private DTOModelMapper dtoModelMapper;
 
     // ----- SUCCESS -----
 

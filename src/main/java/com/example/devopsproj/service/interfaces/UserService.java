@@ -5,8 +5,8 @@ import com.example.devopsproj.dto.requestdto.UserCreationDTO;
 import com.example.devopsproj.dto.responsedto.ProjectDTO;
 import com.example.devopsproj.dto.responsedto.UserDTO;
 import com.example.devopsproj.dto.responsedto.UserProjectsDTO;
-import com.example.devopsproj.model.Project;
 import com.example.devopsproj.model.User;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
@@ -50,7 +50,7 @@ public interface UserService {
 
     List<ProjectDTO> getAllProjectsAndRepositoriesByUserId(Long userId);
 
-    List<Project> getUsersByRoleAndUserId(Long userId, EnumRole userRole);
+    ResponseEntity<Object> getProjectsByRoleAndUserId(Long userId, String role);
 
     UserDTO loginVerification(String email);
 

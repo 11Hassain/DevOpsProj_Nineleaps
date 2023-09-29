@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 public interface HelpDocumentsService {
@@ -15,7 +16,11 @@ public interface HelpDocumentsService {
 
     String getFileExtension(MultipartFile file);
 
+    List<HelpDocumentsDTO> getAllDocumentsByProjectId(Long projectId);
+
     Optional<HelpDocumentsDTO> getDocumentById(Long fileId);
+
+    HelpDocuments getPdfFile(String fileName);
 
     void deleteDocument(Long fileId);
 }

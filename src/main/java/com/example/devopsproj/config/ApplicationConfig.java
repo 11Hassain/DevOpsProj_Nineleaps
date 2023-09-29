@@ -1,5 +1,6 @@
 package com.example.devopsproj.config;
 
+import com.example.devopsproj.dto.responsedto.CollaboratorDTO;
 import com.example.devopsproj.repository.UserRepository;
 import com.example.devopsproj.utils.GitHubUserValidation;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,11 @@ public class ApplicationConfig {
     @Bean
     public GitHubUserValidation gitHubUserValidation(){
         return new GitHubUserValidation();
+    }
+
+    @Bean
+    public CollaboratorDTO collaboratorDTO() {
+        return new CollaboratorDTO();
     }
 
     @Bean

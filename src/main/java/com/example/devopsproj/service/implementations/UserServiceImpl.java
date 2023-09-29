@@ -1,15 +1,10 @@
 package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
-import com.example.devopsproj.dto.responsedto.ProjectDTO;
-import com.example.devopsproj.model.GitRepository;
+import com.example.devopsproj.dto.responsedto.*;
+import com.example.devopsproj.model.*;
 import com.example.devopsproj.repository.UserRepository;
 import com.example.devopsproj.dto.requestdto.UserCreationDTO;
-import com.example.devopsproj.dto.responsedto.GitRepositoryDTO;
-import com.example.devopsproj.dto.responsedto.UserDTO;
-import com.example.devopsproj.dto.responsedto.UserProjectsDTO;
-import com.example.devopsproj.model.Project;
-import com.example.devopsproj.model.User;
 import com.example.devopsproj.otp.otpservice.IUserService;
 import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.service.interfaces.UserService;
@@ -17,6 +12,8 @@ import com.example.devopsproj.utils.JwtUtils;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -233,8 +230,34 @@ public class UserServiceImpl implements IUserService, UserService {
     }
 
     @Override
-    public List<Project> getUsersByRoleAndUserId(Long userId, EnumRole userRole) {
-        return userRepository.findByRoleAndUserId(userId, userRole);
+    public ResponseEntity<Object> getProjectsByRoleAndUserId(Long userId, String role){
+        EnumRole userRole = EnumRole.valueOf(role.toUpperCase()); // Getting value of role(string)
+        List<Project> projects = userRepository.findByRoleAndUserId(userId, userRole);
+        if (projects.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        List<ProjectDTO> projectDTOList = projects.stream()
+                .map(project -> {
+                    List<GitRepositoryDTO> repositoryDTOList = project.getRepositories().stream()
+                            .map(repository -> new GitRepositoryDTO( repository.getName(), repository.getDescription()))
+                            .collect(Collectors.toList());
+                    Figma figma = project.getFigma();
+                    String figmaURL = figma != null ? figma.getFigmaURL() : null; // Retrieve the Figma URL
+                    FigmaDTO figmaDTO = new FigmaDTO(figmaURL);
+                    GoogleDrive googleDrive = project.getGoogleDrive();
+                    String driveLink = googleDrive != null ? googleDrive.getDriveLink() : null; // Retrieve the driveLink
+
+                    return new ProjectDTO(
+                            project.getProjectId(),
+                            project.getProjectName(),
+                            project.getProjectDescription(),
+                            repositoryDTOList,
+                            figmaDTO,
+                            new GoogleDriveDTO(driveLink) // Pass the GoogleDriveDTO object with driveLink value
+                    );
+                })
+                .toList();
+        return new ResponseEntity<>(projectDTOList, HttpStatus.OK);
     }
 
     @Override
