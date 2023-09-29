@@ -93,7 +93,7 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
     }
 
     @Override
-    public ResponseEntity<Object> downloadPdfFile(String fileName) {
+    public ResponseEntity<byte[]> downloadPdfFile(String fileName) {
         HelpDocuments pdfFile = helpDocumentsRepository.findByFileName(fileName);
         if (pdfFile == null) {
             return ResponseEntity.notFound().build();
@@ -108,14 +108,6 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
                 .body(pdfFile.getData());
     }
 
-    private ResponseEntity<GoogleDriveDTO> mapToGoogleDriveDTO(GoogleDrive googleDrive) {
-        GoogleDriveDTO googleDriveDTO = new GoogleDriveDTO(
-                new ProjectDTO(googleDrive.getProject().getProjectId(), googleDrive.getProject().getProjectName()),
-                googleDrive.getDriveLink(),
-                googleDrive.getDriveId()
-        );
-        return ResponseEntity.ok(googleDriveDTO);
-    }
 
 
 

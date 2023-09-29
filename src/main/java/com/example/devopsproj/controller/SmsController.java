@@ -1,14 +1,12 @@
 package com.example.devopsproj.controller;
 
-import com.example.devopsproj.commons.enumerations.EnumRole;
-import com.example.devopsproj.model.User;
-import com.example.devopsproj.otp.OTPDTO.JwtResponse;
+
 import com.example.devopsproj.otp.OTPDTO.SmsPojo;
 import com.example.devopsproj.otp.OTPDTO.StoreOTP;
 import com.example.devopsproj.otp.OTPDTO.TempOTP;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+
 
 import com.example.devopsproj.service.interfaces.IUserService;
 import com.example.devopsproj.service.implementations.SmsService;
@@ -51,43 +49,6 @@ public class SmsController {
         return new ResponseEntity<>("OTP sent", HttpStatus.OK);
     }
 
-    // Endpoint to resend an SMS.
-    @PostMapping("/resend")
-    public ResponseEntity<String> smsSub(@RequestBody SmsPojo resendsms) {
-        try {
-            // Call the service to resend the SMS.
-            service.send(resendsms);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        // Notify via WebSocket that the SMS has been sent again.
-        webSocket.convertAndSend(TOPIC_DESTINATION, getTimeStamp() + ": SMS has been sent " + resendsms.getPhoneNumber());
-        return new ResponseEntity<>("OTP sent", HttpStatus.OK);
-    }
-
-    // Endpoint to verify OTP and generate an access token.
-    @PostMapping("/verify/token")
-    public ResponseEntity<Object> verifyOTP(@RequestBody TempOTP tempOTP, HttpServletResponse response) throws Exception {
-
-        if (tempOTP.getOtp() == StoreOTP.getOtp()) {
-            SmsPojo sms = new SmsPojo(); // Instantiate the SmsPojo class
-            String phoneNumber = sms.getPhoneNumber(); // Get the phone number from SmsPojo
-            User user = userservice.getUserViaPhoneNumber(phoneNumber);
-
-            if (user != null) {
-                String email = user.getEmail();
-                String accessToken = generateToken(email, phoneNumber, response);
-
-                JwtResponse jwtResponse = new JwtResponse();
-                jwtResponse.setAccessToken(accessToken);
-                return ResponseEntity.ok(jwtResponse);
-            } else {
-                return ResponseEntity.ok("User not found");
-            }
-        } else {
-            return ResponseEntity.ok("Incorrect OTP");
-        }
-    }
 
     // Endpoint to verify OTP during signup.
     @PostMapping("/verify")
@@ -98,29 +59,6 @@ public class SmsController {
         } else {
             return false;
         }
-    }
-
-    // Generate a JWT token with claims.
-    public String generateToken(String email, String phoneNumber, HttpServletResponse response) throws IOException {
-        User userDtls = userservice.getUserByMail(email.trim());
-        Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY.getBytes());
-        Set<EnumRole> roles = Collections.singleton(userDtls.getEnumRole());
-
-        // Extract role names as strings
-        List<String> roleNames = new ArrayList<>();
-        for (EnumRole role : roles) {
-            roleNames.add(role.toString());
-        }
-
-        // Convert the List<String> to a comma-separated string
-        String rolesString = String.join(",", roleNames);
-        return JWT.create()
-                .withSubject(email)
-                .withClaim("phoneNumber", phoneNumber) // Add phone number claim
-                .withClaim("roles", rolesString)
-                .withClaim("userId", userDtls.getId())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 10)) // Set token expiration time
-                .sign(algorithm);
     }
 
     // Helper method to get the current timestamp.

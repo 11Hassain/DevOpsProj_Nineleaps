@@ -1,161 +1,131 @@
 package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
-import com.example.devopsproj.dto.requestdto.UserCreationDTO;
-import com.example.devopsproj.dto.responsedto.*;
+import com.example.devopsproj.dto.responsedto.ProjectDTO;
 import com.example.devopsproj.model.GitRepository;
+import com.example.devopsproj.repository.UserRepository;
+import com.example.devopsproj.dto.requestdto.UserCreationDTO;
+import com.example.devopsproj.dto.responsedto.GitRepositoryDTO;
+import com.example.devopsproj.dto.responsedto.UserDTO;
+import com.example.devopsproj.dto.responsedto.UserProjectsDTO;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.model.User;
+
 import com.example.devopsproj.repository.ProjectRepository;
-import com.example.devopsproj.repository.UserRepository;
 import com.example.devopsproj.service.interfaces.IUserService;
-import com.example.devopsproj.service.interfaces.JwtService;
-import com.example.devopsproj.service.interfaces.ProjectService;
+import com.example.devopsproj.service.interfaces.UserService;
 import com.example.devopsproj.utils.JwtUtils;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements IUserService {
+public class UserServiceImpl implements IUserService, UserService {
 
     private final UserRepository userRepository;
-
-    private final ProjectService projectService;
-
-    private final JwtService jwtService;
-
+    private final ProjectServiceImpl projectServiceImpl;
+    private final JwtServiceImpl jwtServiceImpl;
     private final JwtUtils jwtUtils;
-
     private final ProjectRepository projectRepository;
-
     private final ModelMapper modelMapper;
 
 
-    // Save a new user to the repository.
+    //implementing user creation using DTO pattern
+    @Override
     public User saveUser(@RequestBody UserCreationDTO userCreationDTO) {
-        // Create a new User instance.
         User user = new User();
-
-        // Set user properties from the DTO.
         user.setId(userCreationDTO.getId());
         user.setName(userCreationDTO.getName());
         user.setEmail(userCreationDTO.getEmail());
         user.setEnumRole(userCreationDTO.getEnumRole());
-
-        // Set the last updated and last logout timestamps.
         user.setLastUpdated(LocalDateTime.now());
         user.setLastLogout(LocalDateTime.now());
-
-        // Save the user to the repository.
         return userRepository.save(user);
     }
 
-    // Update an existing user's information.
+    @Override
     public UserDTO updateUser(Long id, UserDTO userDTO) {
-        // Attempt to find the user by ID.
         Optional<User> optionalUser = userRepository.findById(id);
-
         if (optionalUser.isPresent()) {
-            // User found, update their information.
             User existingUser = optionalUser.get();
             existingUser.setName(userDTO.getName());
             existingUser.setEnumRole(userDTO.getEnumRole());
             existingUser.setLastUpdated(LocalDateTime.now());
-
-            // Save the updated user to the repository.
             User updatedUser = userRepository.save(existingUser);
-
-            // Create and return a UserDTO with the updated information.
             return new UserDTO(updatedUser.getName(), updatedUser.getEnumRole(), updatedUser.getLastUpdated());
         } else {
-            // User not found, throw an exception.
             throw new EntityNotFoundException("User not found" + id);
         }
     }
 
-    // Find a user by their user ID.
+    //find user by user id
+    @Override
     public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
     }
 
-    // Check if a user with the given ID has been soft-deleted.
+    //this function says whether id is soft-deleted or not
+    @Override
     public boolean existsByIdIsDeleted(Long id) {
         Optional<User> checkUser = userRepository.findById(id);
-
-        if (checkUser.isPresent()) {
-            User cuser = checkUser.get();
-            return cuser.getDeleted(); // true if deleted=1, false otherwise
-        } else {
-            return false; // User with the given ID does not exist
+        if (checkUser.isEmpty()){
+            return true;
         }
+        User cuser = checkUser.get();
+        return cuser.getDeleted(); //true if deleted=1, false otherwise
     }
 
-    // Soft delete a user by setting their deleted status to true.
+    //Soft deleting the user
+    @Override
     public boolean softDeleteUser(Long id) {
         try {
             userRepository.softDelete(id);
-            return true; // Setting deleted=1 / true
+            return true; //setting deleted=1 / true
         } catch (Exception e) {
-            return false; // Keeping deleted false
+            return false; //keeping deleted false
         }
     }
 
-    // Check if a user with the given ID exists.
+    @Override
     public boolean existsById(Long id) {
         return userRepository.existsById(id);
     }
 
-    // Get a list of users with a specific role.
+    //get all user based on role id
+    @Override
     public List<User> getUsersByRole(EnumRole enumRole) {
         return userRepository.findByRole(enumRole);
     }
 
-    // Convert a User object to a UserDTO.
-    private UserDTO convertToUserDto(User user) {
-        UserDTO userDTO = modelMapper.map(user, UserDTO.class);
-        return userDTO;
-    }
 
-    // Find a user by their email address.
-    public User getUserByEmail(String userEmail) {
-        return userRepository.findByEmail(userEmail);
-    }
-
-    // Get the count of all users.
+    @Override
     public Integer getCountAllUsers() {
         return userRepository.countAllUsers();
     }
 
-    // Get the count of users with a specific role.
+    @Override
     public Integer getCountAllUsersByRole(EnumRole role) {
         return userRepository.countAllUsersByRole(role);
     }
 
     @Override
     public Integer getCountAllUsersByProjectId(Long projectId) {
-        return null;
+        Integer countUsers = projectRepository.countAllUsersByProjectId(projectId);
+        // Handle the case where countUsers is null or 0
+        return countUsers != null ? countUsers : 0;
     }
 
-    // Get the count of users associated with a specific project by project ID.
-//    public Integer getCountAllUsersByProjectId(Long projectId) {
-//        Optional<Project> project = projectService.getProjectById(projectId);
-//        if (project.isPresent()) {
-//            return userRepository.countAllUsersByProjectId(projectId);
-//        } else {
-//            return 0;
-//        }
-//    }
-
-    // Get a list of users with associated project names.
+    @Override
     public List<UserProjectsDTO> getAllUsersWithProjects() {
         List<User> users = userRepository.findAllUsers();
         List<UserProjectsDTO> userProjectsDTOs = new ArrayList<>();
@@ -163,17 +133,15 @@ public class UserService implements IUserService {
         for (User user : users) {
             List<Project> projects = user.getProjects();
 
-            // Remove any projects that are marked as deleted.
+            // Remove any projects that are marked as deleted
             List<Project> existingProjects = projects.stream()
                     .filter(project -> !project.getDeleted())
-                    .collect(Collectors.toList());
+                    .toList();
 
-            // Extract project names.
             List<String> projectNames = existingProjects.stream()
                     .map(Project::getProjectName)
                     .collect(Collectors.toList());
 
-            // Create a UserProjectsDTO for the user.
             UserProjectsDTO userProjectsDTO = new UserProjectsDTO(user.getId(), user.getName(), projectNames);
             userProjectsDTOs.add(userProjectsDTO);
         }
@@ -181,10 +149,7 @@ public class UserService implements IUserService {
         return userProjectsDTOs;
     }
 
-
-
-
-    // Get a list of users with a specific role and not associated with a specific project.
+    @Override
     public List<UserDTO> getAllUsersWithoutProjects(EnumRole role, Long projectId) {
         List<User> users = userRepository.findAllUsersByRole(role);
         List<UserDTO> userDTOs = new ArrayList<>();
@@ -192,8 +157,7 @@ public class UserService implements IUserService {
         for (User user : users) {
             List<Project> projects = user.getProjects();
 
-            // Check if the user is not associated with the specified project.
-            if (projects.stream().noneMatch(project -> project.getProjectId() == projectId)) {
+            if (projects.stream().noneMatch(project -> Objects.equals(project.getProjectId(), projectId))) {
                 UserDTO userDTO = new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole());
                 userDTOs.add(userDTO);
             }
@@ -201,7 +165,7 @@ public class UserService implements IUserService {
         return userDTOs;
     }
 
-    // Get a list of users with multiple associated projects.
+    @Override
     public List<UserProjectsDTO> getUsersWithMultipleProjects() {
         List<UserProjectsDTO> allUsersWithProjects = getAllUsersWithProjects();
         List<UserProjectsDTO> usersWithMultipleProjects = new ArrayList<>();
@@ -210,15 +174,17 @@ public class UserService implements IUserService {
             List<String> projectNames = userProjectsDTO.getProjectNames();
             List<String> validProjectNames = new ArrayList<>();
 
+            // Check if each project exists in the database
             for (String projectName : projectNames) {
-                // Check if the project exists.
                 if (projectExists(projectName)) {
                     validProjectNames.add(projectName);
                 }
             }
 
+            // Update the UserProjectsDTO with valid project names
             userProjectsDTO.setProjectNames(validProjectNames);
 
+            // Add the UserProjectsDTO to the list if it has multiple projects
             if (validProjectNames.size() > 1) {
                 usersWithMultipleProjects.add(userProjectsDTO);
             }
@@ -227,23 +193,22 @@ public class UserService implements IUserService {
         return usersWithMultipleProjects;
     }
 
-    // Check if a project with the given name exists.
-    private boolean projectExists(String projectName) {
+    @Override
+    public boolean projectExists(String projectName) {
         List<Project> projects = projectRepository.findAllProjects();
         return projects.stream()
                 .anyMatch(project -> project.getProjectName().equals(projectName));
     }
 
-    // Get a list of all users.
+    @Override
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
-        List<UserDTO> userDTOList = users.stream()
+        return users.stream()
                 .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
                 .toList();
-        return userDTOList;
     }
 
-    // Get a list of all projects and repositories associated with a user by user ID.
+    @Override
     public List<ProjectDTO> getAllProjectsAndRepositoriesByUserId(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
@@ -266,16 +231,16 @@ public class UserService implements IUserService {
         return projectDTOs;
     }
 
-    // Get a list of projects with a specific role and associated with a user by user ID.
+    @Override
     public List<Project> getUsersByRoleAndUserId(Long userId, EnumRole userRole) {
         return userRepository.findByRoleAndUserId(userId, userRole);
     }
 
-    // Verify user login and generate a JWT token.
+    @Override
     public UserDTO loginVerification(String email) {
         UserDTO userDTO = new UserDTO();
         User user = userRepository.existsByEmail(email);
-        if (user == null) {
+        if(user == null){
             return null;
         }
         user.setLastUpdated(LocalDateTime.now());
@@ -285,23 +250,24 @@ public class UserService implements IUserService {
         userDTO.setEmail(user.getEmail());
         userDTO.setEnumRole(user.getEnumRole());
         userDTO.setLastUpdated(user.getLastUpdated());
-
-        // Generate a JWT token and save it.
-        String jwtToken = jwtService.generateToken(user);
-        jwtUtils.saveUserToken(user, jwtToken);
+        //generate token
+        String jwtToken = jwtServiceImpl.generateToken(user);
+        jwtUtils.saveUserToken(user,jwtToken);
         userDTO.setToken(jwtToken);
         return userDTO;
     }
 
-    // Log out a user by updating their last logout timestamp.
-    public String userLogout(Long id) {
+
+
+    @Override
+    public String userLogout(Long id){
         Optional<User> optionalUser = userRepository.findById(id);
-        if (optionalUser.isPresent()) {
+        if(optionalUser.isPresent()){
             User user = optionalUser.get();
             user.setLastLogout(LocalDateTime.now());
             userRepository.save(user);
             return "User logged out successfully";
-        } else {
+        }else{
             return "Log out unsuccessful";
         }
     }
@@ -321,3 +287,5 @@ public class UserService implements IUserService {
 
 
 }
+
+

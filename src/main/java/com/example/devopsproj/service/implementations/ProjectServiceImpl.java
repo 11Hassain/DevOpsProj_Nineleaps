@@ -364,18 +364,16 @@ public class ProjectServiceImpl implements ProjectService {
     public List<ProjectNamePeopleCountDTO> getCountAllPeopleAndProjectName() {
         List<Project> projects = projectRepository.findAllProjects();
         List<ProjectNamePeopleCountDTO> peopleCountDTOS = new ArrayList<>();
+        for (Project project : projects){
+            ProjectNamePeopleCountDTO peopleCountDTO = new ProjectNamePeopleCountDTO();
 
-        if (!projects.isEmpty()) {
-            for (Project project : projects) {
-                ProjectNamePeopleCountDTO peopleCountDTO = new ProjectNamePeopleCountDTO();
-                Integer count = projectRepository.countAllUsersByProjectId(project.getProjectId());
-                peopleCountDTO.setProjectId(project.getProjectId());
-                peopleCountDTO.setProjectName(project.getProjectName());
-                peopleCountDTO.setCountPeople(count);
-                peopleCountDTOS.add(peopleCountDTO);
-            }
+            Integer count = projectRepository.countAllUsersByProjectId(project.getProjectId());
+
+            peopleCountDTO.setProjectId(project.getProjectId());
+            peopleCountDTO.setProjectName(project.getProjectName());
+            peopleCountDTO.setCountPeople(count);
+            peopleCountDTOS.add(peopleCountDTO);
         }
-
         return peopleCountDTOS;
     }
 

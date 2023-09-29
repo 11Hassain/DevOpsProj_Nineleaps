@@ -44,8 +44,13 @@ public class ProjectController {
     @GetMapping("/{id}")
     public ResponseEntity<Object> getProjectById(@PathVariable("id") Long id) {
         ProjectDTO projectDTO = projectService.getProjectById(id);
-        return new ResponseEntity<>(projectDTO, HttpStatus.OK);
+        if (projectDTO != null) {
+            return new ResponseEntity<>(projectDTO, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
+
 
 
     // Get a list of all projects.
@@ -216,7 +221,12 @@ public class ProjectController {
     @GetMapping("/{projectId}/details")
     public ResponseEntity<Object> getProjectDetailsById(@PathVariable Long projectId) {
         ProjectDTO projectDetails = projectService.getProjectDetailsById(projectId);
-        return new ResponseEntity<>(projectDetails, HttpStatus.OK);
+
+        if (projectDetails != null) {
+            return new ResponseEntity<>(projectDetails, HttpStatus.OK);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }

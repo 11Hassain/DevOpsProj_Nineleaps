@@ -1,6 +1,7 @@
 package com.example.devopsproj.controller;
 
 import com.example.devopsproj.service.interfaces.IUserService;
+import com.example.devopsproj.service.interfaces.UserService;
 import com.example.devopsproj.utils.JwtUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,8 @@ import java.io.IOException;
 @RequestMapping("/auth/api/v1")
 public class AuthController {
 
-    private final IUserService userService;
+    private final IUserService iUserService;
+    private final UserService userService;
 
     // Get email from a custom "emailToVerify" header.
     @GetMapping("/get-email")

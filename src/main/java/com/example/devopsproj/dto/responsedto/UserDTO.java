@@ -9,9 +9,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import lombok.*;
-
-import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -71,7 +68,7 @@ public class UserDTO {
         this.gitHubUsername = gitHubUsername;
     }
 
-    public UserDTO(Long id, String name, String email, EnumRole enumRole, LocalDateTime lastUpdated) {
+    public UserDTO(Long id, String name, String email) {
         this.id = id;
         this.name = name;
         this.email = email;

@@ -8,8 +8,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.example.devopsproj")
 public class DevOpsProjApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(DevOpsProjApplication.class, args);

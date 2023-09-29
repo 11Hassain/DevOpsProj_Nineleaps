@@ -10,10 +10,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import lombok.*;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -44,7 +40,7 @@ public class ProjectDTO {
     private String helpDocuments;
 
 
-    public ProjectDTO(Long projectId, String projectName, String projectDescription, List<GitRepositoryDTO> repositories, FigmaDTO figma, GoogleDriveDTO googleDrive) {
+    public ProjectDTO(Long projectId, String projectName, String projectDescription, List<GitRepositoryDTO> repositories, boolean b, FigmaDTO figma, GoogleDriveDTO googleDrive, boolean b1, Object o, Object object) {
         this.projectId = projectId;
         this.projectName = projectName;
         this.projectDescription = projectDescription;
@@ -77,7 +73,7 @@ public class ProjectDTO {
         this.lastUpdated = lastUpdated;
         this.status = status;
     }
-    public ProjectDTO(Long projectId, String projectName) {
+    public ProjectDTO(Long projectId, String projectName, String projectDescription, List<GitRepositoryDTO> repositoryDTOList, FigmaDTO figmaDTO, GoogleDriveDTO googleDriveDTO) {
         this.projectId = projectId;
         this.projectName = projectName;
     }
@@ -98,5 +94,8 @@ public class ProjectDTO {
         this.figma = figma;
         this.googleDrive = googleDrive;
         this.lastUpdated = lastUpdated;
+    }
+
+    public ProjectDTO(Long projectId, String projectName) {
     }
 }

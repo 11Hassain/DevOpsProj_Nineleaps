@@ -6,6 +6,7 @@ import com.example.devopsproj.model.GoogleDrive;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.repository.GoogleDriveRepository;
 import com.example.devopsproj.service.interfaces.GoogleDriveService;
+import com.example.devopsproj.service.interfaces.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.util.Optional;
 public class GoogleDriveServiceImpl implements GoogleDriveService {
 
     private final GoogleDriveRepository googleDriveRepository;
+    private final ProjectService projectService;
 
 
     // Create a new Google Drive entry
@@ -80,6 +82,7 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
 
 
 
+    // Get a Google Drive entry by its associated Project ID
     // Get a Google Drive entry by its associated Project ID
     @Override
     public ResponseEntity<GoogleDriveDTO> getGoogleDriveByProjectId(Long projectId) {
