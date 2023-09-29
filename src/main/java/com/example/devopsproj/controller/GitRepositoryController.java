@@ -145,7 +145,7 @@ public class GitRepositoryController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> deleteRepository(
             @PathVariable Long repoId,
-            @RequestHeader(value = "AccessToken", required = false) String accessToken
+            @RequestHeader("AccessToken") String accessToken
     ) {
         boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
         if(isTokenValid) {
