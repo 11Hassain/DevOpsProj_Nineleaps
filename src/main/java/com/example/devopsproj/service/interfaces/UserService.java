@@ -32,6 +32,9 @@ public interface UserService {
     //get all user based on role id
     List<User> getUsersByRole(EnumRole enumRole);
 
+    List<UserDTO> getUserDTOsByRole(EnumRole role);
+
+
     Integer getCountAllUsers();
 
     Integer getCountAllUsersByRole(EnumRole role);

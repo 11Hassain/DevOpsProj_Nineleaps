@@ -3,10 +3,7 @@ package com.example.devopsproj.controller;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.dto.responsedto.*;
-import com.example.devopsproj.model.Figma;
-import com.example.devopsproj.model.GoogleDrive;
 import com.example.devopsproj.dto.requestdto.UserCreationDTO;
-import com.example.devopsproj.model.Project;
 import com.example.devopsproj.model.User;
 
 import com.example.devopsproj.service.implementations.UserServiceImpl;
@@ -20,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -74,13 +70,10 @@ public class UserController {
 
 
 
-    @GetMapping("/role/{role}") // Get list of users by role
+    @GetMapping("/role/{role}")
     public ResponseEntity<Object> getUserByRoleId(@PathVariable("role") String role) {
-        EnumRole userRole = EnumRole.valueOf(role.toUpperCase()); // getting value of role(string)
-        List<User> users = userServiceImpl.getUsersByRole(userRole);
-        List<UserDTO> userDTOList = users.stream()
-                .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole(), user.getLastUpdated(), user.getLastLogout()))
-                .toList();
+        EnumRole userRole = EnumRole.valueOf(role.toUpperCase());
+        List<UserDTO> userDTOList = userServiceImpl.getUserDTOsByRole(userRole);
         return new ResponseEntity<>(userDTOList, HttpStatus.OK);
     }
 

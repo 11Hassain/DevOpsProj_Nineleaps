@@ -103,6 +103,22 @@ public class UserServiceImpl implements IUserService, UserService {
         return userRepository.findByRole(enumRole);
     }
 
+    @Override
+    public List<UserDTO> getUserDTOsByRole(EnumRole role) {
+            List<User> users = userRepository.findByEnumRole(role);
+
+            return users.stream()
+                    .map(user -> new UserDTO(
+                            user.getId(),
+                            user.getName(),
+                            user.getEmail(),
+                            user.getEnumRole(),
+                            user.getLastUpdated(),
+                            user.getLastLogout()))
+                    .collect(Collectors.toList());
+        }
+
+
 
     @Override
     public Integer getCountAllUsers() {

@@ -57,4 +57,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findByPhoneNumber(String phoneNumber);
 
+    List<User> findByEnumRole(EnumRole enumRole);
+
+
 }
