@@ -54,19 +54,7 @@ public class SmsService {
         this.phoneNumber = phoneNumber;
     }
 
-//    public void resend(SmsPojo resendsms) throws ParseException{
-//        Twilio.init(ACCOUNT_SID,AUTH_TOKEN);
-//        int min = 100000;
-//        int max = 999999;
-//        int number  = (int)(Math.random()*(max-min +1)+min);
-//        String msg = "Your OTP is - "+number+" . Please enter the OTP. Do not share it with anyone. Thank you!";
-//        Message newmessage = Message.creator(new PhoneNumber(resendsms.getPhoneNumber()),new PhoneNumber(FROM_NUMBER),msg)
-//                .create();
-//        StoreOTP.setOtp(number);
-//    }
 
-//    public void recieve (MultiValueMap<String,String> smscallback){
-//    }
     public String getTimeStamp() {
         return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now());
     }

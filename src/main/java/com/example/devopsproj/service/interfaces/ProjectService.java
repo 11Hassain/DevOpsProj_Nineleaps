@@ -25,13 +25,19 @@ public interface ProjectService {
 
     Project updateProject(Project updatedProject);
 
-//    List<User> getAllUsersByProjectId(Long projectId); // Add this method
+    //    List<User> getAllUsersByProjectId(Long projectId); // Add this method
     List<UserDTO> getAllUsersByProjectId(Long projectId);
+
     List<UserDTO> getAllUsersByProjectIdAndRole(Long projectId, EnumRole role);
+
     ProjectDTO updateProject(Long projectId, ProjectDTO projectDTO);
+
     ResponseEntity<String> deleteProject(Long id);
+
     ResponseEntity<Object> addUserToProject(Long projectId, Long userId);
+
     ResponseEntity<String> removeUserFromProject(Long projectId, Long userId);
+
     ResponseEntity<String> removeUserFromProjectAndRepo(Long projectId, Long userId, CollaboratorDTO collaboratorDTO);
 
     boolean existsByIdIsDeleted(Long id);
@@ -59,6 +65,7 @@ public interface ProjectService {
     Integer getCountAllInActiveProjects();
 
     List<UserDTO> getUsersByProjectIdAndRole(Long projectId, String role);
+
     ResponseEntity<Object> addRepositoryToProject(Long projectId, Long repoId);
 
 
@@ -70,4 +77,7 @@ public interface ProjectService {
     ProjectDTO getProjectDetailsById(Long projectId);
 
     ProjectDTO mapProjectToProjectDTO(Project project);
+
+    Project mapProjectDTOToProject(ProjectDTO projectDTO);
+
 }

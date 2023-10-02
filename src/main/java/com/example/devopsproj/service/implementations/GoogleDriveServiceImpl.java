@@ -20,8 +20,6 @@ import java.util.Optional;
 public class GoogleDriveServiceImpl implements GoogleDriveService {
 
     private final GoogleDriveRepository googleDriveRepository;
-    private final ProjectService projectService;
-
 
     // Create a new Google Drive entry
     @Override
@@ -110,7 +108,7 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
     }
 
     // Add the missing method to map ProjectDTO to Project
-    private Project mapProjectDTOToProject(ProjectDTO projectDTO) {
+    public Project mapProjectDTOToProject(ProjectDTO projectDTO) {
         Project project = new Project();
         project.setProjectId(projectDTO.getProjectId());
         project.setProjectName(projectDTO.getProjectName());

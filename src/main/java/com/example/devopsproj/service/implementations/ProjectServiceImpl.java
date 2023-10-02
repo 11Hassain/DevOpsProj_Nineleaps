@@ -15,6 +15,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import com.example.devopsproj.model.Project;
+import com.example.devopsproj.dto.responsedto.ProjectDTO;
+
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -527,4 +530,14 @@ public class ProjectServiceImpl implements ProjectService {
         projectDTO.setProjectName(project.getProjectName());
         return projectDTO;
     }
+
+    @Override
+    public Project mapProjectDTOToProject(ProjectDTO projectDTO) {
+        Project project = new Project();
+        project.setProjectId(projectDTO.getProjectId());
+        project.setProjectName(projectDTO.getProjectName());
+        // Map other properties as needed
+        return project;
+    }
+
 }

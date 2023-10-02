@@ -3,6 +3,7 @@ package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.dto.responsedto.UserNamesDTO;
+import com.example.devopsproj.exceptions.CustomGenericException;
 import com.example.devopsproj.exceptions.DuplicateUsernameException;
 import com.example.devopsproj.exceptions.GitHubUserNotFoundException;
 import com.example.devopsproj.model.UserNames;
@@ -43,10 +44,9 @@ public class UserNamesServiceImpl implements UserNamesService {
             throw new DuplicateUsernameException("Username already exists");
         } catch (Exception e) {
             // Handle other exceptions generically or as needed.
-            throw new RuntimeException("An error occurred", e);
+            throw new CustomGenericException("An error occurred", e);
         }
     }
-
 
     // Get a list of GitHub usernames by their role
     @Override
@@ -56,6 +56,6 @@ public class UserNamesServiceImpl implements UserNamesService {
         // Extract the usernames and return them as a list of strings
         return userNamesList.stream()
                 .map(UserNames::getUsername)
-                .collect(Collectors.toList());
+                .toList(); // Use Stream.toList() for a simpler alternative
     }
 }

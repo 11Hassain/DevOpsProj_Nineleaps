@@ -1,9 +1,5 @@
 package com.example.devopsproj.service.implementations;
-
-import com.example.devopsproj.dto.responsedto.GoogleDriveDTO;
 import com.example.devopsproj.dto.responsedto.HelpDocumentsDTO;
-import com.example.devopsproj.dto.responsedto.ProjectDTO;
-import com.example.devopsproj.model.GoogleDrive;
 import com.example.devopsproj.model.HelpDocuments;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.repository.GoogleDriveRepository;
@@ -12,17 +8,15 @@ import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.service.interfaces.HelpDocumentsService;
 import com.example.devopsproj.service.interfaces.ProjectService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -58,7 +52,6 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
 
     // Extract and return the file extension from a multipart file
     @Override
-
     public String getFileExtension(MultipartFile file) {
         try {
             String originalFilename = file.getOriginalFilename();
@@ -83,7 +76,7 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
                 .filter(pdfFile -> pdfFile != null && pdfFile.getProject() != null && pdfFile.getProject().getProjectId() == projectId)
                 .map(pdfFile -> new HelpDocumentsDTO(pdfFile.getHelpDocumentId(), pdfFile.getFileName()))
                 .filter(helpDoc -> helpDoc.getFileName() != null) // Filter out any remaining null file names
-                .collect(Collectors.toList());
+                .toList(); // Replace .collect(Collectors.toList()) with .toList()
 
         if (fileInfos.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -101,7 +94,13 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", fileName);
+
+        // Set the Content-Disposition header with the correct format
+        headers.setContentDisposition(
+                ContentDisposition.builder("attachment")
+                        .filename(fileName, StandardCharsets.UTF_8) // Ensure proper encoding
+                        .build()
+        );
 
         return ResponseEntity.ok()
                 .headers(headers)
