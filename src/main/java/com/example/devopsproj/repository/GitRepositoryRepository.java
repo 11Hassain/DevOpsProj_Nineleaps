@@ -25,4 +25,6 @@ public interface GitRepositoryRepository extends JpaRepository<GitRepository, Lo
 
     Optional<GitRepository> findByRepoId(Long repoId);
 
+
+
 }

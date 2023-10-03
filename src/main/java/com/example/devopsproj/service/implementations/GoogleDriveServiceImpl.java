@@ -79,8 +79,6 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
     }
 
 
-
-    // Get a Google Drive entry by its associated Project ID
     // Get a Google Drive entry by its associated Project ID
     @Override
     public ResponseEntity<GoogleDriveDTO> getGoogleDriveByProjectId(Long projectId) {

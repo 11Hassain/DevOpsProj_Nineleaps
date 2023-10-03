@@ -38,4 +38,17 @@ public class GitRepository {
     public Long getRepoId() {
         return repoId;
     }
+    public GitRepository(String name) {
+        this.name = name;
+        // Initialize other properties as needed
+    }
+    public GitRepository(Long repoId, String name, String description) {
+        this.repoId = repoId;
+        this.name = name;
+        this.description = description;
+        // Initialize other properties as needed
+    }
+
+
 }
+

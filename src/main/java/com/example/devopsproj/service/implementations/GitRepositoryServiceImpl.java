@@ -81,13 +81,12 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
         // Retrieve all Git repositories from the local repository
         List<GitRepository> gitRepositories = gitRepositoryRepository.findAll();
 
-        // Convert the GitRepository entities to GitRepositoryDTOs
-        List<GitRepositoryDTO> gitRepositoriesDTO = gitRepositories.stream()
+        // Convert the GitRepository entities to GitRepositoryDTOs and return the result directly
+        return gitRepositories.stream()
                 .map(this::convertToDto)
-                .collect(Collectors.toList());
-
-        return gitRepositoriesDTO;
+                .toList(); // Use Stream.toList() for simplicity
     }
+
 
     // Delete a Git repository by its ID
     @Override
@@ -167,12 +166,14 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
     public List<GitRepositoryDTO> getAllReposByRole(EnumRole enumRole) {
         // Retrieve Git repositories by role from the local repository
         List<GitRepository> gitRepositories = gitRepositoryRepository.findAllByRole(enumRole);
-        // Convert the GitRepository entities to GitRepositoryDTOs
-        List<GitRepositoryDTO> gitRepositoryDTOS = gitRepositories.stream()
+
+        // Convert the GitRepository entities to GitRepositoryDTOs and return the result directly
+        return gitRepositories.stream()
                 .map(repository -> new GitRepositoryDTO(repository.getRepoId(), repository.getName(), repository.getDescription()))
-                .collect(Collectors.toList());
-        return gitRepositoryDTOS;
+                .toList(); // Use Stream.toList() for simplicity
     }
+
+
 
     // Get a Git repository by its ID
     @Override
