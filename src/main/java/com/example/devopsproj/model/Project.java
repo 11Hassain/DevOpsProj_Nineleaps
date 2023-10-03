@@ -73,4 +73,13 @@ public class Project {
         this.projectName = projectName;
     }
 
+    public Project(Long projectId, String projectName, String projectDescription, LocalDateTime lastUpdated, boolean deleted) {
+        this.projectId = projectId;
+        this.projectName = projectName;
+        this.projectDescription = projectDescription;
+        this.lastUpdated = lastUpdated;
+        this.deleted = deleted;
+    }
+
+
 }

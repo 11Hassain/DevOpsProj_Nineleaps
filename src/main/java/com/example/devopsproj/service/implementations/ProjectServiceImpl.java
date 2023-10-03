@@ -145,28 +145,21 @@ public class ProjectServiceImpl implements ProjectService {
     // Get all users associated with a project by its ID and role
     @Override
     public List<UserDTO> getAllUsersByProjectIdAndRole(Long projectId, EnumRole role) {
-        try {
-            List<User> users = projectRepository.findAllUsersByProjectIdAndRole(projectId, role);
+        List<User> users = projectRepository.findAllUsersByProjectIdAndRole(projectId, role);
 
-            if (users.isEmpty()) {
-                throw new NotFoundException("No users found for project with ID: " + projectId + " and role: " + role);
-            }
-
-            return users.stream()
-                    .map(user -> {
-                        UserNames usernames = user.getUserNames();
-                        String username = (usernames != null) ? usernames.getUsername() : null;
-                        return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole(), username);
-                    })
-                    .collect(Collectors.toList());
-        } catch (IllegalArgumentException e) {
-            // Handle the case where an invalid role is provided.
-            throw new IllegalArgumentException("Invalid role provided.");
-        } catch (Exception e) {
-            // Handle other exceptions.
-            throw new RuntimeException("Internal server error.");
+        if (users.isEmpty()) {
+            throw new NotFoundException("No users found for project with ID: " + projectId + " and role: " + role);
         }
+
+        return users.stream()
+                .map(user -> {
+                    UserNames usernames = user.getUserNames();
+                    String username = (usernames != null) ? usernames.getUsername() : null;
+                    return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole(), username);
+                })
+                .collect(Collectors.toList());
     }
+
 
     @Override
     public ProjectDTO updateProject(Long projectId, ProjectDTO projectDTO) {
@@ -192,25 +185,27 @@ public class ProjectServiceImpl implements ProjectService {
 
 
 
-    // Check if a project with the given ID exists and is soft-deleted
     @Override
     public ResponseEntity<String> deleteProject(Long id) {
-        if (existsProjectById(id)) {
-            boolean isDeleted = existsByIdIsDeleted(id);
-            if (isDeleted) {
-                return ResponseEntity.ok("Project doesn't exist");
+        Optional<Project> optionalProject = projectRepository.findById(id);
+
+        if (optionalProject.isPresent()) {
+            Project existingProject = optionalProject.get();
+
+            if (!existingProject.getDeleted()) { // Check if it's not soft-deleted
+                existingProject.setDeleted(true);
+                existingProject.setLastUpdated(LocalDateTime.now());
+                projectRepository.save(existingProject);
+                return ResponseEntity.ok("Deleted project successfully");
             } else {
-                boolean softDeleteResult = softDeleteProject(id);
-                if (softDeleteResult) {
-                    return ResponseEntity.ok("Deleted project successfully");
-                } else {
-                    throw new RuntimeException("Failed to delete project with ID " + id);
-                }
+                return ResponseEntity.ok("Project doesn't exist");
             }
         } else {
-            throw new NotFoundException("Invalid project ID: " + id);
+            throw new NotFoundException("Project with ID " + id + " not found");
         }
     }
+
+
 
     @Override
     public ResponseEntity<Object> addUserToProject(Long projectId, Long userId) {
@@ -410,11 +405,12 @@ public class ProjectServiceImpl implements ProjectService {
     public List<UserDTO> getUsersByProjectIdAndRole(Long projectId, String role) {
         EnumRole userRole = EnumRole.valueOf(role.toUpperCase());
         List<User> users = projectRepository.findUsersByProjectIdAndRole(projectId, userRole);
-        List<UserDTO> userDTOList = users.stream()
+        return users.stream()
                 .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
-                .collect(Collectors.toList());
-        return userDTOList;
+                .toList(); // Use Stream.toList() to collect the stream elements into a List
     }
+
+
 
     @Override
     public ResponseEntity<Object> addRepositoryToProject(Long projectId, Long repoId) {

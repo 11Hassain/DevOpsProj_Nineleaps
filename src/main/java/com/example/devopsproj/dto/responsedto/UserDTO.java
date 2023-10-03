@@ -4,6 +4,7 @@ import com.example.devopsproj.commons.enumerations.EnumRole;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -84,4 +85,21 @@ public class UserDTO {
         this.lastUpdated = lastUpdated;
         this.lastLogout = lastLogout;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, email, enumRole);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserDTO userDTO = (UserDTO) o;
+        return Objects.equals(id, userDTO.id) &&
+                Objects.equals(name, userDTO.name) &&
+                Objects.equals(email, userDTO.email) &&
+                enumRole == userDTO.enumRole;
+    }
+
 }

@@ -3,6 +3,7 @@ package com.example.devopsproj.service.implementations;
 import com.example.devopsproj.dto.responsedto.FigmaDTO;
 import com.example.devopsproj.dto.responsedto.FigmaScreenshotDTO;
 import com.example.devopsproj.dto.responsedto.ProjectDTO;
+import com.example.devopsproj.exceptions.FigmaCreationException;
 import com.example.devopsproj.exceptions.FigmaNotFoundException;
 import com.example.devopsproj.exceptions.FigmaServiceException;
 import com.example.devopsproj.exceptions.UnauthorizedException;
@@ -25,11 +26,11 @@ public class FigmaServiceImpl implements FigmaService {
 
     private final FigmaRepository figmaRepository;
     private final ProjectRepository projectRepository;
-    private final JwtServiceImpl jwtService;
+
 
     // Create a new Figma project
     @Override
-    public Figma createFigma(FigmaDTO figmaDTO) throws DataIntegrityViolationException {
+    public Figma createFigma(FigmaDTO figmaDTO) throws FigmaCreationException {
         // Create a new Figma object and populate it with data from the DTO
         Figma figma = new Figma();
         figma.setProject(mapProjectDTOToProject(figmaDTO.getProjectDTO()));
@@ -39,10 +40,12 @@ public class FigmaServiceImpl implements FigmaService {
             // Save the new Figma project to the repository
             return figmaRepository.save(figma);
         } catch (DataIntegrityViolationException e) {
-            throw new DataIntegrityViolationException("Could not create figma");
+            // If there's a specific data integrity violation related to Figma creation,
+            // you can catch it and rethrow it as your custom exception.
+            throw new FigmaCreationException("Could not create Figma", e);
         } catch (Exception e) {
             // Handle any other exceptions that may occur and rethrow them as needed
-            throw new RuntimeException("An error occurred while creating figma", e);
+            throw new FigmaCreationException("An error occurred while creating Figma", e);
         }
     }
 
@@ -53,19 +56,15 @@ public class FigmaServiceImpl implements FigmaService {
     @Override
     public List<Figma> getAllFigmaProjects() {
         try {
-            // Retrieve all active projects
-            List<Project> activeProjects = projectRepository.findAllProjects();
-
-            // Map each active project to its associated Figma project and collect them in a list
-            List<Figma> figmaProjects = activeProjects.stream()
+            // Retrieve all active projects, map them to their associated Figma projects, and return as a list
+            return projectRepository.findAllProjects().stream()
                     .map(Project::getFigma)
-                    .collect(Collectors.toList());
-
-            return figmaProjects;
+                    .toList(); // Use Stream.toList() for simplicity
         } catch (Exception e) {
             throw new FigmaServiceException("An error occurred while retrieving Figma projects", e);
         }
     }
+
 
 
 
@@ -114,17 +113,18 @@ public class FigmaServiceImpl implements FigmaService {
             Map<String, String> screenshotImagesByUser = figma.getScreenshotImagesByUser();
             if (screenshotImagesByUser == null) {
                 screenshotImagesByUser = new HashMap<>();
+                figma.setScreenshotImagesByUser(screenshotImagesByUser); // Set the map back to the Figma object
             }
 
             // Add the screenshot image for the specified user.
             screenshotImagesByUser.put(user, figmaDTO.getScreenshotImage());
-            figma.setScreenshotImagesByUser(screenshotImagesByUser);
 
             figmaRepository.save(figma);
         } else {
             throw new FigmaNotFoundException("Figma not found for ID: " + figmaId);
         }
     }
+
 
     @Override
     public List<FigmaScreenshotDTO> getScreenshotsForFigmaId(Long figmaId) {
