@@ -191,12 +191,18 @@ public class UserServiceImpl implements IUserService, UserService {
         return usersWithMultipleProjects;
     }
 
+
     @Override
     public boolean projectExists(String projectName) {
         List<Project> projects = projectRepository.findAllProjects();
-        return projects.stream()
-                .anyMatch(project -> project.getProjectName().equals(projectName));
+        for (Project project : projects) {
+            if (project.getProjectName().equals(projectName)) {
+                return true;
+            }
+        }
+        return false;
     }
+
 
     @Override
     public List<UserDTO> getAllUsers() {
@@ -303,8 +309,8 @@ public class UserServiceImpl implements IUserService, UserService {
     }
 
     @Override
-    public User getUserByMail(String userMai) {
-        return userRepository.findByEmail(userMai);
+    public User getUserByMail(String userMail) {
+        return userRepository.findByEmail(userMail);
     }
 
 

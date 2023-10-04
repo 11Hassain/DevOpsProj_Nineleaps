@@ -19,6 +19,8 @@ public interface ProjectService {
 
     List<ProjectWithUsersDTO> getAllProjectsWithUsers();
 
+    ResponseEntity<Object> addRepositoryToProject(Long projectId, Long repoId);
+
     List<Project> getAll();
 
     List<Project> getAllProjects();

@@ -10,6 +10,8 @@ import com.example.devopsproj.model.*;
 import com.example.devopsproj.service.interfaces.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -29,9 +31,11 @@ public class ProjectServiceImpl implements ProjectService {
     private final GitHubCollaboratorServiceImpl collaboratorService;
     private final CollaboratorDTO collaboratorDTO;
 
+    private final Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
 
     @Override
     public ProjectDTO createProject(ProjectDTO projectDTO) {
+
         Project project = new Project();
         project.setProjectId(projectDTO.getProjectId());
         project.setProjectName(projectDTO.getProjectName());
@@ -70,8 +74,6 @@ public class ProjectServiceImpl implements ProjectService {
             return new ResponseEntity<>(projectDTO, HttpStatus.OK);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -102,6 +104,7 @@ public class ProjectServiceImpl implements ProjectService {
         return projectsWithUsers;
     }
 
+    @Override
     public ResponseEntity<Object> addRepositoryToProject(Long projectId, Long repoId){
         Optional<Project> optionalProject = projectRepository.findById(projectId);
         Optional<GitRepository> optionalGitRepository = gitRepositoryRepository.findById(repoId);
@@ -353,7 +356,7 @@ public class ProjectServiceImpl implements ProjectService {
                 projectRepository.save(project);
                 List<UserDTO> userDTOList = project.getUsers().stream()
                         .map(users -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
-                        .collect(Collectors.toList());
+                        .toList();
                 ProjectUserDTO projectUserDTO = new ProjectUserDTO(project.getProjectId(), project.getProjectName(), project.getProjectDescription(), userDTOList);
                 return new ResponseEntity<>(projectUserDTO, HttpStatus.OK);
             } else {

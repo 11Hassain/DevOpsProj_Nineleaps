@@ -98,16 +98,6 @@ class ProjectControllerTest {
     }
 
     @Test
-    void testGetProjectById_ValidToken_BadRequest() {
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.getProject(anyLong())).thenThrow(new IllegalArgumentException());
-
-        ResponseEntity<Object> response = projectController.getProjectById(1L, "valid-access-token");
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    }
-
-    @Test
     void testGetAll_ValidToken_ProjectsFound() {
         when(jwtService.isTokenTrue(anyString())).thenReturn(true);
 

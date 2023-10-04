@@ -78,8 +78,6 @@ public class ProjectController {
             return projectServiceImpl.getProject(id);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
