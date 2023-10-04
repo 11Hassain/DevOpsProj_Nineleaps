@@ -73,10 +73,19 @@ public class FigmaController {
 
             List<FigmaDTO> figmaDTOs = figmaProjects.stream()
                     .filter(Objects::nonNull) // Filter out null values
-                    .map(figma -> new FigmaDTO(
-                            figma.getFigmaId(),
-                            DTOModelMapper.mapProjectToProjectDTO(figma.getProject()),
-                            figma.getFigmaURL()))
+                    .map(figma -> {
+                        if (figma.getProject() != null) {
+                            return new FigmaDTO(
+                                    figma.getFigmaId(),
+                                    DTOModelMapper.mapProjectToProjectDTO(figma.getProject()),
+                                    figma.getFigmaURL());
+                        } else {
+                            return new FigmaDTO(
+                                    figma.getFigmaId(),
+                                    null, // Handle the case where Project is null
+                                    figma.getFigmaURL());
+                        }
+                    })
                     .toList();
 
             return ResponseEntity.ok(figmaDTOs);
@@ -150,9 +159,15 @@ public class FigmaController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> deleteFigma(@PathVariable Long figmaId) {
-        figmaServiceImpl.deleteFigma(figmaId);
-        return ResponseEntity.ok("Figma deleted successfully");
+    public ResponseEntity<String> deleteFigma(@PathVariable Long figmaId,
+                                              @RequestHeader("AccessToken") String accessToken) {
+        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
+        if (isTokenValid) {
+            figmaServiceImpl.deleteFigma(figmaId);
+            return ResponseEntity.ok("Figma deleted successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
+        }
     }
 
     @GetMapping("/project/{projectId}")

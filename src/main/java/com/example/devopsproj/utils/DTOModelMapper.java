@@ -12,16 +12,22 @@ public class DTOModelMapper {
     }
 
     public static ProjectDTO mapProjectToProjectDTO(Project project) {
-        ProjectDTO projectDTO = new ProjectDTO();
-        projectDTO.setProjectId(project.getProjectId());
-        projectDTO.setProjectName(project.getProjectName());
-        return projectDTO;
+        if (project != null) {
+            ProjectDTO projectDTO = new ProjectDTO();
+            projectDTO.setProjectId(project.getProjectId());
+            projectDTO.setProjectName(project.getProjectName());
+            return projectDTO;
+        }
+        return null;
     }
 
     public static Project mapProjectDTOToProject(ProjectDTO projectDTO) {
-        Project project = new Project();
-        project.setProjectId(projectDTO.getProjectId());
-        project.setProjectName(projectDTO.getProjectName());
-        return project;
+        if (projectDTO != null) {
+            Project project = new Project();
+            project.setProjectId(projectDTO.getProjectId());
+            project.setProjectName(projectDTO.getProjectName());
+            return project;
+        }
+        return null;
     }
 }
