@@ -30,6 +30,7 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
         return googleDriveRepository.findAll();
     }
 
+    @Override
     public Optional<GoogleDriveDTO> getGoogleDriveById(Long driveId) {
         Optional<GoogleDrive> optionalGoogleDrive = googleDriveRepository.findById(driveId);
         return optionalGoogleDrive.map(this::mapGoogleDriveToDTO);
@@ -51,7 +52,7 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
         return googleDriveRepository.findGoogleDriveByProjectId(projectId);
     }
 
-    private GoogleDriveDTO mapGoogleDriveToDTO(GoogleDrive googleDrive) {
+    public GoogleDriveDTO mapGoogleDriveToDTO(GoogleDrive googleDrive) {
         return new GoogleDriveDTO(DTOModelMapper.mapProjectToProjectDTO(googleDrive.getProject()), googleDrive.getDriveLink(), googleDrive.getDriveId());
     }
 

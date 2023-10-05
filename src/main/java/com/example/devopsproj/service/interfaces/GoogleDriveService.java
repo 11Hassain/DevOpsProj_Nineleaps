@@ -11,6 +11,8 @@ public interface GoogleDriveService {
 
     List<GoogleDrive> getAllGoogleDrives();
 
+    Optional<GoogleDriveDTO> getGoogleDriveById(Long driveId);
+
     boolean deleteGoogleDriveById(Long driveId);
 
     Optional<GoogleDrive> getGoogleDriveByProjectId(Long projectId);
