@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +39,6 @@ public class UserNamesServiceImpl implements UserNamesService {
         List<UserNames> userNamesList = userNamesRepository.findByUserRole(role);
         return userNamesList.stream()
                 .map(UserNames::getUsername)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

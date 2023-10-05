@@ -47,8 +47,6 @@ class UserServiceImplTest {
     @Mock
     private ProjectRepository projectRepository;
     @Mock
-    private ModelMapper modelMapper;
-    @Mock
     private JwtServiceImpl jwtService;
     @Mock
     private JwtUtils jwtUtils;
