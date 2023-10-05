@@ -41,13 +41,11 @@ public class TokenExchangeController {
     )
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> tokenExchange(@RequestParam("code") String authorizationCode) {
-
         String clientId = System.getenv("GOOGLE_CLIENT_ID");
         String clientSecret = System.getenv("GOOGLE_SECRET_KEY");
         String redirectUri = "https://www.google.com/";
 
-        try(CloseableHttpClient httpClient = HttpClients.createDefault()){
-
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             // Construct token endpoint URL
             String tokenEndpointUrl = "https://oauth2.googleapis.com/token";
 
@@ -74,10 +72,9 @@ public class TokenExchangeController {
 
             return ResponseEntity.ok(responseBody);
 
-        } catch (IOException e){
+        } catch (IOException e) {
             logger.error("An error occurred: ", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
         }
-
     }
 }
