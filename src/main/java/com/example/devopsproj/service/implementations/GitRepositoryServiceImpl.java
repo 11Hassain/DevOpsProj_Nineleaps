@@ -133,7 +133,7 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
     // ---- Other methods ------
 
 
-    private GitRepositoryDTO convertToDto(GitRepository gitRepository) {
+    public GitRepositoryDTO convertToDto(GitRepository gitRepository) {
         // Perform the mapping logic from GitRepository to GitRepositoryDTO
         GitRepositoryDTO gitRepositoryDTO = new GitRepositoryDTO();
         gitRepositoryDTO.setRepoId(gitRepository.getRepoId());
