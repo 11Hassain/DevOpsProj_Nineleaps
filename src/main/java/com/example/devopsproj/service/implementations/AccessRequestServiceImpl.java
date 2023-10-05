@@ -3,10 +3,8 @@ package com.example.devopsproj.service.implementations;
 import com.example.devopsproj.dto.responsedto.ProjectDTO;
 import com.example.devopsproj.dto.responsedto.UserDTO;
 import com.example.devopsproj.model.AccessRequest;
-import com.example.devopsproj.model.User;
 import com.example.devopsproj.dto.requestdto.AccessRequestDTO;
 import com.example.devopsproj.dto.responsedto.AccessResponseDTO;
-import com.example.devopsproj.model.Project;
 import com.example.devopsproj.repository.AccessRequestRepository;
 import com.example.devopsproj.service.interfaces.AccessRequestService;
 import com.example.devopsproj.service.interfaces.JwtService;
@@ -30,21 +28,49 @@ public class AccessRequestServiceImpl implements AccessRequestService {
 
     @Override
     public AccessRequestDTO createRequest(AccessRequestDTO accessRequestDTO) {
-        AccessRequest accessRequest = mapDTOToAccessRequest(accessRequestDTO);
-        accessRequestRepository.save(accessRequest);
-        return mapAccessRequestToDTO(accessRequest);
+        AccessRequest accessRequest = new AccessRequest();
+        accessRequest.setAccessRequestId(accessRequestDTO.getAccessRequestId());
+        accessRequest.setPmName(accessRequestDTO.getPmName());
+
+        // Save the AccessRequest directly
+        AccessRequest savedAccessRequest = accessRequestRepository.save(accessRequest);
+
+        // Create an AccessRequestDTO from the saved entity
+        AccessRequestDTO createdRequestDTO = new AccessRequestDTO();
+        createdRequestDTO.setAccessRequestId(savedAccessRequest.getAccessRequestId());
+        createdRequestDTO.setPmName(savedAccessRequest.getPmName());
+
+        return createdRequestDTO;
     }
 
     @Override
     public List<AccessRequestDTO> getAllRequests() {
         List<AccessRequest> accessRequestList = accessRequestRepository.findAll();
-        return mapAccessRequestListToDTOList(accessRequestList);
+        List<AccessRequestDTO> accessRequestDTOList = new ArrayList<>();
+
+        for (AccessRequest accessRequest : accessRequestList) {
+            AccessRequestDTO accessRequestDTO = new AccessRequestDTO();
+            accessRequestDTO.setAccessRequestId(accessRequest.getAccessRequestId());
+            accessRequestDTO.setPmName(accessRequest.getPmName());
+
+            accessRequestDTOList.add(accessRequestDTO);
+        }
+        return accessRequestDTOList;
     }
 
     @Override
     public List<AccessRequestDTO> getAllActiveRequests() {
         List<AccessRequest> accessRequestList = accessRequestRepository.findAllActiveRequests();
-        return mapAccessRequestListToDTOList(accessRequestList);
+        List<AccessRequestDTO> accessRequestDTOList = new ArrayList<>();
+
+        for (AccessRequest accessRequest : accessRequestList) {
+            AccessRequestDTO accessRequestDTO = new AccessRequestDTO();
+            accessRequestDTO.setAccessRequestId(accessRequest.getAccessRequestId());
+            accessRequestDTO.setPmName(accessRequest.getPmName());
+
+            accessRequestDTOList.add(accessRequestDTO);
+        }
+        return accessRequestDTOList;
     }
 
     @Override
@@ -57,7 +83,31 @@ public class AccessRequestServiceImpl implements AccessRequestService {
             accessRequestRepository.save(existingAccessRequest);
         }
         List<AccessRequest> accessRequests = accessRequestRepository.findAllActiveRequests();
-        return mapAccessRequestListToResponseDTOList(accessRequests);
+
+        // Create a list of AccessResponseDTO objects directly
+        List<AccessResponseDTO> accessResponseDTOList = new ArrayList<>();
+        for (AccessRequest accessRequest : accessRequests) {
+            AccessResponseDTO accessResponseDTO = new AccessResponseDTO();
+            accessResponseDTO.setAccessRequestId(accessRequest.getAccessRequestId());
+            accessResponseDTO.setPmName(accessRequest.getPmName());
+            accessResponseDTO.setAccessDescription(accessRequest.getRequestDescription());
+            accessResponseDTO.setAllowed(accessRequest.isAllowed());
+
+            ProjectDTO projectDTO = new ProjectDTO();
+            projectDTO.setProjectId(accessRequest.getProject().getProjectId());
+            projectDTO.setProjectName(accessRequest.getProject().getProjectName());
+
+            UserDTO userDTO = new UserDTO();
+            userDTO.setId(accessRequest.getUser().getId());
+            userDTO.setName(accessRequest.getUser().getName());
+            userDTO.setEmail(accessRequest.getUser().getEmail());
+
+            accessResponseDTO.setProject(projectDTO);
+            accessResponseDTO.setUser(userDTO);
+
+            accessResponseDTOList.add(accessResponseDTO);
+        }
+        return accessResponseDTOList;
     }
 
     private static final String RESPONSE = "Request for adding ";
@@ -92,7 +142,6 @@ public class AccessRequestServiceImpl implements AccessRequestService {
             accessResponseDTO.setNotified(accessRequest.isPmNotified());
             accessResponseDTOList.add(accessResponseDTO);
         }
-
         return accessResponseDTOList;
     }
 
@@ -110,43 +159,6 @@ public class AccessRequestServiceImpl implements AccessRequestService {
     @Transactional
     public void clearAllNotifications(){
         accessRequestRepository.deleteAll();
-    }
-
-
-    //Other methods...
-
-    private AccessRequestDTO mapAccessRequestToDTO(AccessRequest accessRequest) {
-        return modelMapper.map(accessRequest, AccessRequestDTO.class);
-    }
-
-    private List<AccessRequestDTO> mapAccessRequestListToDTOList(List<AccessRequest> accessRequestList) {
-        return accessRequestList.stream()
-                .map(this::mapAccessRequestToDTO)
-                .toList();
-    }
-
-    private List<AccessResponseDTO> mapAccessRequestListToResponseDTOList(List<AccessRequest> accessRequestList) {
-        return accessRequestList.stream()
-                .map(accessRequest -> new AccessResponseDTO(
-                        accessRequest.getAccessRequestId(),
-                        accessRequest.getPmName(),
-                        mapUserToUserDTO(accessRequest.getUser()),
-                        mapProjectToProjectDTO(accessRequest.getProject()),
-                        accessRequest.getRequestDescription(),
-                        accessRequest.isAllowed()))
-                .toList();
-    }
-
-    private UserDTO mapUserToUserDTO(User user) {
-        return modelMapper.map(user, UserDTO.class);
-    }
-
-    private ProjectDTO mapProjectToProjectDTO(Project project) {
-        return modelMapper.map(project, ProjectDTO.class);
-    }
-
-    private AccessRequest mapDTOToAccessRequest(AccessRequestDTO accessRequestDTO) {
-        return modelMapper.map(accessRequestDTO, AccessRequest.class);
     }
 
 }
