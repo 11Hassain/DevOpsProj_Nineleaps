@@ -38,7 +38,7 @@ public class AccessRequestControllerTest {
     @Test
     public void testCreateAccessRequest_Success() {
         AccessRequestDTO requestDTO = new AccessRequestDTO();
-        when(accessRequestService.createRequest(requestDTO)).thenReturn(Optional.of(requestDTO));
+        when(accessRequestService.createRequest(requestDTO)).thenReturn(requestDTO);
 
         ResponseEntity<Object> response = accessRequestController.createAccessRequest(requestDTO);
 
@@ -49,13 +49,14 @@ public class AccessRequestControllerTest {
     @Test
     public void testCreateAccessRequest_Failure() {
         AccessRequestDTO requestDTO = new AccessRequestDTO();
-        when(accessRequestService.createRequest(requestDTO)).thenReturn(Optional.empty());
+        when(accessRequestService.createRequest(requestDTO)).thenReturn(null); // Mocking a failure by returning null
 
         ResponseEntity<Object> response = accessRequestController.createAccessRequest(requestDTO);
 
         verify(accessRequestService, times(1)).createRequest(requestDTO);
         assert(response.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
 
     @Test
     public void testGetAllActiveRequests_NoRequests() {

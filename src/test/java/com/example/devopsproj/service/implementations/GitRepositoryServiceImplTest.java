@@ -260,12 +260,4 @@ public class GitRepositoryServiceImplTest {
     }
 
 
-
-
-
-
-
-
-
-
 }

@@ -4,21 +4,17 @@ import com.example.devopsproj.dto.responsedto.AccessResponseDTO;
 import com.example.devopsproj.dto.responsedto.ProjectDTO;
 import com.example.devopsproj.dto.responsedto.UserDTO;
 import com.example.devopsproj.model.AccessRequest;
-import com.example.devopsproj.model.Project;
-import com.example.devopsproj.model.User;
+
 import com.example.devopsproj.repository.AccessRequestRepository;
 import com.example.devopsproj.service.interfaces.AccessRequestService;
-import com.example.devopsproj.service.interfaces.JwtService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 @Service
@@ -28,286 +24,141 @@ public class AccessRequestServiceImpl implements AccessRequestService {
 
 
     private final AccessRequestRepository accessRequestRepository;
-    private final ModelMapper modelMapper;
-    private final JwtService jwtService;
 
-    // Create a new access request
+
+
     @Override
-    public Optional<AccessRequestDTO> createRequest(AccessRequestDTO accessRequestDTO) {
-        try {
-            // You should remove the access token-related code here as it's not needed in this method.
+    public AccessRequestDTO createRequest(AccessRequestDTO accessRequestDTO) {
+        AccessRequest accessRequest = new AccessRequest();
+        accessRequest.setAccessRequestId(accessRequestDTO.getAccessRequestId());
+        accessRequest.setPmName(accessRequestDTO.getPmName());
 
-            // Create a new AccessRequest object and populate it with data from the DTO
-            AccessRequest accessRequest = new AccessRequest();
-            accessRequest.setPmName(accessRequestDTO.getPmName());
-            accessRequest.setRequestDescription(accessRequestDTO.getRequestDescription());
-            accessRequest.setUser(mapUserDTOToUser(accessRequestDTO.getUser()));
-            accessRequest.setProject(mapProjectDTOToProject(accessRequestDTO.getProject()));
+        // Save the AccessRequest directly
+        AccessRequest savedAccessRequest = accessRequestRepository.save(accessRequest);
 
-            // Save the new AccessRequest to the repository
-            AccessRequest savedRequest = accessRequestRepository.save(accessRequest);
+        // Create an AccessRequestDTO from the saved entity
+        AccessRequestDTO createdRequestDTO = new AccessRequestDTO();
+        createdRequestDTO.setAccessRequestId(savedAccessRequest.getAccessRequestId());
+        createdRequestDTO.setPmName(savedAccessRequest.getPmName());
 
-            // Map the saved AccessRequest back to a DTO and return it
-            AccessRequestDTO createdRequestDTO = modelMapper.map(savedRequest, AccessRequestDTO.class);
-            return Optional.of(createdRequestDTO);
-        } catch (Exception e) {
-            // Log the exception for debugging purposes
-            logger.error("An error occurred while creating an access request: " + e.getMessage(), e);
-
-            // You can throw a custom exception here or handle the error differently based on your requirements.
-            // For simplicity, this example returns an empty optional.
-            return Optional.empty();
-        }
+        return createdRequestDTO;
     }
 
     @Override
     public List<AccessRequestDTO> getAllRequests() {
-        try {
-            // Retrieve all access requests from the repository
-            List<AccessRequest> accessRequestList = accessRequestRepository.findAll();
+        List<AccessRequest> accessRequestList = accessRequestRepository.findAll();
+        List<AccessRequestDTO> accessRequestDTOList = new ArrayList<>();
 
-            // If there are no requests, return an empty list
-            if (accessRequestList.isEmpty()) {
-                return Collections.emptyList();
-            }
+        for (AccessRequest accessRequest : accessRequestList) {
+            AccessRequestDTO accessRequestDTO = new AccessRequestDTO();
+            accessRequestDTO.setAccessRequestId(accessRequest.getAccessRequestId());
+            accessRequestDTO.setPmName(accessRequest.getPmName());
 
-            // Create a list to store DTOs and map each AccessRequest to a DTO
-            List<AccessRequestDTO> accessRequestDTOList = new ArrayList<>();
-            for (AccessRequest accessRequest : accessRequestList) {
-                AccessRequestDTO accessRequestDTO = modelMapper.map(accessRequest, AccessRequestDTO.class);
-                accessRequestDTOList.add(accessRequestDTO);
-            }
-
-            // Return the list of DTOs
-            return accessRequestDTOList;
-        } catch (Exception e) {
-            // Log and handle any exceptions
-            logger.error("An error occurred while retrieving all access requests: " + e.getMessage(), e);
-            return Collections.emptyList();
+            accessRequestDTOList.add(accessRequestDTO);
         }
+        return accessRequestDTOList;
     }
 
     @Override
     public List<AccessRequestDTO> getAllActiveRequests() {
-        try {
-            // Retrieve all active access requests from the repository
-            List<AccessRequest> accessRequestList = accessRequestRepository.findAllActiveRequests();
+        List<AccessRequest> accessRequestList = accessRequestRepository.findAllActiveRequests();
+        List<AccessRequestDTO> accessRequestDTOList = new ArrayList<>();
 
-            // If there are no active requests, return an empty list
-            if (accessRequestList.isEmpty()) {
-                return Collections.emptyList();
-            }
+        for (AccessRequest accessRequest : accessRequestList) {
+            AccessRequestDTO accessRequestDTO = new AccessRequestDTO();
+            accessRequestDTO.setAccessRequestId(accessRequest.getAccessRequestId());
+            accessRequestDTO.setPmName(accessRequest.getPmName());
 
-            // Create a list to store DTOs and map each active AccessRequest to a DTO
-            List<AccessRequestDTO> accessRequestDTOList = new ArrayList<>();
-            for (AccessRequest accessRequest : accessRequestList) {
-                AccessRequestDTO accessRequestDTO = modelMapper.map(accessRequest, AccessRequestDTO.class);
-                accessRequestDTOList.add(accessRequestDTO);
-            }
-
-            // Return the list of DTOs only for active requests
-            return accessRequestDTOList;
-        } catch (Exception e) {
-            // Log and handle any exceptions
-            logger.error("An error occurred while retrieving all active access requests: " + e.getMessage(), e);
-            return Collections.emptyList();
+            accessRequestDTOList.add(accessRequestDTO);
         }
+        return accessRequestDTOList;
     }
 
-    // Update an access request based on the request ID and request DTO
     @Override
     public List<AccessResponseDTO> getUpdatedRequests(Long id, AccessRequestDTO accessRequestDTO) {
-        try {
-            // Retrieve the existing access request by ID
-            Optional<AccessRequest> optionalAccessRequest = accessRequestRepository.findById(id);
-            if (optionalAccessRequest.isPresent()) {
-                AccessRequest existingAccessRequest = optionalAccessRequest.get();
-
-                // Update the access request with data from the DTO
-                existingAccessRequest.setAllowed(accessRequestDTO.isAllowed());
-                existingAccessRequest.setUpdated(true);
-
-                // Save the updated access request
-                AccessRequest updatedAccessRequest = accessRequestRepository.save(existingAccessRequest);
-
-                // Create a response DTO with updated data
-                AccessResponseDTO accessResponseDTO = new AccessResponseDTO(
-                        updatedAccessRequest.getAccessRequestId(),
-                        updatedAccessRequest.getPmName(),
-                        mapUserToUserDTO(updatedAccessRequest.getUser()),
-                        mapProjectToProjectDTO(updatedAccessRequest.getProject()),
-                        updatedAccessRequest.getRequestDescription(),
-                        updatedAccessRequest.isAllowed()
-                );
-
-                // Retrieve all active access requests and map them to DTOs
-                List<AccessRequest> accessRequests = accessRequestRepository.findAllActiveRequests();
-                List<AccessResponseDTO> accessResponseDTOList = accessRequests.stream()
-                        .map(accessRequest -> new AccessResponseDTO(accessRequest.getAccessRequestId(), accessRequest.getPmName(), mapUserToUserDTO(accessRequest.getUser()), mapProjectToProjectDTO(accessRequest.getProject()), accessRequest.getRequestDescription(), accessRequest.isAllowed()))
-                        .collect(Collectors.toList());
-
-                // Add the updated DTO to the list
-                accessResponseDTOList.add(accessResponseDTO);
-
-                // Return the list of updated DTOs
-                return accessResponseDTOList;
-            } else {
-                // Handle the case where the requested access request does not exist
-                logger.error("Access request with ID {} does not exist.", id);
-                return Collections.emptyList();
-            }
-        } catch (Exception e) {
-            // Log and handle any exceptions
-            logger.error("An error occurred while updating access request: " + e.getMessage(), e);
-            return Collections.emptyList();
+        Optional<AccessRequest> optionalAccessRequest = accessRequestRepository.findById(id);
+        if (optionalAccessRequest.isPresent()) {
+            AccessRequest existingAccessRequest = optionalAccessRequest.get();
+            existingAccessRequest.setAllowed(accessRequestDTO.isAllowed());
+            existingAccessRequest.setUpdated(true);
+            accessRequestRepository.save(existingAccessRequest);
         }
+        List<AccessRequest> accessRequests = accessRequestRepository.findAllActiveRequests();
+
+        // Create a list of AccessResponseDTO objects directly
+        List<AccessResponseDTO> accessResponseDTOList = new ArrayList<>();
+        for (AccessRequest accessRequest : accessRequests) {
+            AccessResponseDTO accessResponseDTO = new AccessResponseDTO();
+            accessResponseDTO.setAccessRequestId(accessRequest.getAccessRequestId());
+            accessResponseDTO.setPmName(accessRequest.getPmName());
+            accessResponseDTO.setAccessDescription(accessRequest.getRequestDescription());
+            accessResponseDTO.setAllowed(accessRequest.isAllowed());
+
+            ProjectDTO projectDTO = new ProjectDTO();
+            projectDTO.setProjectId(accessRequest.getProject().getProjectId());
+            projectDTO.setProjectName(accessRequest.getProject().getProjectName());
+
+            UserDTO userDTO = new UserDTO();
+            userDTO.setId(accessRequest.getUser().getId());
+            userDTO.setName(accessRequest.getUser().getName());
+            userDTO.setEmail(accessRequest.getUser().getEmail());
+
+            accessResponseDTO.setProject(projectDTO);
+            accessResponseDTO.setUser(userDTO);
+
+            accessResponseDTOList.add(accessResponseDTO);
+        }
+        return accessResponseDTOList;
     }
 
-    // Get unread access requests for a project manager
 
     @Override
     public List<AccessResponseDTO> getPMUnreadRequests(String pmName) {
-        try {
-            // Retrieve all unread access requests for the given project manager
-            List<AccessRequest> accessRequests = accessRequestRepository.findAllUnreadPMRequestsByName(pmName);
-
-            // Create a list to store DTOs and map each unread AccessRequest to a DTO
-            List<AccessResponseDTO> accessResponseDTOList = new ArrayList<>();
-            String listOfPMRequests;
-            for (AccessRequest accessRequest : accessRequests) {
-                AccessResponseDTO accessResponseDTO = new AccessResponseDTO();
-                accessResponseDTO.setAccessRequestId(accessRequest.getAccessRequestId());
-                accessResponseDTO.setPmName(accessRequest.getPmName());
-
-                // Determine the response message based on whether the request was allowed or denied
-                if (accessRequest.isAllowed()) {
-                    listOfPMRequests = "Request for adding " + accessRequest.getUser().getName() + " has been granted";
-                } else {
-                    listOfPMRequests = "Request for adding " + accessRequest.getUser().getName() + " has been denied";
-                }
-
-                // Populate the DTO with data
-                accessResponseDTO.setResponse(listOfPMRequests);
-                accessResponseDTO.setNotified(accessRequest.isPmNotified());
-                accessResponseDTOList.add(accessResponseDTO);
-            }
-
-            return accessResponseDTOList;
-        } catch (Exception e) {
-            // Log and handle any exceptions
-            logger.error("An error occurred while retrieving PM's unread requests: " + e.getMessage(), e);
-            return Collections.emptyList(); // Return an empty list in case of an exception
-        }
+        List<AccessRequest> accessRequests = accessRequestRepository.findAllUnreadPMRequestsByName(pmName);
+        return mapAccessRequestsToResponseDTOs(accessRequests);
     }
-
-
 
     @Override
     public List<AccessResponseDTO> getPMRequests(String pmName) {
-        try {
-            // Retrieve all access requests for the given project manager
-            List<AccessRequest> accessRequests = accessRequestRepository.findAllPMRequestsByName(pmName);
+        List<AccessRequest> accessRequests = accessRequestRepository.findAllPMRequestsByName(pmName);
+        return mapAccessRequestsToResponseDTOs(accessRequests);
+    }
 
-            // If there are no requests, return an empty list
-            if (accessRequests.isEmpty()) {
-                return Collections.emptyList();
-            }
+    @Override
+    public List<AccessResponseDTO> mapAccessRequestsToResponseDTOs(List<AccessRequest> accessRequests) {
+        List<AccessResponseDTO> accessResponseDTOList = new ArrayList<>();
 
-            // Create a list to store DTOs and map each AccessRequest to a DTO
-            List<AccessResponseDTO> accessResponseDTOList = new ArrayList<>();
+        for (AccessRequest accessRequest : accessRequests) {
+            AccessResponseDTO accessResponseDTO = new AccessResponseDTO();
+            accessResponseDTO.setAccessRequestId(accessRequest.getAccessRequestId());
+            accessResponseDTO.setPmName(accessRequest.getPmName());
             String listOfPMRequests;
-            for (AccessRequest accessRequest : accessRequests) {
-                AccessResponseDTO accessResponseDTO = new AccessResponseDTO();
-                accessResponseDTO.setAccessRequestId(accessRequest.getAccessRequestId());
-                accessResponseDTO.setPmName(accessRequest.getPmName());
-
-                // Determine the response message based on whether the request was allowed or denied
-                if (accessRequest.isAllowed()) {
-                    listOfPMRequests = "Request for adding " + accessRequest.getUser().getName() + " has been granted";
-                } else {
-                    listOfPMRequests = "Request for adding " + accessRequest.getUser().getName() + " has been denied";
-                }
-
-                // Populate the DTO with data
-                accessResponseDTO.setResponse(listOfPMRequests);
-                accessResponseDTO.setNotified(accessRequest.isPmNotified());
-                accessResponseDTOList.add(accessResponseDTO);
-            }
-
-            // Return the list of request DTOs for the project manager
-            return accessResponseDTOList;
-        } catch (Exception e) {
-            // Log and handle any exceptions
-            logger.error("An error occurred while retrieving PM's requests: " + e.getMessage(), e);
-            return Collections.emptyList();
-        }
-    }
-
-
-    // Set the notification flag for a PM request to true
-    @Override
-    public ResponseEntity<String> setPMRequestsNotificationTrue(Long accessRequestId) {
-        try {
-            // Retrieve the access request by ID
-            Optional<AccessRequest> optionalAccessRequest = accessRequestRepository.findById(accessRequestId);
-            if (optionalAccessRequest.isPresent()) {
-                AccessRequest accessRequest = optionalAccessRequest.get();
-
-                // Set the PM notification flag to true
-                accessRequest.setPmNotified(true);
-
-                // Save the updated access request
-                accessRequestRepository.save(accessRequest);
+            if (accessRequest.isAllowed()) {
+                listOfPMRequests = "Request for adding " + accessRequest.getUser().getName() + " has been granted";
             } else {
-                // Handle the case where the requested access request does not exist
-                logger.error("Access request with ID {} does not exist.", accessRequestId);
+                listOfPMRequests = "Request for adding " + accessRequest.getUser().getName() + " has been denied";
             }
-        } catch (Exception e) {
-            // Log and handle any exceptions
-            logger.error("An error occurred while setting PM notification flag: " + e.getMessage(), e);
+            accessResponseDTO.setResponse(listOfPMRequests);
+            accessResponseDTO.setNotified(accessRequest.isPmNotified());
+            accessResponseDTOList.add(accessResponseDTO);
         }
-        return null;
+        return accessResponseDTOList;
     }
 
     @Override
-    public void clearAllNotifications() {
-        try {
-            // Delete all access requests
-            accessRequestRepository.deleteAll();
-        } catch (Exception e) {
-            // Log and handle any exceptions
-            logger.error("An error occurred while clearing all notifications: " + e.getMessage(), e);
+    public void setPMRequestsNotificationTrue(Long accessRequestId) {
+        Optional<AccessRequest> optionalAccessRequest = accessRequestRepository.findById(accessRequestId);
+        if (optionalAccessRequest.isPresent()) {
+            AccessRequest accessRequest = optionalAccessRequest.get();
+            accessRequest.setPmNotified(true);
+            accessRequestRepository.save(accessRequest);
         }
     }
-    // Helper method to map User to UserDTO
-    private UserDTO mapUserToUserDTO(User user) {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setId(user.getId());
-        userDTO.setName(user.getName());
-        return userDTO;
+
+    @Override
+    @Transactional
+    public void clearAllNotifications(){
+        accessRequestRepository.deleteAll();
     }
 
-    // Helper method to map Project to ProjectDTO
-    private ProjectDTO mapProjectToProjectDTO(Project project) {
-        ProjectDTO projectDTO = new ProjectDTO();
-        projectDTO.setProjectId(project.getProjectId());
-        projectDTO.setProjectName(project.getProjectName());
-        return projectDTO;
-    }
-
-    // Helper method to map UserDTO to User
-    private User mapUserDTOToUser(UserDTO userDTO) {
-        User user = new User();
-        user.setId(userDTO.getId());
-        user.setName(userDTO.getName());
-        return user;
-    }
-
-    // Helper method to map ProjectDTO to Project
-    private Project mapProjectDTOToProject(ProjectDTO projectDTO) {
-        Project project = new Project();
-        project.setProjectId(projectDTO.getProjectId());
-        project.setProjectName(projectDTO.getProjectName());
-        return project;
-    }
 }

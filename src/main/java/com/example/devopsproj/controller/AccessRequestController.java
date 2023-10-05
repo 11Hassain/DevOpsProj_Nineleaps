@@ -23,12 +23,10 @@ public class AccessRequestController {
         // Create a new access request.
         @PostMapping("/create")
         public ResponseEntity<Object> createAccessRequest(@RequestBody AccessRequestDTO accessRequestDTO) {
-            Optional<AccessRequestDTO> createdRequest = accessRequestService.createRequest(accessRequestDTO);
+            Optional<AccessRequestDTO> createdRequest = Optional.ofNullable(accessRequestService.createRequest(accessRequestDTO));
             return createdRequest.map(request -> ResponseEntity.ok((Object) "Request made successfully"))
                     .orElse(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body((Object) "Failed to create request"));
         }
-
-
 
     @GetMapping("/allActive")
     public ResponseEntity<Object> getAllActiveRequests() {

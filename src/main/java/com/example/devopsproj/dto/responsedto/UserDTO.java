@@ -73,8 +73,6 @@ public class UserDTO {
         this.id = id;
         this.name = name;
         this.email = email;
-        this.enumRole = enumRole;
-        this.lastUpdated = lastUpdated;
     }
 
     public UserDTO(Long id, String name, String email, EnumRole enumRole, LocalDateTime lastUpdated, LocalDateTime lastLogout) {
