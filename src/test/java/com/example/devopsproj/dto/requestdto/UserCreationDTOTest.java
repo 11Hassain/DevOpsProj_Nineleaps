@@ -3,8 +3,7 @@ package com.example.devopsproj.dto.requestdto;
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class UserCreationDTOTest {
 
@@ -42,10 +41,14 @@ class UserCreationDTOTest {
 
     @Test
     void testEqualsAndHashCode() {
-        UserCreationDTO userDTO1 = new UserCreationDTO(1L, "John Doe", "john@example.com", EnumRole.ADMIN);
-        UserCreationDTO userDTO2 = new UserCreationDTO(1L, "John Doe", "john@example.com", EnumRole.ADMIN);
+        UserCreationDTO user1 = new UserCreationDTO(1L, "John", "john@example.com", EnumRole.ADMIN);
+        UserCreationDTO user2 = new UserCreationDTO(1L, "John", "john@example.com", EnumRole.ADMIN);
+        UserCreationDTO user3 = new UserCreationDTO(2L, "Alice", "alice@example.com", EnumRole.USER);
 
-        assertTrue(userDTO1.equals(userDTO2));
-        assertEquals(userDTO1.hashCode(), userDTO2.hashCode());
+        assertEquals(user1, user2);
+        assertNotEquals(user1, user3);
+
+        assertEquals(user1.hashCode(), user2.hashCode());
+        assertNotEquals(user1.hashCode(), user3.hashCode());
     }
 }
