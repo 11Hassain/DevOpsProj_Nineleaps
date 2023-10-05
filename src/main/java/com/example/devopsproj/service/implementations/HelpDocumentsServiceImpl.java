@@ -39,11 +39,15 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
     @Override
     public void saveFile(HelpDocuments helpDocuments, MultipartFile file, String fileExtension) throws IOException {
         if (file != null && !file.isEmpty()) {
-            helpDocuments.setFileName(file.getOriginalFilename());
-            helpDocuments.setData(file.getBytes());
-            helpDocuments.setFileExtension(fileExtension);
+            String originalFilename = file.getOriginalFilename();
+            if (originalFilename != null) {
+                helpDocuments.setFileName(originalFilename);
+                helpDocuments.setData(file.getBytes());
+                helpDocuments.setFileExtension(fileExtension);
+            }
         }
     }
+
 
     @Override
     public String getFileExtension(MultipartFile file) {
