@@ -6,10 +6,8 @@ import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 @NoArgsConstructor
-@AllArgsConstructor
 @Setter
 @Getter
-@ToString
 public class FigmaDTO {
 
     @NotNull(message = "projectDTO cannot be null")
@@ -43,10 +41,5 @@ public class FigmaDTO {
         this.projectDTO = projectDTO;
         this.figmaURL = figmaURL;
         this.figmaId = figmaId;
-    }
-
-    public FigmaDTO(String screenshotImage, String user) {
-        this.screenshotImage = screenshotImage;
-        this.user = user;
     }
 }
