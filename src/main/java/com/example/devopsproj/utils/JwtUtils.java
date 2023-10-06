@@ -1,7 +1,5 @@
 package com.example.devopsproj.utils;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.devopsproj.commons.enumerations.TokenType;
 import com.example.devopsproj.model.Token;
 import com.example.devopsproj.model.User;
