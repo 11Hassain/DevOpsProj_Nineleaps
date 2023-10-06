@@ -9,7 +9,6 @@ import lombok.*;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 public class GitRepositoryDTO {
 
     @Positive(message = "repoId should be a positive number")
