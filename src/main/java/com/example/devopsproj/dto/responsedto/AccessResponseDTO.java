@@ -10,7 +10,6 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
 public class AccessResponseDTO {
 
     @NotNull(message = "accessRequestId cannot be null")
