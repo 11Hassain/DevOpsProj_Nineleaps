@@ -38,17 +38,4 @@ class UserCreationDTOTest {
         String expectedToString = "UserCreationDTO(id=1, name=John Doe, email=john@example.com, enumRole=ADMIN)";
         assertEquals(expectedToString, userDTO.toString());
     }
-
-    @Test
-    void testEqualsAndHashCode() {
-        UserCreationDTO user1 = new UserCreationDTO(1L, "John", "john@example.com", EnumRole.ADMIN);
-        UserCreationDTO user2 = new UserCreationDTO(1L, "John", "john@example.com", EnumRole.ADMIN);
-        UserCreationDTO user3 = new UserCreationDTO(2L, "Alice", "alice@example.com", EnumRole.USER);
-
-        assertEquals(user1, user2);
-        assertNotEquals(user1, user3);
-
-        assertEquals(user1.hashCode(), user2.hashCode());
-        assertNotEquals(user1.hashCode(), user3.hashCode());
-    }
 }

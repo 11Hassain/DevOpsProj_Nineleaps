@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @ToString
-@EqualsAndHashCode
 @Getter
 @Setter
 @AllArgsConstructor
