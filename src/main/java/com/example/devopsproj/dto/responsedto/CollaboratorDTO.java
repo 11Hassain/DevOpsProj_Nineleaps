@@ -6,10 +6,9 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @NoArgsConstructor
+@AllArgsConstructor
 @Setter
 @Getter
-@ToString
-@Data
 public class CollaboratorDTO {
 
     @NotBlank(message = "Owner cannot be blank")
