@@ -10,7 +10,6 @@ import java.util.List;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 public class ProjectUserDTO {
 
     @Positive(message = "projectId should be a positive number")
