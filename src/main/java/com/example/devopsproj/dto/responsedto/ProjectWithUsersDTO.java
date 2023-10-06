@@ -9,10 +9,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @NoArgsConstructor
-@AllArgsConstructor
 @Setter
 @Getter
-@ToString
 public class ProjectWithUsersDTO {
 
     @Positive(message = "projectId should be a positive number")
@@ -47,5 +45,5 @@ public class ProjectWithUsersDTO {
         this.projectDescription = projectDescription;
     }
 
-    }
+}
 
