@@ -11,7 +11,7 @@ import lombok.*;
 @ToString
 public class HelpDocumentsDTO {
 
-    @Positive(message = "helpDocumentId should be a positive numer")
+    @Positive(message = "helpDocumentId should be a positive number")
     private Long helpDocumentId;
 
     @Size(max = 50, message = "File name should not exceed 50 characters")
