@@ -7,7 +7,6 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
 public class ProjectNamePeopleCountDTO {
 
     @Positive(message = "projectId should be a positive number")
