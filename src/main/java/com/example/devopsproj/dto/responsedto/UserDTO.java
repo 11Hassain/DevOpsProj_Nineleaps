@@ -9,11 +9,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
 public class UserDTO {
 
     @Positive(message = "id should be a positive number")
