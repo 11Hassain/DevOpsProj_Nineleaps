@@ -16,12 +16,6 @@ public class JwtUtils {
 
     private final TokenRepository tokenRepository;
 
-    //get the email from the token
-    public static String getEmailFromJwt(String jwt){
-        DecodedJWT decodedJWT = JWT.decode(jwt);
-        return decodedJWT.getClaim("email").asString();
-    }
-
     public  void saveUserToken(User user, String jwtToken) {
         var token = Token.builder()
                 .user(user)
