@@ -1,7 +1,10 @@
 package com.example.devopsproj.otp.otpdto;
 
 import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class StoreOTP {
 
     private StoreOTP() {
