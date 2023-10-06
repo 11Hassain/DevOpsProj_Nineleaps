@@ -38,7 +38,6 @@ public class SmsController {
     private final SimpMessagingTemplate webSocket;
 
     private static final String TOPIC_DESTINATION = "/lesson/sms";
-    private static final String SECRET_KEY = System.getenv("SMS_SECRET_KEY");
 
 
     @PostMapping("/send")
@@ -100,12 +99,12 @@ public class SmsController {
 
             if (user != null) {
                 String email = user.getEmail();
-                String accessToken= generateToken(email, phoneNumber);
+                String accessToken= service.generateToken(email, phoneNumber);
 
                 JwtResponse jwtResponse = new JwtResponse();
                 jwtResponse.setAccessToken(accessToken);
-                return ResponseEntity.ok(jwtResponse);}
-            else {
+                return ResponseEntity.ok(jwtResponse);
+            } else {
                 return ResponseEntity.ok("User not found") ;
             }
         }
@@ -128,30 +127,7 @@ public class SmsController {
         return sms.getOtp() == StoreOTP.getOtp();
     }
 
-    public String generateToken(String email, String phoneNumber) {
-
-        User userDtls = userService.getUserByMail(email.trim());
-        Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY.getBytes());
-        Set<EnumRole> roles = Collections.singleton(userDtls.getEnumRole());
-
-        // Extract role names as strings
-        List<String> roleNames = new ArrayList<>();
-        for (EnumRole role : roles) {
-            roleNames.add(role.toString());
-        }
-
-        // Convert the List<String> to a comma-separated string
-        String rolesString = String.join(",", roleNames);
-
-
-        return JWT.create()
-                .withSubject(email)
-                .withClaim("phoneNumber", phoneNumber) // Add phone number claim
-                .withClaim("roles", rolesString)
-                .withClaim("userId", userDtls.getId())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 *10))
-                .sign(algorithm);
-    }
+    // ----- Helper Methods -----
 
     private String getTimeStamp(){
         return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now());
