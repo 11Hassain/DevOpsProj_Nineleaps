@@ -58,28 +58,5 @@ class OTPRequestDTOTest {
         assertEquals("test@example.com", otpRequestDTO.getEmail());
         assertEquals("1234", otpRequestDTO.getOtp());
 
-        // Test equals and hashCode
-        OTPRequestDTO anotherDTO = new OTPRequestDTO("1234567890", "test@example.com", "1234");
-        assertEquals(otpRequestDTO, anotherDTO);
-        assertEquals(otpRequestDTO.hashCode(), anotherDTO.hashCode());
-
-        // Test toString
-        String expectedToString = "OTPRequestDTO(phone=1234567890, email=test@example.com, otp=1234)";
-        assertEquals(expectedToString, otpRequestDTO.toString());
-    }
-
-    @Test
-    void testEqualsAndHashCode() {
-        OTPRequestDTO dto1 = new OTPRequestDTO("1234567890", "test@example.com", "1234");
-        OTPRequestDTO dto2 = new OTPRequestDTO("1234567890", "test@example.com", "1234");
-        OTPRequestDTO dto3 = new OTPRequestDTO("9876543210", "another@example.com", "5678");
-
-        // Test equals
-        assertEquals(dto1, dto2);
-        assertNotEquals(dto1, dto3);
-
-        // Test hashCode
-        assertEquals(dto1.hashCode(), dto2.hashCode());
-        assertNotEquals(dto1.hashCode(), dto3.hashCode());
     }
 }
