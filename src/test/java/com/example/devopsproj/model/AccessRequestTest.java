@@ -9,9 +9,6 @@ import org.mockito.MockitoAnnotations;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AccessRequestTest {
-
-    @InjectMocks
-    private AccessRequest accessRequest;
     @Mock
     private User user;
     @Mock
