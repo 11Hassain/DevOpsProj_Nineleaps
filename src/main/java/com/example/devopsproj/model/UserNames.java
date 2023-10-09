@@ -1,15 +1,14 @@
 package com.example.devopsproj.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
@@ -30,6 +29,6 @@ public class UserNames implements Serializable{
     private User user;
 
     @ManyToMany(mappedBy = "usernames")
-    private List<GitRepository> repositories;
+    private List<GitRepository> repositories = new ArrayList<>();
 
 }
