@@ -8,11 +8,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,7 +23,6 @@ import java.util.List;
 @Table(name = "user")
 public class User implements UserDetails{
 
-    // -- JWT -- public class User implements UserDetails
     @Id
     @GeneratedValue
     @Column(name = "user_id", nullable = false)
@@ -57,10 +58,10 @@ public class User implements UserDetails{
     //linking project entity with user
     @JsonIgnore
     @ManyToMany(mappedBy = "users")
-    private List<Project> projects;
+    private List<Project> projects = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<AccessRequest> accessRequest;
+    private List<AccessRequest> accessRequest = new ArrayList<>();
 
     @OneToOne(mappedBy = "user")
     private UserNames userNames;
