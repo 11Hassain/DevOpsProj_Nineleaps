@@ -303,6 +303,7 @@ class ProjectControllerTest {
 
         List<UserDTO> userDTOList = (List<UserDTO>) response.getBody();
         assertEquals(1, userDTOList.size());
+        assertEquals(1, userDTOList.size());
 
         UserDTO userDTO = userDTOList.get(0);
         assertEquals(userWithNullUsernames.getId(), userDTO.getId());
