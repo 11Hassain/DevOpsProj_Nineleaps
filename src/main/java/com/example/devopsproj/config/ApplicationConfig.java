@@ -27,10 +27,7 @@ public class ApplicationConfig {
         return new ModelMapper();
     }
 
-    @Bean
-    public GitHubUserValidation gitHubUserValidation(){
-        return new GitHubUserValidation();
-    }
+
 
     @Bean
     public UserDetailsService userDetailsService(){

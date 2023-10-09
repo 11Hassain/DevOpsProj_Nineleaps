@@ -8,11 +8,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -60,10 +62,11 @@ public class User implements UserDetails{
     //linking project entity with user
     @JsonIgnore
     @ManyToMany(mappedBy = "users")
-    private List<Project> projects;
+    private List<Project> projects = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<AccessRequest> accessRequest;
+    private List<AccessRequest> accessRequest = new ArrayList<>();
+
 
     @OneToOne(mappedBy = "user")
     private UserNames userNames;
@@ -71,7 +74,7 @@ public class User implements UserDetails{
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override

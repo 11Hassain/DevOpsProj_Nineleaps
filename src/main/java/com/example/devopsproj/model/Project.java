@@ -6,19 +6,18 @@ import lombok.*;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 
-@AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Setter
 @Entity
 @Table(name = "project")
-public class Project {
+public class Project implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -55,6 +54,7 @@ public class Project {
     @OneToOne(mappedBy = "project")
     private Figma figma;
 
+    @JsonIgnore
     @OneToOne(mappedBy = "project")
     private GoogleDrive googleDrive;
     public List<GitRepository> getRepositories() {

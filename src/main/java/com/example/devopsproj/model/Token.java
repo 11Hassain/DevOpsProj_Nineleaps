@@ -1,13 +1,12 @@
 package com.example.devopsproj.model;
 
-//import com.example.DevOpsProj.commons.enumerations.TokenType;
 import com.example.devopsproj.commons.enumerations.TokenType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-@Data
+import lombok.*;
+
+@Getter
+@Setter
+@ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

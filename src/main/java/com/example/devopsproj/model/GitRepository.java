@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.List;
 
 @AllArgsConstructor
@@ -14,7 +15,7 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "repositories")
-public class GitRepository {
+public class GitRepository implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long repoId;
