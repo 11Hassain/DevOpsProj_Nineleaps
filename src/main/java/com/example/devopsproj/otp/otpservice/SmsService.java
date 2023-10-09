@@ -51,27 +51,6 @@ public class SmsService {
         phoneNumber = sms.getPhoneNumber();
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public void resend(SmsPojo resendSms){
-        Twilio.init(ACCOUNT_SID,AUTH_TOKEN);
-        // Create a SecureRandom instance for generating OTPs
-        SecureRandom secureRandom = new SecureRandom();
-
-        // Define the range for your OTP
-        int min = 100000;
-        int max = 999999;
-
-        // Generate a random number within the specified range
-        int number = secureRandom.nextInt(max - min + 1) + min;
-        String msg = "Your OTP is - "+number+" . Please enter the OTP. Do not share it with anyone. Thank you!";
-        Message.creator(new PhoneNumber(resendSms.getPhoneNumber()),new PhoneNumber(FROM_NUMBER),msg)
-                .create();
-        StoreOTP.setOtp(number);
-    }
-
     public String generateToken(String email, String phoneNumber) {
         User userDtls = userService.getUserByMail(email.trim());
         if (userDtls == null) {
@@ -88,7 +67,7 @@ public class SmsService {
         return createJwtToken(email, phoneNumber, rolesString, userDtls.getId());
     }
 
-    private String createJwtToken(String email, String phoneNumber, String rolesString, Long userId) {
+    String createJwtToken(String email, String phoneNumber, String rolesString, Long userId) {
         Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY.getBytes());
 
         return JWT.create()
