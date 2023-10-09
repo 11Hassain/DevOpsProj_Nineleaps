@@ -26,7 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final TokenRepository tokenRepository;
 
     @Override
-    protected void doFilterInternal(
+    public void doFilterInternal(
             @NonNull HttpServletRequest request,//THIS REQUEST IS OUR REQUEST
             @NonNull HttpServletResponse response,// THIS RESPONSE IS ALSO OUR RESPONSE
             @NonNull FilterChain filterChain//THIS BASICALLY CONTAIN THE LIST OF THE FILTER
