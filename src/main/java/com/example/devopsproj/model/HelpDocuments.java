@@ -3,9 +3,7 @@ package com.example.devopsproj.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-@AllArgsConstructor
 @NoArgsConstructor
-@Data
 @Getter
 @Setter
 @Entity
@@ -33,5 +31,4 @@ public class HelpDocuments {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
     private Project project;
-
 }

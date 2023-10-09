@@ -9,6 +9,7 @@ import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.service.implementations.HelpDocumentsServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -56,14 +57,18 @@ class HelpDocumentsServiceImplTest {
 
         assertEquals("File uploaded successfully", response.getBody());
 
-        HelpDocuments expectedHelpDocuments = new HelpDocuments();
-        expectedHelpDocuments.setProject(project);
-        expectedHelpDocuments.setFileName("sample.txt");
-        expectedHelpDocuments.setData(fileContent);
-        expectedHelpDocuments.setFileExtension(fileExtension);
+        ArgumentCaptor<HelpDocuments> helpDocumentsCaptor = ArgumentCaptor.forClass(HelpDocuments.class);
+        verify(helpDocumentsRepository, times(1)).save(helpDocumentsCaptor.capture());
 
-        verify(helpDocumentsRepository, times(1)).save(expectedHelpDocuments);
+        HelpDocuments savedHelpDocuments = helpDocumentsCaptor.getValue();
+
+        // Verify that the saved HelpDocuments object matches the expected values
+        assertEquals(project, savedHelpDocuments.getProject());
+        assertEquals("sample.txt", savedHelpDocuments.getFileName());
+        assertArrayEquals(fileContent, savedHelpDocuments.getData());
+        assertEquals("txt", savedHelpDocuments.getFileExtension());
     }
+
 
     @Test
     void testSaveFile_Success() throws IOException {
