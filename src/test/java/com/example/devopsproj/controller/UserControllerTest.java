@@ -16,8 +16,11 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -75,6 +78,126 @@ class UserControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assert user1 != null;
         assertEquals("johndoe1@gmail.com", user1.getEmail());
+    }
+
+    @Test
+    void testGetUserById_Successful() {
+        Long userId = 1L;
+        String accessToken = "valid_token";
+
+        User user = new User();
+        user.setId(userId);
+        user.setName("John Doe");
+        user.setEmail("john@example.com");
+        user.setEnumRole(EnumRole.USER);
+        user.setLastUpdated(LocalDateTime.now());
+        user.setLastLogout(LocalDateTime.now());
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(userService.getUserById(userId)).thenReturn(Optional.of(user));
+
+        ResponseEntity<Object> response = userController.getUserById(userId, accessToken);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+
+        UserDTO userDTO = (UserDTO) response.getBody();
+        assertEquals(user.getId(), userDTO.getId());
+        assertEquals(user.getName(), userDTO.getName());
+        assertEquals(user.getEmail(), userDTO.getEmail());
+        assertEquals(user.getEnumRole(), userDTO.getEnumRole());
+        assertEquals(user.getLastUpdated(), userDTO.getLastUpdated());
+        assertEquals(user.getLastLogout(), userDTO.getLastLogout());
+    }
+
+    @Test
+    void testGetUserById_UserNotFound() {
+        Long userId = 1L;
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(userService.getUserById(userId)).thenReturn(Optional.empty());
+
+        ResponseEntity<Object> response = userController.getUserById(userId, accessToken);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNull(response.getBody());
+    }
+
+    @Test
+    void testDeleteUserById_SuccessfulDeletion() {
+        Long userId = 1L;
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(userService.existsById(userId)).thenReturn(true);
+        when(userService.existsByIdIsDeleted(userId)).thenReturn(false);
+        when(userService.softDeleteUser(userId)).thenReturn(true);
+
+        ResponseEntity<String> response = userController.deleteUserById(userId, accessToken);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("User successfully deleted", response.getBody());
+    }
+
+    @Test
+    void testDeleteUserById_UserNotFound() {
+        Long userId = 1L;
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(userService.existsById(userId)).thenReturn(false);
+
+        ResponseEntity<String> response = userController.deleteUserById(userId, accessToken);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void testDeleteUserById_UserAlreadySoftDeleted() {
+        Long userId = 1L;
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(userService.existsById(userId)).thenReturn(true);
+        when(userService.existsByIdIsDeleted(userId)).thenReturn(true);
+
+        ResponseEntity<String> response = userController.deleteUserById(userId, accessToken);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("User doesn't exist", response.getBody());
+    }
+
+    @Test
+    void testDeleteUserById_UserNotDeleted() {
+        Long userId = 1L;
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(userService.existsById(userId)).thenReturn(true);
+        when(userService.existsByIdIsDeleted(userId)).thenReturn(false);
+
+        ResponseEntity<String> response = userController.deleteUserById(userId, accessToken);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void testGetUserByRoleId_Successful() {
+        String role = "USER";
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+
+        EnumRole userRole = EnumRole.USER;
+        List<User> users = Arrays.asList(new User(), new User());
+        when(userService.getUsersByRole(userRole)).thenReturn(users);
+
+        ResponseEntity<Object> response = userController.getUserByRoleId(role, accessToken);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.getBody() instanceof List<?>);
+        assertEquals(users.size(), ((List<?>) response.getBody()).size());
     }
 
     @Test

@@ -119,11 +119,11 @@ public class UserController {
                     //successfully deleting user (soft delete) (user exists in db)
                 }
                 else{
-                    return ResponseEntity.ok("404 Not found");
+                    return ResponseEntity.notFound().build();
                     //gives 404 Not Found error response
                 }
             }
-            else return ResponseEntity.ok("Invalid user ID");
+            else return ResponseEntity.notFound().build();
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
