@@ -1,9 +1,9 @@
 package com.example.devopsproj.Controller;
 
 import com.example.devopsproj.controller.SmsController;
-import com.example.devopsproj.otp.OTPDTO.SmsPojo;
-import com.example.devopsproj.otp.OTPDTO.StoreOTP;
-import com.example.devopsproj.otp.OTPDTO.TempOTP;
+import com.example.devopsproj.dto.responsedto.SmsPojo;
+import com.example.devopsproj.dto.responsedto.StoreOTP;
+import com.example.devopsproj.dto.responsedto.TempOTP;
 import com.example.devopsproj.service.implementations.SmsService;
 import com.example.devopsproj.service.interfaces.IUserService;
 import com.fasterxml.jackson.databind.ObjectMapper;

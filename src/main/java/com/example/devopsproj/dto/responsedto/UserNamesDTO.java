@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Size;
 
 
 @NoArgsConstructor
-@AllArgsConstructor
 @Setter
 @Getter
 @ToString

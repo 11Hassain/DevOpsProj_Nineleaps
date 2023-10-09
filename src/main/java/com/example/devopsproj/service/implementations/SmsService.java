@@ -1,8 +1,8 @@
 package com.example.devopsproj.service.implementations;
 
 
-import com.example.devopsproj.otp.OTPDTO.SmsPojo;
-import com.example.devopsproj.otp.OTPDTO.StoreOTP;
+import com.example.devopsproj.dto.responsedto.SmsPojo;
+import com.example.devopsproj.dto.responsedto.StoreOTP;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;

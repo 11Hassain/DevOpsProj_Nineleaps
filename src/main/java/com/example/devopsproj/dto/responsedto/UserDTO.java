@@ -11,11 +11,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
-@AllArgsConstructor
+
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
 public class UserDTO {
 
     @Positive(message = "id should be a positive number")

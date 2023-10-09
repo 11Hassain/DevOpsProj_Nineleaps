@@ -3,10 +3,10 @@ package com.example.devopsproj.service.interfaces;
 import com.example.devopsproj.dto.requestdto.AccessRequestDTO;
 import com.example.devopsproj.dto.responsedto.AccessResponseDTO;
 import com.example.devopsproj.model.AccessRequest;
-import org.springframework.http.ResponseEntity;
+
 
 import java.util.List;
-import java.util.Optional;
+
 
 public interface AccessRequestService {
 

@@ -1,8 +1,12 @@
 package com.example.devopsproj.dto.requestdto;
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
+@Setter
+@Getter
 public class OTPRequestDTO {
 
     private String phone;

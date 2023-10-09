@@ -21,14 +21,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements IUserService, UserService {
 
     private final UserRepository userRepository;
-    private final ProjectServiceImpl projectServiceImpl;
     private final JwtServiceImpl jwtServiceImpl;
     private final JwtUtils jwtUtils;
     private final ProjectRepository projectRepository;
@@ -69,8 +67,6 @@ public class UserServiceImpl implements IUserService, UserService {
         return userRepository.findById(id);
     }
 
-
-
     @Override
     public boolean existsByIdIsDeleted(Long id) {
         Optional<User> checkUser = userRepository.findById(id);
@@ -105,18 +101,19 @@ public class UserServiceImpl implements IUserService, UserService {
 
     @Override
     public List<UserDTO> getUserDTOsByRole(EnumRole role) {
-            List<User> users = userRepository.findByEnumRole(role);
+        List<User> users = userRepository.findByEnumRole(role);
 
-            return users.stream()
-                    .map(user -> new UserDTO(
-                            user.getId(),
-                            user.getName(),
-                            user.getEmail(),
-                            user.getEnumRole(),
-                            user.getLastUpdated(),
-                            user.getLastLogout()))
-                    .collect(Collectors.toList());
-        }
+        return users.stream()
+                .map(user -> new UserDTO(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail(),
+                        user.getEnumRole(),
+                        user.getLastUpdated(),
+                        user.getLastLogout()))
+                .toList();
+    }
+
 
 
 
@@ -148,11 +145,11 @@ public class UserServiceImpl implements IUserService, UserService {
             // Remove any projects that are marked as deleted
             List<Project> existingProjects = projects.stream()
                     .filter(project -> !project.getDeleted())
-                    .toList();
+                    .toList(); // Replace 'toList()' with 'Stream.toList()'
 
             List<String> projectNames = existingProjects.stream()
                     .map(Project::getProjectName)
-                    .collect(Collectors.toList());
+                    .toList(); // Replace 'toList()' with 'Stream.toList()'
 
             UserProjectsDTO userProjectsDTO = new UserProjectsDTO(user.getId(), user.getName(), projectNames);
             userProjectsDTOs.add(userProjectsDTO);
@@ -245,20 +242,20 @@ public class UserServiceImpl implements IUserService, UserService {
 
     @Override
     public String deleteUserById(Long userId) {
-            Optional<User> userOptional = userRepository.findById(userId);
+        Optional<User> userOptional = userRepository.findById(userId);
 
-            if (userOptional.isPresent()) {
-                User user = userOptional.get();
-                if (user.getDeleted()) {
-                    return "User doesn't exist";
-                } else {
-                    boolean isDeleted = softDeleteUser(userId);
-                    return isDeleted ? "User successfully deleted" : "404 Not found";
-                }
-            } else {
-                return "Invalid user ID";
-            }
+        if (!userOptional.isPresent()) {
+            return "Invalid user ID";
         }
+
+        User user = userOptional.get();
+        if (user.getDeleted()) {
+            return "User doesn't exist";
+        }
+
+        boolean isDeleted = softDeleteUser(userId);
+        return isDeleted ? "User successfully deleted" : "404 Not found";
+    }
 
 
 
@@ -305,17 +302,19 @@ public class UserServiceImpl implements IUserService, UserService {
 
     @Override
     public List<ProjectDTO> getProjectsByRoleIdAndUserId(Long userId, String role) {
-        EnumRole userRole = EnumRole.valueOf(role.toUpperCase()); // Getting value of role(string)
+        EnumRole userRole = EnumRole.valueOf(role.toUpperCase()); // Getting the value of role (string)
         List<Project> projects = getUsersByRoleAndUserId(userId, userRole);
 
         return projects.stream()
                 .map(project -> {
                     List<GitRepositoryDTO> repositoryDTOList = project.getRepositories().stream()
                             .map(repository -> new GitRepositoryDTO(repository.getName(), repository.getDescription()))
-                            .collect(Collectors.toList());
+                            .toList(); // Replace 'Stream.collect(Collectors.toList())' with 'Stream.toList()'
+
                     Figma figma = project.getFigma();
                     String figmaURL = figma != null ? figma.getFigmaURL() : null; // Retrieve the Figma URL
                     FigmaDTO figmaDTO = new FigmaDTO(figmaURL);
+
                     GoogleDrive googleDrive = project.getGoogleDrive();
                     String driveLink = googleDrive != null ? googleDrive.getDriveLink() : null; // Retrieve the driveLink
 
@@ -328,8 +327,9 @@ public class UserServiceImpl implements IUserService, UserService {
                             new GoogleDriveDTO(driveLink) // Pass the GoogleDriveDTO object with driveLink value
                     );
                 })
-                .toList();
+                .toList(); // Replace 'Stream.collect(Collectors.toList())' with 'Stream.toList()'
     }
+
 
 
 

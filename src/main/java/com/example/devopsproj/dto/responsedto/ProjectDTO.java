@@ -12,7 +12,6 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 @NoArgsConstructor
-@AllArgsConstructor
 @Setter
 @Getter
 @ToString
@@ -40,7 +39,7 @@ public class ProjectDTO {
     private String helpDocuments;
 
 
-    public ProjectDTO(Long projectId, String projectName, String projectDescription, List<GitRepositoryDTO> repositories, boolean b, FigmaDTO figma, GoogleDriveDTO googleDrive, boolean b1, Object o, Object object) {
+    public ProjectDTO(Long projectId, String projectName, String projectDescription, List<GitRepositoryDTO> repositories,  FigmaDTO figma, GoogleDriveDTO googleDrive) {
         this.projectId = projectId;
         this.projectName = projectName;
         this.projectDescription = projectDescription;
@@ -73,10 +72,11 @@ public class ProjectDTO {
         this.lastUpdated = lastUpdated;
         this.status = status;
     }
-    public ProjectDTO(Long projectId, String projectName, String projectDescription, List<GitRepositoryDTO> repositoryDTOList, FigmaDTO figmaDTO, GoogleDriveDTO googleDriveDTO) {
+    public ProjectDTO(Long projectId, String projectName) {
         this.projectId = projectId;
         this.projectName = projectName;
     }
+
     public ProjectDTO(
             String projectName,
             String projectDescription,
@@ -96,6 +96,5 @@ public class ProjectDTO {
         this.lastUpdated = lastUpdated;
     }
 
-    public ProjectDTO(Long projectId, String projectName) {
-    }
+
 }

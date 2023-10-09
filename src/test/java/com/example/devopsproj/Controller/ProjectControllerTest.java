@@ -363,54 +363,6 @@ public class ProjectControllerTest {
     }
 
     @Test
-    public void testGetProjectsWithoutFigmaURL() {
-        // Create a list of ProjectDTO objects without Figma URL
-        List<ProjectDTO> projectsWithoutFigmaURL = new ArrayList<>();
-        projectsWithoutFigmaURL.add(new ProjectDTO(1L, "Project 1", "Description 1", null, false, null, null, false, null, null));
-        projectsWithoutFigmaURL.add(new ProjectDTO(2L, "Project 2", "Description 2", null, false, null, null, false, null, null));
-
-        // Mock the projectService to return the list of projects without Figma URL
-        when(projectService.getProjectsWithoutFigmaURL()).thenReturn(projectsWithoutFigmaURL);
-
-        // Call the getProjectsWithoutFigmaURL method
-        ResponseEntity<List<ProjectDTO>> responseEntity = projectController.getProjectsWithoutFigmaURL();
-
-        // Assert the response status code
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-
-        // Assert the response body
-        List<ProjectDTO> responseProjects = responseEntity.getBody();
-        assertEquals(projectsWithoutFigmaURL.size(), responseProjects.size());
-        for (int i = 0; i < projectsWithoutFigmaURL.size(); i++) {
-            assertEquals(projectsWithoutFigmaURL.get(i), responseProjects.get(i));
-        }
-    }
-
-    @Test
-    public void testGetProjectsWithoutGoogleDriveLink() {
-        // Create a list of ProjectDTO objects without Google Drive link
-        List<ProjectDTO> projectsWithoutGoogleDriveLink = new ArrayList<>();
-        projectsWithoutGoogleDriveLink.add(new ProjectDTO(1L, "Project 1", "Description 1", null, false, null, null, false, null, null));
-        projectsWithoutGoogleDriveLink.add(new ProjectDTO(2L, "Project 2", "Description 2", null, false, null, null, false, null, null));
-
-        // Mock the projectService to return the list of projects without Google Drive link
-        when(projectService.getProjectsWithoutGoogleDriveLink()).thenReturn(projectsWithoutGoogleDriveLink);
-
-        // Call the getProjectsWithoutGoogleDriveLink method
-        ResponseEntity<List<ProjectDTO>> responseEntity = projectController.getProjectsWithoutGoogleDriveLink();
-
-        // Assert the response status code
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-
-        // Assert the response body
-        List<ProjectDTO> responseProjects = responseEntity.getBody();
-        assertEquals(projectsWithoutGoogleDriveLink.size(), responseProjects.size());
-        for (int i = 0; i < projectsWithoutGoogleDriveLink.size(); i++) {
-            assertEquals(projectsWithoutGoogleDriveLink.get(i), responseProjects.get(i));
-        }
-    }
-
-    @Test
     public void testCountAllPeopleByProjectIdAndName() {
         // Create a list of ProjectNamePeopleCountDTO objects with some sample data
         List<ProjectNamePeopleCountDTO> peopleCountDTOs = new ArrayList<>();

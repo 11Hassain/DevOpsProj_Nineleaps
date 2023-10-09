@@ -15,47 +15,45 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
 public class UserNamesServiceImpl implements UserNamesService {
 
+    public final GitHubUserValidation gitHubUserValidation;
     private final UserNamesRepository userNamesRepository;
-    private final GitHubUserValidation gitHubUserValidation;
 
-    // Save a GitHub username in the database if it's valid
+
     @Override
     public UserNamesDTO saveUsername(UserNamesDTO userNamesDTO) {
         try {
-            // Check if the GitHub user is valid using GitHubUserValidation
-            boolean isValid = GitHubUserValidation.isGitHubUserValid(userNamesDTO.getUsername(), userNamesDTO.getAccessToken());
-            if (isValid) {
-                UserNames userNames = new UserNames();
-                userNames.setUsername(userNamesDTO.getUsername());
-                userNames.setUser(userNamesDTO.getUser());
-                userNamesRepository.save(userNames);
-                return userNamesDTO; // Return the saved UserNamesDTO
-            } else {
-                throw new GitHubUserNotFoundException("GitHub user not found");
-            }
-        } catch (DataIntegrityViolationException e) {
-            // Handle the case where the username already exists.
-            throw new DuplicateUsernameException("Username already exists");
-        } catch (Exception e) {
-            // Handle other exceptions generically or as needed.
-            throw new CustomGenericException("An error occurred", e);
+        boolean yes = GitHubUserValidation.isGitHubUserValid(userNamesDTO.getUsername(), userNamesDTO.getAccessToken());
+        if (yes){
+            UserNames userNames = new UserNames();
+            userNames.setUsername(userNamesDTO.getUsername());
+            userNames.setUser(userNamesDTO.getUser());
+            userNamesRepository.save(userNames);
+            return userNamesDTO;
+        } else {
+            throw new GitHubUserNotFoundException("GitHub user not found");
         }
+    } catch (DataIntegrityViolationException e) {
+        // Handle the case where the username already exists.
+        throw new DuplicateUsernameException("Username already exists");
+    } catch (Exception e) {
+        // Handle other exceptions generically or as needed.
+        throw new CustomGenericException("An error occurred", e);
+    }
     }
 
-    // Get a list of GitHub usernames by their role
+
+
     @Override
     public List<String> getGitHubUserNamesByRole(EnumRole role) {
-        // Find user names associated with the specified role
         List<UserNames> userNamesList = userNamesRepository.findByUserRole(role);
-        // Extract the usernames and return them as a list of strings
         return userNamesList.stream()
                 .map(UserNames::getUsername)
-                .toList(); // Use Stream.toList() for a simpler alternative
+                .toList();
     }
 }

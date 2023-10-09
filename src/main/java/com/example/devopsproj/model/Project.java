@@ -7,6 +7,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -56,6 +57,13 @@ public class Project {
 
     @OneToOne(mappedBy = "project")
     private GoogleDrive googleDrive;
+    public List<GitRepository> getRepositories() {
+        if (repositories == null) {
+            repositories = new ArrayList<>();
+        }
+        return repositories;
+    }
+
 
 
     public Boolean getDeleted() {

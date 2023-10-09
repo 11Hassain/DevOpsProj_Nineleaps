@@ -1,9 +1,9 @@
 package com.example.devopsproj.controller;
 
 
-import com.example.devopsproj.otp.OTPDTO.SmsPojo;
-import com.example.devopsproj.otp.OTPDTO.StoreOTP;
-import com.example.devopsproj.otp.OTPDTO.TempOTP;
+import com.example.devopsproj.dto.responsedto.SmsPojo;
+import com.example.devopsproj.dto.responsedto.StoreOTP;
+import com.example.devopsproj.dto.responsedto.TempOTP;
 
 
 

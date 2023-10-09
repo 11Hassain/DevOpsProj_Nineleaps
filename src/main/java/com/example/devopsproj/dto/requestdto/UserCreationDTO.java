@@ -3,7 +3,7 @@ package com.example.devopsproj.dto.requestdto;
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import lombok.*;
 
-@Data
+
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString

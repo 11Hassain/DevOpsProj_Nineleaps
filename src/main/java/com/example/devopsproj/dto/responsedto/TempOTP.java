@@ -1,4 +1,4 @@
-package com.example.devopsproj.otp.OTPDTO;
+package com.example.devopsproj.dto.responsedto;
 
 public class TempOTP {
 

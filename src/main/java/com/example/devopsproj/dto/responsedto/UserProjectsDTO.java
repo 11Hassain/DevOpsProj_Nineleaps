@@ -7,7 +7,7 @@ import lombok.*;
 
 import java.util.List;
 
-@Data
+
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
@@ -23,4 +23,5 @@ public class UserProjectsDTO {
     private String userName;
 
     private List<String> projectNames;
+
 }

@@ -119,5 +119,10 @@ public class User implements UserDetails{
         this.enumRole = enumRole;
     }
 
+    public User(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     
 }
