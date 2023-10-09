@@ -4,7 +4,9 @@ import com.example.devopsproj.commons.enumerations.TokenType;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Data
+@Getter
+@Setter
+@ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,13 +15,13 @@ public class Token {
 
     @Id
     @GeneratedValue
-    public Integer id;
+    private Integer id;
 
     @Column(unique = true)
-    public String tokenId;
+    private String tokenId;
 
     @Enumerated(EnumType.STRING)
-    public TokenType tokenType = TokenType.BEARER;
+    private TokenType tokenType = TokenType.BEARER;
 
     @Getter
     @Setter
@@ -31,5 +33,5 @@ public class Token {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    public User user;
+    private User user;
 }
