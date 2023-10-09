@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RestController
@@ -34,7 +33,7 @@ public class ProjectController {
     private final JwtServiceImpl jwtServiceImpl;
 
     private static final String INVALID_TOKEN = "Invalid Token";
-    private static final String INTERNAL_SERVER_ERROR = "Internal server error";
+    private static final String INTERNAL_SERVER_ERROR = "Something went wrong";
 
 
     @PostMapping("/create")
@@ -201,8 +200,6 @@ public class ProjectController {
                         .toList();
 
                 return ResponseEntity.ok(userDTOList);
-            } catch (NoSuchElementException e) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             } catch (Exception e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -240,8 +237,6 @@ public class ProjectController {
                 } else {
                     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
                 }
-            } catch (IllegalArgumentException e) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             } catch (Exception e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -274,9 +269,9 @@ public class ProjectController {
                 if (isDeleted) {
                     return ResponseEntity.ok("Deleted project successfully");
                 } else {
-                    return ResponseEntity.ok("404 Not Found");
+                    return ResponseEntity.notFound().build();
                 }
-            } else return ResponseEntity.ok("Invalid project id");
+            } else return ResponseEntity.notFound().build();
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
         }
@@ -367,8 +362,6 @@ public class ProjectController {
                 ResponseEntity<String> response = projectServiceImpl.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO);
                 if (response.getStatusCode() == HttpStatus.BAD_REQUEST){
                     return ResponseEntity.badRequest().body("Unable to remove user");
-                } else if (response.getStatusCode() == HttpStatus.NOT_FOUND) {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project or User not found");
                 } else {
                     return ResponseEntity.ok("User removed successfully");
                 }

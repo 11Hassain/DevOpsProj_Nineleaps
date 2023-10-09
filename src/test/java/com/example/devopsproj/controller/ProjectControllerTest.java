@@ -2,6 +2,7 @@ package com.example.devopsproj.controller;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.dto.responsedto.*;
+import com.example.devopsproj.exceptions.ConflictException;
 import com.example.devopsproj.exceptions.NotFoundException;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.model.User;
@@ -15,8 +16,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -37,6 +37,8 @@ class ProjectControllerTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
+
+    String INTERNAL_SERVER_ERROR = "Something went wrong";
 
     // ----- SUCCESS (For VALID TOKEN)-----
 
@@ -159,6 +161,522 @@ class ProjectControllerTest {
         ResponseEntity<Object> response = projectController.getAllProjectsWithUsers("valid-access-token");
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void testGetAllUsersByProjectId_Successful() {
+        Long projectId = 1L;
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+
+        List<UserDTO> userDTOList = new ArrayList<>();
+        userDTOList.add(new UserDTO());
+        when(projectService.getAllUsersByProjectId(projectId)).thenReturn(userDTOList);
+
+        ResponseEntity<Object> response = projectController.getAllUsersByProjectId(projectId, accessToken);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.getBody() instanceof List);
+        assertEquals(userDTOList, response.getBody());
+    }
+
+    @Test
+    void testGetAllUsersByProjectId_NoUsersFound() {
+        Long projectId = 1L;
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+
+        when(projectService.getAllUsersByProjectId(projectId)).thenReturn(Collections.emptyList());
+
+        ResponseEntity<Object> response = projectController.getAllUsersByProjectId(projectId, accessToken);
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+    }
+
+    @Test
+    void testGetAllUsersByProjectId_NotFoundException() {
+        Long projectId = 1L;
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+
+        when(projectService.getAllUsersByProjectId(projectId)).thenThrow(new NotFoundException("Project not found"));
+
+        ResponseEntity<Object> response = projectController.getAllUsersByProjectId(projectId, accessToken);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void testGetAllUsersByProjectId_InternalServerError() {
+        Long projectId = 1L;
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+
+        when(projectService.getAllUsersByProjectId(projectId)).thenThrow(new RuntimeException("Something went wrong"));
+
+        ResponseEntity<Object> response = projectController.getAllUsersByProjectId(projectId, accessToken);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    }
+
+    @Test
+    void testGetAllUsersByProjectIdByRole_Successful() {
+        Long projectId = 1L;
+        String role = "USER";
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+
+        EnumRole enumRole = EnumRole.USER;
+        List<User> userList = new ArrayList<>();
+        userList.add(new User());
+        when(projectService.getAllUsersByProjectIdAndRole(projectId, enumRole)).thenReturn(userList);
+
+        ResponseEntity<Object> response = projectController.getAllUsersByProjectIdByRole(projectId, role, accessToken);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.getBody() instanceof List);
+    }
+
+    @Test
+    void testGetAllUsersByProjectIdByRole_NoUsersFound() {
+        Long projectId = 1L;
+        String role = "USER";
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+
+        EnumRole enumRole = EnumRole.USER;
+        when(projectService.getAllUsersByProjectIdAndRole(projectId, enumRole)).thenReturn(Collections.emptyList());
+
+        ResponseEntity<Object> response = projectController.getAllUsersByProjectIdByRole(projectId, role, accessToken);
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+    }
+
+    @Test
+    void testGetAllUsersByProjectIdByRole_InternalServerError() {
+        Long projectId = 1L;
+        String role = "USER";
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+
+        EnumRole enumRole = EnumRole.USER;
+        when(projectService.getAllUsersByProjectIdAndRole(projectId, enumRole))
+                .thenThrow(new RuntimeException("Something went wrong"));
+
+        ResponseEntity<Object> response = projectController.getAllUsersByProjectIdByRole(projectId, role, accessToken);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    }
+
+    @Test
+    void testGetAllUsersByProjectIdByRole_UsernamesNull() {
+        Long projectId = 1L;
+        String role = "USER";
+        String accessToken = "valid_token";
+
+        EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
+        List<User> userList = new ArrayList<>();
+
+        User userWithNullUsernames = new User();
+        userWithNullUsernames.setId(1L);
+        userWithNullUsernames.setName("User Name");
+        userWithNullUsernames.setEmail("user@example.com");
+        userWithNullUsernames.setEnumRole(enumRole);
+        userWithNullUsernames.setUserNames(null); // Set usernames to null
+
+        userList.add(userWithNullUsernames);
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(projectService.getAllUsersByProjectIdAndRole(projectId, enumRole)).thenReturn(userList);
+
+        ResponseEntity<Object> response = projectController.getAllUsersByProjectIdByRole(projectId, role, accessToken);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+
+        List<UserDTO> userDTOList = (List<UserDTO>) response.getBody();
+        assertEquals(1, userDTOList.size());
+
+        UserDTO userDTO = userDTOList.get(0);
+        assertEquals(userWithNullUsernames.getId(), userDTO.getId());
+        assertEquals(userWithNullUsernames.getName(), userDTO.getName());
+        assertEquals(userWithNullUsernames.getEmail(), userDTO.getEmail());
+        assertEquals(userWithNullUsernames.getEnumRole(), userDTO.getEnumRole());
+        assertNull(userDTO.getGitHubUsername()); // Username should be null in the response
+    }
+
+    @Test
+    void testUpdateProject_SuccessfulUpdate() {
+        Long projectId = 1L;
+        ProjectDTO projectDTO = new ProjectDTO();
+        projectDTO.setProjectName("Updated Project");
+        projectDTO.setProjectDescription("Updated Description");
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+
+        Project existingProject = new Project();
+        existingProject.setProjectId(projectId);
+        existingProject.setProjectName("Old Project");
+        existingProject.setProjectDescription("Old Description");
+
+        when(projectService.getProjectById(projectId)).thenReturn(Optional.of(existingProject));
+        when(projectService.updateProject(existingProject)).thenReturn(existingProject);
+
+        ResponseEntity<Object> response = projectController.updateProject(projectId, projectDTO, accessToken);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.getBody() instanceof ProjectDTO);
+        ProjectDTO updatedProjectDTO = (ProjectDTO) response.getBody();
+        assertEquals(projectDTO.getProjectName(), updatedProjectDTO.getProjectName());
+        assertEquals(projectDTO.getProjectDescription(), updatedProjectDTO.getProjectDescription());
+    }
+
+    @Test
+    void testUpdateProject_ProjectNotFound() {
+        Long projectId = 1L;
+        ProjectDTO projectDTO = new ProjectDTO();
+        projectDTO.setProjectName("Updated Project");
+        projectDTO.setProjectDescription("Updated Description");
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(projectService.getProjectById(projectId)).thenReturn(Optional.empty());
+
+        ResponseEntity<Object> response = projectController.updateProject(projectId, projectDTO, accessToken);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void testUpdateProject_InternalServerError() {
+        Long projectId = 1L;
+        ProjectDTO projectDTO = new ProjectDTO();
+        projectDTO.setProjectName("Updated Project");
+        projectDTO.setProjectDescription("Updated Description");
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(projectService.getProjectById(projectId)).thenThrow(new RuntimeException("Something went wrong"));
+
+        ResponseEntity<Object> response = projectController.updateProject(projectId, projectDTO, accessToken);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    }
+
+    @Test
+    void testDeleteProject_SuccessfulDeletion() {
+        Long projectId = 1L;
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(projectService.existsProjectById(projectId)).thenReturn(true);
+        when(projectService.existsByIdIsDeleted(projectId)).thenReturn(false);
+        when(projectService.softDeleteProject(projectId)).thenReturn(true);
+
+        ResponseEntity<String> response = projectController.deleteProject(projectId, accessToken);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Deleted project successfully", response.getBody());
+    }
+
+    @Test
+    void testDeleteProject_FailedDeletion() {
+        Long projectId = 1L;
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(projectService.existsProjectById(projectId)).thenReturn(true);
+        when(projectService.existsByIdIsDeleted(projectId)).thenReturn(false);
+        when(projectService.softDeleteProject(projectId)).thenReturn(false);
+
+        ResponseEntity<String> response = projectController.deleteProject(projectId, accessToken);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void testDeleteProject_ProjectNotFound() {
+        Long projectId = 1L;
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(projectService.existsProjectById(projectId)).thenReturn(false);
+
+        ResponseEntity<String> response = projectController.deleteProject(projectId, accessToken);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void testDeleteProject_AlreadyDeleted() {
+        Long projectId = 1L;
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(projectService.existsProjectById(projectId)).thenReturn(true);
+        when(projectService.existsByIdIsDeleted(projectId)).thenReturn(true);
+
+        ResponseEntity<String> response = projectController.deleteProject(projectId, accessToken);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Project doesn't exist", response.getBody());
+    }
+
+    @Test
+    void testAddUserToProject_SuccessfulAddition() {
+        Long projectId = 1L;
+        Long userId = 2L;
+        String accessToken = "valid_token";
+
+        ResponseEntity<Object> successfulResponse = new ResponseEntity<>("User added successfully", HttpStatus.OK);
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(projectService.addUserToProjectByUserIdAndProjectId(projectId, userId)).thenReturn(successfulResponse);
+
+        ResponseEntity<Object> response = projectController.addUserToProject(projectId, userId, accessToken);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("User added successfully", response.getBody());
+    }
+
+    @Test
+    void testAddUserToProject_ResourceNotFound() {
+        Long projectId = 1L;
+        Long userId = 2L;
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(projectService.addUserToProjectByUserIdAndProjectId(projectId, userId))
+                .thenThrow(new NotFoundException("Resource not found"));
+
+        ResponseEntity<Object> response = projectController.addUserToProject(projectId, userId, accessToken);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("Resource not found", response.getBody());
+    }
+
+    @Test
+    void testAddUserToProject_Conflict() {
+        Long projectId = 1L;
+        Long userId = 2L;
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(projectService.addUserToProjectByUserIdAndProjectId(projectId, userId))
+                .thenThrow(new ConflictException("User already exists in the project"));
+
+        ResponseEntity<Object> response = projectController.addUserToProject(projectId, userId, accessToken);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("User already exists in the project", response.getBody());
+    }
+
+    @Test
+    void testAddUserToProject_InternalServerError() {
+        Long projectId = 1L;
+        Long userId = 2L;
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(projectService.addUserToProjectByUserIdAndProjectId(projectId, userId))
+                .thenThrow(new RuntimeException("Something went wrong"));
+
+        ResponseEntity<Object> response = projectController.addUserToProject(projectId, userId, accessToken);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("Something went wrong", response.getBody());
+    }
+
+    @Test
+    void testRemoveUserFromProject_SuccessfulRemoval() {
+        Long projectId = 1L;
+        Long userId = 2L;
+        String accessToken = "valid_token";
+
+        ResponseEntity<String> successfulResponse = new ResponseEntity<>("User removed successfully", HttpStatus.OK);
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(projectService.removeUserFromProjectByUserIdAndProjectId(projectId, userId)).thenReturn(successfulResponse);
+
+        ResponseEntity<String> response = projectController.removeUserFromProject(projectId, userId, accessToken);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("User removed successfully", response.getBody());
+    }
+
+    @Test
+    void testRemoveUserFromProject_ResourceNotFound() {
+        Long projectId = 1L;
+        Long userId = 2L;
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(projectService.removeUserFromProjectByUserIdAndProjectId(projectId, userId))
+                .thenThrow(new NotFoundException("Resource not found"));
+
+        ResponseEntity<String> response = projectController.removeUserFromProject(projectId, userId, accessToken);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("Resource not found", response.getBody());
+    }
+
+    @Test
+    void testRemoveUserFromProject_InternalServerError() {
+        Long projectId = 1L;
+        Long userId = 2L;
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(projectService.removeUserFromProjectByUserIdAndProjectId(projectId, userId))
+                .thenThrow(new RuntimeException("Something went wrong"));
+
+        ResponseEntity<String> response = projectController.removeUserFromProject(projectId, userId, accessToken);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("Something went wrong", response.getBody());
+    }
+
+    @Test
+    void testRemoveUserFromProjectAndRepo_SuccessfulRemoval() {
+        Long projectId = 1L;
+        Long userId = 2L;
+        CollaboratorDTO collaboratorDTO = new CollaboratorDTO();
+        String accessToken = "valid_token";
+
+        ResponseEntity<String> successfulResponse = new ResponseEntity<>("User removed successfully", HttpStatus.OK);
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(projectService.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO)).thenReturn(successfulResponse);
+
+        ResponseEntity<String> response = projectController.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO, accessToken);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("User removed successfully", response.getBody());
+    }
+
+    @Test
+    void testRemoveUserFromProjectAndRepo_UserNotFound() {
+        Long projectId = 1L;
+        Long userId = 2L;
+        CollaboratorDTO collaboratorDTO = new CollaboratorDTO();
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(projectService.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO))
+                .thenThrow(new NotFoundException("User not found"));
+
+        ResponseEntity<String> response = projectController.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO, accessToken);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("Project or User not found", response.getBody());
+    }
+
+    @Test
+    void testRemoveUserFromProjectAndRepo_ProjectNotFound() {
+        Long projectId = 1L;
+        Long userId = 2L;
+        CollaboratorDTO collaboratorDTO = new CollaboratorDTO();
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(projectService.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO))
+                .thenThrow(new NotFoundException("Project not found"));
+
+        ResponseEntity<String> response = projectController.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO, accessToken);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("Project or User not found", response.getBody());
+    }
+
+    @Test
+    void testRemoveUserFromProjectAndRepo_BadRequest() {
+        Long projectId = 1L;
+        Long userId = 2L;
+        CollaboratorDTO collaboratorDTO = new CollaboratorDTO();
+        String accessToken = "valid_token";
+
+        ResponseEntity<String> badRequestResponse = new ResponseEntity<>("Unable to remove user", HttpStatus.BAD_REQUEST);
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(projectService.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO)).thenReturn(badRequestResponse);
+
+        ResponseEntity<String> response = projectController.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO, accessToken);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Unable to remove user", response.getBody());
+    }
+
+    @Test
+    void testRemoveUserFromProjectAndRepo_InternalServerError() {
+        Long projectId = 1L;
+        Long userId = 2L;
+        CollaboratorDTO collaboratorDTO = new CollaboratorDTO();
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(projectService.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO))
+                .thenThrow(new RuntimeException("Something went wrong"));
+
+        ResponseEntity<String> response = projectController.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO, accessToken);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("Something went wrong", response.getBody());
+    }
+
+    @Test
+    void testAddRepositoryToProject_SuccessfulAddition() {
+        Long projectId = 1L;
+        Long repoId = 2L;
+        String accessToken = "valid_token";
+
+        ResponseEntity<Object> successfulResponse = ResponseEntity.ok("Stored successfully");
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(projectService.addRepositoryToProject(projectId, repoId)).thenReturn(successfulResponse);
+
+        ResponseEntity<Object> response = projectController.addRepositoryToProject(projectId, repoId, accessToken);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Stored successfully", response.getBody());
+    }
+
+    @Test
+    void testAddRepositoryToProject_RepositoryNotFound() {
+        Long projectId = 1L;
+        Long repoId = 2L;
+        String accessToken = "valid_token";
+
+        ResponseEntity<Object> notFoundResponse = ResponseEntity.status(HttpStatus.NOT_FOUND).body("Repository or Project not found");
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(projectService.addRepositoryToProject(projectId, repoId)).thenReturn(notFoundResponse);
+
+        ResponseEntity<Object> response = projectController.addRepositoryToProject(projectId, repoId, accessToken);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("Repository or Project not found", response.getBody());
+    }
+
+    @Test
+    void testAddRepositoryToProject_InternalServerError() {
+        Long projectId = 1L;
+        Long repoId = 2L;
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(projectService.addRepositoryToProject(projectId, repoId)).thenThrow(new RuntimeException("Something went wrong"));
+
+        ResponseEntity<Object> response = projectController.addRepositoryToProject(projectId, repoId, accessToken);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
 
     @Test
@@ -548,6 +1066,19 @@ class ProjectControllerTest {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
+    }
+
+    @Test
+    void testGetProjectDetailsById_InternalServerError() {
+        Long projectId = 1L;
+        String accessToken = "valid_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        when(projectService.getProjectDetailsById(projectId)).thenThrow(new RuntimeException("Something went wrong"));
+
+        ResponseEntity<Object> response = projectController.getProjectDetailsById(accessToken, projectId);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
 
 
