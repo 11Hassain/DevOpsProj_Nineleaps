@@ -2,10 +2,13 @@ package com.example.devopsproj.controller;
 
 import com.example.devopsproj.dto.responsedto.FigmaDTO;
 import com.example.devopsproj.dto.responsedto.FigmaScreenshotDTO;
+import com.example.devopsproj.dto.responsedto.ProjectDTO;
 import com.example.devopsproj.exceptions.NotFoundException;
 import com.example.devopsproj.model.Figma;
+import com.example.devopsproj.model.Project;
 import com.example.devopsproj.service.implementations.FigmaServiceImpl;
 import com.example.devopsproj.service.implementations.JwtServiceImpl;
+import com.example.devopsproj.utils.DTOModelMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -99,6 +102,48 @@ class FigmaControllerTest {
 
         assertNotNull(responseFigmaDTOs);
         assertTrue(responseFigmaDTOs.isEmpty());
+    }
+
+    @Test
+    void testGetAllFigmaProjects_ProjectNotNull() {
+        String accessToken = "valid_access_token";
+
+        // Mock the JWT service to return true for a valid token
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+
+        // Create a mock list of Figma objects with a non-null project
+        List<Figma> mockFigmaProjects = new ArrayList<>();
+        Project mockProject = new Project();
+        mockProject.setProjectId(1L);
+        mockProject.setProjectName("Test Project");
+        Figma mockFigma = new Figma();
+        mockFigma.setFigmaId(1L);
+        mockFigma.setProject(mockProject);
+        mockFigma.setFigmaURL("https://example.com/figma1");
+        mockFigmaProjects.add(mockFigma);
+
+        // Mock the figmaServiceImpl to return the mockFigmaProjects list
+        when(figmaService.getAllFigmaProjects()).thenReturn(mockFigmaProjects);
+
+        // Perform the controller method call
+        ResponseEntity<Object> response = figmaController.getAllFigmaProjects(accessToken);
+
+        // Verify that the response is OK (200)
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        // Verify that the response contains the expected Figma objects
+        List<FigmaDTO> responseDTOs = (List<FigmaDTO>) response.getBody();
+        assertNotNull(responseDTOs);
+        assertEquals(1, responseDTOs.size());
+
+//        // Verify that the FigmaDTO matches the expected values
+//        FigmaDTO expectedDTO = new FigmaDTO(
+//                mockFigma.getFigmaId(),
+//                new ProjectDTO(mockProject.getProjectId(), mockProject.getProjectName()),
+//                mockFigma.getFigmaURL()
+//        );
+//
+//        assertEquals(expectedDTO, responseDTOs.get(0));
     }
 
     @Test
