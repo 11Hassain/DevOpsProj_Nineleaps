@@ -5,7 +5,6 @@ import com.example.devopsproj.model.UserNames;
 import com.example.devopsproj.dto.responsedto.UserNamesDTO;
 import com.example.devopsproj.repository.UserNamesRepository;
 import com.example.devopsproj.service.interfaces.UserNamesService;
-import com.example.devopsproj.utils.GitHubUserValidation;
 import com.example.devopsproj.utils.GitHubUserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
