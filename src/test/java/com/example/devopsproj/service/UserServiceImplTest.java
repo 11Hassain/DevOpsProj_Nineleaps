@@ -6,32 +6,24 @@ import com.example.devopsproj.dto.responsedto.GitRepositoryDTO;
 import com.example.devopsproj.dto.responsedto.ProjectDTO;
 import com.example.devopsproj.dto.responsedto.UserDTO;
 import com.example.devopsproj.dto.responsedto.UserProjectsDTO;
-import com.example.devopsproj.model.GitRepository;
-import com.example.devopsproj.model.Project;
-import com.example.devopsproj.model.User;
+import com.example.devopsproj.model.*;
 import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.repository.UserRepository;
 import com.example.devopsproj.service.implementations.JwtServiceImpl;
 import com.example.devopsproj.service.implementations.ProjectServiceImpl;
 import com.example.devopsproj.service.implementations.UserServiceImpl;
-import com.example.devopsproj.utils.JwtUtils;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -48,8 +40,6 @@ class UserServiceImplTest {
     private ProjectRepository projectRepository;
     @Mock
     private JwtServiceImpl jwtService;
-    @Mock
-    private JwtUtils jwtUtils;
 
     @BeforeEach
     void setUp() {
@@ -341,18 +331,53 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testProjectExists_ProjectExists() {
-        String projectName = "Project A";
+    void testProjectExistsWhenProjectExists() {
+        String projectName = "ExistingProject";
         List<Project> projects = new ArrayList<>();
-        Project projectA = new Project();
-        projectA.setProjectName(projectName);
-        projects.add(projectA);
+        Project existingProject = new Project();
+        existingProject.setProjectName(projectName);
+        projects.add(existingProject);
 
         when(projectRepository.findAllProjects()).thenReturn(projects);
 
         boolean result = userService.projectExists(projectName);
 
         assertTrue(result);
+    }
+
+    @Test
+    void testProjectExistsWhenProjectDoesNotExist() {
+        String projectName = "NonExistingProject";
+        List<Project> projects = new ArrayList<>();
+        Project existingProject = new Project();
+        existingProject.setProjectName("ExistingProject");
+        projects.add(existingProject);
+
+        when(projectRepository.findAllProjects()).thenReturn(projects);
+        boolean result = userService.projectExists(projectName);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void testProjectExistsWithNullProjectName() {
+        String projectName = null;
+
+        boolean result = userService.projectExists(projectName);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void testProjectExistsWithEmptyProjectList() {
+        String projectName = "ExistingProject";
+        List<Project> projects = new ArrayList<>();
+
+        when(projectRepository.findAllProjects()).thenReturn(projects);
+
+        boolean result = userService.projectExists(projectName);
+
+        assertFalse(result);
     }
 
     @Test
@@ -425,6 +450,46 @@ class UserServiceImplTest {
     }
 
     @Test
+    void testGetProjectsByRoleAndUserIdWithFigmaAndDrive() {
+        User user = new User();
+        user.setId(1L);
+        EnumRole userRole = EnumRole.USER;
+        Project project = new Project();
+        Figma figma = new Figma();
+        figma.setFigmaURL("https://example.com/figma");
+        project.setFigma(figma);
+        project.setRepositories(new ArrayList<>());
+        GoogleDrive googleDrive = new GoogleDrive();
+        googleDrive.setDriveLink("https://example.com/drive");
+        project.setGoogleDrive(googleDrive);
+        List<Project> projects = Collections.singletonList(project);
+
+        when(userRepository.findByRoleAndUserId(1L, userRole)).thenReturn(projects);
+
+        ResponseEntity<Object> response = userService.getProjectsByRoleAndUserId(1L, "user");
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+    }
+
+    @Test
+    void testGetProjectsByRoleAndUserIdWithNullFigmaAndDrive() {
+        User user = new User();
+        user.setId(1L);
+        EnumRole userRole = EnumRole.USER;
+        Project project = new Project();
+        project.setRepositories(new ArrayList<>());
+        List<Project> projects = Collections.singletonList(project);
+
+        when(userRepository.findByRoleAndUserId(1L, userRole)).thenReturn(projects);
+
+        ResponseEntity<Object> response = userService.getProjectsByRoleAndUserId(1L, "user");
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+    }
+
+    @Test
     void testLoginVerification_Successful() {
         String userEmail = "johndoe@example.com";
         User user = new User();
@@ -448,10 +513,6 @@ class UserServiceImplTest {
         assertNotNull(result.getLastUpdated());
         assertEquals(mockToken, result.getToken());
     }
-
-
-
-
 
     @Test
     void testUserLogout_Successful() {
@@ -621,18 +682,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testProjectExists_ProjectDoesNotExist() {
-        String projectName = "Project A";
-        List<Project> projects = new ArrayList<>();
-
-        when(projectRepository.findAllProjects()).thenReturn(projects);
-
-        boolean result = userService.projectExists(projectName);
-
-        assertFalse(result);
-    }
-
-    @Test
     void testGetAllUsers_EmptyData() {
         List<User> users = new ArrayList<>();
 
@@ -642,6 +691,65 @@ class UserServiceImplTest {
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void testGetAllProjectsAndRepositoriesByUserId() {
+        User user = new User();
+        user.setId(1L);
+        user.setName("John");
+        user.setProjects(new ArrayList<>());
+
+        Project project1 = new Project();
+        project1.setProjectId(101L);
+        project1.setProjectName("Project A");
+        project1.setRepositories(new ArrayList<>());
+
+        Project project2 = new Project();
+        project2.setProjectId(102L);
+        project2.setProjectName("Project B");
+        project2.setRepositories(new ArrayList<>());
+
+        GitRepository repo1 = new GitRepository();
+        repo1.setRepoId(201L);
+        repo1.setName("Repo 1");
+
+        GitRepository repo2 = new GitRepository();
+        repo2.setRepoId(202L);
+        repo2.setName("Repo 2");
+
+        project1.getRepositories().add(repo1);
+        project1.getRepositories().add(repo2);
+
+        user.getProjects().add(project1);
+        user.getProjects().add(project2);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        List<ProjectDTO> result = userService.getAllProjectsAndRepositoriesByUserId(1L);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+
+        ProjectDTO projectDTO1 = result.get(0);
+        assertEquals(101L, projectDTO1.getProjectId());
+        assertEquals("Project A", projectDTO1.getProjectName());
+        assertEquals(2, projectDTO1.getRepositories().size());
+
+        ProjectDTO projectDTO2 = result.get(1);
+        assertEquals(102L, projectDTO2.getProjectId());
+        assertEquals("Project B", projectDTO2.getProjectName());
+        assertEquals(0, projectDTO2.getRepositories().size());
+
+        GitRepositoryDTO repoDTO1 = projectDTO1.getRepositories().get(0);
+        assertEquals(201L, repoDTO1.getRepoId());
+        assertEquals("Repo 1", repoDTO1.getName());
+
+        GitRepositoryDTO repoDTO2 = projectDTO1.getRepositories().get(1);
+        assertEquals(202L, repoDTO2.getRepoId());
+        assertEquals("Repo 2", repoDTO2.getName());
+
+        verify(userRepository, times(1)).findById(1L);
     }
 
     @Test
