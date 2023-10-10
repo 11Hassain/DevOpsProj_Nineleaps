@@ -108,10 +108,8 @@ class FigmaControllerTest {
     void testGetAllFigmaProjects_ProjectNotNull() {
         String accessToken = "valid_access_token";
 
-        // Mock the JWT service to return true for a valid token
         when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
 
-        // Create a mock list of Figma objects with a non-null project
         List<Figma> mockFigmaProjects = new ArrayList<>();
         Project mockProject = new Project();
         mockProject.setProjectId(1L);
@@ -122,16 +120,12 @@ class FigmaControllerTest {
         mockFigma.setFigmaURL("https://example.com/figma1");
         mockFigmaProjects.add(mockFigma);
 
-        // Mock the figmaServiceImpl to return the mockFigmaProjects list
         when(figmaService.getAllFigmaProjects()).thenReturn(mockFigmaProjects);
 
-        // Perform the controller method call
         ResponseEntity<Object> response = figmaController.getAllFigmaProjects(accessToken);
 
-        // Verify that the response is OK (200)
         assertEquals(HttpStatus.OK, response.getStatusCode());
 
-        // Verify that the response contains the expected Figma objects
         List<FigmaDTO> responseDTOs = (List<FigmaDTO>) response.getBody();
         assertNotNull(responseDTOs);
         assertEquals(1, responseDTOs.size());
