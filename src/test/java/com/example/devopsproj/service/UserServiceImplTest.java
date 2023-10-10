@@ -12,6 +12,7 @@ import com.example.devopsproj.repository.UserRepository;
 import com.example.devopsproj.service.implementations.JwtServiceImpl;
 import com.example.devopsproj.service.implementations.ProjectServiceImpl;
 import com.example.devopsproj.service.implementations.UserServiceImpl;
+import com.example.devopsproj.utils.JwtUtils;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,8 @@ class UserServiceImplTest {
     private ProjectRepository projectRepository;
     @Mock
     private JwtServiceImpl jwtService;
+    @Mock
+    private JwtUtils jwtUtils;
 
     @BeforeEach
     void setUp() {
@@ -502,6 +505,8 @@ class UserServiceImplTest {
 
         String mockToken = "mocked-jwt-token";
         when(jwtService.generateToken(user)).thenReturn(mockToken);
+
+        doNothing().when(jwtUtils).saveUserToken(user, mockToken);
 
         UserDTO result = userService.loginVerification(userEmail);
 
