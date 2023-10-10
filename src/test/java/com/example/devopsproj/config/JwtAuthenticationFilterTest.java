@@ -1,4 +1,4 @@
-package com.example.devopsproj;
+package com.example.devopsproj.config;
 
 import com.example.devopsproj.config.JwtAuthenticationFilter;
 import com.example.devopsproj.repository.TokenRepository;

@@ -2,11 +2,10 @@ package com.example.devopsproj.service;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.dto.responsedto.UserNamesDTO;
-import com.example.devopsproj.model.User;
 import com.example.devopsproj.model.UserNames;
 import com.example.devopsproj.repository.UserNamesRepository;
 import com.example.devopsproj.service.implementations.UserNamesServiceImpl;
-import com.example.devopsproj.utils.GitHubUserValidation;
+import com.example.devopsproj.utils.GitHubUserValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -27,7 +26,7 @@ class UserNamesServiceImplTest {
     @Mock
     private UserNamesRepository userNamesRepository;
     @Mock
-    private GitHubUserValidation gitHubUserValidation;
+    private GitHubUserValidator gitHubUserValidator;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -55,6 +54,20 @@ class UserNamesServiceImplTest {
         assertTrue(userNames.contains("Username2"));
     }
 
+    @Test
+    void testSaveUsernameWithValidUser() {
+        UserNamesDTO userNamesDTO = new UserNamesDTO();
+        userNamesDTO.setUsername("UserName1");
+        userNamesDTO.setAccessToken("valid_github_access_token");
+
+        when(gitHubUserValidator.isGitHubUserValid(userNamesDTO.getUsername(), userNamesDTO.getAccessToken()))
+                .thenReturn(true);
+
+        UserNamesDTO result = userNamesService.saveUsername(userNamesDTO);
+
+        assertNotNull(result);
+    }
+
     // ----- FAILURE -----
 
 
@@ -67,6 +80,20 @@ class UserNamesServiceImplTest {
 
         assertNotNull(userNames);
         assertTrue(userNames.isEmpty());
+    }
+
+    @Test
+    void testSaveUsernameWithInvalidUser() {
+        UserNamesDTO userNamesDTO = new UserNamesDTO();
+        userNamesDTO.setUsername("InvalidUser");
+        userNamesDTO.setAccessToken("invalid_github_access_token");
+
+        when(gitHubUserValidator.isGitHubUserValid(userNamesDTO.getUsername(), userNamesDTO.getAccessToken()))
+                .thenReturn(false);
+
+        UserNamesDTO result = userNamesService.saveUsername(userNamesDTO);
+
+        assertNull(result);
     }
 
 }

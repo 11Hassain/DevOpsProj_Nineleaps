@@ -6,6 +6,7 @@ import com.example.devopsproj.dto.responsedto.UserNamesDTO;
 import com.example.devopsproj.repository.UserNamesRepository;
 import com.example.devopsproj.service.interfaces.UserNamesService;
 import com.example.devopsproj.utils.GitHubUserValidation;
+import com.example.devopsproj.utils.GitHubUserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,11 +18,11 @@ public class UserNamesServiceImpl implements UserNamesService {
 
     private final UserNamesRepository userNamesRepository;
 
-    public final GitHubUserValidation gitHubUserValidation;
+    public final GitHubUserValidator gitHubUserValidator;
 
     @Override
     public UserNamesDTO saveUsername(UserNamesDTO userNamesDTO) {
-        boolean yes = GitHubUserValidation.isGitHubUserValid(userNamesDTO.getUsername(), userNamesDTO.getAccessToken());
+        boolean yes = gitHubUserValidator.isGitHubUserValid(userNamesDTO.getUsername(), userNamesDTO.getAccessToken());
         if (yes){
             UserNames userNames = new UserNames();
             userNames.setUsername(userNamesDTO.getUsername());
