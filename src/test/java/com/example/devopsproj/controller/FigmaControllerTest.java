@@ -135,15 +135,6 @@ class FigmaControllerTest {
         List<FigmaDTO> responseDTOs = (List<FigmaDTO>) response.getBody();
         assertNotNull(responseDTOs);
         assertEquals(1, responseDTOs.size());
-
-//        // Verify that the FigmaDTO matches the expected values
-//        FigmaDTO expectedDTO = new FigmaDTO(
-//                mockFigma.getFigmaId(),
-//                new ProjectDTO(mockProject.getProjectId(), mockProject.getProjectName()),
-//                mockFigma.getFigmaURL()
-//        );
-//
-//        assertEquals(expectedDTO, responseDTOs.get(0));
     }
 
     @Test
