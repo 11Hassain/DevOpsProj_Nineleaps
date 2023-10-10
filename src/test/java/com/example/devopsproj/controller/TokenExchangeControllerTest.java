@@ -38,7 +38,6 @@ class TokenExchangeControllerTest {
 
     @Test
     void testTokenExchange_Success() throws IOException {
-        // Arrange
         String authorizationCode = "validAuthorizationCode";
         String expectedResponseBody = "{\"error\":\"invalid_request\",\"error_description\":\"Could not determine client ID from request.\"}";
         String actualResponseBody = "{\"error\":\"invalid_request\",\"error_description\":\"Could not determine client ID from request.\"}";
@@ -54,15 +53,10 @@ class TokenExchangeControllerTest {
         when(httpResponse.getStatusLine()).thenReturn(new BasicStatusLine(
                 new ProtocolVersion("HTTP", 1, 1), HttpStatus.SC_OK, null));
 
-        // Act
         ResponseEntity<Object> responseEntity = tokenExchangeController.tokenExchange(authorizationCode);
 
-        // Assert
         assertEquals(HttpStatus.SC_OK, responseEntity.getStatusCode().value());
-
-        // Compare JSON objects
         assertEquals(expectedJson, actualJson);
     }
-
 
 }
