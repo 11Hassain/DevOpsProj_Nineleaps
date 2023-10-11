@@ -76,7 +76,7 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
     @Transactional
     public void deleteRepository(Long repoId) {
         GitRepository repository = gitRepositoryRepository.findByRepoId(repoId)
-                .orElseThrow(() -> new RuntimeException("Repository not found with repoId: " + repoId));
+                .orElseThrow(() -> new NotFoundException("Repository with repoId " + repoId + " not found."));
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(GITHUB_ACCESS_TOKEN);
@@ -96,8 +96,6 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
             }
 
             gitRepositoryRepository.delete(repository);
-        } catch (HttpClientErrorException.NotFound e) {
-            throw new NotFoundException("Repository with repoId " + repoId + " not found.");
         } catch (Exception e) {
             throw new RepositoryDeletionException("Error deleting repository with repoId " + repoId);
         }
