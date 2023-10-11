@@ -45,6 +45,11 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
                 helpDocuments.setData(file.getBytes());
                 helpDocuments.setFileExtension(fileExtension);
             }
+        } else {
+            // Handle the case where the file is empty or null
+            helpDocuments.setFileName(null);
+            helpDocuments.setData(new byte[0]);
+            helpDocuments.setFileExtension(fileExtension);
         }
     }
 

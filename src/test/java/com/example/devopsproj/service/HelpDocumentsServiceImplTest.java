@@ -196,9 +196,37 @@ class HelpDocumentsServiceImplTest {
         helpDocumentsService.saveFile(helpDocuments, file, fileExtension);
 
         assertNull(helpDocuments.getFileName());
-        assertNull(helpDocuments.getData());
-        assertNull(helpDocuments.getFileExtension());
+        assertArrayEquals(new byte[0], helpDocuments.getData());
+        assertEquals("pdf", helpDocuments.getFileExtension());
     }
+
+
+    @Test
+    void testSaveFile_EmptyFile() throws IOException {
+        HelpDocuments helpDocuments = new HelpDocuments();
+        MultipartFile file = createEmptyMultipartFile(); // Create an empty MultipartFile
+        String fileExtension = "pdf";
+
+        helpDocumentsService.saveFile(helpDocuments, file, fileExtension);
+
+        assertNull(helpDocuments.getFileName());
+        assertArrayEquals(new byte[0], helpDocuments.getData());
+        assertEquals("pdf", helpDocuments.getFileExtension());
+    }
+
+    @Test
+    void testSaveFile_NullOriginalFilename() throws IOException {
+        HelpDocuments helpDocuments = new HelpDocuments();
+        MultipartFile file = createMockMultipartFileWithNullOriginalFilename(); // Create a MultipartFile with null original filename
+        String fileExtension = "pdf";
+
+        helpDocumentsService.saveFile(helpDocuments, file, fileExtension);
+
+        assertEquals("", helpDocuments.getFileName());
+        assertArrayEquals("Mock PDF Content".getBytes(), helpDocuments.getData());
+        assertEquals("pdf", helpDocuments.getFileExtension());
+    }
+
 
     @Test
     void testGetFileExtension_FilenameWithoutExtension() {
@@ -214,6 +242,16 @@ class HelpDocumentsServiceImplTest {
         assertNull(fileExtension2);
         assertNull(fileExtension3);
     }
+
+    @Test
+    void testGetFileExtension_FilenameWithMixedCaseExtension() {
+        MultipartFile file = new MockMultipartFile("file", "document.PdF", "application/pdf", new byte[0]);
+
+        String fileExtension = helpDocumentsService.getFileExtension(file);
+
+        assertEquals("pdf", fileExtension.toLowerCase());
+    }
+
 
     @Test
     void testGetAllDocumentsByProjectId_NoFilesFound() {
@@ -251,6 +289,42 @@ class HelpDocumentsServiceImplTest {
     }
 
     @Test
+    void testGetAllDocumentsByProjectId_FilteredFiles() {
+        Long projectId = 1L;
+
+        List<HelpDocuments> pdfFiles = new ArrayList<>();
+
+        HelpDocuments pdfFile1 = new HelpDocuments();
+        pdfFile1.setHelpDocumentId(1L);
+        pdfFile1.setFileName("Document1.pdf");
+
+        Project project1 = new Project();
+        project1.setProjectId(projectId);
+
+        pdfFile1.setProject(project1);
+        pdfFiles.add(pdfFile1);
+
+        HelpDocuments pdfFile2 = new HelpDocuments();
+        pdfFile2.setHelpDocumentId(2L);
+        pdfFile2.setFileName("Document2.pdf");
+
+        Project project2 = new Project();
+        project2.setProjectId(projectId + 1); // Different projectId
+
+        pdfFile2.setProject(project2);
+        pdfFiles.add(pdfFile2);
+
+        when(helpDocumentsRepository.findAll()).thenReturn(pdfFiles);
+
+        List<HelpDocumentsDTO> result = helpDocumentsService.getAllDocumentsByProjectId(projectId);
+
+        assertEquals(1, result.size());
+        assertEquals(1L, result.get(0).getHelpDocumentId());
+        assertEquals("Document1.pdf", result.get(0).getFileName());
+    }
+
+
+    @Test
     void testGetDocumentById_InvalidId() {
         Long fileId = 1L;
         when(helpDocumentsRepository.findById(fileId)).thenReturn(Optional.empty());
@@ -272,5 +346,14 @@ class HelpDocumentsServiceImplTest {
 
     private MultipartFile createMockMultipartFile() {
         return new MockMultipartFile("file", "test.pdf", "application/pdf", "Mock PDF Content".getBytes());
+    }
+
+    private MultipartFile createEmptyMultipartFile() {
+        return new MockMultipartFile("file", "test.pdf", "application/pdf", new byte[0]);
+    }
+
+    private MultipartFile createMockMultipartFileWithNullOriginalFilename() {
+        // Create a MockMultipartFile with a null original filename
+        return new MockMultipartFile("file", null, "application/pdf", "Mock PDF Content".getBytes());
     }
 }
