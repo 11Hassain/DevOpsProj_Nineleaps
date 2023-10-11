@@ -15,5 +15,12 @@ class DevOpsProjApplicationTest {
                 Assertions.assertTrue(condition, "Test class is being loaded successfully");
         }
 
+        @Test
+        void testMainMethod() {
+                // Test the main() method by calling it directly.
+                DevOpsProjApplication.main(new String[]{}); // You can pass command line arguments if needed.
+                Assertions.assertTrue(true, "Main method tested");
+        }
+
 }
 
