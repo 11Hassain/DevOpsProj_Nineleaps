@@ -17,8 +17,7 @@ class DevOpsProjApplicationTest {
 
         @Test
         void testMainMethod() {
-                // Test the main() method by calling it directly.
-                DevOpsProjApplication.main(new String[]{}); // You can pass command line arguments if needed.
+                DevOpsProjApplication.main(new String[]{});
                 Assertions.assertTrue(true, "Main method tested");
         }
 
