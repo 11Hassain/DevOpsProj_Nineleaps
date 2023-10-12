@@ -16,13 +16,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-
 @Service
 @RequiredArgsConstructor
 public class UserNamesServiceImpl implements UserNamesService {
 
     public final GitHubUserValidation gitHubUserValidation;
     private final UserNamesRepository userNamesRepository;
+
+
 
 
     @Override

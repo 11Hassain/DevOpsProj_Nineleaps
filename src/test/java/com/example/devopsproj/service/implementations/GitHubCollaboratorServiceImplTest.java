@@ -14,73 +14,125 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-public class GitHubCollaboratorServiceImplTest {
+import com.example.devopsproj.dto.responsedto.CollaboratorDTO;
+import com.example.devopsproj.service.interfaces.GitHubCollaboratorService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.*;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
-    @Mock
-    private RestTemplate restTemplate;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import com.example.devopsproj.dto.responsedto.CollaboratorDTO;
+import com.example.devopsproj.service.implementations.GitHubCollaboratorServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+
+import org.springframework.http.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+class GitHubCollaboratorServiceImplTest {
 
     @InjectMocks
     private GitHubCollaboratorServiceImpl gitHubCollaboratorService;
+    @Mock
+    private RestTemplate restTemplate;
 
     @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
-//    @Test
-//    public void testAddCollaborator_Success() {
-//        // Arrange
-//        CollaboratorDTO collaboratorDTO = new CollaboratorDTO("owner", "repo", "username", "access-token");
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setBearerAuth("access-token");
-//
-//        ResponseEntity<String> successResponse = new ResponseEntity<>("Success", HttpStatus.OK);
-//
-//        when(restTemplate.exchange(
-//                eq("https://api.github.com/repos/owner/repo/collaborators/username"),
-//                eq(HttpMethod.PUT),
-//                any(HttpEntity.class),
-//                eq(String.class)))
-//                .thenReturn(successResponse);
-//
-//        // Act
-//        boolean result = gitHubCollaboratorService.addCollaborator(collaboratorDTO);
-//
-//        // Assert
-//        assertTrue(result);
-//
-//        // Verify that restTemplate.exchange is called with the correct parameters
-//        verify(restTemplate, times(1)).exchange(
-//                eq("https://api.github.com/repos/owner/repo/collaborators/username"),
-//                eq(HttpMethod.PUT),
-//                any(HttpEntity.class),
-//                eq(String.class));
-//    }
-//
-//
-//    @Test
-//    public void testAddCollaborator_Failure_Unauthorized() {
-//        // Arrange
-//        CollaboratorDTO collaboratorDTO = new CollaboratorDTO("owner", "repo", "username", "invalid-access-token");
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setBearerAuth("invalid-access-token");
-//
-//        ResponseEntity<String> unauthorizedResponse = new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
-//
-//        when(restTemplate.exchange(
-//                eq("https://api.github.com/repos/owner/repo/collaborators/username"),
-//                eq(HttpMethod.PUT),
-//                any(HttpEntity.class),
-//                eq(String.class)))
-//                .thenThrow(new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Unauthorized"));
-//
-//        // Act
-//        boolean result = gitHubCollaboratorService.addCollaborator(collaboratorDTO);
-//
-//        // Assert
-//        assertFalse(result);
-//    }
+    @Test
+    void testCreateHttpHeaders() {
+        String accessToken = "your-access-token";
+
+        HttpHeaders headers = gitHubCollaboratorService.createHttpHeaders(accessToken);
+
+        assertNotNull(headers);
+        assertEquals("Bearer " + accessToken, headers.getFirst("Authorization"));
+        assertEquals("application/vnd.github+json", headers.getFirst("Accept"));
+        assertEquals("2022-11-28", headers.getFirst("X-GitHub-Api-Version"));
+    }
+
+
+    // ----- FAILURE -----
+
+    @Test
+    void testAddCollaborator_Unauthorized() {
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(String.class)))
+                .thenReturn(new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED));
+
+        CollaboratorDTO collaboratorDTO = new CollaboratorDTO("owner", "repo", "username", "accessToken");
+
+        boolean result = gitHubCollaboratorService.addCollaborator(collaboratorDTO);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void testAddCollaborator_CollaboratorNotFound() {
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(String.class)))
+                .thenReturn(new ResponseEntity<>("Not Found", HttpStatus.NOT_FOUND));
+
+        CollaboratorDTO collaboratorDTO = new CollaboratorDTO("owner", "repo", "username", "accessToken");
+
+        boolean result = gitHubCollaboratorService.addCollaborator(collaboratorDTO);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void testAddCollaborator_HttpError() {
+        HttpClientErrorException httpClientErrorException = new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Bad Request");
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(String.class)))
+                .thenThrow(httpClientErrorException);
+
+        CollaboratorDTO collaboratorDTO = new CollaboratorDTO("owner", "repo", "username", "accessToken");
+
+        boolean result = gitHubCollaboratorService.addCollaborator(collaboratorDTO);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void testDeleteCollaborator_Unsuccessful() {
+        HttpClientErrorException httpClientErrorException = new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Unauthorized");
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(String.class)))
+                .thenThrow(httpClientErrorException);
+
+        CollaboratorDTO collaboratorDTO = new CollaboratorDTO("owner", "repo", "username", "accessToken");
+
+        boolean result = gitHubCollaboratorService.deleteCollaborator(collaboratorDTO);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void testDeleteCollaborator_HttpError() {
+        HttpClientErrorException httpClientErrorException = new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Bad Request");
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(String.class)))
+                .thenThrow(httpClientErrorException);
+
+        CollaboratorDTO collaboratorDTO = new CollaboratorDTO("owner", "repo", "username", "accessToken");
+
+        boolean result = gitHubCollaboratorService.deleteCollaborator(collaboratorDTO);
+
+        assertFalse(result);
+    }
+
+
 
 }

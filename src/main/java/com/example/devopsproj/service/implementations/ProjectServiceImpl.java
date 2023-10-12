@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -57,9 +57,8 @@ public class ProjectServiceImpl implements ProjectService {
         Optional<Project> optionalProject = projectRepository.findById(id);
         if (optionalProject.isPresent()) {
             Project project = optionalProject.get();
-            // Convert the Project to ProjectDTO
-            ProjectDTO projectDTO = mapProjectToProjectDTO(project);
-            return projectDTO;
+            // Convert the Project to ProjectDTO and return it
+            return mapProjectToProjectDTO(project);
         } else {
             // Handle the case where the project with the given ID is not found
             throw new ProjectNotFoundException("Project not found with ID: " + id);
@@ -78,12 +77,13 @@ public class ProjectServiceImpl implements ProjectService {
 
             return projects.stream()
                     .map(project -> new ProjectDTO(project.getProjectId(), project.getProjectName(), project.getProjectDescription(), project.getLastUpdated(), project.getDeleted()))
-                    .collect(Collectors.toList());
+                    .toList(); // Use Stream.toList() to collect into a list
         } catch (Exception e) {
             // Handle other exceptions here
             throw new ServiceException("An error occurred while fetching projects", e);
         }
     }
+
 
 
     // Get a list of all projects, including inactive ones
@@ -100,7 +100,7 @@ public class ProjectServiceImpl implements ProjectService {
             }
             List<UserDTO> userDTOList = userList.stream()
                     .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
-                    .collect(Collectors.toList());
+                    .toList(); // Use Stream.toList() to collect into a list
 
             ProjectWithUsersDTO projectWithUsers = new ProjectWithUsersDTO(
                     project.getProjectId(),
@@ -115,6 +115,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         return projectsWithUsers;
     }
+
 
     @Override
     public List<Project> getAllProjects() {
@@ -140,8 +141,9 @@ public class ProjectServiceImpl implements ProjectService {
 
         return users.stream()
                 .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
-                .collect(Collectors.toList());
+                .toList(); // Use Stream.toList() to collect into a list
     }
+
     // Get all users associated with a project by its ID and role
     @Override
     public List<UserDTO> getAllUsersByProjectIdAndRole(Long projectId, EnumRole role) {
@@ -157,8 +159,9 @@ public class ProjectServiceImpl implements ProjectService {
                     String username = (usernames != null) ? usernames.getUsername() : null;
                     return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole(), username);
                 })
-                .collect(Collectors.toList());
+                .toList(); // Use Stream.toList() to collect into a list
     }
+
 
 
     @Override
@@ -173,10 +176,8 @@ public class ProjectServiceImpl implements ProjectService {
 
             Project updatedProject = projectRepository.save(existingProject);
 
-            // Create the ProjectDTO within the service
-            ProjectDTO updatedProjectDTO = new ProjectDTO(updatedProject.getProjectId(), updatedProject.getProjectName(), updatedProject.getProjectDescription(), updatedProject.getLastUpdated());
-
-            return updatedProjectDTO;
+            // Return the ProjectDTO directly
+            return new ProjectDTO(updatedProject.getProjectId(), updatedProject.getProjectName(), updatedProject.getProjectDescription(), updatedProject.getLastUpdated());
         } else {
             throw new NotFoundException("Project with ID " + projectId + " not found");
         }
@@ -192,13 +193,13 @@ public class ProjectServiceImpl implements ProjectService {
         if (optionalProject.isPresent()) {
             Project existingProject = optionalProject.get();
 
-            if (!existingProject.getDeleted()) { // Check if it's not soft-deleted
+            if (existingProject.getDeleted()) {
+                return ResponseEntity.ok("Project doesn't exist");
+            } else {
                 existingProject.setDeleted(true);
                 existingProject.setLastUpdated(LocalDateTime.now());
                 projectRepository.save(existingProject);
                 return ResponseEntity.ok("Deleted project successfully");
-            } else {
-                return ResponseEntity.ok("Project doesn't exist");
             }
         } else {
             throw new NotFoundException("Project with ID " + id + " not found");
@@ -226,7 +227,7 @@ public class ProjectServiceImpl implements ProjectService {
 
                 List<UserDTO> userDTOList = project.getUsers().stream()
                         .map(u -> new UserDTO(u.getId(), u.getName(), u.getEmail(), u.getEnumRole()))
-                        .collect(Collectors.toList());
+                        .toList(); // Use Stream.toList() to collect into a list
 
                 ProjectUserDTO projectUserDTO = new ProjectUserDTO(project.getProjectId(), project.getProjectName(), project.getProjectDescription(), userDTOList);
 
@@ -239,28 +240,31 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
+    private static final String UNABLE_TO_REMOVE_USER_MESSAGE = "Unable to remove user";
+
     @Override
     public ResponseEntity<String> removeUserFromProject(Long projectId, Long userId) {
-            try {
-                Optional<Project> optionalProject = projectRepository.findById(projectId);
-                Optional<User> optionalUser = userRepository.findById(userId);
+        try {
+            Optional<Project> optionalProject = projectRepository.findById(projectId);
+            Optional<User> optionalUser = userRepository.findById(userId);
 
-                if (optionalProject.isPresent() && optionalUser.isPresent()) {
-                    Project project = optionalProject.get();
-                    User user = optionalUser.get();
-                    project.getUsers().remove(user);
-                    projectRepository.save(project);
+            if (optionalProject.isPresent() && optionalUser.isPresent()) {
+                Project project = optionalProject.get();
+                User user = optionalUser.get();
+                project.getUsers().remove(user);
+                projectRepository.save(project);
 
-                    // Create userDTOList and projectUserDTO as needed
+                // Create userDTOList and projectUserDTO as needed
 
-                    return ResponseEntity.ok("User removed");
-                } else {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project or User not found");
-                }
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unable to remove user");
+                return ResponseEntity.ok("User removed");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project or User not found");
             }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(UNABLE_TO_REMOVE_USER_MESSAGE);
         }
+    }
+
 
 
     @Override
@@ -279,16 +283,17 @@ public class ProjectServiceImpl implements ProjectService {
 
                 boolean deleted = collaboratorService.deleteCollaborator(collaboratorDTO);
                 if (!deleted) {
-                    return ResponseEntity.ok("Unable to remove user");
+                    return ResponseEntity.ok(UNABLE_TO_REMOVE_USER_MESSAGE);
                 }
                 return ResponseEntity.ok("User removed");
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project or User not found");
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unable to remove user");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(UNABLE_TO_REMOVE_USER_MESSAGE);
         }
     }
+
 
 
 
@@ -318,12 +323,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public boolean existUserInProject(Long projectId, Long userId) {
         List<User> userList = projectRepository.existUserInProject(projectId, userId);
-        if (userList.isEmpty()) {
-            return false;
-        } else {
-            return true;
-        }
+        return !userList.isEmpty();
     }
+
 
     // Get the count of all projects
 
@@ -501,7 +503,6 @@ public class ProjectServiceImpl implements ProjectService {
             FigmaDTO figmaDTO = new FigmaDTO(figmaURL);
             GoogleDrive googleDrive = project.getGoogleDrive();
             String driveLink = googleDrive != null ? googleDrive.getDriveLink() : null;
-            GoogleDriveDTO googleDriveDTO = new GoogleDriveDTO(driveLink);
             LocalDateTime lastUpdated = project.getLastUpdated();
             return new ProjectDTO(
                     projectName,

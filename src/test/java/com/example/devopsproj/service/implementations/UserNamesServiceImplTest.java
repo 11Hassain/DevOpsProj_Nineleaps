@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.dao.DataIntegrityViolationException;
 
@@ -73,9 +74,12 @@ public class UserNamesServiceImplTest {
         assertEquals("user2", result.get(1));
     }
 
+
     private UserNames createUserWithName(String username) {
         UserNames userNames = new UserNames();
         userNames.setUsername(username);
         return userNames;
     }
+
+
 }

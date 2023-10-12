@@ -2,12 +2,18 @@ package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.dto.responsedto.CollaboratorDTO;
 import com.example.devopsproj.service.interfaces.GitHubCollaboratorService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Service
 public class GitHubCollaboratorServiceImpl implements GitHubCollaboratorService {
+
+    private static final Logger logger = LoggerFactory.getLogger(GitHubCollaboratorServiceImpl.class);
+
 
     @Override
     public boolean addCollaborator(CollaboratorDTO collaboratorDTO) {
@@ -18,10 +24,18 @@ public class GitHubCollaboratorServiceImpl implements GitHubCollaboratorService 
 
         HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
 
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> responseEntity = restTemplate.exchange(apiUrl, HttpMethod.PUT, requestEntity, String.class);
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> responseEntity = restTemplate.exchange(apiUrl, HttpMethod.PUT, requestEntity, String.class);
 
-        return responseEntity.getStatusCode().is2xxSuccessful();
+            // Check the response status code
+            return responseEntity.getStatusCode().is2xxSuccessful();
+        } catch (HttpClientErrorException ex) {
+            // Handle HTTP errors, e.g., log the error
+            int statusCode = ex.getStatusCode().value();
+            logger.error("GitHub API returned an error: {} {}", statusCode, ex.getStatusText());
+            return false;
+        }
     }
 
     @Override
@@ -33,12 +47,20 @@ public class GitHubCollaboratorServiceImpl implements GitHubCollaboratorService 
 
         HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
 
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> responseEntity = restTemplate.exchange(apiUrl, HttpMethod.DELETE, requestEntity, String.class);
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> responseEntity = restTemplate.exchange(apiUrl, HttpMethod.DELETE, requestEntity, String.class);
 
-        return responseEntity.getStatusCode().is2xxSuccessful();
+            return responseEntity.getStatusCode().is2xxSuccessful();
+        } catch (HttpClientErrorException ex){
+            // Handle HTTP errors, e.g., log the error
+            int statusCode = ex.getStatusCode().value();
+            logger.error("GitHub API returned an error: {} {}", statusCode, ex.getStatusText());
+            return false;
+        }
     }
 
+    // Creates HTTP headers for making requests to the GitHub API with the provided access token.
     @Override
     public HttpHeaders createHttpHeaders(String accessToken) {
         HttpHeaders headers = new HttpHeaders();
@@ -48,3 +70,4 @@ public class GitHubCollaboratorServiceImpl implements GitHubCollaboratorService 
         return headers;
     }
 }
+

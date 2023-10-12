@@ -2,7 +2,10 @@ package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.dto.responsedto.GitRepositoryDTO;
+import com.example.devopsproj.exceptions.NotFoundException;
+import com.example.devopsproj.exceptions.RepositoryDeletionException;
 import com.example.devopsproj.model.GitRepository;
+
 import com.example.devopsproj.repository.GitRepositoryRepository;
 import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.service.interfaces.ProjectService;
@@ -12,9 +15,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -142,30 +147,7 @@ public class GitRepositoryServiceImplTest {
         verify(gitRepositoryRepository, times(1)).findAll();
     }
 
-    @Test
-    public void testDeleteRepository_Success() {
-        // Arrange
-        Long repoId = 1L;
-        String repoName = "TestRepo";
 
-        GitRepository repository = new GitRepository();
-        repository.setRepoId(repoId);
-        repository.setName(repoName);
-
-        when(gitRepositoryRepository.findByRepoId(repoId)).thenReturn(Optional.of(repository));
-        when(restTemplate.exchange(
-                eq("https://api.github.com/repos/Bindushree-0906/TestRepo"), // Adjust the URL as needed
-                eq(HttpMethod.DELETE),
-                any(HttpEntity.class),
-                eq(Void.class)
-        )).thenReturn(new ResponseEntity<>(HttpStatus.NO_CONTENT));
-
-        // Act
-        gitRepositoryService.deleteRepository(repoId);
-
-        // Assert
-        verify(gitRepositoryRepository, times(1)).delete(repository);
-    }
 
     @Test
     public void testGetAllReposByRole_Success() {
@@ -256,6 +238,110 @@ public class GitRepositoryServiceImplTest {
         // Assert
         assertTrue(result);
     }
+
+    @Test
+    void testDeleteRepository_Successful() {
+        Long repoId = 1L;
+        GitRepository repository = new GitRepository();
+        repository.setRepoId(repoId);
+        repository.setName("my-repo");
+
+        when(gitRepositoryRepository.findByRepoId(repoId)).thenReturn(Optional.of(repository));
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Void.class)))
+                .thenReturn(new ResponseEntity<>(HttpStatus.NO_CONTENT));
+
+        assertDoesNotThrow(() -> gitRepositoryService.deleteRepository(repoId));
+
+        verify(gitRepositoryRepository, times(1)).delete(repository);
+    }
+
+    @Test
+    void testDeleteRepository_Successful_NoContent() {
+        Long repoId = 1L;
+        GitRepository repository = new GitRepository();
+        repository.setRepoId(repoId);
+        repository.setName("my-repo");
+
+        when(gitRepositoryRepository.findByRepoId(repoId)).thenReturn(Optional.of(repository));
+        doNothing().when(gitRepositoryRepository).delete(repository);
+
+        ResponseEntity<Void> noContentResponse = new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        doReturn(noContentResponse).when(restTemplate).exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Void.class));
+
+        gitRepositoryService.deleteRepository(repoId);
+
+        verify(gitRepositoryRepository).delete(repository);
+    }
+    @Test
+    void testDeleteRepository_Unsuccessful() {
+        Long repoId = 1L;
+        GitRepository repository = new GitRepository();
+        repository.setRepoId(repoId);
+        repository.setName("my-repo");
+
+        when(gitRepositoryRepository.findByRepoId(repoId)).thenReturn(Optional.of(repository));
+
+        HttpClientErrorException httpClientErrorException = new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Bad Request");
+
+        doThrow(httpClientErrorException)
+                .when(restTemplate).exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Void.class));
+
+        RepositoryDeletionException exception = assertThrows(RepositoryDeletionException.class, () -> gitRepositoryService.deleteRepository(repoId));
+
+        assertTrue(exception.getMessage().contains("Error deleting repository with repoId " + repoId));
+    }
+
+
+    @Test
+    void testDeleteRepository_NotFound() {
+        Long repoId = 1L;
+
+        when(gitRepositoryRepository.findByRepoId(repoId)).thenReturn(Optional.empty());
+
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> gitRepositoryService.deleteRepository(repoId));
+
+        assertTrue(exception.getMessage().contains("Repository with repoId " + repoId + " not found."));
+    }
+
+
+    @Test
+    void testGetAllReposByRole_NoReposFound() {
+        EnumRole role = EnumRole.ADMIN;
+
+        when(gitRepositoryRepository.findAllByRole(role)).thenReturn(Collections.emptyList());
+
+        List<GitRepositoryDTO> result = gitRepositoryService.getAllReposByRole(role);
+
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    void testGetRepositoryById_RepositoryDoesNotExist() {
+        Long repositoryId = 2L;
+
+        when(gitRepositoryRepository.findById(repositoryId)).thenReturn(Optional.empty());
+
+        GitRepository result = gitRepositoryService.getRepositoryById(repositoryId);
+
+        assertNull(result);
+    }
+
+    @Test
+    void testCreateRepository_Unsuccessful() {
+        GitRepository gitRepository = new GitRepository();
+        gitRepository.setName("my-repo");
+
+        // Mock an HTTP error (Bad Request in this case)
+        HttpClientErrorException httpClientErrorException = new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Bad Request");
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(GitRepository.class)))
+                .thenThrow(httpClientErrorException);
+
+        assertThrows(HttpClientErrorException.class, () -> gitRepositoryService.createRepository(gitRepository));
+    }
+
+
+
+
 
 
 }

@@ -393,8 +393,4 @@ public class AccessRequestServiceTest {
         assertEquals(1, result.size());
         assertEquals(false, result.get(0).isAllowed());
     }
-
-
-
-
 }

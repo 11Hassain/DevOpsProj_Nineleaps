@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -36,6 +37,9 @@ public class ProjectServiceImplTest {
 
     @Mock
     private ModelMapper modelMapper;
+
+    @Mock
+    private GitHubCollaboratorServiceImpl collaboratorService;
     @Mock
     private GitRepositoryRepository gitRepositoryRepository;
 
@@ -1242,6 +1246,79 @@ public class ProjectServiceImplTest {
 
 
 
+    @Test
+    void testRemoveUserFromProjectAndRepo_Success() {
+        Long projectId = 1L;
+        Long userId = 1L;
+        CollaboratorDTO collaboratorDTO = new CollaboratorDTO();
+
+        Project project = new Project();
+        project.setUsers(new ArrayList<>());
+        User user = new User();
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(collaboratorService.deleteCollaborator(collaboratorDTO)).thenReturn(true);
+        when(projectRepository.save(project)).thenReturn(project);
+
+        ResponseEntity<String> responseEntity = projectService.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals("User removed", responseEntity.getBody());
+    }
+
+    @Test
+    void testRemoveUserFromProjectAndRepo_ProjectNotFound() {
+        Long projectId = 1L;
+        Long userId = 1L;
+        CollaboratorDTO collaboratorDTO = new CollaboratorDTO();
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
+        when(userRepository.findById(userId)).thenReturn(Optional.of(new User()));
+
+        ResponseEntity<String> responseEntity = projectService.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO);
+
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        assertEquals("Project or User not found", responseEntity.getBody());
+    }
+
+    @Test
+    void testRemoveUserFromProjectAndRepo_UserNotFound() {
+        Long projectId = 1L;
+        Long userId = 1L;
+        CollaboratorDTO collaboratorDTO = new CollaboratorDTO();
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(new Project()));
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        ResponseEntity<String> responseEntity = projectService.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO);
+
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        assertEquals("Project or User not found", responseEntity.getBody());
+    }
+
+    @Test
+    void testExistsProjectById_ProjectDoesNotExist() {
+        Long projectId = 2L;
+
+        when(projectRepository.existsById(projectId)).thenReturn(false);
+
+        boolean result = projectService.existsProjectById(projectId);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void testExistUserInProject_UserDoesNotExistInProject() {
+        Long projectId = 2L;
+        Long userId = 2L;
+
+        when(projectRepository.existUserInProject(projectId, userId)).thenReturn(new ArrayList<>());
+
+        boolean result = projectService.existUserInProject(projectId, userId);
+
+        assertFalse(result);
+    }
 
 
 

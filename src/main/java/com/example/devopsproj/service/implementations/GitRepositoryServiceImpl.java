@@ -2,75 +2,70 @@ package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.dto.responsedto.GitRepositoryDTO;
 
-//import com.example.devopsproj.exceptions.NotFoundException;
-//import com.example.devopsproj.exceptions.FigmaNotFoundException;
+
+
 import com.example.devopsproj.exceptions.FigmaNotFoundException;
+import com.example.devopsproj.exceptions.NotFoundException;
+import com.example.devopsproj.exceptions.RepositoryCreationException;
+import com.example.devopsproj.exceptions.RepositoryDeletionException;
 import com.example.devopsproj.model.GitRepository;
 import com.example.devopsproj.commons.enumerations.EnumRole;
-import com.example.devopsproj.model.Project;
-//import com.example.devopsproj.repository.GitRepositoryRepository;
+
 import com.example.devopsproj.repository.GitRepositoryRepository;
-import com.example.devopsproj.repository.ProjectRepository;
+
 import com.example.devopsproj.service.interfaces.GitRepositoryService;
-import com.example.devopsproj.service.interfaces.ProjectService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
+
 import org.springframework.web.client.RestTemplate;
-//import com.example.devopsproj.repository.GitRepositoryRepository;
+
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
 public class GitRepositoryServiceImpl implements GitRepositoryService {
 
+    private final GitRepositoryRepository gitRepositoryRepository;
+    private final ProjectServiceImpl projectServiceImpl;
+    private final JdbcTemplate jdbcTemplate;
+
     private static final String API_BASE_URL = "https://api.github.com";
     private static final String USER_REPOS_ENDPOINT = "/user/repos";
-    private static final String REPOS_ENDPOINT = "/repos/Bindushree-0906";
-    private static final String OWNER = "Bindushree-0906";
-
+    private static final String REPOS_ENDPOINT = "/repos/sahilanna";
     private static final String GITHUB_ACCESS_TOKEN = System.getenv("GITHUB_ACCESS_TOKEN");
 
     private final RestTemplate restTemplate;
-    private final GitRepositoryRepository gitRepositoryRepository;
-    private final ProjectRepository projectRepository;
-    private final ProjectService projectService;
 
 
-    // Create a new Git repository
     @Override
     @Transactional
     public GitRepository createRepository(GitRepository gitRepository) {
-        // Create HTTP headers with the GitHub access token and content type
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(GITHUB_ACCESS_TOKEN);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        // Create an HTTP request entity with the GitRepository and headers
         HttpEntity<GitRepository> requestEntity = new HttpEntity<>(gitRepository, headers);
 
-        // Send an HTTP POST request to create the repository on GitHub
         ResponseEntity<GitRepository> responseEntity = restTemplate.exchange(
                 API_BASE_URL + USER_REPOS_ENDPOINT,
                 HttpMethod.POST,
                 requestEntity,
                 GitRepository.class);
 
-        // Check if the response status code indicates success (HTTP 201 - Created)
         if (responseEntity.getStatusCode() == HttpStatus.CREATED) {
             GitRepository createdGitRepository = responseEntity.getBody();
-            // Save the created GitRepository to the local repository
+            assert createdGitRepository != null;
             gitRepositoryRepository.save(createdGitRepository);
             return createdGitRepository;
         } else {
-            // Throw a RuntimeException if the repository creation fails
-            throw new RuntimeException("Error creating repository " + gitRepository.getName() + ". Response: " + responseEntity.getBody());
+            throw new RepositoryCreationException("Error creating repository " + gitRepository.getName() + ". Response: " + responseEntity.getBody());
         }
     }
 
@@ -92,73 +87,38 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
     @Override
     @Transactional
     public void deleteRepository(Long repoId) {
-        // Retrieve the Git repository by its ID
         GitRepository repository = gitRepositoryRepository.findByRepoId(repoId)
-                .orElseThrow(() -> new RuntimeException("Repository not found with repoId: " + repoId));
+                .orElseThrow(() -> new NotFoundException("Repository with repoId " + repoId + " not found."));
 
-        // Get the repository name from the entity
-        String repoName = repository.getName();
-
-        // Create HTTP headers with the GitHub access token and content type
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(GITHUB_ACCESS_TOKEN);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        // Create an HTTP request entity with the headers
         HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
 
         try {
-            // Send an HTTP DELETE request to remove the repository on GitHub
             ResponseEntity<Void> responseEntity = restTemplate.exchange(
-                    API_BASE_URL + REPOS_ENDPOINT + "/" + repository.getName(), // Use the correct repository name
+                    API_BASE_URL + REPOS_ENDPOINT + "/" + repository.getName(),
                     HttpMethod.DELETE,
                     requestEntity,
                     Void.class);
 
-            // Check if the response status code indicates success (HTTP 204 - No Content)
             if (responseEntity.getStatusCode() != HttpStatus.NO_CONTENT) {
-                throw new RuntimeException("Error deleting repository with repoId " + repoId + ". Response: " + responseEntity.getBody());
+                throw new RepositoryDeletionException("Error deleting repository with repoId " + repoId + ". Response: " + responseEntity.getBody());
             }
 
-            // Delete the repository from the local repository
             gitRepositoryRepository.delete(repository);
-        } catch (HttpClientErrorException.NotFound e) {
-            throw new RuntimeException("Repository with repoId " + repoId + " not found.", e);
         } catch (Exception e) {
-            throw new RuntimeException("Error deleting repository with repoId " + repoId, e);
+            throw new RepositoryDeletionException("Error deleting repository with repoId " + repoId);
         }
     }
 
+
     @Override
     public List<GitRepositoryDTO> getAllRepositoriesByProject(Long id) {
-        return null;
+        // Return an empty list
+        return Collections.emptyList();
     }
-
-    // Get a list of all Git repositories associated with a project
-//    @Override
-//    @Transactional(readOnly = true)
-//    public List<GitRepositoryDTO> getAllRepositoriesByProject(Long id) {
-//        // Retrieve the project by its ID
-//        Optional<Project> projectOptional = projectService.getProjectById(id);
-//        if (projectOptional.isPresent()) {
-//            Project project = projectOptional.get();
-//
-//            // Find the Git repositories associated with the project
-//            List<GitRepository> repositories = gitRepositoryRepository.findRepositoriesByProject(project);
-//
-//            // Convert the GitRepository entities to GitRepositoryDTOs
-//            List<GitRepositoryDTO> gitRepositoryDTOS = repositories.stream()
-//                    .map(repository -> new GitRepositoryDTO(repository.getName(), repository.getDescription()))
-//                    .collect(Collectors.toList());
-//
-//            return gitRepositoryDTOS;
-//        } else {
-//            // Handle the case where the project with the given ID doesn't exist
-//            return Collections.emptyList(); // Return an empty list or handle it as needed
-//        }
-//    }
-
-
 
     // Get a list of Git repositories by role
     @Override
@@ -174,7 +134,6 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
     }
 
 
-
     // Get a Git repository by its ID
     @Override
     @Transactional(readOnly = true)
@@ -187,7 +146,6 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
             throw new FigmaNotFoundException("An error occurred while retrieving the Git repository by ID");
         }
     }
-
     // Check if a GitHub access token is valid
     @Override
     public boolean isAccessTokenValid(String accessToken) {
@@ -214,7 +172,6 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
         // Return true if the token is valid, otherwise return false
         return responseEntity.getStatusCode() == HttpStatus.OK;
     }
-
     // Helper method to convert a GitRepository entity to a GitRepositoryDTO
     private GitRepositoryDTO convertToDto(GitRepository gitRepository) {
         GitRepositoryDTO gitRepositoryDTO = new GitRepositoryDTO();

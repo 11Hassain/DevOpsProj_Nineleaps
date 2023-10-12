@@ -57,6 +57,10 @@ public class Project implements Serializable {
     @JsonIgnore
     @OneToOne(mappedBy = "project")
     private GoogleDrive googleDrive;
+
+    public Project(long l, String s, String s1, LocalDateTime now) {
+    }
+
     public List<GitRepository> getRepositories() {
         if (repositories == null) {
             repositories = new ArrayList<>();
@@ -81,6 +85,7 @@ public class Project implements Serializable {
         this.projectName = projectName;
     }
 
+ 
     public Project(Long projectId, String projectName, String projectDescription, LocalDateTime lastUpdated, boolean deleted) {
         this.projectId = projectId;
         this.projectName = projectName;
