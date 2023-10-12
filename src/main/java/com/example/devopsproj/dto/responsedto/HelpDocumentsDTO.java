@@ -4,6 +4,13 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+/**
+ * The HelpDocumentsDTO class represents a data transfer object for Help Documents information.
+ * It includes details such as the unique identifier and the file name of the Help Document.
+ *
+ * @version 2.0
+ */
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter

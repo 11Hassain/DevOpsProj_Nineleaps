@@ -18,6 +18,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The UserController class provides endpoints for managing user-related operations.
+ * These operations include saving a user and finding a user by their user ID and other functionalities performed on users.
+ *
+ * @version 2.0
+ */
+
 @RestController
 @RequestMapping("/api/v1/users")
 @Validated

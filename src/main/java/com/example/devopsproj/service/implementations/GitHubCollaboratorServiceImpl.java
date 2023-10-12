@@ -9,6 +9,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+/**
+ * The `GitHubCollaboratorServiceImpl` class provides services for managing GitHub repository collaborators.
+ * It includes methods for adding and deleting collaborators to/from a GitHub repository and creating HTTP headers
+ * for GitHub API requests.
+ *
+ * @version 2.0
+ */
+
 @Service
 public class GitHubCollaboratorServiceImpl implements GitHubCollaboratorService {
 
@@ -60,6 +68,7 @@ public class GitHubCollaboratorServiceImpl implements GitHubCollaboratorService 
         }
     }
 
+    // Creates HTTP headers for making requests to the GitHub API with the provided access token.
     @Override
     public HttpHeaders createHttpHeaders(String accessToken) {
         HttpHeaders headers = new HttpHeaders();

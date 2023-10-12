@@ -13,6 +13,16 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * The User class represents a user in the DevOps system. It stores information such as the user's unique identifier, name,
+ * email, phone number, role, deletion status, last updated timestamp, last logout timestamp, and associations with projects,
+ * access requests, and usernames.
+ * .
+ * This class is mapped to a database table named "user" and implements the UserDetails interface for Spring Security.
+ *
+ * @version 2.0
+ */
+
 @Getter
 @Setter
 @Builder

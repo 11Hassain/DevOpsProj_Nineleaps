@@ -9,6 +9,13 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * The ProjectDTO class represents a data transfer object for project information.
+ * It includes details such as project ID, project name, description, users, status, and associated resources.
+ *
+ * @version 2.0
+ */
+
 @NoArgsConstructor
 @Setter
 @Getter

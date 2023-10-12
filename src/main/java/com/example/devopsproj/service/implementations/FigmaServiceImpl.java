@@ -15,6 +15,14 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * The `FigmaServiceImpl` class provides services for managing Figma projects and their associated screenshots.
+ * It includes methods for creating Figma projects, retrieving Figma project details, managing screenshots,
+ * and performing various operations related to Figma projects.
+ *
+ * @version 2.0
+ */
+
 @Service
 @RequiredArgsConstructor
 public class FigmaServiceImpl implements FigmaService {

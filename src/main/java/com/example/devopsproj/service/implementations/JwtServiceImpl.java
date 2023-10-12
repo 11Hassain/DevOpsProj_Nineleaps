@@ -19,6 +19,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * The `JwtServiceImpl` class provides services related to JSON Web Tokens (JWTs).
+ * It includes methods for token generation, validation, and extraction of token claims.
+ *
+ * @version 2.0
+ */
+
 @Service
 @RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
@@ -36,6 +43,7 @@ public class JwtServiceImpl implements JwtService {
         return claims.getSubject();
     }
 
+    // Extracts and returns a specific claim from the JWT token's claims using a custom resolver function.
     @Override
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
@@ -58,6 +66,7 @@ public class JwtServiceImpl implements JwtService {
                 .compact();
     }
 
+    // Checks if a token is valid and exists in the system.
     @Override
     public boolean isTokenTrue(String token) {
         User user = userRepository.findUserByToken(token);

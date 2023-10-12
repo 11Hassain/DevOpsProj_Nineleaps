@@ -17,6 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The `AccessRequestServiceImpl` class provides services for managing access requests and responses.
+ *
+ * @version 2.0
+ */
+
 @Service
 @RequiredArgsConstructor
 public class AccessRequestServiceImpl implements AccessRequestService {
@@ -124,6 +130,7 @@ public class AccessRequestServiceImpl implements AccessRequestService {
         return mapAccessRequestsToResponseDTOs(accessRequests);
     }
 
+    // Map `AccessRequest` entities to `AccessResponseDTO` objects
     @Override
     public List<AccessResponseDTO> mapAccessRequestsToResponseDTOs(List<AccessRequest> accessRequests) {
         List<AccessResponseDTO> accessResponseDTOList = new ArrayList<>();
@@ -145,6 +152,7 @@ public class AccessRequestServiceImpl implements AccessRequestService {
         return accessResponseDTOList;
     }
 
+    // Set PM notification status to `true` for the specified access request
     @Override
     public void setPMRequestsNotificationTrue(Long accessRequestId) {
         Optional<AccessRequest> optionalAccessRequest = accessRequestRepository.findById(accessRequestId);

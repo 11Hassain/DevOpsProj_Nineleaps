@@ -10,6 +10,13 @@ import lombok.Setter;
 
 import java.util.List;
 
+/**
+ * The UserProjectsDTO class represents a data transfer object for user projects. It includes the user's ID, name,
+ * and a list of project names associated with the user.
+ *
+ * @version 2.0
+ */
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

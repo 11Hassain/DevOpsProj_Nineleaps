@@ -3,6 +3,13 @@ package com.example.devopsproj.utils;
 import com.example.devopsproj.dto.responsedto.ProjectDTO;
 import com.example.devopsproj.model.Project;
 
+/**
+ * The `DTOModelMapper` class provides utility methods for mapping between DTO (Data Transfer Object) and
+ * model entities, specifically for Project and ProjectDTO mapping.
+ *
+ * @version 1.0
+ */
+
 public class DTOModelMapper {
 
     private DTOModelMapper() {

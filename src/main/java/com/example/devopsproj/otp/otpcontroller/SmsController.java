@@ -1,6 +1,5 @@
 package com.example.devopsproj.otp.otpcontroller;
 
-import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.model.User;
 import com.example.devopsproj.otp.otpservice.IUserService;
 import com.example.devopsproj.otp.otpservice.SmsService;
@@ -11,7 +10,6 @@ import com.example.devopsproj.otp.otpdto.TempOTP;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,11 +19,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * The `SmsController` class is a Spring MVC REST controller that handles endpoints related to sending and verifying SMS messages for OTP-based authentication.
+ *
+ * @version 2.0
+ */
 
 @RequestMapping("/api/v1/OTP")
 @RestController

@@ -10,6 +10,16 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+/**
+ * The SecurityConfiguration class provides the security configuration for the DevOps project application. It defines
+ * security settings, such as disabling CSRF protection, specifying authentication filters, and setting up security filter
+ * chains.
+ * .
+ * This class configures and manages security-related settings and filters to secure the application.
+ *
+ * @version 2.0
+ */
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor

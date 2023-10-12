@@ -7,6 +7,15 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
+/**
+ * The GoogleDrive class represents a Google Drive link associated with a project. It stores information such as the
+ * Google Drive link and the project to which it is related.
+ * .
+ * This class is mapped to a database table named "google_drive" and is part of a model for a DevOps project.
+ *
+ * @version 2.0
+ */
+
 @NoArgsConstructor
 @Getter
 @Setter

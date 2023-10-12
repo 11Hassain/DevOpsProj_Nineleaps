@@ -3,6 +3,16 @@ package com.example.devopsproj.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 
+
+/**
+ * The Collaborator class represents a record of a user (username) collaborating on a specific
+ * repository (repo) owned by a user or organization (owner).
+ * .
+ * This class is mapped to a database table named "collaborators" and is part of a model for a DevOps project.
+ *
+ * @version 2.0
+ */
+
 @Getter
 @Entity
 @Table(name = "collaborators")

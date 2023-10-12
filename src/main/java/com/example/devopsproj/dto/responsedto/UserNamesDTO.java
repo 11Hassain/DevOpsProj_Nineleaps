@@ -5,6 +5,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+/**
+ * The UserNamesDTO class represents a data transfer object for usernames. It includes the username, associated user,
+ * and an access token.
+ *
+ * @version 2.0
+ */
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter

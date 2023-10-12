@@ -16,10 +16,17 @@ import org.springframework.http.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+
+/**
+ * The `GitRepositoryServiceImpl` class provides services for managing Git repositories, including
+ * creating, deleting, and retrieving repositories. It also includes methods for listing repositories
+ * based on a user's role and a specific project.
+ *
+ * @version 2.0
+ */
 
 @Service
 @RequiredArgsConstructor
@@ -86,7 +93,7 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
 
         try {
             ResponseEntity<Void> responseEntity = restTemplate.exchange(
-                    API_BASE_URL + REPOS_ENDPOINT + "/" + repository.getName(), // Use the correct repository name
+                    API_BASE_URL + REPOS_ENDPOINT + "/" + repository.getName(),
                     HttpMethod.DELETE,
                     requestEntity,
                     Void.class);

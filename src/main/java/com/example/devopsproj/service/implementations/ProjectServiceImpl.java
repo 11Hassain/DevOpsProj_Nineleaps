@@ -10,15 +10,19 @@ import com.example.devopsproj.model.*;
 import com.example.devopsproj.service.interfaces.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
+
+/**
+ * The `ProjectServiceImpl` class provides services related to projects, including creation,
+ * retrieval, updating, and management of project-related data.
+ *
+ * @version 2.0
+ */
 
 @Service
 @RequiredArgsConstructor
@@ -29,9 +33,6 @@ public class ProjectServiceImpl implements ProjectService {
     private final GitRepositoryRepository gitRepositoryRepository;
     private final ModelMapper modelMapper;
     private final GitHubCollaboratorServiceImpl collaboratorService;
-    private final CollaboratorDTO collaboratorDTO;
-
-    private final Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
 
     @Override
     public ProjectDTO createProject(ProjectDTO projectDTO) {
@@ -140,7 +141,6 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepository.save(updatedProject);
     }
 
-    //get all users in the project based on project id
     @Override
     public List<UserDTO> getAllUsersByProjectId(Long projectId) {
         List<User> users = projectRepository.findAllUsersByProjectId(projectId);
@@ -306,6 +306,7 @@ public class ProjectServiceImpl implements ProjectService {
                 }
             }
 
+            // Setting and adding the repos to the list
             List<GitRepository> repositories = project.getRepositories();
             List<GitRepositoryDTO> repositoryDTOS = new ArrayList<>();
             for(GitRepository repository : repositories){

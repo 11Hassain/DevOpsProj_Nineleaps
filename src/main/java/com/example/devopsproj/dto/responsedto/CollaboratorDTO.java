@@ -5,6 +5,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+/**
+ * The CollaboratorDTO class represents a data transfer object for collaborator information.
+ * It includes details such as the owner's name, repository name, collaborator's username, and access token.
+ *
+ * @version 2.0
+ */
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter

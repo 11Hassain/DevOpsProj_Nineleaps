@@ -19,6 +19,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The GoogleDriveController class provides RESTful API endpoints for managing Google Drive resources and operations.
+ * These endpoints include creating Google Drives, retrieving Google Drives by ID or project, and deleting Google Drives.
+ * User authentication is required using the JwtServiceImpl.
+ *
+ * @version 2.0
+ */
+
 @RestController
 @RequestMapping("/api/v1")
 @Validated

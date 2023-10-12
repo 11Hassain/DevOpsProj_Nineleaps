@@ -14,6 +14,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * The UserNamesController class provides endpoints for managing GitHub usernames.
+ * These operations include saving a GitHub username and retrieving GitHub usernames by role.
+ *
+ * @version 2.0
+ */
+
 @RestController
 @RequestMapping("/api/v1/usernames")
 @Validated

@@ -11,7 +11,6 @@ import com.example.devopsproj.service.interfaces.UserService;
 import com.example.devopsproj.utils.JwtUtils;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -24,6 +23,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * The `UserServiceImpl` class provides services for managing user data, including creation, retrieval,
+ * updating, soft deletion, and other user-related operations.
+ *
+ * @version 2.0
+ */
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements IUserService, UserService {
@@ -33,7 +39,6 @@ public class UserServiceImpl implements IUserService, UserService {
     private final JwtServiceImpl jwtServiceImpl;
     private final JwtUtils jwtUtils;
     private final ProjectRepository projectRepository;
-    private final ModelMapper modelMapper;
 
 
     //implementing user creation using DTO pattern
@@ -97,7 +102,6 @@ public class UserServiceImpl implements IUserService, UserService {
         return userRepository.existsById(id);
     }
 
-    //get all user based on role id
     @Override
     public List<User> getUsersByRole(EnumRole enumRole) {
         return userRepository.findByRole(enumRole);
@@ -155,6 +159,7 @@ public class UserServiceImpl implements IUserService, UserService {
         for (User user : users) {
             List<Project> projects = user.getProjects();
 
+            // List of users who don't have the given project ID
             if (projects.stream().noneMatch(project -> Objects.equals(project.getProjectId(), projectId))) {
                 UserDTO userDTO = new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole());
                 userDTOs.add(userDTO);
@@ -191,7 +196,7 @@ public class UserServiceImpl implements IUserService, UserService {
         return usersWithMultipleProjects;
     }
 
-
+    // Check if the project exists in the database
     @Override
     public boolean projectExists(String projectName) {
         if (projectName == null) {
@@ -205,8 +210,6 @@ public class UserServiceImpl implements IUserService, UserService {
         }
         return false;
     }
-
-
 
     @Override
     public List<UserDTO> getAllUsers() {
@@ -229,6 +232,7 @@ public class UserServiceImpl implements IUserService, UserService {
             projectDTO.setProjectId(project.getProjectId());
             projectDTO.setProjectName(project.getProjectName());
 
+            // Add list of repos to the repositories list
             List<GitRepository> repositories = project.getRepositories();
             List<GitRepositoryDTO> repositoryDTOs = new ArrayList<>();
             for (GitRepository repository : repositories) {
@@ -320,6 +324,4 @@ public class UserServiceImpl implements IUserService, UserService {
     public User getUserByMail(String userMail) {
         return userRepository.findByEmail(userMail);
     }
-
-
 }

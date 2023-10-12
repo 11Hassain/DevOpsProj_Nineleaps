@@ -3,6 +3,12 @@ package com.example.devopsproj.otp.otpdto;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * The `StoreOTP` class is a utility class for storing a one-time password (OTP) value.
+ *
+ * @version 2.0
+ */
+
 @Getter
 @Setter
 public class StoreOTP {

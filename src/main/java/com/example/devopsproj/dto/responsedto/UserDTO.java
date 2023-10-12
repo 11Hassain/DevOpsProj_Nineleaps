@@ -9,6 +9,13 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+/**
+ * The UserDTO class represents a data transfer object for user information. It includes details such as user ID, name, email,
+ * role, access token, GitHub username, last updated timestamp, and last logout timestamp.
+ *
+ * @version 2.0
+ */
+
 @NoArgsConstructor
 @Getter
 @Setter

@@ -2,6 +2,12 @@ package com.example.devopsproj.otp.otpdto;
 
 import lombok.*;
 
+/**
+ * The `JwtResponse` class represents the response containing JWT tokens and error messages.
+ *
+ * @version 2.0
+ */
+
 @Getter
 @Setter
 @AllArgsConstructor

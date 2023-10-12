@@ -19,6 +19,15 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.*;
 
+/**
+ * The FigmaController class is responsible for handling RESTful API endpoints related to Figma projects and their associated functionalities.
+ * It provides endpoints for creating, retrieving, updating, and deleting Figma projects, as well as adding users and screenshots to a Figma project.
+ * .
+ * This controller integrates with the FigmaServiceImpl and JwtServiceImpl to perform Figma-related operations and authentication.
+ *
+ * @version 2.0
+ */
+
 @RestController
 @RequestMapping("/api/v1/figmas")
 @Validated

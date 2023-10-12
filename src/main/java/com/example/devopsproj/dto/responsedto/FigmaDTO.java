@@ -5,6 +5,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.*;
 
+/**
+ * The FigmaDTO class represents a data transfer object for Figma project information.
+ * It includes details such as the associated project, Figma URL, screenshot image, user, and Figma ID.
+ *
+ * @version 2.0
+ */
+
 @NoArgsConstructor
 @Setter
 @Getter

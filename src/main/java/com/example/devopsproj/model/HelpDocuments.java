@@ -3,6 +3,16 @@ package com.example.devopsproj.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+/**
+ * The HelpDocuments class represents documents that help saving files, docs for a project. It stores information
+ * such as the document's identifier, data (content), file name, category, file extension, and the project it is associated
+ * with.
+ * .
+ * This class is mapped to a database table named "help_documents" and is part of a model for a DevOps project.
+ *
+ * @version 2.0
+ */
+
 @NoArgsConstructor
 @Getter
 @Setter

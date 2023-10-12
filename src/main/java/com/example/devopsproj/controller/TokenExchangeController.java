@@ -22,6 +22,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The TokenExchangeController class provides an endpoint for exchanging an authorization code for an access token.
+ * This controller handles the token exchange process for external OAuth 2.0 providers, such as Google.
+ *
+ * @version 2.0
+ */
+
 @RestController
 @RequestMapping("/api/v1")
 @Validated

@@ -6,6 +6,13 @@ import lombok.*;
 
 import java.util.List;
 
+/**
+ * The ProjectUserDTO class represents a data transfer object for project information along with associated users.
+ * It includes details such as project ID, project name, project description, and a list of associated users.
+ *
+ * @version 2.0
+ */
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter

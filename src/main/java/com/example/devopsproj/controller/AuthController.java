@@ -9,6 +9,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * The AuthController class is responsible for handling RESTful API endpoints related to user authentication and authorization.
+ * It provides an endpoint for retrieving an email from a token for login verification purposes.
+ * .
+ * This controller integrates with the UserServiceImpl to perform user authentication and verification.
+ *
+ * @version 2.0
+ */
 
 @RestController
 @RequestMapping("/auth")

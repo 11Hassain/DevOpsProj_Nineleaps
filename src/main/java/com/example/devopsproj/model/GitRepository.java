@@ -8,6 +8,16 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * The GitRepository class represents a GitHub repository associated with a project, usernames of users. It stores
+ * information such as the repository name, description, the project it belongs to, and a list of usernames
+ * related to the repository.
+ * .
+ * This class is mapped to a database table named "repositories" and is part of a model for a DevOps project.
+ *
+ * @version 2.0
+ */
+
 @NoArgsConstructor
 @Getter
 @Setter

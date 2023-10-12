@@ -11,6 +11,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The `GoogleDriveServiceImpl` class provides services for managing Google Drive links associated with projects.
+ * It includes methods for creating, retrieving, listing, and deleting Google Drive links.
+ *
+ * @version 2.0
+ */
+
 @Service
 @RequiredArgsConstructor
 public class GoogleDriveServiceImpl implements GoogleDriveService {
@@ -55,6 +62,4 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
     public GoogleDriveDTO mapGoogleDriveToDTO(GoogleDrive googleDrive) {
         return new GoogleDriveDTO(DTOModelMapper.mapProjectToProjectDTO(googleDrive.getProject()), googleDrive.getDriveLink(), googleDrive.getDriveId());
     }
-
-
 }

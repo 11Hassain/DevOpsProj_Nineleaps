@@ -10,6 +10,16 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * The Project class represents a project within a DevOps system. It stores information such as the project's identifier,
+ * name, description, associated Git repositories, access requests, deletion status, last update timestamp, users, Figma,
+ * and Google Drive associations.
+ * .
+ * This class is mapped to a database table named "project" and is part of a model for a DevOps project.
+ *
+ * @version 2.0
+ */
+
 @NoArgsConstructor
 @Getter
 @Setter

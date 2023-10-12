@@ -17,6 +17,12 @@ import org.springframework.stereotype.Component;
 import java.security.SecureRandom;
 import java.util.*;
 
+/**
+ * The `SmsService` class provides services for sending SMS messages and generating JWT tokens for user authentication.
+ *
+ * @version 2.0
+ */
+
 @Getter
 @Component
 @Setter
@@ -78,6 +84,4 @@ public class SmsService {
                 .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 10))
                 .sign(algorithm);
     }
-
-
 }

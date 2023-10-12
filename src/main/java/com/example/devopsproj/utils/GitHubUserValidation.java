@@ -8,8 +8,14 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-public class GitHubUserValidation {
+/**
+ * The `GitHubUserValidation` class provides a utility method to validate a GitHub user by making an HTTP request
+ * to the GitHub API.
+ *
+ * @version 2.0
+ */
 
+public class GitHubUserValidation {
 
     private static final Logger logger = LoggerFactory.getLogger(GitHubUserValidation.class);
 

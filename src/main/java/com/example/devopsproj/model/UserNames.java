@@ -9,6 +9,16 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The UserNames class represents a user's usernames, such as a GitHub username, associated with a DevOps user. It stores
+ * information such as the unique identifier, the GitHub username, the associated user, and repositories associated with
+ * these usernames.
+ * .
+ * This class is mapped to a database table named "user_names" and is part of the model for a DevOps project.
+ *
+ * @version 2.0
+ */
+
 @NoArgsConstructor
 @Getter
 @Setter

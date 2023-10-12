@@ -16,6 +16,15 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+/**
+ * The ApplicationConfig class provides configuration for various components in the DevOps project application.
+ * It defines beans for a ModelMapper, GitHubUserValidation, CollaboratorDTO, UserDetailsService, AuthenticationProvider,
+ * AuthenticationManager, and PasswordEncoder.
+ * .
+ * This configuration class is responsible for configuring and managing application components and their dependencies.
+ *
+ * @version 2.0
+ */
 
 @Configuration
 @RequiredArgsConstructor

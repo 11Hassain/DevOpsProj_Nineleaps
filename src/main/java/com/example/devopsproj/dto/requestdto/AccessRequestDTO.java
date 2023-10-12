@@ -8,6 +8,14 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+/**
+ * The AccessRequestDTO class represents a data transfer object for access request information.
+ * It contains details about an access request, including the access request ID, project manager name, associated user,
+ * associated project, request description, and whether the request is allowed or not.
+ *
+ * @version 2.0
+ */
+
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString

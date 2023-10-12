@@ -5,6 +5,13 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+/**
+ * The GitRepositoryDTO class represents a data transfer object for Git repository information.
+ * It includes details such as the repository ID, name, and description.
+ *
+ * @version 2.0
+ */
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter

@@ -8,6 +8,14 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * The ProjectWithUsersDTO class represents a data transfer object for project information along with associated users.
+ * It includes details such as project ID, project name, project description, last updated timestamp, a list of associated users,
+ * repositories, project status, and related services (Figma and Google Drive).
+ *
+ * @version 2.0
+ */
+
 @NoArgsConstructor
 @Setter
 @Getter

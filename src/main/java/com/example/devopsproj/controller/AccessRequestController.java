@@ -15,6 +15,17 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * The AccessRequestController class is responsible for handling RESTful API endpoints related to access requests.
+ * It provides endpoints for creating, updating, and retrieving access requests, as well as managing notifications for
+ * project managers (PMs).
+ * .
+ * This controller integrates with the AccessRequestServiceImpl to perform operations related to access requests and
+ * uses JWT tokens for user authentication.
+ *
+ * @version 2.0
+ */
+
 @RestController
 @RequestMapping("/api/v1/request")
 @Validated

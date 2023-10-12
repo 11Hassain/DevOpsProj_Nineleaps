@@ -12,6 +12,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * The GitHubCollaboratorController class is responsible for managing RESTful API endpoints related to GitHub collaborators and their actions.
+ * It provides endpoints for adding and deleting GitHub collaborators, utilizing the GitHubCollaboratorServiceImpl for collaborator-related operations.
+ * This controller also handles user authentication through the JwtServiceImpl.
+ *
+ * @version 2.0
+ */
+
 @RestController
 @RequestMapping("/api/v1/collaborators")
 @Validated

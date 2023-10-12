@@ -17,13 +17,19 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * The `HelpDocumentsServiceImpl` class provides services for managing help documents associated with projects.
+ * It includes methods for uploading, retrieving, listing, and deleting help documents.
+ *
+ * @version 2.0
+ */
+
 @Service
 @RequiredArgsConstructor
 public class HelpDocumentsServiceImpl implements HelpDocumentsService {
 
     private final ProjectRepository projectRepository;
     private final HelpDocumentsRepository helpDocumentsRepository;
-    private final ProjectServiceImpl projectServiceImpl;
 
     @Override
     public ResponseEntity<Object> uploadFiles(long projectId, MultipartFile projectFile, String fileExtension) throws IOException {
@@ -36,6 +42,7 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
         return ResponseEntity.ok("File uploaded successfully");
     }
 
+    // Saves the contents of a help document file to a `HelpDocuments` entity.
     @Override
     public void saveFile(HelpDocuments helpDocuments, MultipartFile file, String fileExtension) throws IOException {
         if (file != null && !file.isEmpty()) {

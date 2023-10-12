@@ -23,6 +23,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The ProjectController class provides RESTful API endpoints for managing projects. It allows creating new projects and retrieving project details.
+ * It also provides other functionalities performed using the projects.
+ * User authentication is required using the JwtServiceImpl.
+ *
+ * @version 2.0
+ */
+
 @RestController
 @RequestMapping("/api/v1/projects")
 @Validated

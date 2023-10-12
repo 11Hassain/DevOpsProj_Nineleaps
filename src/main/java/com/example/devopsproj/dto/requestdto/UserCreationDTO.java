@@ -6,6 +6,13 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+/**
+ * The UserCreationDTO class represents a data transfer object for creating a user.
+ * It contains details such as the user's ID, name, email, and role.
+ *
+ * @version 2.0
+ */
+
 @ToString
 @Getter
 @Setter

@@ -5,6 +5,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.*;
 
+/**
+ * The GoogleDriveDTO class represents a data transfer object for Google Drive information.
+ * It includes details such as the associated project, drive link, and drive ID.
+ *
+ * @version 2.0
+ */
+
 @NoArgsConstructor
 @Setter
 @Getter

@@ -21,6 +21,14 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The HelpDocumentsController class manages RESTful API endpoints for handling project help documents.
+ * It provides functionality for uploading, downloading, and deleting PDF files associated with a project.
+ * User authentication is required using the JwtServiceImpl.
+ *
+ * @version 2.0
+ */
+
 @RestController
 @RequestMapping("api/v1/projects")
 @Validated

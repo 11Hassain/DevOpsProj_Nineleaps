@@ -9,6 +9,15 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.Map;
 
+/**
+ * The Figma class represents Figma-related information for a project. It stores data such as the Figma URL,
+ * users associated with the Figma project, and screenshots of the Figma project by user.
+ * .
+ * This class is mapped to a database table named "figma" and is part of a model for a DevOps project.
+ *
+ * @version 2.0
+ */
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

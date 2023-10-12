@@ -4,6 +4,15 @@ import com.example.devopsproj.commons.enumerations.TokenType;
 import jakarta.persistence.*;
 import lombok.*;
 
+/**
+ * The Token class represents an authentication token used in a DevOps project. It stores information such as the token's
+ * identifier, type, revocation status, expiration status, and the user it is associated with.
+ * .
+ * This class is mapped to a database table and is part of the authentication and authorization system for the project.
+ *
+ * @version 2.0
+ */
+
 @Getter
 @Setter
 @ToString

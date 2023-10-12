@@ -4,6 +4,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+/**
+ * The FigmaScreenshotDTO class represents a data transfer object for Figma screenshot information.
+ * It includes details such as the user and the URL of the screenshot image.
+ *
+ * @version 2.0
+ */
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter

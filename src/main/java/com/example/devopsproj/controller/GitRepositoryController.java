@@ -16,6 +16,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * The GitRepositoryController class is responsible for managing RESTful API endpoints related to Git repositories and their actions.
+ * It provides endpoints for creating, retrieving, and deleting Git repositories, and includes role-based and project-based repository retrieval.
+ * Authentication is performed using the JwtServiceImpl.
+ *
+ * @version 2.0
+ */
+
 @RestController
 @RequestMapping("/api/v1/repositories")
 @Validated

@@ -11,6 +11,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * The `UserNamesServiceImpl` class provides services for managing usernames, including validation,
+ * saving, and retrieving usernames based on their roles.
+ *
+ * @version 2.0
+ */
+
 @Service
 @RequiredArgsConstructor
 public class UserNamesServiceImpl implements UserNamesService {
@@ -19,6 +26,7 @@ public class UserNamesServiceImpl implements UserNamesService {
 
     public final GitHubUserValidator gitHubUserValidator;
 
+    // Validates and saves a GitHub username with the associated user data.
     @Override
     public UserNamesDTO saveUsername(UserNamesDTO userNamesDTO) {
         boolean yes = gitHubUserValidator.isGitHubUserValid(userNamesDTO.getUsername(), userNamesDTO.getAccessToken());
