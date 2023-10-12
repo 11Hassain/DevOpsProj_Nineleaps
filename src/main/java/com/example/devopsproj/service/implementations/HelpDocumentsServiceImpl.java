@@ -55,20 +55,16 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
     // Extract and return the file extension from a multipart file
     @Override
     public String getFileExtension(MultipartFile file) {
-        try {
-            String originalFilename = file.getOriginalFilename();
-            if (originalFilename != null) {
-                int dotIndex = originalFilename.lastIndexOf('.');
-                if (dotIndex >= 0 && dotIndex < originalFilename.length() - 1) {
-                    return originalFilename.substring(dotIndex + 1).toLowerCase();
-                }
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename != null) {
+            int dotIndex = originalFilename.lastIndexOf('.');
+            if (dotIndex >= 0 && dotIndex < originalFilename.length() - 1) {
+                return originalFilename.substring(dotIndex + 1).toLowerCase();
             }
-            return null;
-        } catch (IllegalArgumentException e) {
-            // Log the exception or perform any necessary error handling here
-            throw new IllegalArgumentException("Invalid parameters");
         }
+        throw new IllegalArgumentException("Invalid parameters");
     }
+
 
     @Override
     public ResponseEntity<Object> getPdfFilesList(long projectId) {

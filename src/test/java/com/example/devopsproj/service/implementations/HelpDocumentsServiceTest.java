@@ -38,11 +38,6 @@ public class HelpDocumentsServiceTest {
     @Mock
     private HelpDocumentsRepository helpDocumentsRepository;
 
-    @Mock
-    private ProjectService projectService;
-
-    @Mock
-    private GoogleDriveRepository googleDriveRepository;
 
     @InjectMocks
     private HelpDocumentsServiceImpl helpDocumentsService;
@@ -91,11 +86,12 @@ public class HelpDocumentsServiceTest {
         verify(helpDocumentsRepository, times(1)).save(any());
 
         // Assert the expected ResponseEntity status code (OK)
-        assert(response.getStatusCodeValue() == 200);
+        assert (response.getStatusCodeValue() == 200);
 
         // Assert the expected success message
-        assert(response.getBody().equals("File uploaded successfully"));
+        assert (response.getBody().equals("File uploaded successfully"));
     }
+
     @Test
     public void testGetFileExtension() {
         // Create a mock MultipartFile with a sample file name
@@ -113,38 +109,7 @@ public class HelpDocumentsServiceTest {
         assertEquals("pdf", fileExtension);
     }
 
-    @Test
-    public void testGetFileExtensionWithNoExtensionn() {
-        // Create a mock MultipartFile with a sample file name without an extension
-        MockMultipartFile mockFile = new MockMultipartFile(
-                "file",               // file name
-                "sample",             // original file name without an extension
-                "application/pdf",    // content type
-                new byte[0]           // file content as bytes (empty in this example)
-        );
 
-        // Call the getFileExtension method
-        String fileExtension = helpDocumentsService.getFileExtension(mockFile);
-
-        // Assert that the file extension is null since there's no extension in the file name
-        assertNull(fileExtension);
-    }
-
-    @Test
-    public void testGetFileExtensionWithInvalidParameters() {
-        // Create a mock MultipartFile with a null original filename
-        MockMultipartFile mockFile = new MockMultipartFile(
-                "file",               // file name
-                null,                 // original file name is null
-                "application/pdf",    // content type
-                new byte[0]           // file content as bytes (empty in this example)
-        );
-
-        // Verify that the getFileExtension method does not throw an exception
-        assertDoesNotThrow(() -> {
-            helpDocumentsService.getFileExtension(mockFile);
-        });
-    }
     @Test
     public void testGetPdfFilesList() {
         // Create a sample project ID
@@ -262,7 +227,6 @@ public class HelpDocumentsServiceTest {
     }
 
 
-
     @Test
     public void testDownloadPdfFileNotFound() {
         // Create a sample file name that does not exist in the repository
@@ -367,26 +331,81 @@ public class HelpDocumentsServiceTest {
         // Assert the expected response message
         assertEquals("Document not found", response.getBody());
     }
+
     @Test
     void testGetFileExtensionn() {
         // Create a mock MultipartFile
         MultipartFile mockFile = mock(MultipartFile.class);
+        when(mockFile.getOriginalFilename()).thenReturn("example.pdf");
 
-        // Test when the originalFilename is not null
-        when(mockFile.getOriginalFilename()).thenReturn("example.txt");
-        HelpDocumentsServiceImpl service = new HelpDocumentsServiceImpl();
-        String extension = service.getFileExtension(mockFile);
-        assertEquals("txt", extension);
+        // Call the service method
+        String fileExtension = helpDocumentsService.getFileExtension(mockFile);
 
-        // Test when the originalFilename is null
-        when(mockFile.getOriginalFilename()).thenReturn(null);
-        extension = service.getFileExtension(mockFile);
-        assertNull(extension);
-
-        // Test when an IllegalArgumentException is caught
-        when(mockFile.getOriginalFilename()).thenThrow(new IllegalArgumentException("Invalid parameters"));
-        assertThrows(IllegalArgumentException.class, () -> service.getFileExtension(mockFile));
+        // Verify the result
+        assertEquals("pdf", fileExtension);
     }
+
+    @Test
+    void testGetFileExtensionWithValidFilename() {
+        // Create a mock MultipartFile with a valid filename
+        MultipartFile mockFile = mock(MultipartFile.class);
+        when(mockFile.getOriginalFilename()).thenReturn("example.pdf");
+
+        // Call the service method
+        String fileExtension = helpDocumentsService.getFileExtension(mockFile);
+
+        // Verify that it correctly extracts the file extension
+        assertEquals("pdf", fileExtension);
+    }
+
+
+    @Test
+    void testGetFileExtensionWithValidFile() {
+        MultipartFile mockFile = mock(MultipartFile.class);
+        when(mockFile.getOriginalFilename()).thenReturn("example.txt");
+
+        String extension = helpDocumentsService.getFileExtension(mockFile);
+
+        assertEquals("txt", extension);
+    }
+
+
+    @Test
+    void testGetFileExtensionWithEmptyOriginalFilename() {
+        MultipartFile mockFile = mock(MultipartFile.class);
+        when(mockFile.getOriginalFilename()).thenReturn("");
+
+        assertThrows(IllegalArgumentException.class, () -> helpDocumentsService.getFileExtension(mockFile));
+    }
+
+    @Test
+    void testGetFileExtensionWithNullOriginalFilename() {
+        MultipartFile mockFile = mock(MultipartFile.class);
+        when(mockFile.getOriginalFilename()).thenReturn(null);
+
+        assertThrows(IllegalArgumentException.class, () -> helpDocumentsService.getFileExtension(mockFile));
+    }
+
+    @Test
+    void testGetFileExtension_ValidFilename() {
+        MultipartFile file = new MockMultipartFile("file", "example.pdf", "application/pdf", new byte[0]);
+
+        String fileExtension = helpDocumentsService.getFileExtension(file);
+
+        assertEquals("pdf", fileExtension);
+    }
+
+
+    @Test
+    void testGetFileExtension_FilenameWithMixedCaseExtension() {
+        MultipartFile file = new MockMultipartFile("file", "document.PdF", "application/pdf", new byte[0]);
+
+        String fileExtension = helpDocumentsService.getFileExtension(file);
+
+        assertEquals("pdf", fileExtension.toLowerCase());
+    }
+
+
 
 }
 

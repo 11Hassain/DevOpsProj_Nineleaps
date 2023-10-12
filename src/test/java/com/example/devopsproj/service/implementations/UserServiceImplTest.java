@@ -984,4 +984,81 @@ class UserServiceImplTest {
         assertTrue(result.isEmpty());
     }
 
+    @Test
+    void testLoginVerification_Successful() {
+        String userEmail = "johndoe@example.com";
+        User user = new User();
+        user.setId(1L);
+        user.setName("John Doe");
+        user.setEmail(userEmail);
+        user.setEnumRole(EnumRole.USER);
+
+        when(userRepository.existsByEmail(userEmail)).thenReturn(user);
+
+        String mockToken = "mocked-jwt-token";
+        when(jwtService.generateToken(user)).thenReturn(mockToken);
+
+        doNothing().when(jwtUtils).saveUserToken(user, mockToken);
+
+        UserDTO result = userService.loginVerification(userEmail);
+
+        assertNotNull(result);
+        assertEquals(user.getId(), result.getId());
+        assertEquals(user.getName(), result.getName());
+        assertEquals(user.getEmail(), result.getEmail());
+        assertEquals(user.getEnumRole(), result.getEnumRole());
+        assertNotNull(result.getLastUpdated());
+        assertEquals(mockToken, result.getToken());
+    }
+
+    @Test
+    void testUserLogout_Successful() {
+        Long userId = 1L;
+        User user = new User();
+        user.setId(userId);
+        user.setName("John Doe");
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        String result = userService.userLogout(userId);
+
+        assertEquals("User logged out successfully", result);
+        assertNotNull(user.getLastLogout());
+    }
+
+    @Test
+    void testLoginVerification_UserNotFound() {
+        String userEmail = "nonexistent@example.com";
+        when(userRepository.existsByEmail(userEmail)).thenReturn(null);
+
+        UserDTO result = userService.loginVerification(userEmail);
+
+        assertNull(result);
+    }
+
+
+    @Test
+    void testUserLogout_Unsuccessful_UserNotFound() {
+        Long userId = 2L;
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        String result = userService.userLogout(userId);
+
+        assertEquals("Log out unsuccessful", result);
+    }
+
+    @Test
+    void testLoginVerification_Unsuccessful_UserNotFound() {
+        String userEmail = "nonexistent@example.com";
+
+        when(userRepository.existsByEmail(userEmail)).thenReturn(null);
+
+        UserDTO result = userService.loginVerification(userEmail);
+
+        assertNull(result);
+    }
+
+
+
 }

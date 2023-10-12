@@ -3,6 +3,7 @@ package com.example.devopsproj.service.implementations;
 import com.example.devopsproj.dto.requestdto.AccessRequestDTO;
 import com.example.devopsproj.dto.responsedto.AccessResponseDTO;
 import com.example.devopsproj.model.AccessRequest;
+import com.example.devopsproj.model.Project;
 import com.example.devopsproj.model.User;
 import com.example.devopsproj.repository.AccessRequestRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -350,6 +351,48 @@ public class AccessRequestServiceTest {
         verify(accessRequestRepository, times(1)).deleteAll();
     }
 
+    @Test
+    public void testGetUpdatedRequests() {
+        // Create a sample User object
+        User sampleUser = new User();
+        sampleUser.setId(1L);
+        sampleUser.setName("Sample User");
+
+        // Create a sample Project object
+        Project sampleProject = new Project();
+        sampleProject.setProjectId(1L);
+        sampleProject.setProjectName("Sample Project");
+
+        // Create a sample AccessRequest object and associate it with the User and Project
+        AccessRequest accessRequest = new AccessRequest();
+        accessRequest.setUser(sampleUser); // Set the associated user
+        accessRequest.setProject(sampleProject); // Set the associated project
+        accessRequest.setAccessRequestId(1L);
+        accessRequest.setPmName("Sample PM");
+        accessRequest.setRequestDescription("Sample request");
+        accessRequest.setAllowed(true);
+
+        // Mock the behavior of AccessRequestRepository.findById
+        when(accessRequestRepository.findById(1L)).thenReturn(Optional.of(accessRequest));
+
+        // Create a list of AccessRequest objects
+        List<AccessRequest> accessRequests = new ArrayList<>();
+        accessRequests.add(accessRequest);
+
+        // Mock the behavior of AccessRequestRepository.findAllActiveRequests
+        when(accessRequestRepository.findAllActiveRequests()).thenReturn(accessRequests);
+
+        // Create an AccessRequestDTO with updated information
+        AccessRequestDTO accessRequestDTO = new AccessRequestDTO();
+        accessRequestDTO.setAllowed(false);
+
+        // Call the method to be tested
+        List<AccessResponseDTO> result = accessRequestService.getUpdatedRequests(1L, accessRequestDTO);
+
+        // Verify the result
+        assertEquals(1, result.size());
+        assertEquals(false, result.get(0).isAllowed());
+    }
 
 
 
