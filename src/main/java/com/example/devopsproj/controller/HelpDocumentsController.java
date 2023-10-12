@@ -1,6 +1,6 @@
 package com.example.devopsproj.controller;
 
-import com.example.devopsproj.repository.HelpDocumentsRepository;
+
 import com.example.devopsproj.service.interfaces.HelpDocumentsService;
 
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class HelpDocumentsController {
     private final HelpDocumentsService helpDocumentsService;
-    private final HelpDocumentsRepository helpDocumentsRepository;
+
 
     // Upload a file associated with a specific project.
     @PostMapping("/upload")

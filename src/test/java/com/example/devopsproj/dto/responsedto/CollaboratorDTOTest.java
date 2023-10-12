@@ -23,6 +23,17 @@ class CollaboratorDTOTest {
     }
 
     @Test
+    void testToString() {
+        // Arrange
+        CollaboratorDTO collaboratorDTO = new CollaboratorDTO();
+
+        // Act
+        String toStringResult = collaboratorDTO.toString();
+
+        // Assert
+        assertNotNull(toStringResult);
+    }
+    @Test
     void testDefaultConstructor() {
         CollaboratorDTO collaboratorDTO = new CollaboratorDTO();
 

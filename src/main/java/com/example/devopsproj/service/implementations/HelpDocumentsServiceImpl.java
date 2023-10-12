@@ -12,10 +12,12 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
+
 
 
 @Service
@@ -140,6 +142,9 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
         }
     }
 
+
+
+
     // Helper method to save file data to a HelpDocuments object
     private void saveFile(HelpDocuments helpDocuments, MultipartFile file, String fileExtension) throws IOException {
         if (file != null && !file.isEmpty()) {
@@ -148,6 +153,7 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
             helpDocuments.setFileExtension(fileExtension);
         }
     }
+
 
 
 }

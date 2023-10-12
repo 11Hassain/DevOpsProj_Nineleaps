@@ -1,6 +1,5 @@
-package com.example.devopsproj.Controller;
+package com.example.devopsproj.controller;
 
-import com.example.devopsproj.controller.GitHubCollaboratorController;
 import com.example.devopsproj.dto.responsedto.CollaboratorDTO;
 import com.example.devopsproj.service.interfaces.GitHubCollaboratorService;
 import org.junit.jupiter.api.BeforeEach;

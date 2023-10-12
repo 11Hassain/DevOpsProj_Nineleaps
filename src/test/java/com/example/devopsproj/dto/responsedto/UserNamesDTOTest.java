@@ -68,4 +68,15 @@ class UserNamesDTOTest {
         assertNull(dto.getAccessToken());
     }
 
+    @Test
+    void testToString() {
+        // Arrange
+        UserNamesDTO userNamesDTO = new UserNamesDTO();
+
+        // Act
+        String toStringResult = userNamesDTO.toString();
+
+        // Assert
+        assertNotNull(toStringResult);
+    }
 }

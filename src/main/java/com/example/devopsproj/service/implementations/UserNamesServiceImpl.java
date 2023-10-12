@@ -28,23 +28,24 @@ public class UserNamesServiceImpl implements UserNamesService {
     @Override
     public UserNamesDTO saveUsername(UserNamesDTO userNamesDTO) {
         try {
-        boolean yes = GitHubUserValidation.isGitHubUserValid(userNamesDTO.getUsername(), userNamesDTO.getAccessToken());
-        if (yes){
-            UserNames userNames = new UserNames();
-            userNames.setUsername(userNamesDTO.getUsername());
-            userNames.setUser(userNamesDTO.getUser());
-            userNamesRepository.save(userNames);
-            return userNamesDTO;
-        } else {
-            throw new GitHubUserNotFoundException("GitHub user not found");
+            boolean yes = GitHubUserValidation.isGitHubUserValid(userNamesDTO.getUsername(), userNamesDTO.getAccessToken());
+            if (yes) {
+                UserNames userNames = new UserNames();
+                userNames.setUsername(userNamesDTO.getUsername());
+                userNames.setUser(userNamesDTO.getUser());
+                userNamesRepository.save(userNames);
+                return userNamesDTO;
+            } else {
+                throw new GitHubUserNotFoundException("GitHub user not found");
+            }
+        } catch (DataIntegrityViolationException e) {
+            // Handle the case where the username already exists.
+            throw new DuplicateUsernameException("Username already exists");
+        } catch (InterruptedException e) {
+            // Re-interrupt the thread and throw an exception with a custom message.
+            Thread.currentThread().interrupt();
+            throw new CustomGenericException("An error occurred", e);
         }
-    } catch (DataIntegrityViolationException e) {
-        // Handle the case where the username already exists.
-        throw new DuplicateUsernameException("Username already exists");
-    } catch (Exception e) {
-        // Handle other exceptions generically or as needed.
-        throw new CustomGenericException("An error occurred", e);
-    }
     }
 
 

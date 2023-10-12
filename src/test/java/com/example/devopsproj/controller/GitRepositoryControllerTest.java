@@ -1,4 +1,4 @@
-package com.example.devopsproj.Controller;
+package com.example.devopsproj.controller;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.controller.GitRepositoryController;
@@ -202,5 +202,3 @@ public class GitRepositoryControllerTest {
 
 
 }
-
-

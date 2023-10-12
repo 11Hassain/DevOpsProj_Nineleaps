@@ -88,7 +88,7 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    private ResponseEntity<GoogleDriveDTO> mapToGoogleDriveDTO(GoogleDrive googleDrive) {
+    public ResponseEntity<GoogleDriveDTO> mapToGoogleDriveDTO(GoogleDrive googleDrive) {
         GoogleDriveDTO googleDriveDTO = new GoogleDriveDTO(
                 new ProjectDTO(googleDrive.getProject().getProjectId(), googleDrive.getProject().getProjectName()),
                 googleDrive.getDriveLink(),

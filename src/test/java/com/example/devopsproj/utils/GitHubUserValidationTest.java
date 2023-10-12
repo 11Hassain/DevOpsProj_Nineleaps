@@ -1,17 +1,9 @@
 package com.example.devopsproj.utils;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.net.http.HttpClient;
-import java.net.http.HttpResponse;
-
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static springfox.documentation.builders.PathSelectors.any;
+
 
 public class GitHubUserValidationTest {
 

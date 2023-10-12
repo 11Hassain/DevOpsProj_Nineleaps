@@ -114,7 +114,7 @@ public class HelpDocumentsServiceTest {
     }
 
     @Test
-    public void testGetFileExtensionWithNoExtension() {
+    public void testGetFileExtensionWithNoExtensionn() {
         // Create a mock MultipartFile with a sample file name without an extension
         MockMultipartFile mockFile = new MockMultipartFile(
                 "file",               // file name
@@ -204,6 +204,26 @@ public class HelpDocumentsServiceTest {
         assertNull(response.getBody());
     }
 
+//    @Test
+//    public void testGetFileExtensionWithValidFile() {
+//        // Arrange
+//        HelpDocumentsRepository helpDocumentsRepository = Mockito.mock(HelpDocumentsRepository.class);
+//        ProjectRepository projectRepository = Mockito.mock(ProjectRepository.class);
+//        ProjectService projectService = Mockito.mock(ProjectService.class);
+//        GoogleDriveRepository googleDriveRepository = Mockito.mock(GoogleDriveRepository.class);
+//        HelpDocumentsServiceImpl helpDocumentsService = new HelpDocumentsServiceImpl(
+//                projectRepository, helpDocumentsRepository, projectService, googleDriveRepository
+//        );
+//
+//        MultipartFile file = Mockito.mock(MultipartFile.class);
+//        Mockito.when(file.getOriginalFilename()).thenReturn("example.pdf");
+//
+//        // Act
+//        String fileExtension = helpDocumentsService.getFileExtension(file);
+//
+//        // Assert
+//        assertEquals("pdf", fileExtension);
+//    }
 
     @Test
     public void testDownloadPdfFile() {
@@ -346,6 +366,26 @@ public class HelpDocumentsServiceTest {
 
         // Assert the expected response message
         assertEquals("Document not found", response.getBody());
+    }
+    @Test
+    void testGetFileExtensionn() {
+        // Create a mock MultipartFile
+        MultipartFile mockFile = mock(MultipartFile.class);
+
+        // Test when the originalFilename is not null
+        when(mockFile.getOriginalFilename()).thenReturn("example.txt");
+        HelpDocumentsServiceImpl service = new HelpDocumentsServiceImpl();
+        String extension = service.getFileExtension(mockFile);
+        assertEquals("txt", extension);
+
+        // Test when the originalFilename is null
+        when(mockFile.getOriginalFilename()).thenReturn(null);
+        extension = service.getFileExtension(mockFile);
+        assertNull(extension);
+
+        // Test when an IllegalArgumentException is caught
+        when(mockFile.getOriginalFilename()).thenThrow(new IllegalArgumentException("Invalid parameters"));
+        assertThrows(IllegalArgumentException.class, () -> service.getFileExtension(mockFile));
     }
 
 }

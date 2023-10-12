@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.util.*;
@@ -39,47 +40,87 @@ public class FigmaServiceImplTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
     }
-//    @Test
-//    public void testCreateFigma_Success() throws FigmaCreationException {
-//        // Arrange
-//        FigmaDTO figmaDTO = new FigmaDTO("https://example.com/figma");
-//
-//        // Initialize ProjectDTO with required properties
-//        ProjectDTO projectDTO = new ProjectDTO();
-//        projectDTO.setProjectId(1L); // Set the project ID
-//        projectDTO.setProjectName("Test Project");
-//        projectDTO.setProjectDescription("Test Description");
-//
-//        // Set the projectDTO property of figmaDTO
-//        figmaDTO.setProjectDTO(projectDTO);
-//
-//        // Mock the mapProjectDTOToProject method to return a Project
-//        when(projectService.mapProjectDTOToProject(eq(projectDTO))).thenReturn(new Project());
-//
-//        // Mock the figmaRepository save method to return the Figma object
-//        when(figmaRepository.save(any(Figma.class))).thenReturn(new Figma());
-//
-//        // Act
-//        Figma createdFigma = figmaService.createFigma(figmaDTO);
-//
-//        // Assert
-//        assertNotNull(createdFigma);
-//        assertEquals("https://example.com/figma", createdFigma.getFigmaURL());
-//        // Add additional assertions as needed
-//    }
 
-//
-//    @Test
-//    public void testCreateFigma_Failure() {
-//        // Arrange
-//        FigmaDTO figmaDTO = new FigmaDTO("https://example.com/figma");
-//
-//        // Mock the mapProjectDTOToProject method to throw an exception
-//        when(figmaService.mapProjectDTOToProject(any(ProjectDTO.class))).thenThrow(new RuntimeException("Test Exception"));
-//
-//        // Act and Assert
-//        assertThrows(FigmaCreationException.class, () -> figmaService.createFigma(figmaDTO));
-//    }
+
+    @Test
+    public void testCreateFigma_Success() throws FigmaCreationException {
+        // Prepare input data
+        FigmaDTO figmaDTO = new FigmaDTO(new ProjectDTO(1L, "ProjectName"), "https://figma.com/project1");
+
+        // Mock project retrieval
+        Project project = new Project();
+        project.setProjectId(1L);
+        when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+
+        // Mock Figma creation and save
+        Figma savedFigma = new Figma();
+        when(figmaRepository.save(any(Figma.class))).thenReturn(savedFigma);
+
+        // Perform the Figma creation
+        Figma createdFigma = figmaService.createFigma(figmaDTO);
+
+        // Assert results
+        assertNotNull(createdFigma);
+        assertEquals(savedFigma, createdFigma);
+    }
+
+    @Test
+    public void testGetAllFigmaProjects_Successs() {
+        // Prepare mock data
+        Project project1 = new Project();
+        project1.setProjectId(1L);
+        Project project2 = new Project();
+        project2.setProjectId(2L);
+
+        when(projectRepository.findAllProjects()).thenReturn(List.of(project1, project2));
+
+        // Perform the method
+        List<Figma> figmaProjects = figmaService.getAllFigmaProjects();
+
+        // Verify results
+        assertNotNull(figmaProjects);
+        assertEquals(2, figmaProjects.size());
+    }
+
+    @Test
+    public void testGetAllFigmaProjects_Exception() {
+        // Mock an exception when calling projectRepository.findAllProjects
+        when(projectRepository.findAllProjects()).thenThrow(new RuntimeException("Simulated Exception"));
+
+        // Perform the method and catch the exception
+        Exception exception = assertThrows(FigmaServiceException.class, () -> {
+            figmaService.getAllFigmaProjects();
+        });
+
+        // Verify the exception message
+        assertTrue(exception.getMessage().contains("An error occurred while retrieving Figma projects"));
+    }
+
+    @Test
+    public void testCreateFigma_DataIntegrityViolationException() {
+        FigmaDTO figmaDTO = new FigmaDTO(new ProjectDTO(1L, "ProjectName"), "https://figma.com/project1");
+
+        Project project = new Project();
+        project.setProjectId(1L);
+        when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+
+        when(figmaRepository.save(any(Figma.class))).thenThrow(DataIntegrityViolationException.class);
+
+        assertThrows(FigmaCreationException.class, () -> figmaService.createFigma(figmaDTO));
+    }
+
+    @Test
+    public void testCreateFigma_Exception() {
+        FigmaDTO figmaDTO = new FigmaDTO(new ProjectDTO(1L, "ProjectName"), "https://figma.com/project1");
+
+        Project project = new Project();
+        project.setProjectId(1L);
+        when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+
+        when(figmaRepository.save(any(Figma.class))).thenThrow(new RuntimeException("Test Exception"));
+
+        assertThrows(FigmaCreationException.class, () -> figmaService.createFigma(figmaDTO));
+    }
 
     @Test
     public void testGetAllFigmaProjects_Success() {
@@ -107,6 +148,123 @@ public class FigmaServiceImplTest {
         assertEquals(2, figmaProjects.size());
         // Add additional assertions as needed
     }
+
+    @Test
+    void testGetFigmaById_Found() {
+        Long figmaId = 1L;
+        Figma figma = new Figma();
+        Project project = new Project();
+        project.setProjectId(1L);
+        project.setProjectName("Test Project");
+        figma.setProject(project);
+        figma.setFigmaURL("https://example.com/figma");
+
+        when(figmaRepository.findById(figmaId)).thenReturn(Optional.of(figma));
+
+        Optional<FigmaDTO> figmaDTOOptional = figmaService.getFigmaById(figmaId);
+
+        assertTrue(figmaDTOOptional.isPresent());
+        FigmaDTO figmaDTO = figmaDTOOptional.get();
+        assertNotNull(figmaDTO.getProjectDTO());
+        assertEquals(1L, figmaDTO.getProjectDTO().getProjectId());
+        assertEquals("Test Project", figmaDTO.getProjectDTO().getProjectName());
+        assertEquals("https://example.com/figma", figmaDTO.getFigmaURL());
+    }
+    @Test
+    void testAddUserAndScreenshots_FigmaFound() {
+        Long figmaId = 1L;
+        String user = "User1";
+        String screenshotImage = "screenshot1.png";
+        FigmaDTO figmaDTO = new FigmaDTO();
+        figmaDTO.setUser(user);
+        figmaDTO.setScreenshotImage(screenshotImage);
+
+        Figma figma = new Figma();
+        when(figmaRepository.findById(figmaId)).thenReturn(Optional.of(figma));
+
+        figmaService.addUserAndScreenshots(figmaId, figmaDTO);
+
+        // Verify that the Figma object has been updated with the new user and screenshot.
+        Map<String, String> screenshotImagesByUser = figma.getScreenshotImagesByUser();
+        assertNotNull(screenshotImagesByUser);
+        assertTrue(screenshotImagesByUser.containsKey(user));
+        assertEquals(screenshotImage, screenshotImagesByUser.get(user));
+
+        // Ensure that figmaRepository.save has been called once.
+        verify(figmaRepository, times(1)).save(figma);
+    }
+
+    @Test
+    void testAddUserAndScreenshots_FigmaFoundd() {
+        Long figmaId = 1L;
+        String user = "User1";
+        String screenshotImage = "screenshot1.png";
+        FigmaDTO figmaDTO = new FigmaDTO();
+        figmaDTO.setUser(user);
+        figmaDTO.setScreenshotImage(screenshotImage);
+
+        Figma figma = new Figma();
+        when(figmaRepository.findById(figmaId)).thenReturn(Optional.of(figma));
+
+        figmaService.addUserAndScreenshots(figmaId, figmaDTO);
+
+        // Verify that the Figma object has been updated with the new user and screenshot.
+        Map<String, String> screenshotImagesByUser = figma.getScreenshotImagesByUser();
+        assertNotNull(screenshotImagesByUser);
+        assertTrue(screenshotImagesByUser.containsKey(user));
+        assertEquals(screenshotImage, screenshotImagesByUser.get(user));
+
+        // Ensure that figmaRepository.save has been called once.
+        verify(figmaRepository, times(1)).save(figma);
+
+        // Ensure that screenshotImagesByUser is initialized with an empty HashMap
+        assertEquals(1, screenshotImagesByUser.size()); // The size should be 1 (user -> screenshot)
+    }
+    @Test
+    void testAddUserAndScreenshots_InitializeScreenshotImagesByUser() {
+        Long figmaId = 1L;
+        String user = "User1";
+        String screenshotImage = "screenshot1.png";
+        FigmaDTO figmaDTO = new FigmaDTO();
+        figmaDTO.setUser(user);
+        figmaDTO.setScreenshotImage(screenshotImage);
+
+        Figma figma = new Figma();
+        // Simulate a scenario where screenshotImagesByUser is initially null in Figma.
+        figma.setScreenshotImagesByUser(null);
+
+        when(figmaRepository.findById(figmaId)).thenReturn(Optional.of(figma));
+
+        figmaService.addUserAndScreenshots(figmaId, figmaDTO);
+
+        // Verify that the Figma object has been updated with the new user and screenshot.
+        Map<String, String> screenshotImagesByUser = figma.getScreenshotImagesByUser();
+        assertNotNull(screenshotImagesByUser);
+        assertTrue(screenshotImagesByUser.containsKey(user));
+        assertEquals(screenshotImage, screenshotImagesByUser.get(user));
+
+        // Ensure that figmaRepository.save has been called once.
+        verify(figmaRepository, times(1)).save(figma);
+
+        // Ensure that screenshotImagesByUser is initialized with an empty HashMap
+        assertEquals(1, screenshotImagesByUser.size()); // The size should be 1 (user -> screenshot)
+    }
+
+    @Test
+    void testAddUserAndScreenshots_FigmaNotFound() {
+        Long figmaId = 1L;
+        String user = "User1";
+        String screenshotImage = "screenshot1.png";
+        FigmaDTO figmaDTO = new FigmaDTO();
+        figmaDTO.setUser(user);
+        figmaDTO.setScreenshotImage(screenshotImage);
+
+        when(figmaRepository.findById(figmaId)).thenReturn(Optional.empty());
+
+        // Verify that a FigmaNotFoundException is thrown when Figma is not found.
+        assertThrows(FigmaNotFoundException.class, () -> figmaService.addUserAndScreenshots(figmaId, figmaDTO));
+    }
+
 
     @Test
     public void testGetAllFigmaProjects_EmptyList() {
@@ -406,4 +564,51 @@ public class FigmaServiceImplTest {
         assertEquals(figmaDTO.getFigmaId(), figma.getFigmaId());
         assertEquals(figmaDTO.getFigmaURL(), figma.getFigmaURL());
     }
+    @Test
+    void testGetAllFigmaDTOs() {
+            Project project1 = new Project();
+            Figma figma1 = new Figma();
+            figma1.setFigmaURL("https://example.com/figma1");
+            project1.setFigma(figma1);
+
+            Project project2 = new Project();
+            Figma figma2 = new Figma();
+            figma2.setFigmaURL("https://example.com/figma2");
+            project2.setFigma(figma2);
+
+            List<Project> activeProjects = Arrays.asList(project1, project2);
+
+            when(projectRepository.findAllProjects()).thenReturn(activeProjects);
+
+            List<Figma> figmaProjects = figmaService.getAllFigmaProjects();
+
+            assertNotNull(figmaProjects);
+            assertEquals(2, figmaProjects.size());
+
+            assertEquals("https://example.com/figma1", figmaProjects.get(0).getFigmaURL());
+            assertEquals("https://example.com/figma2", figmaProjects.get(1).getFigmaURL());
+        }
+    @Test
+    void testGetAllFigmaDTOs_WithFigma() {
+        // Create a project with an associated Figma object
+        Project project = new Project();
+        Figma figma = new Figma();
+        figma.setFigmaId(1L);
+        figma.setProject(project);
+        project.setFigma(figma);
+
+        // Mock the repository to return the project with Figma
+        List<Project> activeProjects = Collections.singletonList(project);
+        when(projectRepository.findAllProjects()).thenReturn(activeProjects);
+
+        // Call the method under test
+        List<FigmaDTO> figmaDTOs = figmaService.getAllFigmaDTOs();
+
+        // Assertions
+        assertEquals(1, figmaDTOs.size()); // Check that one FigmaDTO is added
+        FigmaDTO figmaDTO = figmaDTOs.get(0);
+        assertEquals(figma.getFigmaId(), figmaDTO.getFigmaId());
+        // You can add more assertions for other fields if needed
+    }
+
 }

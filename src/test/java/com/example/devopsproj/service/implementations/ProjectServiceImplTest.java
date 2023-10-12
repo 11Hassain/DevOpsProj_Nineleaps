@@ -8,7 +8,7 @@ import com.example.devopsproj.model.*;
 import com.example.devopsproj.repository.GitRepositoryRepository;
 import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.repository.UserRepository;
-import com.example.devopsproj.service.interfaces.ProjectService;
+
 import org.hibernate.service.spi.ServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -315,7 +315,7 @@ public class ProjectServiceImplTest {
 
 
 
-//    @Test
+    //    @Test
 //    public void testGetAllUsersByProjectIdAndRole_InternalServerError() {
 //        // Arrange
 //        Long projectId = 1L;
@@ -504,8 +504,8 @@ public class ProjectServiceImplTest {
 
         // Assert
         assertNotNull(response);
-     //   assertEquals(HttpStatus.OK, response.getStatusCode());
-     //   assertEquals("User removed", response.getBody());
+        //   assertEquals(HttpStatus.OK, response.getStatusCode());
+        //   assertEquals("User removed", response.getBody());
     }
 
 
@@ -944,7 +944,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-     void testGetUsersByProjectIdAndRole_WithUsers() {
+    void testGetUsersByProjectIdAndRole_WithUsers() {
         // Arrange
         Long projectId = 1L;
         String role = "USER";
@@ -1247,6 +1247,3 @@ public class ProjectServiceImplTest {
 
 
 }
-
-
-

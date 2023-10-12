@@ -1,4 +1,4 @@
-package com.example.devopsproj.Controller;
+package com.example.devopsproj.controller;
 
 import aj.org.objectweb.asm.TypeReference;
 import com.example.devopsproj.commons.enumerations.EnumRole;
@@ -28,7 +28,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class ProjectControllerTest {
 
@@ -270,7 +270,37 @@ public class ProjectControllerTest {
         String responseBody = (String) responseEntity.getBody();
         assertEquals("User added to project successfully", responseBody);
     }
+    @Test
+    void testGetProjectsWithoutFigmaURL() {
+        // Arrange
+        List<ProjectDTO> projectsWithoutFigmaURL = new ArrayList<>(); // You should set the projects here
+        ResponseEntity<List<ProjectDTO>> responseEntity = ResponseEntity.ok(projectsWithoutFigmaURL);
 
+        when(projectService.getProjectsWithoutFigmaURL()).thenReturn(projectsWithoutFigmaURL);
+
+        // Act
+        ResponseEntity<List<ProjectDTO>> response = projectController.getProjectsWithoutFigmaURL();
+
+        // Assert
+        verify(projectService, times(1)).getProjectsWithoutFigmaURL();
+        assertEquals(responseEntity, response);
+    }
+
+    @Test
+    void testGetProjectsWithoutGoogleDriveLink() {
+        // Arrange
+        List<ProjectDTO> projectsWithoutGoogleDriveLink = new ArrayList<>(); // You should set the projects here
+        ResponseEntity<List<ProjectDTO>> responseEntity = ResponseEntity.ok(projectsWithoutGoogleDriveLink);
+
+        when(projectService.getProjectsWithoutGoogleDriveLink()).thenReturn(projectsWithoutGoogleDriveLink);
+
+        // Act
+        ResponseEntity<List<ProjectDTO>> response = projectController.getProjectsWithoutGoogleDriveLink();
+
+        // Assert
+        verify(projectService, times(1)).getProjectsWithoutGoogleDriveLink();
+        assertEquals(responseEntity, response);
+    }
     @Test
     public void testRemoveUserFromProject() {
         // Define a projectId and userId for testing

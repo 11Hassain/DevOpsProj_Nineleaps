@@ -70,4 +70,23 @@ public class TokenTest {
         // Assert
         assertNotNull(token.toString());
     }
+    @Test
+    public void testGettersAndSetters() {
+        // Create a Token instance
+        Token token = new Token();
+
+        // Set values using setters
+        token.setId(1);
+        token.setToken("example_token");
+        token.setTokenType(TokenType.BEARER);
+        token.setRevoked(false);
+        token.setExpired(false);
+
+        // Retrieve values using getters
+        assertEquals(1, token.getId());
+        assertEquals("example_token", token.getToken());
+        assertEquals(TokenType.BEARER, token.getTokenType());
+        assertEquals(false, token.isRevoked());
+        assertEquals(false, token.isExpired());
+    }
 }

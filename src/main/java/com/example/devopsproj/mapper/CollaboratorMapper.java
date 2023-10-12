@@ -1,4 +1,4 @@
-package com.example.devopsproj.Mapper;
+package com.example.devopsproj.mapper;
 
 import com.example.devopsproj.dto.responsedto.CollaboratorDTO;
 import com.example.devopsproj.model.Collaborator;

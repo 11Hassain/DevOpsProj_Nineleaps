@@ -7,7 +7,7 @@ import lombok.*;
 import org.hibernate.validator.constraints.URL;
 
 @NoArgsConstructor
-@AllArgsConstructor
+//@AllArgsConstructor
 @Setter
 @Getter
 @ToString

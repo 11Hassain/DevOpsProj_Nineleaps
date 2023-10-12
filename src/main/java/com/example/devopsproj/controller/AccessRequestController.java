@@ -3,7 +3,6 @@ package com.example.devopsproj.controller;
 import com.example.devopsproj.dto.requestdto.AccessRequestDTO;
 import com.example.devopsproj.dto.responsedto.AccessResponseDTO;
 import com.example.devopsproj.service.interfaces.AccessRequestService;
-import com.example.devopsproj.service.interfaces.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,13 +19,13 @@ public class AccessRequestController {
 
     private final AccessRequestService accessRequestService;
 
-        // Create a new access request.
-        @PostMapping("/create")
-        public ResponseEntity<Object> createAccessRequest(@RequestBody AccessRequestDTO accessRequestDTO) {
-            Optional<AccessRequestDTO> createdRequest = Optional.ofNullable(accessRequestService.createRequest(accessRequestDTO));
-            return createdRequest.map(request -> ResponseEntity.ok((Object) "Request made successfully"))
-                    .orElse(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body((Object) "Failed to create request"));
-        }
+    // Create a new access request.
+    @PostMapping("/create")
+    public ResponseEntity<Object> createAccessRequest(@RequestBody AccessRequestDTO accessRequestDTO) {
+        Optional<AccessRequestDTO> createdRequest = Optional.ofNullable(accessRequestService.createRequest(accessRequestDTO));
+        return createdRequest.map(request -> ResponseEntity.ok((Object) "Request made successfully"))
+                .orElse(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body((Object) "Failed to create request"));
+    }
 
     @GetMapping("/allActive")
     public ResponseEntity<Object> getAllActiveRequests() {

@@ -114,5 +114,35 @@ class AccessResponseDTOTest {
         assertNull(accessResponseDTO.getAccessDescription());
         assertFalse(accessResponseDTO.isAllowed());
     }
+    @Test
+    void testToString() {
+        // Arrange
+        AccessResponseDTO accessResponseDTO = new AccessResponseDTO();
+
+        // Act
+        String toStringResult = accessResponseDTO.toString();
+
+        // Assert
+        assertNotNull(toStringResult);
+    }
+
+    @Test
+    void testAllArgsConstructor() {
+        // Arrange
+        Long accessRequestId = 1L;
+        String pmName = "John Doe";
+        UserDTO user = new UserDTO();
+        ProjectDTO project = new ProjectDTO();
+        String accessDescription = "Access description";
+        boolean allowed = true;
+
+        // Act
+        AccessResponseDTO accessResponseDTO = new AccessResponseDTO(
+                accessRequestId, pmName, user, project, accessDescription, allowed
+        );
+
+        // Assert
+        assertNotNull(accessResponseDTO);
+    }
 
 }

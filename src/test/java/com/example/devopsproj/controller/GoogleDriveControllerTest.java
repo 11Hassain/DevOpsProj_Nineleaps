@@ -1,6 +1,5 @@
-package com.example.devopsproj.Controller;
+package com.example.devopsproj.controller;
 
-import com.example.devopsproj.controller.GoogleDriveController;
 import com.example.devopsproj.dto.responsedto.GoogleDriveDTO;
 import com.example.devopsproj.service.interfaces.GoogleDriveService;
 import org.junit.jupiter.api.BeforeEach;

@@ -2,8 +2,7 @@ package com.example.devopsproj.exceptions;
 
 import lombok.*;
 
-@Data
-@ToString
+//@ToString
 @Setter
 @Getter
 public class FigmaNotFoundException extends RuntimeException {

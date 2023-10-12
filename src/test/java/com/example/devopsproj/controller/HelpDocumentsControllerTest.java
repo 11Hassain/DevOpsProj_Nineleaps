@@ -1,6 +1,5 @@
-package com.example.devopsproj.Controller;
+package com.example.devopsproj.controller;
 
-import com.example.devopsproj.controller.HelpDocumentsController;
 import com.example.devopsproj.service.interfaces.HelpDocumentsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -165,6 +164,22 @@ public class HelpDocumentsControllerTest {
 
         // Verify the HTTP status code (NOT_FOUND)
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void testDeleteFile() {
+        // Arrange
+        Long fileId = 1L;
+        ResponseEntity<String> responseEntity = ResponseEntity.ok("File deleted successfully");
+
+        when(helpDocumentsService.deleteDocument(fileId)).thenReturn(responseEntity);
+
+        // Act
+        ResponseEntity<String> response = helpDocumentsController.deleteFile(fileId);
+
+        // Assert
+        verify(helpDocumentsService, times(1)).deleteDocument(fileId);
+        assertEquals(responseEntity, response);
     }
 
 

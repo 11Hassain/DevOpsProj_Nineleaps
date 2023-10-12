@@ -1,4 +1,4 @@
-package com.example.devopsproj.Mapper;
+package com.example.devopsproj.mapper;
 
 import com.example.devopsproj.dto.responsedto.UserDTO;
 import com.example.devopsproj.model.User;

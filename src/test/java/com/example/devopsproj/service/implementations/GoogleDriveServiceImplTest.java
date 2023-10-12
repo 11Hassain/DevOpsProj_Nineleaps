@@ -1,13 +1,9 @@
 package com.example.devopsproj.service.implementations;
 
-//import static jdk.internal.org.objectweb.asm.util.CheckClassAdapter.verify;
-import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
-import static org.hibernate.validator.internal.util.Contracts.assertTrue;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-
 
 import com.example.devopsproj.dto.responsedto.GoogleDriveDTO;
 import com.example.devopsproj.dto.responsedto.ProjectDTO;
@@ -273,5 +269,43 @@ public class GoogleDriveServiceImplTest {
         assertEquals(projectDTO.getProjectName(), project.getProjectName());
     }
 
+    @Test
+    public void testGetGoogleDriveByProjectIdNotFound() {
+        // Mock data
+        long projectId = 1L;
+
+        // Mock the repository to return empty Optional
+        when(googleDriveRepository.findGoogleDriveByProjectId(projectId)).thenReturn(Optional.empty());
+
+        // Test the service method
+        ResponseEntity<GoogleDriveDTO> responseEntity = googleDriveService.getGoogleDriveByProjectId(projectId);
+
+        // Verify the response
+        assertEquals(404, responseEntity.getStatusCodeValue());
+    }
+
+    @Test
+    public void testMapToGoogleDriveDTO() {
+        // Mock data
+        long projectId = 1L;
+        String projectName = "ProjectName";
+        String driveLink = "DriveLink";
+        long driveId = 2L;
+        GoogleDrive googleDrive = new GoogleDrive();
+        googleDrive.setProject(googleDriveService.mapProjectDTOToProject(new ProjectDTO(projectId, projectName)));
+        googleDrive.setDriveLink(driveLink);
+        googleDrive.setDriveId(driveId);
+
+        // Test the mapping method
+        ResponseEntity<GoogleDriveDTO> responseEntity = googleDriveService.mapToGoogleDriveDTO(googleDrive);
+
+        // Verify the response
+        assertEquals(200, responseEntity.getStatusCodeValue());
+        GoogleDriveDTO googleDriveDTO = responseEntity.getBody();
+        assertEquals(projectId, googleDriveDTO.getProjectDTO().getProjectId());
+        assertEquals(projectName, googleDriveDTO.getProjectDTO().getProjectName());
+        assertEquals(driveLink, googleDriveDTO.getDriveLink());
+        assertEquals(driveId, googleDriveDTO.getDriveId());
+    }
 
 }

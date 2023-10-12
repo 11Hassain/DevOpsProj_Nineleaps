@@ -81,6 +81,17 @@ class FigmaDTOTest {
 
         assertEquals(figmaId, figmaDTO.getFigmaId());
     }
+    @Test
+    void testToString() {
+        // Arrange
+        FigmaDTO figmaDTO = new FigmaDTO();
+
+        // Act
+        String toStringResult = figmaDTO.toString();
+
+        // Assert
+        assertNotNull(toStringResult);
+    }
 
 
 }

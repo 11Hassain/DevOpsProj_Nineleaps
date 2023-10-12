@@ -85,5 +85,16 @@ class OTPRequestDTOTest {
         assertEquals(longEmail, otpRequestDTO.getEmail());
         assertEquals(longOtp, otpRequestDTO.getOtp());
     }
+    @Test
+    void testToString() {
+        // Arrange
+        OTPRequestDTO otpRequestDTO = new OTPRequestDTO();
+
+        // Act
+        String toStringResult = otpRequestDTO.toString();
+
+        // Assert
+        assertNotNull(toStringResult);
+    }
 }
 

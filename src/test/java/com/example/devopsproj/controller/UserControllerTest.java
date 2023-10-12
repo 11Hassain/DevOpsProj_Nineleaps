@@ -1,4 +1,4 @@
-package com.example.devopsproj.Controller;
+package com.example.devopsproj.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -63,6 +63,23 @@ public class UserControllerTest {
         // Verify the response status and content
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
         assertEquals(savedUser, responseEntity.getBody());
+    }
+    @Test
+    void testGetProjectsByRoleIdAndUserIdWhenEmpty() {
+        // Arrange
+        Long userId = 1L;
+        String role = "ADMIN";
+        List<ProjectDTO> projectDTOList = new ArrayList<>(); // Empty list
+        ResponseEntity<Object> responseEntity = new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+        when(userService.getProjectsByRoleIdAndUserId(userId, role)).thenReturn(projectDTOList);
+
+        // Act
+        ResponseEntity<Object> response = userController.getProjectsByRoleIdAndUserId(userId, role);
+
+        // Assert
+        verify(userService, times(1)).getProjectsByRoleIdAndUserId(userId, role);
+        assertEquals(responseEntity, response);
     }
     @Test
     public void testGetUserById_UserFound() {
@@ -667,4 +684,3 @@ public class UserControllerTest {
     }
 
 }
-

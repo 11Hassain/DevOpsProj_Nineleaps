@@ -1,6 +1,5 @@
-package com.example.devopsproj.Controller;
+package com.example.devopsproj.controller;
 
-import com.example.devopsproj.controller.SmsController;
 import com.example.devopsproj.dto.responsedto.SmsPojo;
 import com.example.devopsproj.dto.responsedto.StoreOTP;
 import com.example.devopsproj.dto.responsedto.TempOTP;
@@ -16,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class SmsControllerTest {
@@ -34,52 +35,44 @@ public class SmsControllerTest {
 
     private ObjectMapper objectMapper;
 
+    private static final String TOPIC_DESTINATION = "/lesson/sms";
+
+
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         objectMapper = new ObjectMapper();
     }
-
     @Test
-    public void testSmsSubmit_Success() {
-        // Create a sample SmsPojo
-        SmsPojo sms = new SmsPojo();
-        sms.setPhoneNumber("1234567890");
+    void testSmsSubmitSuccess() {
+        // Arrange
+        SmsPojo smsPojo = new SmsPojo();
+        when(smsService.getTimeStamp()).thenReturn("2023-10-05 12:34:56");
+        doNothing().when(smsService).send(smsPojo);
 
-        // Mock the behavior of smsService.send
-        doNothing().when(smsService).send(sms);
+        // Act
+        ResponseEntity<String> response = smsController.smsSubmit(smsPojo);
 
-        // Call the smsSubmit method in the controller
-        ResponseEntity<String> responseEntity = smsController.smsSubmit(sms);
-
-        // Verify that smsService.send was called with the correct SmsPojo
-        verify(smsService).send(sms);
-
-        // Verify the response status
-        assert(responseEntity.getStatusCode()).equals(HttpStatus.OK);
-        assert(responseEntity.getBody()).equals("otp sent");
+        // Assert
+        verify(webSocket, times(1)).convertAndSend(eq(TOPIC_DESTINATION), anyString());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("OTP sent", response.getBody());
     }
 
     @Test
-    public void testSmsSubmit_Failure() {
-        // Create a sample SmsPojo
-        SmsPojo sms = new SmsPojo();
-        sms.setPhoneNumber("1234567890");
+    void testSmsSubmitFailure() {
+        // Arrange
+        SmsPojo smsPojo = new SmsPojo();
+        doThrow(new RuntimeException("Sending failed")).when(smsService).send(smsPojo);
 
-        // Mock the behavior of smsService.send to throw an exception
-        doThrow(new RuntimeException("Error sending SMS")).when(smsService).send(sms);
+        // Act
+        ResponseEntity<String> response = smsController.smsSubmit(smsPojo);
 
-        // Call the smsSubmit method in the controller
-        ResponseEntity<String> responseEntity = smsController.smsSubmit(sms);
-
-        // Verify that smsService.send was called with the correct SmsPojo
-        verify(smsService).send(sms);
-
-        // Verify the response status
-        assert(responseEntity.getStatusCode()).equals(HttpStatus.INTERNAL_SERVER_ERROR);
-        assert(responseEntity.getBody()).equals("something went wrong");
+        // Assert
+        verify(webSocket, never()).convertAndSend(eq(TOPIC_DESTINATION), anyString());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("Something went wrong", response.getBody());
     }
-
     @Test
     public void testVerifyOTPSignUp_CorrectOTP() {
         // Create a sample TempOTP

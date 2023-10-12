@@ -95,6 +95,22 @@ public class UserNamesTest {
         assertEquals("johnDoe", userNames.getUsername());
         assertEquals(user, userNames.getUser());
     }
+    @Test
+    public void testRepositoriesRelationship() {
+        // Create a UserNames instance
+        UserNames userNames = new UserNames();
+
+        // Create a GitRepository instance (you may need to adjust this according to your actual GitRepository class)
+        GitRepository gitRepository = new GitRepository();
+
+        // Add GitRepository to the userNames' repositories
+        userNames.getRepositories().add(gitRepository);
+
+        // Ensure the relationship is correctly established
+        List<GitRepository> repositories = userNames.getRepositories();
+        assertNotNull(repositories);
+        assertTrue(repositories.contains(gitRepository));
+    }
 
 
 }

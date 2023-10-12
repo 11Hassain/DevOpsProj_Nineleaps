@@ -2,28 +2,17 @@ package com.example.devopsproj.controller;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.dto.responsedto.*;
-import com.example.devopsproj.exceptions.NotFoundException;
-import com.example.devopsproj.model.*;
-import com.example.devopsproj.repository.GitRepositoryRepository;
-import com.example.devopsproj.repository.ProjectRepository;
-import com.example.devopsproj.repository.UserRepository;
-import com.example.devopsproj.service.interfaces.GitHubCollaboratorService;
-import com.example.devopsproj.service.interfaces.IUserService;
-import com.example.devopsproj.service.interfaces.JwtService;
+
 import com.example.devopsproj.service.interfaces.ProjectService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
+
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/projects")

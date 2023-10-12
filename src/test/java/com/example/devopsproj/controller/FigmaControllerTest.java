@@ -1,29 +1,17 @@
-package com.example.devopsproj.Controller;
+package com.example.devopsproj.controller;
 
-import com.example.devopsproj.controller.AccessRequestController;
-import com.example.devopsproj.controller.FigmaController;
-import com.example.devopsproj.dto.requestdto.AccessRequestDTO;
 import com.example.devopsproj.dto.responsedto.FigmaDTO;
+import com.example.devopsproj.dto.responsedto.FigmaScreenshotDTO;
 import com.example.devopsproj.dto.responsedto.ProjectDTO;
-import com.example.devopsproj.exceptions.FigmaNotFoundException;
-import com.example.devopsproj.exceptions.FigmaServiceException;
 import com.example.devopsproj.model.Figma;
-import com.example.devopsproj.model.Project;
 import com.example.devopsproj.repository.FigmaRepository;
 import com.example.devopsproj.repository.ProjectRepository;
-import com.example.devopsproj.service.interfaces.AccessRequestService;
 import com.example.devopsproj.service.interfaces.FigmaService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -32,14 +20,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +42,7 @@ public class FigmaControllerTest {
     public void setUp() {
         figmaService = mock(FigmaService.class);
         projectRepository = mock(ProjectRepository.class);
-        figmaController = new FigmaController(figmaService, projectRepository);
+        figmaController = new FigmaController(figmaService);
         mockMvc = MockMvcBuilders.standaloneSetup(figmaController).build();
 
     }
@@ -112,61 +96,52 @@ public class FigmaControllerTest {
         });
     }
 
+    @Test
+    void testGetAllFigmaProjects() {
+        // Arrange
+        List<FigmaDTO> figmaDTOs = new ArrayList<>();
+        when(figmaService.getAllFigmaDTOs()).thenReturn(figmaDTOs);
 
-//    @Test
-//    public void testGetAllFigmaProjectsSuccess() {
-//        // Create a list of mock Project objects and corresponding Figma objects
-//        List<Project> mockProjects = new ArrayList<>();
-//        List<Figma> mockFigmas = new ArrayList<>();
-//
-//        // Create and add mock projects and figmas to the lists
-//        for (int i = 1; i <= 3; i++) {
-//            Project mockProject = new Project();
-//            Figma mockFigma = new Figma();
-//            mockFigma.setFigmaId((long) i);
-//            mockFigma.setProject(mockProject);
-//            mockFigma.setFigmaURL("FigmaURL" + i);
-//            mockProject.setFigma(mockFigma);
-//            mockProjects.add(mockProject);
-//            mockFigmas.add(mockFigma);
-//        }
-//
-//        // Mock the projectRepository.findAllProjects() method to return the list of mock projects
-//        when(projectRepository.findAllProjects()).thenReturn(mockProjects);
-//
-//        // Call the controller method
-//        ResponseEntity<List<FigmaDTO>> response = figmaController.getAllFigmaProjects();
-//
-//        // Debugging: Print the contents of mockProjects and response
-//        System.out.println("Mock Projects: " + mockProjects);
-//        System.out.println("Response: " + response.getBody());
-//
-//        // Verify that the response is successful and contains the expected number of FigmaDTOs
-//        assertEquals(200, response.getStatusCodeValue());
-//        List<FigmaDTO> figmaDTOs = response.getBody();
-//        assertNotNull(figmaDTOs);
-//     //  assertEquals(3, figmaDTOs.size());
-//    }
-//
-//
-//    @Test
-//    public void testGetAllFigmaProjectsNoFigmaObjects() {
-//        // Create a list of mock Project objects without associated Figma objects
-//        List<Project> mockProjects = new ArrayList<>();
-//
-//        // Mock the projectRepository.findAllProjects() method to return the list of mock projects
-//        when(projectRepository.findAllProjects()).thenReturn(mockProjects);
-//
-//        // Call the controller method
-//        ResponseEntity<List<FigmaDTO>> response = figmaController.getAllFigmaProjects();
-//
-//        // Verify that the response is successful and contains an empty list of FigmaDTOs
-//        assertEquals(200, response.getStatusCodeValue());
-//        List<FigmaDTO> figmaDTOs = response.getBody();
-//        assertNotNull(figmaDTOs);
-//        assertTrue(figmaDTOs.isEmpty());
-//    }
+        // Act
+        ResponseEntity<List<FigmaDTO>> response = figmaController.getAllFigmaProjects();
 
+        // Assert
+        verify(figmaService, times(1)).getAllFigmaDTOs();
+        assertEquals(figmaDTOs, response.getBody());
+        assertEquals(200, response.getStatusCodeValue());
+    }
+    @Test
+    void testAddUserAndScreenshotsToFigma() {
+        // Arrange
+        Long figmaId = 1L;
+        FigmaDTO figmaDTO = new FigmaDTO();
+
+        // Act
+        ResponseEntity<String> response = figmaController.addUserAndScreenshotsToFigma(figmaId, figmaDTO);
+
+        // Assert
+        verify(figmaService, times(1)).addUserAndScreenshots(figmaId, figmaDTO);
+        assertEquals("User and screenshot added", response.getBody());
+        assertEquals(200, response.getStatusCodeValue());
+    }
+
+    @Test
+    void testGetScreenshotsForFigmaId() {
+        // Arrange
+        Long figmaId = 1L;
+        List<FigmaScreenshotDTO> screenshotDTOList = new ArrayList<>();
+        screenshotDTOList.add(new FigmaScreenshotDTO());
+
+        when(figmaService.getScreenshotsForFigmaId(figmaId)).thenReturn(screenshotDTOList);
+
+        // Act
+        ResponseEntity<List<FigmaScreenshotDTO>> response = figmaController.getScreenshotsForFigmaId(figmaId);
+
+        // Assert
+        verify(figmaService, times(1)).getScreenshotsForFigmaId(figmaId);
+        assertEquals(screenshotDTOList, response.getBody());
+        assertEquals(200, response.getStatusCodeValue());
+    }
 
 
 

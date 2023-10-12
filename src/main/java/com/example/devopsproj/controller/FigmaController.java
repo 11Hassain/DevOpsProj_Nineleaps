@@ -2,32 +2,25 @@ package com.example.devopsproj.controller;
 
 import com.example.devopsproj.dto.responsedto.FigmaDTO;
 import com.example.devopsproj.dto.responsedto.FigmaScreenshotDTO;
-import com.example.devopsproj.model.Figma;
-import com.example.devopsproj.repository.FigmaRepository;
-import com.example.devopsproj.repository.ProjectRepository;
+
+
 import com.example.devopsproj.service.interfaces.FigmaService;
-import com.example.devopsproj.service.interfaces.JwtService;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.v3.oas.annotations.Operation;
-import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/api/v1/figmas")
 //@RequiredArgsConstructor
 public class FigmaController {
     private final FigmaService figmaService;
-    private final ProjectRepository projectRepository;
 
-    public FigmaController(FigmaService figmaService, ProjectRepository projectRepository) {
+    public FigmaController(FigmaService figmaService) {
         this.figmaService = figmaService;
-        this.projectRepository = projectRepository;
     }
 
 

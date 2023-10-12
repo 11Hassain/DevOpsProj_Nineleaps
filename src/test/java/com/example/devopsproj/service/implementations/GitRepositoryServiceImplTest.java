@@ -2,7 +2,6 @@ package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.dto.responsedto.GitRepositoryDTO;
-import com.example.devopsproj.exceptions.FigmaNotFoundException;
 import com.example.devopsproj.model.GitRepository;
 import com.example.devopsproj.repository.GitRepositoryRepository;
 import com.example.devopsproj.repository.ProjectRepository;
@@ -13,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.*;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
