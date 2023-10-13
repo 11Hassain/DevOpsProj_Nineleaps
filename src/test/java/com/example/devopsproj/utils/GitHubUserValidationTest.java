@@ -4,12 +4,15 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GitHubUserValidationTest {
 
@@ -27,27 +30,6 @@ class GitHubUserValidationTest {
     public static void tearDown() {
         wireMockServer.stop();
     }
-
-//    @Test
-//    void testIsGitHubUserValid_ValidUser() {
-//        // Arrange
-//        String username = "validUsername";
-//        String accessToken = "validAccessToken";
-//        wireMockServer.stubFor(
-//                WireMock.get(WireMock.urlEqualTo("/users/" + username))
-//                        .withHeader("Authorization", WireMock.equalTo("Bearer " + accessToken))
-//                        .willReturn(WireMock.aResponse()
-//                                .withStatus(200)
-//                                .withBody("{}")
-//                        )
-//        );
-//
-//        // Act
-//        boolean result = GitHubUserValidation.isGitHubUserValid(username, accessToken);
-//
-//        // Assert
-//        assertTrue(result);
-//    }
 
     @Test
     void testIsGitHubUserValid_InvalidUser() {
@@ -78,5 +60,24 @@ class GitHubUserValidationTest {
         boolean result = GitHubUserValidation.isGitHubUserValid("username", "invalid_token");
 
         assertFalse(result);
+    }
+
+    @Test
+    void testPrivateConstructor() throws Exception {
+        // Use reflection to access the private constructor
+        Constructor<GitHubUserValidation> constructor = GitHubUserValidation.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+
+        // Attempt to create an instance of GitHubUserValidation
+        try {
+            constructor.newInstance();
+        } catch (InvocationTargetException e) {
+            // Check if the actual exception is an UnsupportedOperationException
+            if (e.getCause() != null) {
+                Assertions.assertEquals(UnsupportedOperationException.class, e.getCause().getClass());
+            } else {
+                Assertions.fail("Expected an UnsupportedOperationException but got no cause exception.");
+            }
+        }
     }
 }
