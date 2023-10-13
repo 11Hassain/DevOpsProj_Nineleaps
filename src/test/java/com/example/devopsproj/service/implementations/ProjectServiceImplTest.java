@@ -141,20 +141,6 @@ public class ProjectServiceImplTest {
     }
 
 
-    @Test
-    public void testGetAll_ServiceException() {
-        // Arrange
-        // Mock the repository to throw an exception
-        when(projectRepository.findAll()).thenThrow(new RuntimeException("Something went wrong"));
-
-        // Act and Assert
-        ServiceException exception = assertThrows(ServiceException.class, () -> {
-            projectService.getAll();
-        });
-
-        assertEquals("An error occurred while fetching projects", exception.getMessage());
-        assertNotNull(exception.getCause());
-    }
 
 
     @Test
@@ -1320,7 +1306,331 @@ public class ProjectServiceImplTest {
         assertFalse(result);
     }
 
+    @Test
+    void testExistsByIdIsDeleted() {
+        // Arrange
+        Long projectId = 1L;
 
+        // Act
+        boolean result = projectService.existsByIdIsDeleted(projectId);
+
+        // Assert
+        assertFalse(result); // Expecting the method to return false
+    }
+
+
+    @Test
+    void testGetCountAllUsersByProjectIdAndRole() {
+        // Arrange
+        Long projectId = 1L;
+        EnumRole enumRole = EnumRole.USER;
+        Integer expectedResult = 5;
+
+        // Mock the projectRepository's behavior
+        Mockito.when(projectRepository.countAllUsersByProjectIdAndRole(projectId, enumRole)).thenReturn(expectedResult);
+
+        // Act
+        Integer result = projectService.getCountAllUsersByProjectIdAndRole(projectId, enumRole);
+
+        // Assert
+        assertEquals(expectedResult, result);
+    }
+
+    @Test
+    void testGetCountAllUsersByProjectIdAndRoleWithNullResult() {
+        // Arrange
+        Long projectId = 2L;
+        EnumRole enumRole = EnumRole.USER;
+        Integer expectedResult = 0;
+
+        // Mock the projectRepository's behavior to return null
+        Mockito.when(projectRepository.countAllUsersByProjectIdAndRole(projectId, enumRole)).thenReturn(null);
+
+        // Act
+        Integer result = projectService.getCountAllUsersByProjectIdAndRole(projectId, enumRole);
+
+        // Assert
+        assertEquals(expectedResult, result);
+    }
+
+
+    @Test
+    void testGetCountAllActiveProjects() {
+        // Arrange
+        Integer expectedResult = 10;
+
+        // Mock the projectRepository's behavior
+        Mockito.when(projectRepository.countAllActiveProjects()).thenReturn(expectedResult);
+
+        // Act
+        Integer result = projectService.getCountAllActiveProjects();
+
+        // Assert
+        assertEquals(expectedResult, result);
+    }
+
+    @Test
+    void testGetCountAllActiveProjectsWithNullResult() {
+        // Arrange
+        Integer expectedResult = 0;
+
+        // Mock the projectRepository's behavior to return null
+        Mockito.when(projectRepository.countAllActiveProjects()).thenReturn(null);
+
+        // Act
+        Integer result = projectService.getCountAllActiveProjects();
+
+        // Assert
+        assertEquals(expectedResult, result);
+    }
+    @Test
+    void testGetCountAllInActiveProjects() {
+        // Arrange
+        Integer expectedResult = 5;
+
+        // Mock the projectRepository's behavior
+        Mockito.when(projectRepository.countAllInActiveProjects()).thenReturn(expectedResult);
+
+        // Act
+        Integer result = projectService.getCountAllInActiveProjects();
+
+        // Assert
+        assertEquals(expectedResult, result);
+    }
+
+    @Test
+    void testGetCountAllInActiveProjectsWithNullResult() {
+        // Arrange
+        Integer expectedResult = 0;
+
+        // Mock the projectRepository's behavior to return null
+        Mockito.when(projectRepository.countAllInActiveProjects()).thenReturn(null);
+
+        // Act
+        Integer result = projectService.getCountAllInActiveProjects();
+
+        // Assert
+        assertEquals(expectedResult, result);
+    }
+    @Test
+    void testAddRepositoryToProjectWithException() {
+        // Arrange
+        Long projectId = 1L;
+        Long repoId = 2L;
+        // Mock the necessary repository methods to throw an exception
+        Mockito.when(projectRepository.findById(projectId)).thenThrow(new RuntimeException("Test Exception"));
+        Mockito.when(gitRepositoryRepository.findById(repoId)).thenReturn(Optional.empty());
+
+        // Act
+        ResponseEntity<Object> responseEntity = projectService.addRepositoryToProject(projectId, repoId);
+
+        // Assert
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+        assertEquals("Server Error", responseEntity.getBody());
+    }
+
+    @Test
+    void testGetProjectsWithoutFigmaURLs() {
+        // Create a project with no Figma
+        Project projectWithoutFigma = new Project();
+
+        // Create a project with Figma but no FigmaURL
+        Project projectWithFigmaNoURL = new Project();
+        Figma figmaWithoutURL = new Figma();
+        projectWithFigmaNoURL.setFigma(figmaWithoutURL);
+
+        // Create a project with Figma and FigmaURL
+        Project projectWithFigmaAndURL = new Project();
+        Figma figmaWithURL = new Figma();
+        figmaWithURL.setFigmaURL("https://figma.com/project");
+        projectWithFigmaAndURL.setFigma(figmaWithURL);
+
+        List<Project> projects = new ArrayList<>();
+        projects.add(projectWithoutFigma);
+        projects.add(projectWithFigmaNoURL);
+        projects.add(projectWithFigmaAndURL);
+
+        when(projectRepository.findAllProjects()).thenReturn(projects);
+
+        List<ProjectDTO> projectDTOs = projectService.getProjectsWithoutFigmaURL();
+
+        assertEquals(2, projectDTOs.size()); // Only two projects should have no Figma URL
+    }
+
+    @Test
+    void testGetProjectsWithoutGoogleDriveLinks() {
+        // Create a project with no Google Drive
+        Project projectWithoutGoogleDrive = new Project();
+
+        // Create a project with Google Drive but no Drive Link
+        Project projectWithGoogleDriveNoLink = new Project();
+        GoogleDrive googleDriveWithoutLink = new GoogleDrive();
+        projectWithGoogleDriveNoLink.setGoogleDrive(googleDriveWithoutLink);
+
+        // Create a project with Google Drive and Drive Link
+        Project projectWithGoogleDriveAndLink = new Project();
+        GoogleDrive googleDriveWithLink = new GoogleDrive();
+        googleDriveWithLink.setDriveLink("https://drive.google.com/project");
+        projectWithGoogleDriveAndLink.setGoogleDrive(googleDriveWithLink);
+
+        List<Project> projects = new ArrayList<>();
+        projects.add(projectWithoutGoogleDrive);
+        projects.add(projectWithGoogleDriveNoLink);
+        projects.add(projectWithGoogleDriveAndLink);
+
+        when(projectRepository.findAllProjects()).thenReturn(projects);
+
+        List<ProjectDTO> projectDTOs = projectService.getProjectsWithoutGoogleDriveLink();
+
+        assertEquals(2, projectDTOs.size()); // Only two projects should have no Google Drive link
+    }
+
+    @Test
+    void testGetProjectDetailsById_ProjectExists() {
+        // Create a sample project
+        Project sampleProject = new Project();
+        sampleProject.setProjectName("Sample Project");
+        sampleProject.setProjectDescription("Description");
+        sampleProject.setDeleted(false);
+
+        // Create a sample user with the role PROJECT_MANAGER
+        User sampleUser = new User();
+        sampleUser.setName("Project Manager");
+        sampleUser.setEnumRole(EnumRole.PROJECT_MANAGER);
+
+        List<User> users = new ArrayList<>();
+        users.add(sampleUser);
+        sampleProject.setUsers(users);
+
+        // Create a sample GitRepository
+        GitRepository sampleRepository = new GitRepository();
+        sampleRepository.setName("Repo Name");
+        sampleRepository.setDescription("Repo Description");
+
+        List<GitRepository> repositories = new ArrayList<>();
+        repositories.add(sampleRepository);
+        sampleProject.setRepositories(repositories);
+
+        // Create a sample Figma
+        Figma figma = new Figma();
+        figma.setFigmaURL("https://figma.com/project");
+        sampleProject.setFigma(figma);
+
+        // Create a sample GoogleDrive
+        GoogleDrive googleDrive = new GoogleDrive();
+        googleDrive.setDriveLink("https://drive.google.com/project");
+        sampleProject.setGoogleDrive(googleDrive);
+
+        // Set lastUpdated
+        sampleProject.setLastUpdated(LocalDateTime.now());
+
+        // Mock projectRepository's findById method
+        when(projectRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(sampleProject));
+
+        // Test the service method
+        ProjectDTO projectDTO = projectService.getProjectDetailsById(1L);
+
+        // Verify the results
+        assertEquals("Sample Project", projectDTO.getProjectName());
+        assertEquals("Description", projectDTO.getProjectDescription());
+//        assertEquals(false, projectDTO.getStatus());
+        assertEquals("Project Manager", projectDTO.getPmName());
+
+        assertEquals(1, projectDTO.getRepositories().size());
+        assertEquals("Repo Name", projectDTO.getRepositories().get(0).getName());
+        assertEquals("Repo Description", projectDTO.getRepositories().get(0).getDescription());
+
+        assertEquals("https://figma.com/project", projectDTO.getFigma().getFigmaURL());
+        assertEquals("https://drive.google.com/project", projectDTO.getGoogleDrive().getDriveLink());
+
+        // Verify the lastUpdated field, assuming it's a reasonable approximation
+        assertEquals(sampleProject.getLastUpdated().getYear(), projectDTO.getLastUpdated().getYear());
+    }
+
+    @Test
+    void testGetProjectDetailsById_ProjectDoesNotExist() {
+        // Mock projectRepository's findById method to return an empty Optional
+        when(projectRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+
+        // Test the service method
+        ProjectDTO projectDTO = projectService.getProjectDetailsById(1L);
+
+        // Verify that it returns an empty ProjectDTO
+        ProjectDTO expectedProjectDTO = new ProjectDTO();
+
+        // Use appropriate assertions to compare the expected and actual objects
+        assertEquals(expectedProjectDTO.getProjectId(), projectDTO.getProjectId());
+        assertEquals(expectedProjectDTO.getProjectName(), projectDTO.getProjectName());
+        assertEquals(expectedProjectDTO.getProjectDescription(), projectDTO.getProjectDescription());
+        assertEquals(expectedProjectDTO.getLastUpdated(), projectDTO.getLastUpdated());
+//        assertEquals(expectedProjectDTO.getStatus(), projectDTO.getStatus());
+        assertEquals(expectedProjectDTO.getPmName(), projectDTO.getPmName());
+        assertEquals(expectedProjectDTO.getRepositories(), projectDTO.getRepositories());
+        assertEquals(expectedProjectDTO.getFigma(), projectDTO.getFigma());
+        assertEquals(expectedProjectDTO.getGoogleDrive(), projectDTO.getGoogleDrive());
+        assertEquals(expectedProjectDTO.getHelpDocuments(), projectDTO.getHelpDocuments());
+    }
+
+    @Test
+    void testGetAll_NoProjectsFound() {
+        // Mock the projectRepository to return an empty list
+        when(projectRepository.findAll()).thenReturn(Collections.emptyList());
+
+        // Test the service method and expect a NotFoundException
+        assertThrows(NotFoundException.class, () -> projectService.getAll());
+    }
+
+
+    @Test
+    void testGetAllUsersByProjectIdAndRole_UsersExist() {
+        // Create a test user with non-null usernames
+        User user = new User();
+        UserNames usernames = new UserNames();
+        usernames.setUsername("testuser");
+        user.setUserNames(usernames);
+
+        List<User> users = new ArrayList<>();
+        users.add(user);
+
+        // Mock the repository to return the list of users
+        when(projectRepository.findAllUsersByProjectIdAndRole(anyLong(), any(EnumRole.class))).thenReturn(users);
+
+        // Call the service method
+        List<UserDTO> userDTOs = projectService.getAllUsersByProjectIdAndRole(1L, EnumRole.USER);
+
+        // Assertions
+        assertEquals(1, userDTOs.size());
+        assertEquals("testuser", userDTOs.get(0).getGitHubUsername());
+
+    }
+
+
+    @Test
+    void testGetAllUsersByProjectIdAndRole_NoUsers() {
+        // Simulate the case where no users are found
+        when(projectRepository.findAllUsersByProjectIdAndRole(anyLong(), any(EnumRole.class))).thenReturn(new ArrayList<>());
+
+        // Use assertThrows to check if NotFoundException is thrown
+        assertThrows(NotFoundException.class, () -> {
+            projectService.getAllUsersByProjectIdAndRole(1L, EnumRole.USER);
+        });
+    }
+
+    @Test
+    void testGetAllUsersByProjectIdAndRole_NullUsernames() {
+        // Create a test user with null usernames
+        User user = new User();
+
+        List<User> users = new ArrayList<>();
+        users.add(user);
+
+        when(projectRepository.findAllUsersByProjectIdAndRole(anyLong(), any(EnumRole.class))).thenReturn(users);
+
+        List<UserDTO> userDTOs = projectService.getAllUsersByProjectIdAndRole(1L, EnumRole.USER);
+
+        assertEquals(1, userDTOs.size());
+        assertNull(userDTOs.get(0).getName());
+    }
 
 
 }

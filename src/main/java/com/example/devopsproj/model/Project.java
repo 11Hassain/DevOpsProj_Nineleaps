@@ -58,8 +58,7 @@ public class Project implements Serializable {
     @OneToOne(mappedBy = "project")
     private GoogleDrive googleDrive;
 
-    public Project(long l, String s, String s1, LocalDateTime now) {
-    }
+
 
     public List<GitRepository> getRepositories() {
         if (repositories == null) {

@@ -8,6 +8,8 @@ import com.example.devopsproj.exceptions.GitHubUserNotFoundException;
 import com.example.devopsproj.model.UserNames;
 import com.example.devopsproj.repository.UserNamesRepository;
 import com.example.devopsproj.utils.GitHubUserValidation;
+import com.example.devopsproj.utils.GitHubUserValidator;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -18,6 +20,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,7 +35,8 @@ public class UserNamesServiceImplTest {
     private UserNamesRepository userNamesRepository;
 
     @Mock
-    private GitHubUserValidation gitHubUserValidation;
+    private GitHubUserValidator gitHubUserValidator;
+
 
     @BeforeEach
     void setUp() {
@@ -80,6 +84,50 @@ public class UserNamesServiceImplTest {
         userNames.setUsername(username);
         return userNames;
     }
+
+
+
+    @Test
+    void testSaveUsernameWithValidUser() {
+        UserNamesDTO userNamesDTO = new UserNamesDTO();
+        userNamesDTO.setUsername("UserName1");
+        userNamesDTO.setAccessToken("valid_github_access_token");
+
+        when(gitHubUserValidator.isGitHubUserValid(userNamesDTO.getUsername(), userNamesDTO.getAccessToken()))
+                .thenReturn(true);
+
+        UserNamesDTO result = userNamesService.saveUsername(userNamesDTO);
+
+        assertNotNull(result);
+    }
+
+
+
+    @Test
+    void testGetGitHubUserNamesByRole_WithNoUsers() {
+        EnumRole role = EnumRole.USER;
+        when(userNamesRepository.findByUserRole(role)).thenReturn(Collections.emptyList());
+
+        List<String> userNames = userNamesService.getGitHubUserNamesByRole(role);
+
+        assertNotNull(userNames);
+        assertTrue(userNames.isEmpty());
+    }
+
+    @Test
+    void testSaveUsernameWithInvalidUser() {
+        UserNamesDTO userNamesDTO = new UserNamesDTO();
+        userNamesDTO.setUsername("InvalidUser");
+        userNamesDTO.setAccessToken("invalid_github_access_token");
+
+        when(gitHubUserValidator.isGitHubUserValid(userNamesDTO.getUsername(), userNamesDTO.getAccessToken()))
+                .thenReturn(false);
+
+        UserNamesDTO result = userNamesService.saveUsername(userNamesDTO);
+
+        assertNull(result);
+    }
+
 
 
 }

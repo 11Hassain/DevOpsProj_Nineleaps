@@ -69,20 +69,15 @@ public class ProjectServiceImpl implements ProjectService {
     // Get a list of all projects
     @Override
     public List<ProjectDTO> getAll() {
-        try {
-            List<Project> projects = projectRepository.findAll();
-            if (projects.isEmpty()) {
-                throw new NotFoundException("No projects found");
-            }
-
-            return projects.stream()
-                    .map(project -> new ProjectDTO(project.getProjectId(), project.getProjectName(), project.getProjectDescription(), project.getLastUpdated(), project.getDeleted()))
-                    .toList(); // Use Stream.toList() to collect into a list
-        } catch (Exception e) {
-            // Handle other exceptions here
-            throw new ServiceException("An error occurred while fetching projects", e);
+        List<Project> projects = projectRepository.findAll();
+        if (projects.isEmpty()) {
+            throw new NotFoundException("No projects found");
         }
+        return projects.stream()
+                .map(project -> new ProjectDTO(project.getProjectId(), project.getProjectName(), project.getProjectDescription(), project.getLastUpdated(), project.getDeleted()))
+                .toList(); // Use Stream.toList() to collect into a list
     }
+
 
 
 
@@ -195,16 +190,18 @@ public class ProjectServiceImpl implements ProjectService {
 
             if (existingProject.getDeleted()) {
                 return ResponseEntity.ok("Project doesn't exist");
-            } else {
-                existingProject.setDeleted(true);
-                existingProject.setLastUpdated(LocalDateTime.now());
-                projectRepository.save(existingProject);
-                return ResponseEntity.ok("Deleted project successfully");
             }
+
+            existingProject.setDeleted(true);
+            existingProject.setLastUpdated(LocalDateTime.now());
+            projectRepository.save(existingProject);
+            return ResponseEntity.ok("Deleted project successfully");
         } else {
             throw new NotFoundException("Project with ID " + id + " not found");
         }
     }
+
+
 
 
 
@@ -419,11 +416,9 @@ public class ProjectServiceImpl implements ProjectService {
         try {
             Optional<Project> optionalProject = projectRepository.findById(projectId);
             Optional<GitRepository> optionalGitRepository = gitRepositoryRepository.findById(repoId);
-
             if (optionalProject.isPresent() && optionalGitRepository.isPresent()) {
                 Project project = optionalProject.get();
                 GitRepository gitRepository = optionalGitRepository.get();
-
                 // Check if the project has been deleted
                 if (Boolean.FALSE.equals(project.getDeleted())) {
                     gitRepository.setProject(project);
@@ -431,13 +426,12 @@ public class ProjectServiceImpl implements ProjectService {
                     gitRepository.setProject(null);
                 }
                 gitRepositoryRepository.save(gitRepository);
-
                 return ResponseEntity.ok("Stored successfully");
             } else {
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server Error"); // Set the response body
         }
     }
 
