@@ -4,6 +4,7 @@ import com.example.devopsproj.dto.responsedto.CollaboratorDTO;
 import com.example.devopsproj.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -26,6 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  */
 
 @Configuration
+@ConfigurationProperties
 @RequiredArgsConstructor
 public class ApplicationConfig {
 
