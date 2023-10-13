@@ -2,7 +2,6 @@ package com.example.devopsproj.config;
 
 import com.example.devopsproj.dto.responsedto.CollaboratorDTO;
 import com.example.devopsproj.repository.UserRepository;
-import com.example.devopsproj.utils.GitHubUserValidation;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
@@ -35,11 +34,6 @@ public class ApplicationConfig {
     @Bean
     public ModelMapper modelMapper(){
         return new ModelMapper();
-    }
-
-    @Bean
-    public GitHubUserValidation gitHubUserValidation(){
-        return new GitHubUserValidation();
     }
 
     @Bean

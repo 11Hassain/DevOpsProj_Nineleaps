@@ -19,6 +19,12 @@ public class GitHubUserValidation {
 
     private static final Logger logger = LoggerFactory.getLogger(GitHubUserValidation.class);
 
+    private GitHubUserValidation() {
+        // This constructor is intentionally left empty because the class
+        // only contains static methods for mapping and doesn't need to be instantiated.
+        throw new UnsupportedOperationException("This class should not be instantiated.");
+    }
+
     public static boolean isGitHubUserValid(String username, String accessToken) {
         String apiUrl = "https://api.github.com/users/" + username;
 

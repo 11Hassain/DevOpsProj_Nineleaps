@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * The `FigmaServiceImpl` class provides services for managing Figma projects and their associated screenshots.
@@ -43,7 +42,7 @@ public class FigmaServiceImpl implements FigmaService {
         List<Project> activeProjects = projectRepository.findAllProjects();
         return activeProjects.stream()
                 .map(Project::getFigma)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

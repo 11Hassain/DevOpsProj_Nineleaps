@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * The `UserServiceImpl` class provides services for managing user data, including creation, retrieval,
@@ -142,7 +141,7 @@ public class UserServiceImpl implements IUserService, UserService {
 
             List<String> projectNames = existingProjects.stream()
                     .map(Project::getProjectName)
-                    .collect(Collectors.toList());
+                    .toList();
 
             UserProjectsDTO userProjectsDTO = new UserProjectsDTO(user.getId(), user.getName(), projectNames);
             userProjectsDTOs.add(userProjectsDTO);
@@ -258,7 +257,7 @@ public class UserServiceImpl implements IUserService, UserService {
                 .map(project -> {
                     List<GitRepositoryDTO> repositoryDTOList = project.getRepositories().stream()
                             .map(repository -> new GitRepositoryDTO( repository.getName(), repository.getDescription()))
-                            .collect(Collectors.toList());
+                            .toList();
                     Figma figma = project.getFigma();
                     String figmaURL = figma != null ? figma.getFigmaURL() : null; // Retrieve the Figma URL
                     FigmaDTO figmaDTO = new FigmaDTO(figmaURL);
