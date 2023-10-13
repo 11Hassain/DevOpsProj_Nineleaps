@@ -1,4 +1,4 @@
-package com.example.devopsproj.otp.otpcontroller;
+package com.example.devopsproj.controller;
 
 import com.example.devopsproj.controller.SmsController;
 import com.example.devopsproj.dto.otpdto.SmsPojo;

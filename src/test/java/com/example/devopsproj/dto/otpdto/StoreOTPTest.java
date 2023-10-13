@@ -1,4 +1,4 @@
-package com.example.devopsproj.otp.otpdto;
+package com.example.devopsproj.dto.otpdto;
 
 import com.example.devopsproj.dto.otpdto.StoreOTP;
 import org.junit.jupiter.api.Test;

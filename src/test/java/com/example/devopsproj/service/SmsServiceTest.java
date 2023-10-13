@@ -1,4 +1,4 @@
-package com.example.devopsproj.otp.otpservice;
+package com.example.devopsproj.service;
 
 import com.example.devopsproj.service.implementations.SmsService;
 import com.example.devopsproj.service.interfaces.IUserService;
