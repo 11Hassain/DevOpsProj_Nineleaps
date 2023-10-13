@@ -5,7 +5,7 @@ import com.example.devopsproj.dto.responsedto.*;
 import com.example.devopsproj.model.*;
 import com.example.devopsproj.repository.UserRepository;
 import com.example.devopsproj.dto.requestdto.UserCreationDTO;
-import com.example.devopsproj.otp.otpservice.IUserService;
+import com.example.devopsproj.service.interfaces.IUserService;
 import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.service.interfaces.UserService;
 import com.example.devopsproj.utils.JwtUtils;

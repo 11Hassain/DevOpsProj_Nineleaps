@@ -1,5 +1,6 @@
 package com.example.devopsproj.otp.otpdto;
 
+import com.example.devopsproj.dto.otpdto.StoreOTP;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;

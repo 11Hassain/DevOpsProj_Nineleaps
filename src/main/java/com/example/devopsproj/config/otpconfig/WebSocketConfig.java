@@ -1,4 +1,4 @@
-package com.example.devopsproj.otp.otpconfig;
+package com.example.devopsproj.config.otpconfig;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

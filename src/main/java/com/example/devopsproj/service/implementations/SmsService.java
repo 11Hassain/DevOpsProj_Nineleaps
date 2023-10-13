@@ -1,11 +1,8 @@
-package com.example.devopsproj.otp.otpservice;
+package com.example.devopsproj.service.implementations;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.example.devopsproj.commons.enumerations.EnumRole;
-import com.example.devopsproj.model.User;
-import com.example.devopsproj.otp.otpdto.SmsPojo;
-import com.example.devopsproj.otp.otpdto.StoreOTP;
+import com.example.devopsproj.dto.otpdto.SmsPojo;
+import com.example.devopsproj.dto.otpdto.StoreOTP;
+import com.example.devopsproj.service.interfaces.IUserService;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
@@ -15,7 +12,6 @@ import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
-import java.util.*;
 
 /**
  * The `SmsService` class provides services for sending SMS messages and generating JWT tokens for user authentication.
@@ -55,33 +51,5 @@ public class SmsService {
                 .create();
         StoreOTP.setOtp(number);
         phoneNumber = sms.getPhoneNumber();
-    }
-
-    public String generateToken(String email, String phoneNumber) {
-        User userDtls = userService.getUserByMail(email.trim());
-        if (userDtls == null) {
-            return null; // Handle the case where the user is not found
-        }
-
-        Set<EnumRole> roles = Collections.singleton(userDtls.getEnumRole());
-        List<String> roleNames = roles.stream()
-                .map(EnumRole::toString)
-                .toList();
-
-        String rolesString = String.join(",", roleNames);
-
-        return createJwtToken(email, phoneNumber, rolesString, userDtls.getId());
-    }
-
-    String createJwtToken(String email, String phoneNumber, String rolesString, Long userId) {
-        Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY.getBytes());
-
-        return JWT.create()
-                .withSubject(email)
-                .withClaim("phoneNumber", phoneNumber)
-                .withClaim("roles", rolesString)
-                .withClaim("userId", userId)
-                .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 10))
-                .sign(algorithm);
     }
 }

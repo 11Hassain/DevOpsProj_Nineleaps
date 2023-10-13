@@ -1,5 +1,6 @@
 package com.example.devopsproj.otp.otpdto;
 
+import com.example.devopsproj.dto.otpdto.SmsPojo;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

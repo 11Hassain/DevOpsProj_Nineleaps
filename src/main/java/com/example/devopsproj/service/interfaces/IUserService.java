@@ -1,4 +1,4 @@
-package com.example.devopsproj.otp.otpservice;
+package com.example.devopsproj.service.interfaces;
 
 import com.example.devopsproj.model.User;
 
