@@ -359,56 +359,6 @@ class UserServiceImplTest {
         assertEquals(Collections.emptyList(), result);
     }
 
-//    @Test
-//    void testProjectExistsWhenProjectExists() {
-//        String projectName = "ExistingProject";
-//        List<Project> projects = new ArrayList<>();
-//        Project existingProject = new Project();
-//        existingProject.setProjectName(projectName);
-//        projects.add(existingProject);
-//
-//        when(projectRepository.findAllProjects()).thenReturn(projects);
-//
-//        boolean result = userService.projectExists(projectName);
-//
-//        assertTrue(result);
-//    }
-//
-//    @Test
-//    void testProjectExistsWhenProjectDoesNotExist() {
-//        String projectName = "NonExistingProject";
-//        List<Project> projects = new ArrayList<>();
-//        Project existingProject = new Project();
-//        existingProject.setProjectName("ExistingProject");
-//        projects.add(existingProject);
-//
-//        when(projectRepository.findAllProjects()).thenReturn(projects);
-//        boolean result = userService.projectExists(projectName);
-//
-//        assertFalse(result);
-//    }
-//
-//    @Test
-//    void testProjectExistsWithNullProjectName() {
-//        String projectName = null;
-//
-//        boolean result = userService.projectExists(projectName);
-//
-//        assertFalse(result);
-//    }
-//
-//    @Test
-//    void testProjectExistsWithEmptyProjectList() {
-//        String projectName = "ExistingProject";
-//        List<Project> projects = new ArrayList<>();
-//
-//        when(projectRepository.findAllProjects()).thenReturn(projects);
-//
-//        boolean result = userService.projectExists(projectName);
-//
-//        assertFalse(result);
-//    }
-
     @Test
     void testGetAllUsers_WithData() {
         List<User> users = new ArrayList<>();
