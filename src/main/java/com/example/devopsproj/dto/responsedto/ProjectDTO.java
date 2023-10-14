@@ -95,4 +95,5 @@ public class ProjectDTO {
         this.googleDrive = googleDrive;
         this.lastUpdated = lastUpdated;
     }
+
 }
