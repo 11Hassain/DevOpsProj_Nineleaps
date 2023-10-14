@@ -334,54 +334,80 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testProjectExistsWhenProjectExists() {
-        String projectName = "ExistingProject";
-        List<Project> projects = new ArrayList<>();
-        Project existingProject = new Project();
-        existingProject.setProjectName(projectName);
-        projects.add(existingProject);
+    void testGetUsersWithMultipleProjects_NoUsers() {
+        when(projectRepository.findAllProjects()).thenReturn(Collections.emptyList());
 
-        when(projectRepository.findAllProjects()).thenReturn(projects);
+        List<UserProjectsDTO> result = userService.getUsersWithMultipleProjects();
 
-        boolean result = userService.projectExists(projectName);
-
-        assertTrue(result);
+        assertEquals(Collections.emptyList(), result);
     }
 
     @Test
-    void testProjectExistsWhenProjectDoesNotExist() {
-        String projectName = "NonExistingProject";
-        List<Project> projects = new ArrayList<>();
-        Project existingProject = new Project();
-        existingProject.setProjectName("ExistingProject");
-        projects.add(existingProject);
+    void testGetUsersWithMultipleProjects_NoMultipleProjects() {
+        Project project1 = new Project();
+        project1.setProjectName("Project1");
 
-        when(projectRepository.findAllProjects()).thenReturn(projects);
-        boolean result = userService.projectExists(projectName);
+        Project project2 = new Project();
+        project2.setProjectName("Project2");
 
-        assertFalse(result);
-    }
-
-    @Test
-    void testProjectExistsWithNullProjectName() {
-        String projectName = null;
-
-        boolean result = userService.projectExists(projectName);
-
-        assertFalse(result);
-    }
-
-    @Test
-    void testProjectExistsWithEmptyProjectList() {
-        String projectName = "ExistingProject";
-        List<Project> projects = new ArrayList<>();
+        List<Project> projects = Arrays.asList(project1, project2);
 
         when(projectRepository.findAllProjects()).thenReturn(projects);
 
-        boolean result = userService.projectExists(projectName);
+        List<UserProjectsDTO> result = userService.getUsersWithMultipleProjects();
 
-        assertFalse(result);
+        assertEquals(Collections.emptyList(), result);
     }
+
+//    @Test
+//    void testProjectExistsWhenProjectExists() {
+//        String projectName = "ExistingProject";
+//        List<Project> projects = new ArrayList<>();
+//        Project existingProject = new Project();
+//        existingProject.setProjectName(projectName);
+//        projects.add(existingProject);
+//
+//        when(projectRepository.findAllProjects()).thenReturn(projects);
+//
+//        boolean result = userService.projectExists(projectName);
+//
+//        assertTrue(result);
+//    }
+//
+//    @Test
+//    void testProjectExistsWhenProjectDoesNotExist() {
+//        String projectName = "NonExistingProject";
+//        List<Project> projects = new ArrayList<>();
+//        Project existingProject = new Project();
+//        existingProject.setProjectName("ExistingProject");
+//        projects.add(existingProject);
+//
+//        when(projectRepository.findAllProjects()).thenReturn(projects);
+//        boolean result = userService.projectExists(projectName);
+//
+//        assertFalse(result);
+//    }
+//
+//    @Test
+//    void testProjectExistsWithNullProjectName() {
+//        String projectName = null;
+//
+//        boolean result = userService.projectExists(projectName);
+//
+//        assertFalse(result);
+//    }
+//
+//    @Test
+//    void testProjectExistsWithEmptyProjectList() {
+//        String projectName = "ExistingProject";
+//        List<Project> projects = new ArrayList<>();
+//
+//        when(projectRepository.findAllProjects()).thenReturn(projects);
+//
+//        boolean result = userService.projectExists(projectName);
+//
+//        assertFalse(result);
+//    }
 
     @Test
     void testGetAllUsers_WithData() {

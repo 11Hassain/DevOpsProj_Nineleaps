@@ -17,10 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * The `UserServiceImpl` class provides services for managing user data, including creation, retrieval,
@@ -171,43 +168,28 @@ public class UserServiceImpl implements IUserService, UserService {
     public List<UserProjectsDTO> getUsersWithMultipleProjects() {
         List<UserProjectsDTO> allUsersWithProjects = getAllUsersWithProjects();
         List<UserProjectsDTO> usersWithMultipleProjects = new ArrayList<>();
-
         for (UserProjectsDTO userProjectsDTO : allUsersWithProjects) {
             List<String> projectNames = userProjectsDTO.getProjectNames();
             List<String> validProjectNames = new ArrayList<>();
-
             // Check if each project exists in the database
             for (String projectName : projectNames) {
-                if (projectExists(projectName)) {
+                boolean flag = false;
+                List<Project> projects = projectRepository.findAllProjects();
+                for (Project project : projects) {
+                    flag = projectName.equals(project.getProjectName());
+                }
+                if (flag) {
                     validProjectNames.add(projectName);
                 }
             }
-
             // Update the UserProjectsDTO with valid project names
             userProjectsDTO.setProjectNames(validProjectNames);
-
             // Add the UserProjectsDTO to the list if it has multiple projects
             if (validProjectNames.size() > 1) {
                 usersWithMultipleProjects.add(userProjectsDTO);
             }
         }
-
         return usersWithMultipleProjects;
-    }
-
-    // Check if the project exists in the database
-    @Override
-    public boolean projectExists(String projectName) {
-        if (projectName == null) {
-            return false;
-        }
-        List<Project> projects = projectRepository.findAllProjects();
-        for (Project project : projects) {
-            if (projectName.equals(project.getProjectName())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override

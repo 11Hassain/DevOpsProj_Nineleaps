@@ -44,8 +44,6 @@ public interface UserService {
 
     List<UserProjectsDTO> getUsersWithMultipleProjects();
 
-    boolean projectExists(String projectName);
-
     List<UserDTO> getAllUsers();
 
     List<ProjectDTO> getAllProjectsAndRepositoriesByUserId(Long userId);
