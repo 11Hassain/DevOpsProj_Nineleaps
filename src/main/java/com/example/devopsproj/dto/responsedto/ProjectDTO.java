@@ -82,7 +82,6 @@ public class ProjectDTO {
     public ProjectDTO(
             String projectName,
             String projectDescription,
-            boolean status,
             String pmName,
             List<GitRepositoryDTO> repositories,
             FigmaDTO figma,
@@ -90,7 +89,6 @@ public class ProjectDTO {
             LocalDateTime lastUpdated) {
         this.projectName = projectName;
         this.projectDescription = projectDescription;
-        this.status = status;
         this.pmName = pmName;
         this.repositories = repositories;
         this.figma = figma;

@@ -295,7 +295,6 @@ public class ProjectServiceImpl implements ProjectService {
             // Retrieve the required details from the project object
             String projectName = project.getProjectName();
             String projectDescription = project.getProjectDescription();
-            boolean status = project.getDeleted();
 
             List<User> users = project.getUsers();
             String pmName = null;
@@ -329,7 +328,6 @@ public class ProjectServiceImpl implements ProjectService {
             return new ProjectDTO(
                     projectName,
                     projectDescription,
-                    status,
                     pmName,
                     repositoryDTOS,
                     figmaDTO,
