@@ -652,6 +652,38 @@ class ProjectServiceImplTest {
     }
 
     @Test
+    void testGetProjectsWithoutFigmaURL_FigmaIsNull() {
+        List<Project> projects = new ArrayList<>();
+        Project project = new Project();
+        project.setFigma(null); // Figma is null
+        projects.add(project);
+        when(projectRepository.findAllProjects()).thenReturn(projects);
+
+        List<ProjectDTO> result = projectService.getProjectsWithoutFigmaURL();
+
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void testGetProjectsWithoutFigmaURL_FigmaURLIsNull() {
+        List<Project> projects = new ArrayList<>();
+        Project project = new Project();
+        Figma figma = new Figma();
+        figma.setFigmaURL(null); // FigmaURL is null
+        project.setFigma(figma);
+        projects.add(project);
+        when(projectRepository.findAllProjects()).thenReturn(projects);
+
+        List<ProjectDTO> result = projectService.getProjectsWithoutFigmaURL();
+
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
+    }
+
+    @Test
     void testGetProjectsWithoutGoogleDriveLink() {
         // P1
         Project projectWithGoogleDrive = new Project();
@@ -683,6 +715,39 @@ class ProjectServiceImplTest {
         assertEquals(2L, project2.getProjectId());
         assertEquals("P2", project2.getProjectName());
     }
+
+    @Test
+    void testGetProjectsWithoutGoogleDriveLink_GoogleDriveIsNull() {
+        List<Project> projects = new ArrayList<>();
+        Project project = new Project();
+        project.setGoogleDrive(null); // Google Drive is null
+        projects.add(project);
+        when(projectRepository.findAllProjects()).thenReturn(projects);
+
+        List<ProjectDTO> result = projectService.getProjectsWithoutGoogleDriveLink();
+
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void testGetProjectsWithoutGoogleDriveLink_DriveLinkIsNull() {
+        List<Project> projects = new ArrayList<>();
+        Project project = new Project();
+        GoogleDrive googleDrive = new GoogleDrive();
+        googleDrive.setDriveLink(null); // DriveLink is null
+        project.setGoogleDrive(googleDrive);
+        projects.add(project);
+        when(projectRepository.findAllProjects()).thenReturn(projects);
+
+        List<ProjectDTO> result = projectService.getProjectsWithoutGoogleDriveLink();
+
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
+    }
+
 
     @Test
     void testGetProjectDetailsById() {
@@ -740,6 +805,58 @@ class ProjectServiceImplTest {
         assertEquals("https://example.com/figma", result.getFigma().getFigmaURL());
         assertEquals("https://drive.google.com/drive", result.getGoogleDrive().getDriveLink());
         assertNotNull(result.getLastUpdated());
+    }
+
+    @Test
+    void testGetProjectDetailsById_ProjectNotFound() {
+        Long projectId = 123L; // Assuming a non-existent project ID
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
+
+        ProjectDTO result = projectService.getProjectDetailsById(projectId);
+
+        assertNotNull(result);
+        assertNull(result.getProjectName());
+        assertNull(result.getProjectDescription());
+        assertFalse(result.isStatus());
+        assertNull(result.getPmName());
+        assertTrue(result.getRepositories().isEmpty());
+        assertNull(result.getFigma());
+        assertNull(result.getGoogleDrive());
+        assertNull(result.getLastUpdated());
+    }
+
+    @Test
+    void testGetProjectDetailsById_NoProjectManager() {
+        Long projectId = 1L;
+
+        // Create a project with users where none of them have the PROJECT_MANAGER role
+        Project project = new Project();
+        project.setProjectName("TestProject");
+        project.setProjectDescription("Description");
+        project.setDeleted(false);
+        project.setLastUpdated(LocalDateTime.now());
+        project.setRepositories(new ArrayList<>());
+
+        List<User> users = new ArrayList<>();
+        User user1 = new User();
+        user1.setEnumRole(EnumRole.USER);
+        user1.setName("User1");
+        users.add(user1);
+
+        User user2 = new User();
+        user2.setEnumRole(EnumRole.USER);
+        user2.setName("User2");
+        users.add(user2);
+
+        project.setUsers(users);
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+
+        ProjectDTO result = projectService.getProjectDetailsById(projectId);
+
+        assertNull(result.getPmName());
+        assertTrue(result.getRepositories().isEmpty());
     }
 
     @Test
@@ -1042,6 +1159,36 @@ class ProjectServiceImplTest {
     }
 
     @Test
+    void testExistUserInProject_NullUserList() {
+        Long projectId = 3L;
+        Long userId = 3L;
+
+        when(projectRepository.existUserInProject(projectId, userId)).thenReturn(Collections.emptyList());
+
+        boolean result = projectService.existUserInProject(projectId, userId);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void testExistUserInProject_MultipleUsersInList() {
+        Long projectId = 4L;
+        Long userId = 4L;
+
+        List<User> userList = new ArrayList<>();
+        userList.add(new User());
+        userList.add(new User());
+        userList.add(new User());
+
+        when(projectRepository.existUserInProject(projectId, userId)).thenReturn(userList);
+
+        boolean result = projectService.existUserInProject(projectId, userId);
+
+        assertTrue(result);
+    }
+
+
+    @Test
     void testAddUserToProject_ProjectNotFound() {
         Long projectId = 1L;
         Long userId = 1L;
@@ -1092,12 +1239,50 @@ class ProjectServiceImplTest {
     }
 
     @Test
+    void testAddUserToProjectByUserIdAndProjectId_UserExistsInProject() {
+        Long projectId = 1L;
+        Long userId = 2L;
+
+        Project project = new Project();
+        project.setProjectId(projectId);
+        project.setProjectName("Project1");
+
+        User user = new User();
+        user.setId(userId);
+
+        List<User> userList = new ArrayList<>();
+        userList.add(user);
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(projectRepository.existUserInProject(projectId, userId)).thenReturn(userList);
+
+        ResponseEntity<Object> response = projectService.addUserToProjectByUserIdAndProjectId(projectId, userId);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+    }
+
+    @Test
     void testRemoveUserFromProject_ProjectNotFound() {
         Long projectId = 1L;
         Long userId = 1L;
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
         when(userRepository.findById(userId)).thenReturn(Optional.of(new User()));
+
+        ResponseEntity<String> responseEntity = projectService.removeUserFromProjectByUserIdAndProjectId(projectId, userId);
+
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        assertEquals("Project or User not found", responseEntity.getBody());
+    }
+
+    @Test
+    void testRemoveUserFromProject_UserNotFound() {
+        Long projectId = 1L;
+        Long userId = 1L;
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(new Project()));
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         ResponseEntity<String> responseEntity = projectService.removeUserFromProjectByUserIdAndProjectId(projectId, userId);
 

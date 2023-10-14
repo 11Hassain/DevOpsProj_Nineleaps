@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,7 +36,7 @@ public class ProjectDTO {
     private List<User> users;
 
     private String pmName;
-    private List<GitRepositoryDTO> repositories;
+    private List<GitRepositoryDTO> repositories = new ArrayList<>();
     private boolean status;
     private FigmaDTO figma;
     private GoogleDriveDTO googleDrive;

@@ -23,7 +23,7 @@ class ProjectDTOTest {
         assertNull(projectDTO.getLastUpdated());
         assertNull(projectDTO.getUsers());
         assertNull(projectDTO.getPmName());
-        assertNull(projectDTO.getRepositories());
+        assertTrue(projectDTO.getRepositories().isEmpty());
         assertFalse(projectDTO.isStatus());
         assertNull(projectDTO.getFigma());
         assertNull(projectDTO.getGoogleDrive());

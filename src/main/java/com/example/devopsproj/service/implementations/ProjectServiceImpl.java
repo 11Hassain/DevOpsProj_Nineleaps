@@ -350,7 +350,8 @@ public class ProjectServiceImpl implements ProjectService {
             if (optionalProject.isPresent() && optionalUser.isPresent()) {
                 Project project = optionalProject.get();
                 User user = optionalUser.get();
-                if (existUserInProject(project.getProjectId(), user.getId())) {
+                List<User> userList = projectRepository.existUserInProject(projectId, userId);
+                if (!userList.isEmpty()) {
                     return new ResponseEntity<>(HttpStatus.CONFLICT);
                 }
                 project.getUsers().add(user);
