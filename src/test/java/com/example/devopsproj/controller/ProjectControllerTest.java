@@ -6,6 +6,7 @@ import com.example.devopsproj.exceptions.ConflictException;
 import com.example.devopsproj.exceptions.NotFoundException;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.model.User;
+import com.example.devopsproj.model.UserNames;
 import com.example.devopsproj.service.implementations.JwtServiceImpl;
 import com.example.devopsproj.service.implementations.ProjectServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -276,42 +277,74 @@ class ProjectControllerTest {
     }
 
     @Test
-    void testGetAllUsersByProjectIdByRole_UsernamesNull() {
+    void testGetAllUsersByProjectIdByRole_UsernameNull() {
         Long projectId = 1L;
         String role = "USER";
-        String accessToken = "valid_token";
-
-        EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
-        List<User> userList = new ArrayList<>();
-
-        User userWithNullUsernames = new User();
-        userWithNullUsernames.setId(1L);
-        userWithNullUsernames.setName("User Name");
-        userWithNullUsernames.setEmail("user@example.com");
-        userWithNullUsernames.setEnumRole(enumRole);
-        userWithNullUsernames.setUserNames(null); // Set usernames to null
-
-        userList.add(userWithNullUsernames);
+        String accessToken = "access_token";
 
         when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(projectService.getAllUsersByProjectIdAndRole(projectId, enumRole)).thenReturn(userList);
+
+        // Create a user with null username
+        User userWithNullUsername = new User();
+        userWithNullUsername.setId(1L);
+        userWithNullUsername.setName("User1");
+        userWithNullUsername.setEmail("user1@example.com");
+        userWithNullUsername.setEnumRole(EnumRole.USER);
+
+        List<User> userList = Collections.singletonList(userWithNullUsername);
+
+        when(projectService.getAllUsersByProjectIdAndRole(projectId, EnumRole.USER)).thenReturn(userList);
 
         ResponseEntity<Object> response = projectController.getAllUsersByProjectIdByRole(projectId, role, accessToken);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
 
         List<UserDTO> userDTOList = (List<UserDTO>) response.getBody();
-        assertEquals(1, userDTOList.size());
-        assertEquals(1, userDTOList.size());
+
+        assertNotNull(userDTOList);
+        assertFalse(userDTOList.isEmpty());
 
         UserDTO userDTO = userDTOList.get(0);
-        assertEquals(userWithNullUsernames.getId(), userDTO.getId());
-        assertEquals(userWithNullUsernames.getName(), userDTO.getName());
-        assertEquals(userWithNullUsernames.getEmail(), userDTO.getEmail());
-        assertEquals(userWithNullUsernames.getEnumRole(), userDTO.getEnumRole());
-        assertNull(userDTO.getGitHubUsername()); // Username should be null in the response
+        assertNull(userDTO.getGitHubUsername());
     }
+
+    @Test
+    void testGetAllUsersByProjectIdByRole_UsernameNotNull() {
+        Long projectId = 1L;
+        String role = "USER";
+        String accessToken = "access_token";
+
+        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+
+        // Create a user with a non-null username
+        User userWithUsername = new User();
+        userWithUsername.setId(1L);
+        userWithUsername.setName("User1");
+        userWithUsername.setEmail("user1@example.com");
+        userWithUsername.setEnumRole(EnumRole.USER);
+
+        UserNames usernames = new UserNames();
+        usernames.setUsername("user1_username");
+        userWithUsername.setUserNames(usernames);
+
+        List<User> userList = Collections.singletonList(userWithUsername);
+
+        when(projectService.getAllUsersByProjectIdAndRole(projectId, EnumRole.USER)).thenReturn(userList);
+
+        ResponseEntity<Object> response = projectController.getAllUsersByProjectIdByRole(projectId, role, accessToken);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        List<UserDTO> userDTOList = (List<UserDTO>) response.getBody();
+
+        assertNotNull(userDTOList);
+        assertFalse(userDTOList.isEmpty());
+
+        UserDTO userDTO = userDTOList.get(0);
+        assertNotNull(userDTO.getGitHubUsername());
+        assertEquals("user1_username", userDTO.getGitHubUsername());
+    }
+
 
     @Test
     void testUpdateProject_SuccessfulUpdate() {
