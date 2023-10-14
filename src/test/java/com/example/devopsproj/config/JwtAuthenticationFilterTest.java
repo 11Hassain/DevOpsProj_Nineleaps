@@ -1,8 +1,5 @@
 package com.example.devopsproj.config;
 
-import com.example.devopsproj.config.JwtAuthenticationFilter;
-import com.example.devopsproj.repository.TokenRepository;
-import com.example.devopsproj.service.implementations.JwtServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,7 +11,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.io.IOException;
 
@@ -25,12 +21,6 @@ class JwtAuthenticationFilterTest {
 
     @InjectMocks
     private JwtAuthenticationFilter jwtAuthenticationFilter;
-    @Mock
-    private JwtServiceImpl jwtService;
-    @Mock
-    private UserDetailsService userDetailsService;
-    @Mock
-    private TokenRepository tokenRepository;
     @Mock
     private HttpServletRequest request;
     @Mock
