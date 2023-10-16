@@ -10,6 +10,8 @@ import com.example.devopsproj.model.UserNames;
 import com.example.devopsproj.service.implementations.JwtServiceImpl;
 import com.example.devopsproj.service.implementations.ProjectServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -39,1358 +41,1494 @@ class ProjectControllerTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    String INTERNAL_SERVER_ERROR = "Something went wrong";
+    @Nested
+    class CreateProjectTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testCreateProject_ValidToken(){
+            List<User> userList = new ArrayList<>();
+            User user1 = new User();
+            User user2 = new User();
+            userList.add(user1);
+            userList.add(user2);
 
-    // ----- SUCCESS (For VALID TOKEN)-----
+            ProjectDTO projectDTO = new ProjectDTO();
+            projectDTO.setProjectId(1L);
+            projectDTO.setProjectName("P1");
+            projectDTO.setProjectDescription("P1 description");
+            projectDTO.setStatus(true);
+            projectDTO.setUsers(userList);
 
-    @Test
-    void testCreateProject_ValidToken(){
-        List<User> userList = new ArrayList<>();
-        User user1 = new User();
-        User user2 = new User();
-        userList.add(user1);
-        userList.add(user2);
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            when(projectService.createProject(projectDTO)).thenReturn(projectDTO);
 
-        ProjectDTO projectDTO = new ProjectDTO();
-        projectDTO.setProjectId(1L);
-        projectDTO.setProjectName("P1");
-        projectDTO.setProjectDescription("P1 description");
-        projectDTO.setStatus(true);
-        projectDTO.setUsers(userList);
+            ResponseEntity<Object> response = projectController.createProject(projectDTO, "valid-access-token");
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.createProject(projectDTO)).thenReturn(projectDTO);
+            assertEquals(HttpStatus.CREATED, response.getStatusCode());
 
-        ResponseEntity<Object> response = projectController.createProject(projectDTO, "valid-access-token");
+            // Retrieve the projectDTO from the response
+            ProjectDTO responseProjectDTO = (ProjectDTO) response.getBody();
 
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+            assert responseProjectDTO != null;
+            assertEquals("P1", responseProjectDTO.getProjectName());
+        }
 
-        // Retrieve the projectDTO from the response
-        ProjectDTO responseProjectDTO = (ProjectDTO) response.getBody();
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testCreateProject_InvalidToken(){
+            // projectDTO is empty
+            ProjectDTO projectDTO = new ProjectDTO();
 
-        // Assert that the projectName is "P1"
-        assert responseProjectDTO != null;
-        assertEquals("P1", responseProjectDTO.getProjectName());
-    }
-
-    @Test
-    void testGetProjectById_ValidToken_ProjectFound(){
-        ProjectDTO projectDTO = new ProjectDTO();
-        projectDTO.setProjectName("P1");
-        projectDTO.setProjectDescription("P1 description");
+            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
+            when(projectService.createProject(projectDTO)).thenReturn(projectDTO);
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.getProject(anyLong())).thenReturn(ResponseEntity.ok(projectDTO));
+            ResponseEntity<Object> response = projectController.createProject(projectDTO, "valid-access-token");
 
-        // Act
-        ResponseEntity<Object> response = projectController.getProjectById(1L, "valid-access-token");
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(projectDTO, response.getBody());
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals("Invalid Token", response.getBody());
+        }
     }
 
-    @Test
-    void testGetProjectById_ValidToken_ProjectNotFound() {
-        // Arrange
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.getProject(anyLong())).thenThrow(new NotFoundException("Project not found"));
+    @Nested
+    class GetProjectByIdTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testGetProjectById_ValidToken_ProjectFound(){
+            ProjectDTO projectDTO = new ProjectDTO();
+            projectDTO.setProjectName("P1");
+            projectDTO.setProjectDescription("P1 description");
 
-        ResponseEntity<Object> response = projectController.getProjectById(1L, "valid-access-token");
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            when(projectService.getProject(anyLong())).thenReturn(ResponseEntity.ok(projectDTO));
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-    }
+            // Act
+            ResponseEntity<Object> response = projectController.getProjectById(1L, "valid-access-token");
 
-    @Test
-    void testGetAll_ValidToken_ProjectsFound() {
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(projectDTO, response.getBody());
+        }
 
-        List<Project> projectList = new ArrayList<>();
-        Project project1 = new Project();
-        project1.setProjectName("P1");
-        project1.setProjectId(1L);
-        projectList.add(project1);
+        @Test
+        @DisplayName("Testing project not found case")
+        void testGetProjectById_ValidToken_ProjectNotFound() {
+            // Arrange
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            when(projectService.getProject(anyLong())).thenThrow(new NotFoundException("Project not found"));
 
-        when(projectService.getAll()).thenReturn(projectList);
+            ResponseEntity<Object> response = projectController.getProjectById(1L, "valid-access-token");
 
-        ResponseEntity<Object> response = projectController.getAll("valid-access-token");
+            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        }
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testGetProjectById_InvalidToken() {
+            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
 
-        List<ProjectDTO> responseDTOs = (List<ProjectDTO>) response.getBody();
+            ResponseEntity<Object> response = projectController.getProjectById(1L, "invalid-access-token");
 
-        assert responseDTOs != null;
-        assertEquals(projectList.size(), responseDTOs.size());
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals("Invalid Token", response.getBody());
+        }
     }
 
-    @Test
-    void testGetAll_ValidToken_ProjectsNotFound() {
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.getAll()).thenThrow(new NotFoundException("Project not found"));
+    @Nested
+    class GetAllTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testGetAll_ValidToken_ProjectsFound() {
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
 
-        ResponseEntity<Object> response = projectController.getAll("valid-access-token");
+            List<Project> projectList = new ArrayList<>();
+            Project project1 = new Project();
+            project1.setProjectName("P1");
+            project1.setProjectId(1L);
+            projectList.add(project1);
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-    }
+            when(projectService.getAll()).thenReturn(projectList);
 
-    @Test
-    void testGetAllProjectsWithUsers_ValidToken_ProjectWithUsersFound(){
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            ResponseEntity<Object> response = projectController.getAll("valid-access-token");
 
-        List<ProjectWithUsersDTO> projectWithUsersDTOS = new ArrayList<>();
-        ProjectWithUsersDTO project = new ProjectWithUsersDTO();
-        project.setProjectName("P1");
-        project.setProjectId(1L);
-        projectWithUsersDTOS.add(project);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
 
-        when(projectService.getAllProjectsWithUsers()).thenReturn(projectWithUsersDTOS);
+            List<ProjectDTO> responseDTOs = (List<ProjectDTO>) response.getBody();
 
-        ResponseEntity<Object> response = projectController.getAllProjectsWithUsers("valid-access-token");
+            assert responseDTOs != null;
+            assertEquals(projectList.size(), responseDTOs.size());
+        }
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        @Test
+        @DisplayName("Testing project not found case")
+        void testGetAll_ValidToken_ProjectsNotFound() {
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            when(projectService.getAll()).thenThrow(new NotFoundException("Project not found"));
 
-        List<ProjectWithUsersDTO> responseDTOs = (List<ProjectWithUsersDTO>) response.getBody();
+            ResponseEntity<Object> response = projectController.getAll("valid-access-token");
 
-        assert responseDTOs != null;
-        assertEquals(projectWithUsersDTOS.size(), responseDTOs.size());
-    }
+            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        }
 
-    @Test
-    void testGetAllProjectsWithUsers_ValidToken_ProjectWithUsersNotFound(){
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.getAllProjectsWithUsers()).thenThrow(new NotFoundException("Not found"));
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testGetAll_InvalidToken() {
+            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
 
-        ResponseEntity<Object> response = projectController.getAllProjectsWithUsers("valid-access-token");
+            ResponseEntity<Object> response = projectController.getAll("invalid-access-token");
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals("Invalid Token", response.getBody());
+        }
     }
 
-    @Test
-    void testGetAllUsersByProjectId_Successful() {
-        Long projectId = 1L;
-        String accessToken = "valid_token";
+    @Nested
+    class GetAllProjectsWithUsersTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testGetAllProjectsWithUsers_ValidToken_ProjectWithUsersFound(){
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            List<ProjectWithUsersDTO> projectWithUsersDTOS = new ArrayList<>();
+            ProjectWithUsersDTO project = new ProjectWithUsersDTO();
+            project.setProjectName("P1");
+            project.setProjectId(1L);
+            projectWithUsersDTOS.add(project);
 
-        List<UserDTO> userDTOList = new ArrayList<>();
-        userDTOList.add(new UserDTO());
-        when(projectService.getAllUsersByProjectId(projectId)).thenReturn(userDTOList);
+            when(projectService.getAllProjectsWithUsers()).thenReturn(projectWithUsersDTOS);
 
-        ResponseEntity<Object> response = projectController.getAllUsersByProjectId(projectId, accessToken);
+            ResponseEntity<Object> response = projectController.getAllProjectsWithUsers("valid-access-token");
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertTrue(response.getBody() instanceof List);
-        assertEquals(userDTOList, response.getBody());
-    }
+            assertEquals(HttpStatus.OK, response.getStatusCode());
 
-    @Test
-    void testGetAllUsersByProjectId_NoUsersFound() {
-        Long projectId = 1L;
-        String accessToken = "valid_token";
+            List<ProjectWithUsersDTO> responseDTOs = (List<ProjectWithUsersDTO>) response.getBody();
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            assert responseDTOs != null;
+            assertEquals(projectWithUsersDTOS.size(), responseDTOs.size());
+        }
 
-        when(projectService.getAllUsersByProjectId(projectId)).thenReturn(Collections.emptyList());
+        @Test
+        @DisplayName("Testing projects with users not found case")
+        void testGetAllProjectsWithUsers_ValidToken_ProjectWithUsersNotFound(){
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            when(projectService.getAllProjectsWithUsers()).thenThrow(new NotFoundException("Not found"));
 
-        ResponseEntity<Object> response = projectController.getAllUsersByProjectId(projectId, accessToken);
+            ResponseEntity<Object> response = projectController.getAllProjectsWithUsers("valid-access-token");
 
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-    }
+            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        }
 
-    @Test
-    void testGetAllUsersByProjectId_NotFoundException() {
-        Long projectId = 1L;
-        String accessToken = "valid_token";
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testGetAllProjectsWithUsers_InvalidToken() {
+            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            ResponseEntity<Object> response = projectController.getAllProjectsWithUsers("invalid-access-token");
 
-        when(projectService.getAllUsersByProjectId(projectId)).thenThrow(new NotFoundException("Project not found"));
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals("Invalid Token", response.getBody());
+        }
+    }
 
-        ResponseEntity<Object> response = projectController.getAllUsersByProjectId(projectId, accessToken);
+    @Nested
+    class GetAllUsersByProjectIdTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testGetAllUsersByProjectId_Successful() {
+            Long projectId = 1L;
+            String accessToken = "valid_token";
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-    }
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
 
-    @Test
-    void testGetAllUsersByProjectId_InternalServerError() {
-        Long projectId = 1L;
-        String accessToken = "valid_token";
+            List<UserDTO> userDTOList = new ArrayList<>();
+            userDTOList.add(new UserDTO());
+            when(projectService.getAllUsersByProjectId(projectId)).thenReturn(userDTOList);
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            ResponseEntity<Object> response = projectController.getAllUsersByProjectId(projectId, accessToken);
 
-        when(projectService.getAllUsersByProjectId(projectId)).thenThrow(new RuntimeException("Something went wrong"));
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertTrue(response.getBody() instanceof List);
+            assertEquals(userDTOList, response.getBody());
+        }
 
-        ResponseEntity<Object> response = projectController.getAllUsersByProjectId(projectId, accessToken);
+        @Test
+        @DisplayName("Testing Users not found case")
+        void testGetAllUsersByProjectId_NoUsersFound() {
+            Long projectId = 1L;
+            String accessToken = "valid_token";
 
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-    }
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
 
-    @Test
-    void testGetAllUsersByProjectIdByRole_Successful() {
-        Long projectId = 1L;
-        String role = "USER";
-        String accessToken = "valid_token";
+            when(projectService.getAllUsersByProjectId(projectId)).thenReturn(Collections.emptyList());
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            ResponseEntity<Object> response = projectController.getAllUsersByProjectId(projectId, accessToken);
 
-        EnumRole enumRole = EnumRole.USER;
-        List<User> userList = new ArrayList<>();
-        userList.add(new User());
-        when(projectService.getAllUsersByProjectIdAndRole(projectId, enumRole)).thenReturn(userList);
+            assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        }
 
-        ResponseEntity<Object> response = projectController.getAllUsersByProjectIdByRole(projectId, role, accessToken);
+        @Test
+        @DisplayName("Testing project not found case")
+        void testGetAllUsersByProjectId_NotFoundException() {
+            Long projectId = 1L;
+            String accessToken = "valid_token";
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertTrue(response.getBody() instanceof List);
-    }
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
 
-    @Test
-    void testGetAllUsersByProjectIdByRole_NoUsersFound() {
-        Long projectId = 1L;
-        String role = "USER";
-        String accessToken = "valid_token";
+            when(projectService.getAllUsersByProjectId(projectId)).thenThrow(new NotFoundException("Project not found"));
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            ResponseEntity<Object> response = projectController.getAllUsersByProjectId(projectId, accessToken);
 
-        EnumRole enumRole = EnumRole.USER;
-        when(projectService.getAllUsersByProjectIdAndRole(projectId, enumRole)).thenReturn(Collections.emptyList());
+            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        }
 
-        ResponseEntity<Object> response = projectController.getAllUsersByProjectIdByRole(projectId, role, accessToken);
+        @Test
+        @DisplayName("Testing failure case (internal server error)")
+        void testGetAllUsersByProjectId_InternalServerError() {
+            Long projectId = 1L;
+            String accessToken = "valid_token";
 
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-    }
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
 
-    @Test
-    void testGetAllUsersByProjectIdByRole_InternalServerError() {
-        Long projectId = 1L;
-        String role = "USER";
-        String accessToken = "valid_token";
+            when(projectService.getAllUsersByProjectId(projectId)).thenThrow(new RuntimeException("Something went wrong"));
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            ResponseEntity<Object> response = projectController.getAllUsersByProjectId(projectId, accessToken);
 
-        EnumRole enumRole = EnumRole.USER;
-        when(projectService.getAllUsersByProjectIdAndRole(projectId, enumRole))
-                .thenThrow(new RuntimeException("Something went wrong"));
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        }
 
-        ResponseEntity<Object> response = projectController.getAllUsersByProjectIdByRole(projectId, role, accessToken);
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testGetAllUsersByProjectId_InvalidToken(){
+            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
 
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-    }
+            ResponseEntity<Object> response = projectController.getAllUsersByProjectId(1L, "invalid-access-token");
 
-    @Test
-    void testGetAllUsersByProjectIdByRole_UsernameNull() {
-        Long projectId = 1L;
-        String role = "USER";
-        String accessToken = "access_token";
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals("Invalid Token", response.getBody());
+        }
+    }
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+    @Nested
+    class GetAllUsersByProjectIdByRoleTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testGetAllUsersByProjectIdByRole_Successful() {
+            Long projectId = 1L;
+            String role = "USER";
+            String accessToken = "valid_token";
 
-        // Create a user with null username
-        User userWithNullUsername = new User();
-        userWithNullUsername.setId(1L);
-        userWithNullUsername.setName("User1");
-        userWithNullUsername.setEmail("user1@example.com");
-        userWithNullUsername.setEnumRole(EnumRole.USER);
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
 
-        List<User> userList = Collections.singletonList(userWithNullUsername);
+            EnumRole enumRole = EnumRole.USER;
+            List<User> userList = new ArrayList<>();
+            userList.add(new User());
+            when(projectService.getAllUsersByProjectIdAndRole(projectId, enumRole)).thenReturn(userList);
 
-        when(projectService.getAllUsersByProjectIdAndRole(projectId, EnumRole.USER)).thenReturn(userList);
+            ResponseEntity<Object> response = projectController.getAllUsersByProjectIdByRole(projectId, role, accessToken);
 
-        ResponseEntity<Object> response = projectController.getAllUsersByProjectIdByRole(projectId, role, accessToken);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertTrue(response.getBody() instanceof List);
+        }
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        @Test
+        @DisplayName("Testing users not found case")
+        void testGetAllUsersByProjectIdByRole_NoUsersFound() {
+            Long projectId = 1L;
+            String role = "USER";
+            String accessToken = "valid_token";
 
-        List<UserDTO> userDTOList = (List<UserDTO>) response.getBody();
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
 
-        assertNotNull(userDTOList);
-        assertFalse(userDTOList.isEmpty());
+            EnumRole enumRole = EnumRole.USER;
+            when(projectService.getAllUsersByProjectIdAndRole(projectId, enumRole)).thenReturn(Collections.emptyList());
 
-        UserDTO userDTO = userDTOList.get(0);
-        assertNull(userDTO.getGitHubUsername());
-    }
+            ResponseEntity<Object> response = projectController.getAllUsersByProjectIdByRole(projectId, role, accessToken);
 
-    @Test
-    void testGetAllUsersByProjectIdByRole_UsernameNotNull() {
-        Long projectId = 1L;
-        String role = "USER";
-        String accessToken = "access_token";
+            assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        }
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+        @Test
+        @DisplayName("Testing failure case (internal server error)")
+        void testGetAllUsersByProjectIdByRole_InternalServerError() {
+            Long projectId = 1L;
+            String role = "USER";
+            String accessToken = "valid_token";
 
-        // Create a user with a non-null username
-        User userWithUsername = new User();
-        userWithUsername.setId(1L);
-        userWithUsername.setName("User1");
-        userWithUsername.setEmail("user1@example.com");
-        userWithUsername.setEnumRole(EnumRole.USER);
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
 
-        UserNames usernames = new UserNames();
-        usernames.setUsername("user1_username");
-        userWithUsername.setUserNames(usernames);
+            EnumRole enumRole = EnumRole.USER;
+            when(projectService.getAllUsersByProjectIdAndRole(projectId, enumRole))
+                    .thenThrow(new RuntimeException("Something went wrong"));
 
-        List<User> userList = Collections.singletonList(userWithUsername);
+            ResponseEntity<Object> response = projectController.getAllUsersByProjectIdByRole(projectId, role, accessToken);
 
-        when(projectService.getAllUsersByProjectIdAndRole(projectId, EnumRole.USER)).thenReturn(userList);
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        }
 
-        ResponseEntity<Object> response = projectController.getAllUsersByProjectIdByRole(projectId, role, accessToken);
+        @Test
+        @DisplayName("Testing username null case")
+        void testGetAllUsersByProjectIdByRole_UsernameNull() {
+            Long projectId = 1L;
+            String role = "USER";
+            String accessToken = "access_token";
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
 
-        List<UserDTO> userDTOList = (List<UserDTO>) response.getBody();
+            // Create a user with null username
+            User userWithNullUsername = new User();
+            userWithNullUsername.setId(1L);
+            userWithNullUsername.setName("User1");
+            userWithNullUsername.setEmail("user1@example.com");
+            userWithNullUsername.setEnumRole(EnumRole.USER);
 
-        assertNotNull(userDTOList);
-        assertFalse(userDTOList.isEmpty());
+            List<User> userList = Collections.singletonList(userWithNullUsername);
 
-        UserDTO userDTO = userDTOList.get(0);
-        assertNotNull(userDTO.getGitHubUsername());
-        assertEquals("user1_username", userDTO.getGitHubUsername());
-    }
+            when(projectService.getAllUsersByProjectIdAndRole(projectId, EnumRole.USER)).thenReturn(userList);
 
+            ResponseEntity<Object> response = projectController.getAllUsersByProjectIdByRole(projectId, role, accessToken);
 
-    @Test
-    void testUpdateProject_SuccessfulUpdate() {
-        Long projectId = 1L;
-        ProjectDTO projectDTO = new ProjectDTO();
-        projectDTO.setProjectName("Updated Project");
-        projectDTO.setProjectDescription("Updated Description");
-        String accessToken = "valid_token";
+            assertEquals(HttpStatus.OK, response.getStatusCode());
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            List<UserDTO> userDTOList = (List<UserDTO>) response.getBody();
 
-        Project existingProject = new Project();
-        existingProject.setProjectId(projectId);
-        existingProject.setProjectName("Old Project");
-        existingProject.setProjectDescription("Old Description");
+            assertNotNull(userDTOList);
+            assertFalse(userDTOList.isEmpty());
 
-        when(projectService.getProjectById(projectId)).thenReturn(Optional.of(existingProject));
-        when(projectService.updateProject(existingProject)).thenReturn(existingProject);
+            UserDTO userDTO = userDTOList.get(0);
+            assertNull(userDTO.getGitHubUsername());
+        }
 
-        ResponseEntity<Object> response = projectController.updateProject(projectId, projectDTO, accessToken);
+        @Test
+        @DisplayName("Testing username not null case")
+        void testGetAllUsersByProjectIdByRole_UsernameNotNull() {
+            Long projectId = 1L;
+            String role = "USER";
+            String accessToken = "access_token";
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertTrue(response.getBody() instanceof ProjectDTO);
-        ProjectDTO updatedProjectDTO = (ProjectDTO) response.getBody();
-        assertEquals(projectDTO.getProjectName(), updatedProjectDTO.getProjectName());
-        assertEquals(projectDTO.getProjectDescription(), updatedProjectDTO.getProjectDescription());
-    }
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
 
-    @Test
-    void testUpdateProject_ProjectNotFound() {
-        Long projectId = 1L;
-        ProjectDTO projectDTO = new ProjectDTO();
-        projectDTO.setProjectName("Updated Project");
-        projectDTO.setProjectDescription("Updated Description");
-        String accessToken = "valid_token";
+            // Create a user with a non-null username
+            User userWithUsername = new User();
+            userWithUsername.setId(1L);
+            userWithUsername.setName("User1");
+            userWithUsername.setEmail("user1@example.com");
+            userWithUsername.setEnumRole(EnumRole.USER);
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(projectService.getProjectById(projectId)).thenReturn(Optional.empty());
+            UserNames usernames = new UserNames();
+            usernames.setUsername("user1_username");
+            userWithUsername.setUserNames(usernames);
 
-        ResponseEntity<Object> response = projectController.updateProject(projectId, projectDTO, accessToken);
+            List<User> userList = Collections.singletonList(userWithUsername);
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-    }
+            when(projectService.getAllUsersByProjectIdAndRole(projectId, EnumRole.USER)).thenReturn(userList);
 
-    @Test
-    void testUpdateProject_InternalServerError() {
-        Long projectId = 1L;
-        ProjectDTO projectDTO = new ProjectDTO();
-        projectDTO.setProjectName("Updated Project");
-        projectDTO.setProjectDescription("Updated Description");
-        String accessToken = "valid_token";
+            ResponseEntity<Object> response = projectController.getAllUsersByProjectIdByRole(projectId, role, accessToken);
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(projectService.getProjectById(projectId)).thenThrow(new RuntimeException("Something went wrong"));
+            assertEquals(HttpStatus.OK, response.getStatusCode());
 
-        ResponseEntity<Object> response = projectController.updateProject(projectId, projectDTO, accessToken);
+            List<UserDTO> userDTOList = (List<UserDTO>) response.getBody();
 
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-    }
+            assertNotNull(userDTOList);
+            assertFalse(userDTOList.isEmpty());
 
-    @Test
-    void testDeleteProject_SuccessfulDeletion() {
-        Long projectId = 1L;
-        String accessToken = "valid_token";
+            UserDTO userDTO = userDTOList.get(0);
+            assertNotNull(userDTO.getGitHubUsername());
+            assertEquals("user1_username", userDTO.getGitHubUsername());
+        }
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(projectService.existsProjectById(projectId)).thenReturn(true);
-        when(projectService.existsByIdIsDeleted(projectId)).thenReturn(false);
-        when(projectService.softDeleteProject(projectId)).thenReturn(true);
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testGetAllUsersByProjectIdByRole_InvalidToken(){
+            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
+            String role = EnumRole.USER.getEnumRole();
 
-        ResponseEntity<String> response = projectController.deleteProject(projectId, accessToken);
+            ResponseEntity<Object> response = projectController.getAllUsersByProjectIdByRole(1L, role,"invalid-access-token");
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Deleted project successfully", response.getBody());
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals("Invalid Token", response.getBody());
+        }
     }
-
-    @Test
-    void testDeleteProject_FailedDeletion() {
-        Long projectId = 1L;
-        String accessToken = "valid_token";
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(projectService.existsProjectById(projectId)).thenReturn(true);
-        when(projectService.existsByIdIsDeleted(projectId)).thenReturn(false);
-        when(projectService.softDeleteProject(projectId)).thenReturn(false);
+    @Nested
+    class UpdateProjectTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testUpdateProject_SuccessfulUpdate() {
+            Long projectId = 1L;
+            ProjectDTO projectDTO = new ProjectDTO();
+            projectDTO.setProjectName("Updated Project");
+            projectDTO.setProjectDescription("Updated Description");
+            String accessToken = "valid_token";
 
-        ResponseEntity<String> response = projectController.deleteProject(projectId, accessToken);
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-    }
+            Project existingProject = new Project();
+            existingProject.setProjectId(projectId);
+            existingProject.setProjectName("Old Project");
+            existingProject.setProjectDescription("Old Description");
 
-    @Test
-    void testDeleteProject_ProjectNotFound() {
-        Long projectId = 1L;
-        String accessToken = "valid_token";
+            when(projectService.getProjectById(projectId)).thenReturn(Optional.of(existingProject));
+            when(projectService.updateProject(existingProject)).thenReturn(existingProject);
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(projectService.existsProjectById(projectId)).thenReturn(false);
+            ResponseEntity<Object> response = projectController.updateProject(projectId, projectDTO, accessToken);
 
-        ResponseEntity<String> response = projectController.deleteProject(projectId, accessToken);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertTrue(response.getBody() instanceof ProjectDTO);
+            ProjectDTO updatedProjectDTO = (ProjectDTO) response.getBody();
+            assertEquals(projectDTO.getProjectName(), updatedProjectDTO.getProjectName());
+            assertEquals(projectDTO.getProjectDescription(), updatedProjectDTO.getProjectDescription());
+        }
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-    }
+        @Test
+        @DisplayName("Testing project not found case")
+        void testUpdateProject_ProjectNotFound() {
+            Long projectId = 1L;
+            ProjectDTO projectDTO = new ProjectDTO();
+            projectDTO.setProjectName("Updated Project");
+            projectDTO.setProjectDescription("Updated Description");
+            String accessToken = "valid_token";
 
-    @Test
-    void testDeleteProject_AlreadyDeleted() {
-        Long projectId = 1L;
-        String accessToken = "valid_token";
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            when(projectService.getProjectById(projectId)).thenReturn(Optional.empty());
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(projectService.existsProjectById(projectId)).thenReturn(true);
-        when(projectService.existsByIdIsDeleted(projectId)).thenReturn(true);
+            ResponseEntity<Object> response = projectController.updateProject(projectId, projectDTO, accessToken);
 
-        ResponseEntity<String> response = projectController.deleteProject(projectId, accessToken);
+            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        }
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Project doesn't exist", response.getBody());
-    }
+        @Test
+        @DisplayName("Testing failure case (internal server error)")
+        void testUpdateProject_InternalServerError() {
+            Long projectId = 1L;
+            ProjectDTO projectDTO = new ProjectDTO();
+            projectDTO.setProjectName("Updated Project");
+            projectDTO.setProjectDescription("Updated Description");
+            String accessToken = "valid_token";
 
-    @Test
-    void testAddUserToProject_SuccessfulAddition() {
-        Long projectId = 1L;
-        Long userId = 2L;
-        String accessToken = "valid_token";
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            when(projectService.getProjectById(projectId)).thenThrow(new RuntimeException("Something went wrong"));
 
-        ResponseEntity<Object> successfulResponse = new ResponseEntity<>("User added successfully", HttpStatus.OK);
+            ResponseEntity<Object> response = projectController.updateProject(projectId, projectDTO, accessToken);
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(projectService.addUserToProjectByUserIdAndProjectId(projectId, userId)).thenReturn(successfulResponse);
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        }
 
-        ResponseEntity<Object> response = projectController.addUserToProject(projectId, userId, accessToken);
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testUpdateProject_InvalidToken(){
+            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("User added successfully", response.getBody());
-    }
+            ProjectDTO projectDTO = new ProjectDTO();
 
-    @Test
-    void testAddUserToProject_ResourceNotFound() {
-        Long projectId = 1L;
-        Long userId = 2L;
-        String accessToken = "valid_token";
+            ResponseEntity<Object> response = projectController.updateProject(1L, projectDTO,"invalid-access-token");
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(projectService.addUserToProjectByUserIdAndProjectId(projectId, userId))
-                .thenThrow(new NotFoundException("Resource not found"));
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals("Invalid Token", response.getBody());
+        }
+    }
 
-        ResponseEntity<Object> response = projectController.addUserToProject(projectId, userId, accessToken);
+    @Nested
+    class DeleteProjectTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testDeleteProject_SuccessfulDeletion() {
+            Long projectId = 1L;
+            String accessToken = "valid_token";
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals("Resource not found", response.getBody());
-    }
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            when(projectService.existsProjectById(projectId)).thenReturn(true);
+            when(projectService.existsByIdIsDeleted(projectId)).thenReturn(false);
+            when(projectService.softDeleteProject(projectId)).thenReturn(true);
 
-    @Test
-    void testAddUserToProject_Conflict() {
-        Long projectId = 1L;
-        Long userId = 2L;
-        String accessToken = "valid_token";
+            ResponseEntity<String> response = projectController.deleteProject(projectId, accessToken);
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(projectService.addUserToProjectByUserIdAndProjectId(projectId, userId))
-                .thenThrow(new ConflictException("User already exists in the project"));
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals("Deleted project successfully", response.getBody());
+        }
 
-        ResponseEntity<Object> response = projectController.addUserToProject(projectId, userId, accessToken);
+        @Test
+        @DisplayName("Testing failure case (not found)")
+        void testDeleteProject_FailedDeletion() {
+            Long projectId = 1L;
+            String accessToken = "valid_token";
 
-        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertEquals("User already exists in the project", response.getBody());
-    }
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            when(projectService.existsProjectById(projectId)).thenReturn(true);
+            when(projectService.existsByIdIsDeleted(projectId)).thenReturn(false);
+            when(projectService.softDeleteProject(projectId)).thenReturn(false);
 
-    @Test
-    void testAddUserToProject_InternalServerError() {
-        Long projectId = 1L;
-        Long userId = 2L;
-        String accessToken = "valid_token";
+            ResponseEntity<String> response = projectController.deleteProject(projectId, accessToken);
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(projectService.addUserToProjectByUserIdAndProjectId(projectId, userId))
-                .thenThrow(new RuntimeException("Something went wrong"));
+            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        }
 
-        ResponseEntity<Object> response = projectController.addUserToProject(projectId, userId, accessToken);
+        @Test
+        @DisplayName("Testing project not found case")
+        void testDeleteProject_ProjectNotFound() {
+            Long projectId = 1L;
+            String accessToken = "valid_token";
 
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("Something went wrong", response.getBody());
-    }
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            when(projectService.existsProjectById(projectId)).thenReturn(false);
 
-    @Test
-    void testRemoveUserFromProject_SuccessfulRemoval() {
-        Long projectId = 1L;
-        Long userId = 2L;
-        String accessToken = "valid_token";
+            ResponseEntity<String> response = projectController.deleteProject(projectId, accessToken);
 
-        ResponseEntity<String> successfulResponse = new ResponseEntity<>("User removed successfully", HttpStatus.OK);
+            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        }
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(projectService.removeUserFromProjectByUserIdAndProjectId(projectId, userId)).thenReturn(successfulResponse);
+        @Test
+        @DisplayName("Testing already deleted project case")
+        void testDeleteProject_AlreadyDeleted() {
+            Long projectId = 1L;
+            String accessToken = "valid_token";
 
-        ResponseEntity<String> response = projectController.removeUserFromProject(projectId, userId, accessToken);
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            when(projectService.existsProjectById(projectId)).thenReturn(true);
+            when(projectService.existsByIdIsDeleted(projectId)).thenReturn(true);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("User removed successfully", response.getBody());
-    }
+            ResponseEntity<String> response = projectController.deleteProject(projectId, accessToken);
 
-    @Test
-    void testRemoveUserFromProject_ResourceNotFound() {
-        Long projectId = 1L;
-        Long userId = 2L;
-        String accessToken = "valid_token";
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals("Project doesn't exist", response.getBody());
+        }
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(projectService.removeUserFromProjectByUserIdAndProjectId(projectId, userId))
-                .thenThrow(new NotFoundException("Resource not found"));
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testDeleteProject_InvalidToken(){
+            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
 
-        ResponseEntity<String> response = projectController.removeUserFromProject(projectId, userId, accessToken);
+            ResponseEntity<String> response = projectController.deleteProject(1L, "invalid-access-token");
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals("Resource not found", response.getBody());
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals("Invalid Token", response.getBody());
+        }
     }
 
-    @Test
-    void testRemoveUserFromProject_InternalServerError() {
-        Long projectId = 1L;
-        Long userId = 2L;
-        String accessToken = "valid_token";
+    @Nested
+    class AddUserToProjectTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testAddUserToProject_SuccessfulAddition() {
+            Long projectId = 1L;
+            Long userId = 2L;
+            String accessToken = "valid_token";
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(projectService.removeUserFromProjectByUserIdAndProjectId(projectId, userId))
-                .thenThrow(new RuntimeException("Something went wrong"));
+            ResponseEntity<Object> successfulResponse = new ResponseEntity<>("User added successfully", HttpStatus.OK);
 
-        ResponseEntity<String> response = projectController.removeUserFromProject(projectId, userId, accessToken);
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            when(projectService.addUserToProjectByUserIdAndProjectId(projectId, userId)).thenReturn(successfulResponse);
 
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("Something went wrong", response.getBody());
-    }
+            ResponseEntity<Object> response = projectController.addUserToProject(projectId, userId, accessToken);
 
-    @Test
-    void testRemoveUserFromProjectAndRepo_SuccessfulRemoval() {
-        Long projectId = 1L;
-        Long userId = 2L;
-        CollaboratorDTO collaboratorDTO = new CollaboratorDTO();
-        String accessToken = "valid_token";
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals("User added successfully", response.getBody());
+        }
 
-        ResponseEntity<String> successfulResponse = new ResponseEntity<>("User removed successfully", HttpStatus.OK);
+        @Test
+        @DisplayName("Testing resource not found case")
+        void testAddUserToProject_ResourceNotFound() {
+            Long projectId = 1L;
+            Long userId = 2L;
+            String accessToken = "valid_token";
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(projectService.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO)).thenReturn(successfulResponse);
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            when(projectService.addUserToProjectByUserIdAndProjectId(projectId, userId))
+                    .thenThrow(new NotFoundException("Resource not found"));
 
-        ResponseEntity<String> response = projectController.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO, accessToken);
+            ResponseEntity<Object> response = projectController.addUserToProject(projectId, userId, accessToken);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("User removed successfully", response.getBody());
-    }
+            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+            assertEquals("Resource not found", response.getBody());
+        }
 
-    @Test
-    void testRemoveUserFromProjectAndRepo_UserNotFound() {
-        Long projectId = 1L;
-        Long userId = 2L;
-        CollaboratorDTO collaboratorDTO = new CollaboratorDTO();
-        String accessToken = "valid_token";
+        @Test
+        @DisplayName("Testing user already exists in project case")
+        void testAddUserToProject_Conflict() {
+            Long projectId = 1L;
+            Long userId = 2L;
+            String accessToken = "valid_token";
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(projectService.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO))
-                .thenThrow(new NotFoundException("User not found"));
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            when(projectService.addUserToProjectByUserIdAndProjectId(projectId, userId))
+                    .thenThrow(new ConflictException("User already exists in the project"));
 
-        ResponseEntity<String> response = projectController.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO, accessToken);
+            ResponseEntity<Object> response = projectController.addUserToProject(projectId, userId, accessToken);
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals("Project or User not found", response.getBody());
-    }
+            assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+            assertEquals("User already exists in the project", response.getBody());
+        }
 
-    @Test
-    void testRemoveUserFromProjectAndRepo_ProjectNotFound() {
-        Long projectId = 1L;
-        Long userId = 2L;
-        CollaboratorDTO collaboratorDTO = new CollaboratorDTO();
-        String accessToken = "valid_token";
+        @Test
+        @DisplayName("Testing failure case (internal server error)")
+        void testAddUserToProject_InternalServerError() {
+            Long projectId = 1L;
+            Long userId = 2L;
+            String accessToken = "valid_token";
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(projectService.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO))
-                .thenThrow(new NotFoundException("Project not found"));
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            when(projectService.addUserToProjectByUserIdAndProjectId(projectId, userId))
+                    .thenThrow(new RuntimeException("Something went wrong"));
 
-        ResponseEntity<String> response = projectController.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO, accessToken);
+            ResponseEntity<Object> response = projectController.addUserToProject(projectId, userId, accessToken);
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals("Project or User not found", response.getBody());
-    }
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+            assertEquals("Something went wrong", response.getBody());
+        }
 
-    @Test
-    void testRemoveUserFromProjectAndRepo_BadRequest() {
-        Long projectId = 1L;
-        Long userId = 2L;
-        CollaboratorDTO collaboratorDTO = new CollaboratorDTO();
-        String accessToken = "valid_token";
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testAddUserToProject_InvalidToken(){
+            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
+            Long projectId = 1L;
+            Long userId = 2L;
 
-        ResponseEntity<String> badRequestResponse = new ResponseEntity<>("Unable to remove user", HttpStatus.BAD_REQUEST);
+            ResponseEntity<Object> response = projectController.addUserToProject(projectId,userId, "invalid-access-token");
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(projectService.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO)).thenReturn(badRequestResponse);
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals("Invalid Token", response.getBody());
+        }
+    }
 
-        ResponseEntity<String> response = projectController.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO, accessToken);
+    @Nested
+    class RemoveUserFromProjectTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testRemoveUserFromProject_SuccessfulRemoval() {
+            Long projectId = 1L;
+            Long userId = 2L;
+            String accessToken = "valid_token";
 
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Unable to remove user", response.getBody());
-    }
+            ResponseEntity<String> successfulResponse = new ResponseEntity<>("User removed successfully", HttpStatus.OK);
 
-    @Test
-    void testRemoveUserFromProjectAndRepo_InternalServerError() {
-        Long projectId = 1L;
-        Long userId = 2L;
-        CollaboratorDTO collaboratorDTO = new CollaboratorDTO();
-        String accessToken = "valid_token";
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            when(projectService.removeUserFromProjectByUserIdAndProjectId(projectId, userId)).thenReturn(successfulResponse);
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(projectService.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO))
-                .thenThrow(new RuntimeException("Something went wrong"));
+            ResponseEntity<String> response = projectController.removeUserFromProject(projectId, userId, accessToken);
 
-        ResponseEntity<String> response = projectController.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO, accessToken);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals("User removed successfully", response.getBody());
+        }
 
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("Something went wrong", response.getBody());
-    }
+        @Test
+        @DisplayName("Testing resource not found case")
+        void testRemoveUserFromProject_ResourceNotFound() {
+            Long projectId = 1L;
+            Long userId = 2L;
+            String accessToken = "valid_token";
 
-    @Test
-    void testAddRepositoryToProject_SuccessfulAddition() {
-        Long projectId = 1L;
-        Long repoId = 2L;
-        String accessToken = "valid_token";
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            when(projectService.removeUserFromProjectByUserIdAndProjectId(projectId, userId))
+                    .thenThrow(new NotFoundException("Resource not found"));
 
-        ResponseEntity<Object> successfulResponse = ResponseEntity.ok("Stored successfully");
+            ResponseEntity<String> response = projectController.removeUserFromProject(projectId, userId, accessToken);
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(projectService.addRepositoryToProject(projectId, repoId)).thenReturn(successfulResponse);
+            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+            assertEquals("Resource not found", response.getBody());
+        }
 
-        ResponseEntity<Object> response = projectController.addRepositoryToProject(projectId, repoId, accessToken);
+        @Test
+        @DisplayName("Testing failure case (internal server error)")
+        void testRemoveUserFromProject_InternalServerError() {
+            Long projectId = 1L;
+            Long userId = 2L;
+            String accessToken = "valid_token";
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Stored successfully", response.getBody());
-    }
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            when(projectService.removeUserFromProjectByUserIdAndProjectId(projectId, userId))
+                    .thenThrow(new RuntimeException("Something went wrong"));
 
-    @Test
-    void testAddRepositoryToProject_RepositoryNotFound() {
-        Long projectId = 1L;
-        Long repoId = 2L;
-        String accessToken = "valid_token";
+            ResponseEntity<String> response = projectController.removeUserFromProject(projectId, userId, accessToken);
 
-        ResponseEntity<Object> notFoundResponse = ResponseEntity.status(HttpStatus.NOT_FOUND).body("Repository or Project not found");
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+            assertEquals("Something went wrong", response.getBody());
+        }
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(projectService.addRepositoryToProject(projectId, repoId)).thenReturn(notFoundResponse);
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testRemoveUserFromProject_InvalidToken(){
+            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
+            Long projectId = 1L;
+            Long userId = 2L;
 
-        ResponseEntity<Object> response = projectController.addRepositoryToProject(projectId, repoId, accessToken);
+            ResponseEntity<String> response = projectController.removeUserFromProject(projectId,userId, "invalid-access-token");
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals("Repository or Project not found", response.getBody());
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals("Invalid Token", response.getBody());
+        }
     }
 
-    @Test
-    void testAddRepositoryToProject_InternalServerError() {
-        Long projectId = 1L;
-        Long repoId = 2L;
-        String accessToken = "valid_token";
+    @Nested
+    class RemoveUserFromProjectAndRepoTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testRemoveUserFromProjectAndRepo_SuccessfulRemoval() {
+            Long projectId = 1L;
+            Long userId = 2L;
+            CollaboratorDTO collaboratorDTO = new CollaboratorDTO();
+            String accessToken = "valid_token";
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(projectService.addRepositoryToProject(projectId, repoId)).thenThrow(new RuntimeException("Something went wrong"));
+            ResponseEntity<String> successfulResponse = new ResponseEntity<>("User removed successfully", HttpStatus.OK);
 
-        ResponseEntity<Object> response = projectController.addRepositoryToProject(projectId, repoId, accessToken);
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-    }
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            when(projectService.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO)).thenReturn(successfulResponse);
 
-    @Test
-    void testGetUsersByProjectIdAndRole_ValidToken(){
-        List<UserDTO> userDTOList = new ArrayList<>();
-        UserDTO user1 = new UserDTO();
-        UserDTO user2 = new UserDTO();
-        userDTOList.add(user1);
-        userDTOList.add(user2);
+            ResponseEntity<String> response = projectController.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO, accessToken);
 
-        Long projectId = 1L;
-        String role = EnumRole.USER.getEnumRole();
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals("User removed successfully", response.getBody());
+        }
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.getUsersByProjectIdAndRole(projectId, role)).thenReturn(userDTOList);
+        @Test
+        @DisplayName("Testing user not found case")
+        void testRemoveUserFromProjectAndRepo_UserNotFound() {
+            Long projectId = 1L;
+            Long userId = 2L;
+            CollaboratorDTO collaboratorDTO = new CollaboratorDTO();
+            String accessToken = "valid_token";
 
-        ResponseEntity<Object> response = projectController.getUsersByProjectIdAndRole(projectId, role, "valid-access-token");
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            when(projectService.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO))
+                    .thenThrow(new NotFoundException("User not found"));
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(userDTOList, response.getBody());
-    }
+            ResponseEntity<String> response = projectController.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO, accessToken);
 
-    @Test
-    void testGetProjectsWithoutFigmaURL_ValidToken(){
-        List<ProjectDTO> projectDTOList = new ArrayList<>();
-        ProjectDTO projectDTO1 = new ProjectDTO();
-        ProjectDTO projectDTO2 = new ProjectDTO();
-        projectDTOList.add(projectDTO1);
-        projectDTOList.add(projectDTO2);
+            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+            assertEquals("Project or User not found", response.getBody());
+        }
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.getProjectsWithoutFigmaURL()).thenReturn(projectDTOList);
+        @Test
+        @DisplayName("Testing project not found case")
+        void testRemoveUserFromProjectAndRepo_ProjectNotFound() {
+            Long projectId = 1L;
+            Long userId = 2L;
+            CollaboratorDTO collaboratorDTO = new CollaboratorDTO();
+            String accessToken = "valid_token";
 
-        ResponseEntity<Object> response = projectController.getProjectsWithoutFigmaURL("valid-access-token");
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            when(projectService.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO))
+                    .thenThrow(new NotFoundException("Project not found"));
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(projectDTOList, response.getBody());
-    }
+            ResponseEntity<String> response = projectController.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO, accessToken);
 
-    @Test
-    void testGetProjectsWithoutGoogleDriveLink_ValidToken(){
-        List<ProjectDTO> projectDTOList = new ArrayList<>();
-        ProjectDTO projectDTO1 = new ProjectDTO();
-        ProjectDTO projectDTO2 = new ProjectDTO();
-        projectDTOList.add(projectDTO1);
-        projectDTOList.add(projectDTO2);
+            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+            assertEquals("Project or User not found", response.getBody());
+        }
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.getProjectsWithoutGoogleDriveLink()).thenReturn(projectDTOList);
+        @Test
+        @DisplayName("Testing failure case (Bad request)")
+        void testRemoveUserFromProjectAndRepo_BadRequest() {
+            Long projectId = 1L;
+            Long userId = 2L;
+            CollaboratorDTO collaboratorDTO = new CollaboratorDTO();
+            String accessToken = "valid_token";
 
-        ResponseEntity<Object> response = projectController.getProjectsWithoutGoogleDriveLink("valid-access-token");
+            ResponseEntity<String> badRequestResponse = new ResponseEntity<>("Unable to remove user", HttpStatus.BAD_REQUEST);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(projectDTOList, response.getBody());
-    }
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            when(projectService.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO)).thenReturn(badRequestResponse);
 
-    @Test
-    void testCountAllPeopleByProjectIdAndName_NotEmpty_ValidToken(){
+            ResponseEntity<String> response = projectController.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO, accessToken);
 
-        List<ProjectNamePeopleCountDTO> mockDtoList = new ArrayList<>();
-        ProjectNamePeopleCountDTO peopleCountDTO1 = new ProjectNamePeopleCountDTO();
-        peopleCountDTO1.setProjectName("p1");
+            assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+            assertEquals("Unable to remove user", response.getBody());
+        }
 
-        ProjectNamePeopleCountDTO peopleCountDTO2 = new ProjectNamePeopleCountDTO();
-        peopleCountDTO2.setProjectName("p2");
+        @Test
+        @DisplayName("Testing failure case (internal server error)")
+        void testRemoveUserFromProjectAndRepo_InternalServerError() {
+            Long projectId = 1L;
+            Long userId = 2L;
+            CollaboratorDTO collaboratorDTO = new CollaboratorDTO();
+            String accessToken = "valid_token";
 
-        mockDtoList.add(peopleCountDTO1);
-        mockDtoList.add(peopleCountDTO2);
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            when(projectService.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO))
+                    .thenThrow(new RuntimeException("Something went wrong"));
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.getCountAllPeopleAndProjectName()).thenReturn(mockDtoList);
+            ResponseEntity<String> response = projectController.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO, accessToken);
 
-        // Act
-        ResponseEntity<Object> response = projectController.countAllPeopleByProjectIdAndName("valid-access-token");
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+            assertEquals("Something went wrong", response.getBody());
+        }
 
-        // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(mockDtoList, response.getBody());
-    }
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testRemoveUserFromProjectAndRepo_InvalidToken(){
+            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
+            Long projectId = 1L;
+            Long userId = 2L;
 
-    @Test
-    void testCountAllPeopleByProjectIdAndName_Empty_ValidToken(){
-        // mockDtoList is empty
-        List<ProjectNamePeopleCountDTO> mockDtoList = new ArrayList<>();
+            CollaboratorDTO collaboratorDTO = new CollaboratorDTO();
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            ResponseEntity<String> response = projectController.removeUserFromProjectAndRepo(projectId,userId,
+                    collaboratorDTO,"invalid-access-token");
 
-        // Add test data to mockDtoList
-        when(projectService.getCountAllPeopleAndProjectName()).thenReturn(mockDtoList);
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals("Invalid Token", response.getBody());
+        }
+    }
 
-        ResponseEntity<Object> response = projectController.countAllPeopleByProjectIdAndName("valid-access-token");
+    @Nested
+    class GetUsersByProjectIdAndRoleTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testGetUsersByProjectIdAndRole_ValidToken(){
+            List<UserDTO> userDTOList = new ArrayList<>();
+            UserDTO user1 = new UserDTO();
+            UserDTO user2 = new UserDTO();
+            userDTOList.add(user1);
+            userDTOList.add(user2);
 
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-        assertEquals("Empty", response.getBody());
-    }
+            Long projectId = 1L;
+            String role = EnumRole.USER.getEnumRole();
 
-    @Test
-    void testCountAllProjects_NotEmpty_ValidToken(){
-        List<ProjectDTO> mockDtoList = new ArrayList<>();
-        ProjectDTO projectDTO1 = new ProjectDTO();
-        projectDTO1.setProjectName("p1");
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            when(projectService.getUsersByProjectIdAndRole(projectId, role)).thenReturn(userDTOList);
 
-        ProjectDTO projectDTO2 = new ProjectDTO();
-        projectDTO2.setProjectName("p2");
+            ResponseEntity<Object> response = projectController.getUsersByProjectIdAndRole(projectId, role, "valid-access-token");
 
-        mockDtoList.add(projectDTO1);
-        mockDtoList.add(projectDTO2);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(userDTOList, response.getBody());
+        }
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.getCountAllProjects()).thenReturn(mockDtoList.size());
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testGetUsersByProjectIdAndRole_InvalidToken(){
+            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
+            String role = EnumRole.PROJECT_MANAGER.getEnumRole();
 
-        ResponseEntity<Object> response = projectController.countAllProjects("valid-access-token");
+            ResponseEntity<Object> response = projectController.getUsersByProjectIdAndRole(1L,role,"invalid-access-token");
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(2, mockDtoList.size());
-        assertEquals(mockDtoList.size(), response.getBody());
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals("Invalid Token", response.getBody());
+        }
     }
 
-    @Test
-    void testCountAllProjects_Empty_ValidToken(){
-        // mockDtoList is empty
-        List<ProjectDTO> mockDtoList = new ArrayList<>();
+    @Nested
+    class AddRepositoryToProjectTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testAddRepositoryToProject_SuccessfulAddition() {
+            Long projectId = 1L;
+            Long repoId = 2L;
+            String accessToken = "valid_token";
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.getCountAllProjects()).thenReturn(mockDtoList.size());
+            ResponseEntity<Object> successfulResponse = ResponseEntity.ok("Stored successfully");
 
-        ResponseEntity<Object> response = projectController.countAllProjects("valid-access-token");
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            when(projectService.addRepositoryToProject(projectId, repoId)).thenReturn(successfulResponse);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(0, mockDtoList.size());
-        assertEquals(mockDtoList.size(), response.getBody());
-    }
+            ResponseEntity<Object> response = projectController.addRepositoryToProject(projectId, repoId, accessToken);
 
-    @Test
-    void testCountAllProjectsByRole_NotEmpty_ValidToken(){
-        List<ProjectDTO> mockDtoList = new ArrayList<>();
-        ProjectDTO projectDTO1 = new ProjectDTO();
-        projectDTO1.setProjectName("p1");
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals("Stored successfully", response.getBody());
+        }
 
-        ProjectDTO projectDTO2 = new ProjectDTO();
-        projectDTO2.setProjectName("p2");
+        @Test
+        @DisplayName("Testing repository not found case")
+        void testAddRepositoryToProject_RepositoryNotFound() {
+            Long projectId = 1L;
+            Long repoId = 2L;
+            String accessToken = "valid_token";
 
-        mockDtoList.add(projectDTO1);
-        mockDtoList.add(projectDTO2);
+            ResponseEntity<Object> notFoundResponse = ResponseEntity.status(HttpStatus.NOT_FOUND).body("Repository or Project not found");
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.getCountAllProjectsByRole(EnumRole.ADMIN)).thenReturn(mockDtoList.size());
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            when(projectService.addRepositoryToProject(projectId, repoId)).thenReturn(notFoundResponse);
 
-        ResponseEntity<Object> response = projectController.countAllProjectsByRole(EnumRole.ADMIN.getEnumRole(),
-                "valid-access-token");
+            ResponseEntity<Object> response = projectController.addRepositoryToProject(projectId, repoId, accessToken);
 
-        assertEquals(2, mockDtoList.size());
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(2, response.getBody());
-    }
+            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+            assertEquals("Repository or Project not found", response.getBody());
+        }
 
-    @Test
-    void testCountAllProjectsByRole_Empty_ValidToken(){
+        @Test
+        @DisplayName("Testing failure case (internal server error)")
+        void testAddRepositoryToProject_InternalServerError() {
+            Long projectId = 1L;
+            Long repoId = 2L;
+            String accessToken = "valid_token";
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.getCountAllProjectsByRole(EnumRole.ADMIN)).thenReturn(0);
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            when(projectService.addRepositoryToProject(projectId, repoId)).thenThrow(new RuntimeException("Something went wrong"));
 
-        String role = EnumRole.ADMIN.getEnumRole();
+            ResponseEntity<Object> response = projectController.addRepositoryToProject(projectId, repoId, accessToken);
 
-        ResponseEntity<Object> response = projectController.countAllProjectsByRole(role,"valid-access-token");
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        }
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(0, response.getBody());
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testAddRepositoryToProject_InvalidToken(){
+            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
+            Long projectId = 1L;
+            Long repoId = 2L;
+
+            ResponseEntity<Object> response = projectController.addRepositoryToProject(projectId,repoId,"invalid-access-token");
+
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals("Invalid Token", response.getBody());
+        }
     }
 
-    @Test
-    void testCountAllProjectsByUserId_NotEmpty_ValidToken(){
+    @Nested
+    class GetProjectsWithoutFigmaURLTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testGetProjectsWithoutFigmaURL_ValidToken(){
+            List<ProjectDTO> projectDTOList = new ArrayList<>();
+            ProjectDTO projectDTO1 = new ProjectDTO();
+            ProjectDTO projectDTO2 = new ProjectDTO();
+            projectDTOList.add(projectDTO1);
+            projectDTOList.add(projectDTO2);
 
-        List<ProjectDTO> mockDtoList = new ArrayList<>();
-        ProjectDTO projectDTO1 = new ProjectDTO();
-        projectDTO1.setProjectName("p1");
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            when(projectService.getProjectsWithoutFigmaURL()).thenReturn(projectDTOList);
 
-        ProjectDTO projectDTO2 = new ProjectDTO();
-        projectDTO2.setProjectName("p2");
+            ResponseEntity<Object> response = projectController.getProjectsWithoutFigmaURL("valid-access-token");
 
-        mockDtoList.add(projectDTO1);
-        mockDtoList.add(projectDTO2);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(projectDTOList, response.getBody());
+        }
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.getCountAllProjectsByUserId(1L)).thenReturn(mockDtoList.size());
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testGetProjectsWithoutFigmaURL_InvalidToken(){
+            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
 
-        ResponseEntity<Object> response = projectController.countAllProjectsByUserId(1L, "valid-access-token");
+            ResponseEntity<Object> response = projectController.getProjectsWithoutFigmaURL("invalid-access-token");
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(2, response.getBody());
-        assertEquals(2, mockDtoList.size());
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals("Invalid Token", response.getBody());
+        }
     }
 
-    @Test
-    void testCountAllProjectsByUserId_Empty_ValidToken(){
+    @Nested
+    class GetProjectsWithoutGoogleDriveLinkTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testGetProjectsWithoutGoogleDriveLink_ValidToken(){
+            List<ProjectDTO> projectDTOList = new ArrayList<>();
+            ProjectDTO projectDTO1 = new ProjectDTO();
+            ProjectDTO projectDTO2 = new ProjectDTO();
+            projectDTOList.add(projectDTO1);
+            projectDTOList.add(projectDTO2);
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.getCountAllProjectsByUserId(1L)).thenReturn(0);
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            when(projectService.getProjectsWithoutGoogleDriveLink()).thenReturn(projectDTOList);
 
-        ResponseEntity<Object> response = projectController.countAllProjectsByUserId(1L, "valid-access-token");
+            ResponseEntity<Object> response = projectController.getProjectsWithoutGoogleDriveLink("valid-access-token");
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(0, response.getBody());
-    }
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(projectDTOList, response.getBody());
+        }
 
-    @Test
-    void testCountAllUsersByProjectId_NotEmpty_ValidToken(){
-        List<ProjectDTO> mockDtoList = new ArrayList<>();
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testGetProjectsWithoutGoogleDriveLink_InvalidToken(){
+            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
 
-        ProjectDTO projectDTO1 = new ProjectDTO();
-        projectDTO1.setProjectName("P1");
-        projectDTO1.setProjectDescription("P1 description");
+            ResponseEntity<Object> response = projectController.getProjectsWithoutGoogleDriveLink("invalid-access-token");
 
-        ProjectDTO projectDTO2 = new ProjectDTO();
-        projectDTO2.setProjectName("P2");
-        projectDTO2.setProjectDescription("P2 description");
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals("Invalid Token", response.getBody());
+        }
+    }
 
-        mockDtoList.add(projectDTO1);
-        mockDtoList.add(projectDTO2);
+    @Nested
+    class CountAllPeopleByProjectIdAndNameTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testCountAllPeopleByProjectIdAndName_NotEmpty_ValidToken(){
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.getCountAllUsersByProjectId(1L)).thenReturn(mockDtoList.size());
+            List<ProjectNamePeopleCountDTO> mockDtoList = new ArrayList<>();
+            ProjectNamePeopleCountDTO peopleCountDTO1 = new ProjectNamePeopleCountDTO();
+            peopleCountDTO1.setProjectName("p1");
 
-        // Act
-        ResponseEntity<Object> response = projectController.countAllUsersByProjectId(1L,"valid-access-token");
+            ProjectNamePeopleCountDTO peopleCountDTO2 = new ProjectNamePeopleCountDTO();
+            peopleCountDTO2.setProjectName("p2");
 
-        // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(2, response.getBody());
-    }
+            mockDtoList.add(peopleCountDTO1);
+            mockDtoList.add(peopleCountDTO2);
 
-    @Test
-    void testCountAllUsersByProjectId_Empty_ValidToken(){
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.getCountAllUsersByProjectId(1L)).thenReturn(0);
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            when(projectService.getCountAllPeopleAndProjectName()).thenReturn(mockDtoList);
 
-        // Act
-        ResponseEntity<Object> response = projectController.countAllUsersByProjectId(1L,"valid-access-token");
+            ResponseEntity<Object> response = projectController.countAllPeopleByProjectIdAndName("valid-access-token");
 
-        // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(0, response.getBody());
-    }
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(mockDtoList, response.getBody());
+        }
 
-    @Test
-    void testCountAllUsersByProjectIdByRole_NotEmpty_ValidToken(){
-        List<ProjectDTO> mockDtoList = new ArrayList<>();
+        @Test
+        @DisplayName("Testing empty list case")
+        void testCountAllPeopleByProjectIdAndName_Empty_ValidToken(){
+            // mockDtoList is empty
+            List<ProjectNamePeopleCountDTO> mockDtoList = new ArrayList<>();
 
-        ProjectDTO projectDTO1 = new ProjectDTO();
-        projectDTO1.setProjectName("P1");
-        projectDTO1.setProjectDescription("P1 description");
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
 
-        ProjectDTO projectDTO2 = new ProjectDTO();
-        projectDTO2.setProjectName("P2");
-        projectDTO2.setProjectDescription("P2 description");
+            when(projectService.getCountAllPeopleAndProjectName()).thenReturn(mockDtoList);
 
-        mockDtoList.add(projectDTO1);
-        mockDtoList.add(projectDTO2);
+            ResponseEntity<Object> response = projectController.countAllPeopleByProjectIdAndName("valid-access-token");
 
-        String role = EnumRole.ADMIN.getEnumRole();
+            assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+            assertEquals("Empty", response.getBody());
+        }
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.getCountAllUsersByProjectIdAndRole(1L, EnumRole.ADMIN)).thenReturn(mockDtoList.size());
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testCountAllPeopleByProjectIdAndName_InvalidToken(){
+            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
 
-        ResponseEntity<Object> response = projectController.countAllUsersByProjectIdByRole(1L, role,"valid-access-token");
+            ResponseEntity<Object> response = projectController.countAllPeopleByProjectIdAndName("invalid-access-token");
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(2, response.getBody());
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals("Invalid Token", response.getBody());
+        }
     }
-
-    @Test
-    void testCountAllUsersByProjectIdByRole_Empty_ValidToken(){
-        String role = EnumRole.ADMIN.getEnumRole();
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.getCountAllUsersByProjectIdAndRole(1L, EnumRole.ADMIN)).thenReturn(0);
+    @Nested
+    class CountAllProjectsTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testCountAllProjects_NotEmpty_ValidToken(){
+            List<ProjectDTO> mockDtoList = new ArrayList<>();
+            ProjectDTO projectDTO1 = new ProjectDTO();
+            projectDTO1.setProjectName("p1");
 
-        ResponseEntity<Object> response = projectController.countAllUsersByProjectIdByRole(1L, role,"valid-access-token");
+            ProjectDTO projectDTO2 = new ProjectDTO();
+            projectDTO2.setProjectName("p2");
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(0, response.getBody());
-    }
+            mockDtoList.add(projectDTO1);
+            mockDtoList.add(projectDTO2);
 
-    @Test
-    void testCountAllActiveProjects_NotEmpty_ValidToken(){
-        List<ProjectDTO> mockDtoList = new ArrayList<>();
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            when(projectService.getCountAllProjects()).thenReturn(mockDtoList.size());
 
-        ProjectDTO projectDTO1 = new ProjectDTO();
-        projectDTO1.setProjectName("P1");
-        projectDTO1.setProjectDescription("P1 description");
+            ResponseEntity<Object> response = projectController.countAllProjects("valid-access-token");
 
-        ProjectDTO projectDTO2 = new ProjectDTO();
-        projectDTO2.setProjectName("P2");
-        projectDTO2.setProjectDescription("P2 description");
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(2, mockDtoList.size());
+            assertEquals(mockDtoList.size(), response.getBody());
+        }
 
-        mockDtoList.add(projectDTO1);
-        mockDtoList.add(projectDTO2);
+        @Test
+        @DisplayName("Testing empty list case")
+        void testCountAllProjects_Empty_ValidToken(){
+            // mockDtoList is empty
+            List<ProjectDTO> mockDtoList = new ArrayList<>();
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.getCountAllActiveProjects()).thenReturn(mockDtoList.size());
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            when(projectService.getCountAllProjects()).thenReturn(mockDtoList.size());
 
-        ResponseEntity<Object> response = projectController.countAllActiveProjects("valid-access-token");
+            ResponseEntity<Object> response = projectController.countAllProjects("valid-access-token");
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(2, response.getBody());
-    }
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(0, mockDtoList.size());
+            assertEquals(mockDtoList.size(), response.getBody());
+        }
 
-    @Test
-    void testCountAllActiveProjects_Empty_ValidToken(){
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testCountAllProjects_InvalidToken(){
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.getCountAllActiveProjects()).thenReturn(0);
+            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
 
-        ResponseEntity<Object> response = projectController.countAllActiveProjects("valid-access-token");
+            ResponseEntity<Object> response = projectController.countAllProjects("invalid-access-token");
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(0, response.getBody());
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals("Invalid Token", response.getBody());
+        }
     }
-
-    @Test
-    void testCountAllInactiveProjects_NotEmpty_ValidToken(){
-        List<ProjectDTO> mockDtoList = new ArrayList<>();
 
-        ProjectDTO projectDTO1 = new ProjectDTO();
-        projectDTO1.setProjectName("P1");
-        projectDTO1.setProjectDescription("P1 description");
+    @Nested
+    class CountAllProjectsByRoleTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testCountAllProjectsByRole_NotEmpty_ValidToken(){
+            List<ProjectDTO> mockDtoList = new ArrayList<>();
+            ProjectDTO projectDTO1 = new ProjectDTO();
+            projectDTO1.setProjectName("p1");
 
-        ProjectDTO projectDTO2 = new ProjectDTO();
-        projectDTO2.setProjectName("P2");
-        projectDTO2.setProjectDescription("P2 description");
+            ProjectDTO projectDTO2 = new ProjectDTO();
+            projectDTO2.setProjectName("p2");
 
-        mockDtoList.add(projectDTO1);
-        mockDtoList.add(projectDTO2);
+            mockDtoList.add(projectDTO1);
+            mockDtoList.add(projectDTO2);
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.getCountAllInActiveProjects()).thenReturn(mockDtoList.size());
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            when(projectService.getCountAllProjectsByRole(EnumRole.ADMIN)).thenReturn(mockDtoList.size());
 
-        ResponseEntity<Object> response = projectController.countAllInActiveProjects("valid-access-token");
+            ResponseEntity<Object> response = projectController.countAllProjectsByRole(EnumRole.ADMIN.getEnumRole(),
+                    "valid-access-token");
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(2, response.getBody());
-    }
+            assertEquals(2, mockDtoList.size());
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(2, response.getBody());
+        }
 
-    @Test
-    void testCountAllInactiveProjects_Empty_ValidToken(){
+        @Test
+        @DisplayName("Testing empty list case")
+        void testCountAllProjectsByRole_Empty_ValidToken(){
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.getCountAllInActiveProjects()).thenReturn(0);
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            when(projectService.getCountAllProjectsByRole(EnumRole.ADMIN)).thenReturn(0);
 
-        ResponseEntity<Object> response = projectController.countAllInActiveProjects("valid-access-token");
+            String role = EnumRole.ADMIN.getEnumRole();
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(0, response.getBody());
-    }
+            ResponseEntity<Object> response = projectController.countAllProjectsByRole(role,"valid-access-token");
 
-    @Test
-    void testGetProjectDetailsById_NotEmpty_ValidToken(){
-        List<User> userList = new ArrayList<>();
-        User user1 = new User();
-        User user2 = new User();
-        userList.add(user1);
-        userList.add(user2);
-
-        ProjectDTO projectDTO = new ProjectDTO();
-        projectDTO.setProjectName("P1");
-        projectDTO.setProjectDescription("P1 Description");
-        projectDTO.setUsers(userList);
-        projectDTO.setStatus(true);
-
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.getProjectDetailsById(1L)).thenReturn(projectDTO);
-
-        ResponseEntity<Object> response = projectController.getProjectDetailsById("valid-access-token", 1L);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(projectDTO, response.getBody());
-    }
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(0, response.getBody());
+        }
 
-    @Test
-    void testGetProjectDetailsById_Empty_ValidToken(){
-        ProjectDTO projectDTO = new ProjectDTO();
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testCountAllProjectsByRole_InvalidToken(){
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-        when(projectService.getProjectDetailsById(1L)).thenReturn(projectDTO);
+            String role = EnumRole.PROJECT_MANAGER.getEnumRole();
+            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
 
-        ResponseEntity<Object> response = projectController.getProjectDetailsById("valid-access-token", 1L);
+            ResponseEntity<Object> response = projectController.countAllProjectsByRole(role,"invalid-access-token");
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals("Invalid Token", response.getBody());
+        }
     }
 
-    @Test
-    void testGetProjectDetailsById_InternalServerError() {
-        Long projectId = 1L;
-        String accessToken = "valid_token";
+    @Nested
+    class CountAllProjectsByUserIdTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testCountAllProjectsByUserId_NotEmpty_ValidToken(){
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(projectService.getProjectDetailsById(projectId)).thenThrow(new RuntimeException("Something went wrong"));
+            List<ProjectDTO> mockDtoList = new ArrayList<>();
+            ProjectDTO projectDTO1 = new ProjectDTO();
+            projectDTO1.setProjectName("p1");
 
-        ResponseEntity<Object> response = projectController.getProjectDetailsById(accessToken, projectId);
+            ProjectDTO projectDTO2 = new ProjectDTO();
+            projectDTO2.setProjectName("p2");
 
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-    }
+            mockDtoList.add(projectDTO1);
+            mockDtoList.add(projectDTO2);
 
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            when(projectService.getCountAllProjectsByUserId(1L)).thenReturn(mockDtoList.size());
 
-    // ----- FAILURE (For INVALID TOKEN)-----
+            ResponseEntity<Object> response = projectController.countAllProjectsByUserId(1L, "valid-access-token");
 
-    @Test
-    void testCreateProject_InvalidToken(){
-        // projectDTO is empty
-        ProjectDTO projectDTO = new ProjectDTO();
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(2, response.getBody());
+            assertEquals(2, mockDtoList.size());
+        }
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(false);
-        when(projectService.createProject(projectDTO)).thenReturn(projectDTO);
+        @Test
+        @DisplayName("Testing empty list case")
+        void testCountAllProjectsByUserId_Empty_ValidToken(){
 
-        ResponseEntity<Object> response = projectController.createProject(projectDTO, "valid-access-token");
-
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid Token", response.getBody());
-    }
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            when(projectService.getCountAllProjectsByUserId(1L)).thenReturn(0);
 
-    @Test
-    void testGetAll_InvalidToken() {
-        when(jwtService.isTokenTrue(anyString())).thenReturn(false);
+            ResponseEntity<Object> response = projectController.countAllProjectsByUserId(1L, "valid-access-token");
 
-        ResponseEntity<Object> response = projectController.getAll("invalid-access-token");
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(0, response.getBody());
+        }
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid Token", response.getBody());
-    }
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testCountAllProjectsByUserId_InvalidToken(){
 
-    @Test
-    void testGetProjectById_InvalidToken() {
-        when(jwtService.isTokenTrue(anyString())).thenReturn(false);
+            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
 
-        ResponseEntity<Object> response = projectController.getProjectById(1L, "invalid-access-token");
+            ResponseEntity<Object> response = projectController.countAllProjectsByUserId(1L, "invalid-access-token");
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid Token", response.getBody());
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals("Invalid Token", response.getBody());
+        }
     }
 
-    @Test
-    void testGetAllProjectsWithUsers_InvalidToken() {
-        when(jwtService.isTokenTrue(anyString())).thenReturn(false);
+    @Nested
+    class CountAllUsersByProjectIdTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testCountAllUsersByProjectId_NotEmpty_ValidToken(){
+            List<ProjectDTO> mockDtoList = new ArrayList<>();
 
-        ResponseEntity<Object> response = projectController.getAllProjectsWithUsers("invalid-access-token");
+            ProjectDTO projectDTO1 = new ProjectDTO();
+            projectDTO1.setProjectName("P1");
+            projectDTO1.setProjectDescription("P1 description");
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid Token", response.getBody());
-    }
+            ProjectDTO projectDTO2 = new ProjectDTO();
+            projectDTO2.setProjectName("P2");
+            projectDTO2.setProjectDescription("P2 description");
 
-    @Test
-    void testGetAllUsersByProjectId_InvalidToken(){
-        when(jwtService.isTokenTrue(anyString())).thenReturn(false);
+            mockDtoList.add(projectDTO1);
+            mockDtoList.add(projectDTO2);
 
-        ResponseEntity<Object> response = projectController.getAllUsersByProjectId(1L, "invalid-access-token");
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            when(projectService.getCountAllUsersByProjectId(1L)).thenReturn(mockDtoList.size());
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid Token", response.getBody());
-    }
+            ResponseEntity<Object> response = projectController.countAllUsersByProjectId(1L,"valid-access-token");
 
-    @Test
-    void testGetAllUsersByProjectIdByRole_InvalidToken(){
-        when(jwtService.isTokenTrue(anyString())).thenReturn(false);
-        String role = EnumRole.USER.getEnumRole();
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(2, response.getBody());
+        }
 
-        ResponseEntity<Object> response = projectController.getAllUsersByProjectIdByRole(1L, role,"invalid-access-token");
+        @Test
+        @DisplayName("Testing empty list case")
+        void testCountAllUsersByProjectId_Empty_ValidToken(){
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            when(projectService.getCountAllUsersByProjectId(1L)).thenReturn(0);
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid Token", response.getBody());
-    }
+            ResponseEntity<Object> response = projectController.countAllUsersByProjectId(1L,"valid-access-token");
 
-    @Test
-    void testUpdateProject_InvalidToken(){
-        when(jwtService.isTokenTrue(anyString())).thenReturn(false);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(0, response.getBody());
+        }
 
-        ProjectDTO projectDTO = new ProjectDTO();
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testCountAllUsersByProjectId_InvalidToken(){
+            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
 
-        ResponseEntity<Object> response = projectController.updateProject(1L, projectDTO,"invalid-access-token");
+            ResponseEntity<Object> response = projectController.countAllUsersByProjectId(1L, "invalid-access-token");
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid Token", response.getBody());
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals("Invalid Token", response.getBody());
+        }
     }
-
-    @Test
-    void testDeleteProject_InvalidToken(){
-        when(jwtService.isTokenTrue(anyString())).thenReturn(false);
 
-        ResponseEntity<String> response = projectController.deleteProject(1L, "invalid-access-token");
+    @Nested
+    class CountAllUsersByProjectIdByRoleTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testCountAllUsersByProjectIdByRole_NotEmpty_ValidToken(){
+            List<ProjectDTO> mockDtoList = new ArrayList<>();
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid Token", response.getBody());
-    }
+            ProjectDTO projectDTO1 = new ProjectDTO();
+            projectDTO1.setProjectName("P1");
+            projectDTO1.setProjectDescription("P1 description");
 
-    @Test
-    void testAddUserToProject_InvalidToken(){
-        when(jwtService.isTokenTrue(anyString())).thenReturn(false);
-        Long projectId = 1L;
-        Long userId = 2L;
+            ProjectDTO projectDTO2 = new ProjectDTO();
+            projectDTO2.setProjectName("P2");
+            projectDTO2.setProjectDescription("P2 description");
 
-        ResponseEntity<Object> response = projectController.addUserToProject(projectId,userId, "invalid-access-token");
+            mockDtoList.add(projectDTO1);
+            mockDtoList.add(projectDTO2);
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid Token", response.getBody());
-    }
+            String role = EnumRole.ADMIN.getEnumRole();
 
-    @Test
-    void testRemoveUserFromProject_InvalidToken(){
-        when(jwtService.isTokenTrue(anyString())).thenReturn(false);
-        Long projectId = 1L;
-        Long userId = 2L;
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            when(projectService.getCountAllUsersByProjectIdAndRole(1L, EnumRole.ADMIN)).thenReturn(mockDtoList.size());
 
-        ResponseEntity<String> response = projectController.removeUserFromProject(projectId,userId, "invalid-access-token");
+            ResponseEntity<Object> response = projectController.countAllUsersByProjectIdByRole(1L, role,"valid-access-token");
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid Token", response.getBody());
-    }
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(2, response.getBody());
+        }
 
-    @Test
-    void testRemoveUserFromProjectAndRepo_InvalidToken(){
-        when(jwtService.isTokenTrue(anyString())).thenReturn(false);
-        Long projectId = 1L;
-        Long userId = 2L;
+        @Test
+        @DisplayName("Testing empty list case")
+        void testCountAllUsersByProjectIdByRole_Empty_ValidToken(){
+            String role = EnumRole.ADMIN.getEnumRole();
 
-        CollaboratorDTO collaboratorDTO = new CollaboratorDTO();
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            when(projectService.getCountAllUsersByProjectIdAndRole(1L, EnumRole.ADMIN)).thenReturn(0);
 
-        ResponseEntity<String> response = projectController.removeUserFromProjectAndRepo(projectId,userId,
-                collaboratorDTO,"invalid-access-token");
+            ResponseEntity<Object> response = projectController.countAllUsersByProjectIdByRole(1L, role,"valid-access-token");
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid Token", response.getBody());
-    }
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(0, response.getBody());
+        }
 
-    @Test
-    void testGetUsersByProjectIdAndRole_InvalidToken(){
-        when(jwtService.isTokenTrue(anyString())).thenReturn(false);
-        String role = EnumRole.PROJECT_MANAGER.getEnumRole();
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testCountAllUsersByProjectIdByRole_InvalidToken(){
+            String role = EnumRole.PROJECT_MANAGER.getEnumRole();
+            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
 
-        ResponseEntity<Object> response = projectController.getUsersByProjectIdAndRole(1L,role,"invalid-access-token");
+            ResponseEntity<Object> response = projectController.countAllUsersByProjectIdByRole(1L, role, "invalid-access-token");
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid Token", response.getBody());
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals("Invalid Token", response.getBody());
+        }
     }
 
-    @Test
-    void testAddRepositoryToProject_InvalidToken(){
-        when(jwtService.isTokenTrue(anyString())).thenReturn(false);
-        Long projectId = 1L;
-        Long repoId = 2L;
+    @Nested
+    class CountAllActiveProjectsTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testCountAllActiveProjects_NotEmpty_ValidToken(){
+            List<ProjectDTO> mockDtoList = new ArrayList<>();
 
-        ResponseEntity<Object> response = projectController.addRepositoryToProject(projectId,repoId,"invalid-access-token");
+            ProjectDTO projectDTO1 = new ProjectDTO();
+            projectDTO1.setProjectName("P1");
+            projectDTO1.setProjectDescription("P1 description");
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid Token", response.getBody());
-    }
+            ProjectDTO projectDTO2 = new ProjectDTO();
+            projectDTO2.setProjectName("P2");
+            projectDTO2.setProjectDescription("P2 description");
 
-    @Test
-    void testGetProjectsWithoutFigmaURL_InvalidToken(){
-        when(jwtService.isTokenTrue(anyString())).thenReturn(false);
+            mockDtoList.add(projectDTO1);
+            mockDtoList.add(projectDTO2);
 
-        ResponseEntity<Object> response = projectController.getProjectsWithoutFigmaURL("invalid-access-token");
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            when(projectService.getCountAllActiveProjects()).thenReturn(mockDtoList.size());
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid Token", response.getBody());
-    }
+            ResponseEntity<Object> response = projectController.countAllActiveProjects("valid-access-token");
 
-    @Test
-    void testGetProjectsWithoutGoogleDriveLink_InvalidToken(){
-        when(jwtService.isTokenTrue(anyString())).thenReturn(false);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(2, response.getBody());
+        }
 
-        ResponseEntity<Object> response = projectController.getProjectsWithoutGoogleDriveLink("invalid-access-token");
+        @Test
+        @DisplayName("Testing empty list case")
+        void testCountAllActiveProjects_Empty_ValidToken(){
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid Token", response.getBody());
-    }
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            when(projectService.getCountAllActiveProjects()).thenReturn(0);
+
+            ResponseEntity<Object> response = projectController.countAllActiveProjects("valid-access-token");
 
-    @Test
-    void testCountAllPeopleByProjectIdAndName_InvalidToken(){
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(0, response.getBody());
+        }
 
-        // Arrange
-        when(jwtService.isTokenTrue(anyString())).thenReturn(false);
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testCountAllActiveProjects_InvalidToken(){
 
-        // Act
-        ResponseEntity<Object> response = projectController.countAllPeopleByProjectIdAndName("invalid-access-token");
+            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
 
-        // Assert
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid Token", response.getBody());
+            ResponseEntity<Object> response = projectController.countAllActiveProjects("invalid-access-token");
+
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals("Invalid Token", response.getBody());
+        }
     }
 
-    @Test
-    void testCountAllProjects_InvalidToken(){
+    @Nested
+    class CountAllInActiveProjectsTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testCountAllInactiveProjects_NotEmpty_ValidToken(){
+            List<ProjectDTO> mockDtoList = new ArrayList<>();
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(false);
+            ProjectDTO projectDTO1 = new ProjectDTO();
+            projectDTO1.setProjectName("P1");
+            projectDTO1.setProjectDescription("P1 description");
 
-        ResponseEntity<Object> response = projectController.countAllProjects("invalid-access-token");
+            ProjectDTO projectDTO2 = new ProjectDTO();
+            projectDTO2.setProjectName("P2");
+            projectDTO2.setProjectDescription("P2 description");
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid Token", response.getBody());
-    }
+            mockDtoList.add(projectDTO1);
+            mockDtoList.add(projectDTO2);
 
-    @Test
-    void testCountAllProjectsByRole_InvalidToken(){
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            when(projectService.getCountAllInActiveProjects()).thenReturn(mockDtoList.size());
 
-        String role = EnumRole.PROJECT_MANAGER.getEnumRole();
-        when(jwtService.isTokenTrue(anyString())).thenReturn(false);
+            ResponseEntity<Object> response = projectController.countAllInActiveProjects("valid-access-token");
 
-        ResponseEntity<Object> response = projectController.countAllProjectsByRole(role,"invalid-access-token");
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(2, response.getBody());
+        }
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid Token", response.getBody());
-    }
+        @Test
+        @DisplayName("Testing empty list case")
+        void testCountAllInactiveProjects_Empty_ValidToken(){
 
-    @Test
-    void testCountAllProjectsByUserId_InvalidToken(){
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            when(projectService.getCountAllInActiveProjects()).thenReturn(0);
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(false);
+            ResponseEntity<Object> response = projectController.countAllInActiveProjects("valid-access-token");
 
-        ResponseEntity<Object> response = projectController.countAllProjectsByUserId(1L, "invalid-access-token");
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(0, response.getBody());
+        }
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid Token", response.getBody());
-    }
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testCountAllInactiveProjects_InvalidToken(){
 
-    @Test
-    void testCountAllUsersByProjectId_InvalidToken(){
-        when(jwtService.isTokenTrue(anyString())).thenReturn(false);
+            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
 
-        ResponseEntity<Object> response = projectController.countAllUsersByProjectId(1L, "invalid-access-token");
+            ResponseEntity<Object> response = projectController.countAllInActiveProjects("invalid-access-token");
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid Token", response.getBody());
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals("Invalid Token", response.getBody());
+        }
     }
 
-    @Test
-    void testCountAllUsersByProjectIdByRole_InvalidToken(){
-        String role = EnumRole.PROJECT_MANAGER.getEnumRole();
-        when(jwtService.isTokenTrue(anyString())).thenReturn(false);
+    @Nested
+    class GetProjectDetailsByIdTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testGetProjectDetailsById_NotEmpty_ValidToken(){
+            List<User> userList = new ArrayList<>();
+            User user1 = new User();
+            User user2 = new User();
+            userList.add(user1);
+            userList.add(user2);
 
-        ResponseEntity<Object> response = projectController.countAllUsersByProjectIdByRole(1L, role, "invalid-access-token");
+            ProjectDTO projectDTO = new ProjectDTO();
+            projectDTO.setProjectName("P1");
+            projectDTO.setProjectDescription("P1 Description");
+            projectDTO.setUsers(userList);
+            projectDTO.setStatus(true);
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid Token", response.getBody());
-    }
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            when(projectService.getProjectDetailsById(1L)).thenReturn(projectDTO);
 
-    @Test
-    void testCountAllActiveProjects_InvalidToken(){
+            ResponseEntity<Object> response = projectController.getProjectDetailsById("valid-access-token", 1L);
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(false);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(projectDTO, response.getBody());
+        }
 
-        ResponseEntity<Object> response = projectController.countAllActiveProjects("invalid-access-token");
+        @Test
+        @DisplayName("Testing empty list case")
+        void testGetProjectDetailsById_Empty_ValidToken(){
+            ProjectDTO projectDTO = new ProjectDTO();
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid Token", response.getBody());
-    }
+            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
+            when(projectService.getProjectDetailsById(1L)).thenReturn(projectDTO);
 
-    @Test
-    void testCountAllInactiveProjects_InvalidToken(){
+            ResponseEntity<Object> response = projectController.getProjectDetailsById("valid-access-token", 1L);
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(false);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertNotNull(response.getBody());
+        }
 
-        ResponseEntity<Object> response = projectController.countAllInActiveProjects("invalid-access-token");
+        @Test
+        @DisplayName("Testing failure case (internal server error)")
+        void testGetProjectDetailsById_InternalServerError() {
+            Long projectId = 1L;
+            String accessToken = "valid_token";
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid Token", response.getBody());
-    }
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            when(projectService.getProjectDetailsById(projectId)).thenThrow(new RuntimeException("Something went wrong"));
+
+            ResponseEntity<Object> response = projectController.getProjectDetailsById(accessToken, projectId);
+
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        }
 
-    @Test
-    void testGetProjectDetailsById_InvalidToken(){
-        ProjectDTO projectDTO = new ProjectDTO();
-        projectDTO.setProjectName("P1");
-        projectDTO.setProjectDescription("P1 Description");
-        projectDTO.setStatus(true);
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testGetProjectDetailsById_InvalidToken(){
+            ProjectDTO projectDTO = new ProjectDTO();
+            projectDTO.setProjectName("P1");
+            projectDTO.setProjectDescription("P1 Description");
+            projectDTO.setStatus(true);
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(false);
-        when(projectService.getProjectDetailsById(1L)).thenReturn(projectDTO);
+            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
+            when(projectService.getProjectDetailsById(1L)).thenReturn(projectDTO);
 
-        ResponseEntity<Object> response = projectController.getProjectDetailsById("invalid-access-token", 1L);
+            ResponseEntity<Object> response = projectController.getProjectDetailsById("invalid-access-token", 1L);
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid Token", response.getBody());
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals("Invalid Token", response.getBody());
+        }
     }
 }
