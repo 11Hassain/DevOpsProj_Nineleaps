@@ -10,6 +10,8 @@ import com.example.devopsproj.repository.GitRepositoryRepository;
 import com.example.devopsproj.service.implementations.GitRepositoryServiceImpl;
 import com.example.devopsproj.service.implementations.ProjectServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -45,106 +47,287 @@ class GitRepositoryServiceImplTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    // ----- SUCCESS -----
+    @Nested
+    class CreateRepositoryTest {
+        @Test
+        @DisplayName("Testing success case for creating repo")
+        void testCreateRepository_Successful() {
+            GitRepository gitRepository = new GitRepository();
+            gitRepository.setName("my-repo");
 
-    @Test
-    void testGetAllRepositories_Success() {
-        GitRepository repo1 = new GitRepository();
-        repo1.setRepoId(1L);
-        repo1.setName("Repo1");
-        repo1.setDescription("Repo1 Description");
+            ResponseEntity<GitRepository> successfulResponse = new ResponseEntity<>(gitRepository, HttpStatus.CREATED);
+            when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(GitRepository.class)))
+                    .thenReturn(successfulResponse);
 
-        GitRepository repo2 = new GitRepository();
-        repo2.setRepoId(2L);
-        repo2.setName("Repo2");
-        repo2.setDescription("Repo2 Description");
+            GitRepository result = gitRepositoryService.createRepository(gitRepository);
 
-        List<GitRepository> mockRepositoryList = Arrays.asList(repo1, repo2);
+            assertNotNull(result);
+            assertEquals(gitRepository.getName(), result.getName());
+        }
 
-        when(gitRepositoryRepository.findAll()).thenReturn(mockRepositoryList);
+        @Test
+        @DisplayName("Testing failure case for creating repo")
+        void testCreateRepository_Unsuccessful() {
+            GitRepository gitRepository = new GitRepository();
+            gitRepository.setName("my-repo");
 
-        List<GitRepositoryDTO> result = gitRepositoryService.getAllRepositories();
+            // Mock an HTTP error (Bad Request in this case)
+            HttpClientErrorException httpClientErrorException = new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Bad Request");
+            when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(GitRepository.class)))
+                    .thenThrow(httpClientErrorException);
 
-        assertEquals(2, result.size());
-        assertEquals("Repo1", result.get(0).getName());
-        assertEquals("Repo1 Description", result.get(0).getDescription());
-        assertEquals("Repo2", result.get(1).getName());
-        assertEquals("Repo2 Description", result.get(1).getDescription());
+            assertThrows(HttpClientErrorException.class, () -> gitRepositoryService.createRepository(gitRepository));
+        }
     }
 
-    @Test
-    void testGetAllRepositoriesByProject_Success() {
-        Long projectId = 1L;
-        Project project = new Project();
-        project.setProjectId(projectId);
-        project.setProjectName("P1");
-        project.setProjectDescription("P1 Description");
+    @Nested
+    class DeleteRepositoryTest {
+        @Test
+        @DisplayName("Testing success case for deleting repo")
+        void testDeleteRepository_Successful() {
+            Long repoId = 1L;
+            GitRepository repository = new GitRepository();
+            repository.setRepoId(repoId);
+            repository.setName("my-repo");
 
-        GitRepository repo1 = new GitRepository();
-        repo1.setRepoId(1L);
-        repo1.setName("Repo1");
-        repo1.setDescription("Repo1 Description");
+            when(gitRepositoryRepository.findByRepoId(repoId)).thenReturn(Optional.of(repository));
+            when(restTemplate.exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Void.class)))
+                    .thenReturn(new ResponseEntity<>(HttpStatus.NO_CONTENT));
 
-        GitRepository repo2 = new GitRepository();
-        repo2.setRepoId(2L);
-        repo2.setName("Repo2");
-        repo2.setDescription("Repo2 Description");
+            assertDoesNotThrow(() -> gitRepositoryService.deleteRepository(repoId));
 
-        List<GitRepository> mockRepositoryList = List.of(repo1, repo2);
+            verify(gitRepositoryRepository, times(1)).delete(repository);
+        }
 
-        when(projectService.getProjectById(projectId)).thenReturn(Optional.of(project));
-        when(gitRepositoryRepository.findRepositoriesByProject(project)).thenReturn(mockRepositoryList);
+        @Test
+        @DisplayName("Testing no content case")
+        void testDeleteRepository_Successful_NoContent() {
+            Long repoId = 1L;
+            GitRepository repository = new GitRepository();
+            repository.setRepoId(repoId);
+            repository.setName("my-repo");
 
-        List<GitRepositoryDTO> result = gitRepositoryService.getAllRepositoriesByProject(projectId);
+            when(gitRepositoryRepository.findByRepoId(repoId)).thenReturn(Optional.of(repository));
+            doNothing().when(gitRepositoryRepository).delete(repository);
 
-        assertEquals(2, result.size());
-        assertEquals("Repo1", result.get(0).getName());
-        assertEquals("Repo1 Description", result.get(0).getDescription());
-        assertEquals("Repo2", result.get(1).getName());
-        assertEquals("Repo2 Description", result.get(1).getDescription());
+            ResponseEntity<Void> noContentResponse = new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            doReturn(noContentResponse).when(restTemplate).exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Void.class));
+
+            gitRepositoryService.deleteRepository(repoId);
+
+            verify(gitRepositoryRepository).delete(repository);
+        }
+
+        @Test
+        @DisplayName("Testing failure case for deleting repo")
+        void testDeleteRepository_Unsuccessful() {
+            Long repoId = 1L;
+            GitRepository repository = new GitRepository();
+            repository.setRepoId(repoId);
+            repository.setName("my-repo");
+
+            when(gitRepositoryRepository.findByRepoId(repoId)).thenReturn(Optional.of(repository));
+
+            HttpClientErrorException httpClientErrorException = new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Bad Request");
+
+            doThrow(httpClientErrorException)
+                    .when(restTemplate).exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Void.class));
+
+            RepositoryDeletionException exception = assertThrows(RepositoryDeletionException.class, () -> gitRepositoryService.deleteRepository(repoId));
+
+            assertTrue(exception.getMessage().contains("Error deleting repository with repoId " + repoId));
+        }
+
+        @Test
+        @DisplayName("Testing not found case")
+        void testDeleteRepository_NotFound() {
+            Long repoId = 1L;
+
+            when(gitRepositoryRepository.findByRepoId(repoId)).thenReturn(Optional.empty());
+
+            NotFoundException exception = assertThrows(NotFoundException.class, () -> gitRepositoryService.deleteRepository(repoId));
+
+            assertTrue(exception.getMessage().contains("Repository with repoId " + repoId + " not found."));
+        }
     }
 
-    @Test
-    void testGetAllReposByRole_Success() {
-        EnumRole role = EnumRole.ADMIN;
-        GitRepository repo1 = new GitRepository();
-        repo1.setRepoId(1L);
-        repo1.setName("Repo1");
-        repo1.setDescription("Repo1 Description");
+    @Nested
+    class GetAllRepositoriesTest {
+        @Test
+        @DisplayName("Testing success case for repos list")
+        void testGetAllRepositories_Success() {
+            GitRepository repo1 = new GitRepository();
+            repo1.setRepoId(1L);
+            repo1.setName("Repo1");
+            repo1.setDescription("Repo1 Description");
 
-        GitRepository repo2 = new GitRepository();
-        repo2.setRepoId(2L);
-        repo2.setName("Repo2");
-        repo2.setDescription("Repo2 Description");
+            GitRepository repo2 = new GitRepository();
+            repo2.setRepoId(2L);
+            repo2.setName("Repo2");
+            repo2.setDescription("Repo2 Description");
 
-        List<GitRepository> mockRepositoryList = List.of(repo1, repo2);
+            List<GitRepository> mockRepositoryList = Arrays.asList(repo1, repo2);
 
-        when(gitRepositoryRepository.findAllByRole(role)).thenReturn(mockRepositoryList);
+            when(gitRepositoryRepository.findAll()).thenReturn(mockRepositoryList);
 
-        List<GitRepositoryDTO> result = gitRepositoryService.getAllReposByRole(role);
+            List<GitRepositoryDTO> result = gitRepositoryService.getAllRepositories();
 
-        assertEquals(2, result.size());
-        assertEquals(1L, result.get(0).getRepoId());
-        assertEquals("Repo1", result.get(0).getName());
-        assertEquals("Repo1 Description", result.get(0).getDescription());
-        assertEquals(2L, result.get(1).getRepoId());
-        assertEquals("Repo2", result.get(1).getName());
-        assertEquals("Repo2 Description", result.get(1).getDescription());
+            assertEquals(2, result.size());
+            assertEquals("Repo1", result.get(0).getName());
+            assertEquals("Repo1 Description", result.get(0).getDescription());
+            assertEquals("Repo2", result.get(1).getName());
+            assertEquals("Repo2 Description", result.get(1).getDescription());
+        }
+
+        @Test
+        @DisplayName("Testing failure case - empty list")
+        void testGetAllRepositories_EmptyList() {
+            when(gitRepositoryRepository.findAll()).thenReturn(List.of());
+
+            List<GitRepositoryDTO> result = gitRepositoryService.getAllRepositories();
+
+            assertEquals(0, result.size());
+        }
     }
 
-    @Test
-    void testGetRepositoryById_RepositoryExists() {
-        Long repositoryId = 1L;
-        GitRepository expectedRepository = new GitRepository();
-        expectedRepository.setRepoId(1L);
-        expectedRepository.setName("Repo1");
-        expectedRepository.setDescription("Repo1 Description");
+    @Nested
+    class GetAllRepositoriesByProjectTest {
+        @Test
+        @DisplayName("Testing success case for repos list")
+        void testGetAllRepositoriesByProject_Success() {
+            Long projectId = 1L;
+            Project project = new Project();
+            project.setProjectId(projectId);
+            project.setProjectName("P1");
+            project.setProjectDescription("P1 Description");
 
-        when(gitRepositoryRepository.findById(repositoryId)).thenReturn(Optional.of(expectedRepository));
+            GitRepository repo1 = new GitRepository();
+            repo1.setRepoId(1L);
+            repo1.setName("Repo1");
+            repo1.setDescription("Repo1 Description");
 
-        GitRepository result = gitRepositoryService.getRepositoryById(repositoryId);
+            GitRepository repo2 = new GitRepository();
+            repo2.setRepoId(2L);
+            repo2.setName("Repo2");
+            repo2.setDescription("Repo2 Description");
 
-        assertEquals(expectedRepository, result);
+            List<GitRepository> mockRepositoryList = List.of(repo1, repo2);
+
+            when(projectService.getProjectById(projectId)).thenReturn(Optional.of(project));
+            when(gitRepositoryRepository.findRepositoriesByProject(project)).thenReturn(mockRepositoryList);
+
+            List<GitRepositoryDTO> result = gitRepositoryService.getAllRepositoriesByProject(projectId);
+
+            assertEquals(2, result.size());
+            assertEquals("Repo1", result.get(0).getName());
+            assertEquals("Repo1 Description", result.get(0).getDescription());
+            assertEquals("Repo2", result.get(1).getName());
+            assertEquals("Repo2 Description", result.get(1).getDescription());
+        }
+
+        @Test
+        @DisplayName("Testing failure case - Project not found")
+        void testGetAllRepositoriesByProject_NoProjectFound() {
+            Long projectId = 1L;
+
+            when(projectService.getProjectById(projectId)).thenReturn(Optional.empty());
+
+            List<GitRepositoryDTO> result = gitRepositoryService.getAllRepositoriesByProject(projectId);
+
+            assertEquals(0, result.size());
+        }
+
+        @Test
+        @DisplayName("Testing empty repo list case")
+        void testGetAllRepositoriesByProject_EmptyRepositoryList() {
+            Long projectId = 1L;
+            Project project = new Project();
+            project.setProjectId(projectId);
+            project.setProjectName("P1");
+            project.setProjectDescription("P1 Description");
+
+            when(projectService.getProjectById(projectId)).thenReturn(Optional.of(project));
+            when(gitRepositoryRepository.findRepositoriesByProject(project)).thenReturn(Collections.emptyList());
+
+            List<GitRepositoryDTO> result = gitRepositoryService.getAllRepositoriesByProject(projectId);
+
+            assertEquals(0, result.size());
+        }
+    }
+
+    @Nested
+    class GetAllReposByRoleTest {
+        @Test
+        @DisplayName("Testing success case for getting repos list")
+        void testGetAllReposByRole_Success() {
+            EnumRole role = EnumRole.ADMIN;
+            GitRepository repo1 = new GitRepository();
+            repo1.setRepoId(1L);
+            repo1.setName("Repo1");
+            repo1.setDescription("Repo1 Description");
+
+            GitRepository repo2 = new GitRepository();
+            repo2.setRepoId(2L);
+            repo2.setName("Repo2");
+            repo2.setDescription("Repo2 Description");
+
+            List<GitRepository> mockRepositoryList = List.of(repo1, repo2);
+
+            when(gitRepositoryRepository.findAllByRole(role)).thenReturn(mockRepositoryList);
+
+            List<GitRepositoryDTO> result = gitRepositoryService.getAllReposByRole(role);
+
+            assertEquals(2, result.size());
+            assertEquals(1L, result.get(0).getRepoId());
+            assertEquals("Repo1", result.get(0).getName());
+            assertEquals("Repo1 Description", result.get(0).getDescription());
+            assertEquals(2L, result.get(1).getRepoId());
+            assertEquals("Repo2", result.get(1).getName());
+            assertEquals("Repo2 Description", result.get(1).getDescription());
+        }
+
+        @Test
+        @DisplayName("Testing failure case - no repos found")
+        void testGetAllReposByRole_NoReposFound() {
+            EnumRole role = EnumRole.ADMIN;
+
+            when(gitRepositoryRepository.findAllByRole(role)).thenReturn(Collections.emptyList());
+
+            List<GitRepositoryDTO> result = gitRepositoryService.getAllReposByRole(role);
+
+            assertEquals(0, result.size());
+        }
+    }
+
+    @Nested
+    class GetRepositoryByIdTest {
+        @Test
+        @DisplayName("Testing success case - repo exists")
+        void testGetRepositoryById_RepositoryExists() {
+            Long repositoryId = 1L;
+            GitRepository expectedRepository = new GitRepository();
+            expectedRepository.setRepoId(1L);
+            expectedRepository.setName("Repo1");
+            expectedRepository.setDescription("Repo1 Description");
+
+            when(gitRepositoryRepository.findById(repositoryId)).thenReturn(Optional.of(expectedRepository));
+
+            GitRepository result = gitRepositoryService.getRepositoryById(repositoryId);
+
+            assertEquals(expectedRepository, result);
+        }
+
+        @Test
+        @DisplayName("Testing failure case - repo does not exist")
+        void testGetRepositoryById_RepositoryDoesNotExist() {
+            Long repositoryId = 2L;
+
+            when(gitRepositoryRepository.findById(repositoryId)).thenReturn(Optional.empty());
+
+            GitRepository result = gitRepositoryService.getRepositoryById(repositoryId);
+
+            assertNull(result);
+        }
     }
 
     @Test
@@ -161,162 +344,4 @@ class GitRepositoryServiceImplTest {
         assertEquals(gitRepository.getName(), gitRepositoryDTO.getName());
         assertEquals(gitRepository.getDescription(), gitRepositoryDTO.getDescription());
     }
-
-    @Test
-    void testCreateRepository_Successful() {
-        GitRepository gitRepository = new GitRepository();
-        gitRepository.setName("my-repo");
-
-        ResponseEntity<GitRepository> successfulResponse = new ResponseEntity<>(gitRepository, HttpStatus.CREATED);
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(GitRepository.class)))
-                .thenReturn(successfulResponse);
-
-        GitRepository result = gitRepositoryService.createRepository(gitRepository);
-
-        assertNotNull(result);
-        assertEquals(gitRepository.getName(), result.getName());
-    }
-
-    @Test
-    void testDeleteRepository_Successful() {
-        Long repoId = 1L;
-        GitRepository repository = new GitRepository();
-        repository.setRepoId(repoId);
-        repository.setName("my-repo");
-
-        when(gitRepositoryRepository.findByRepoId(repoId)).thenReturn(Optional.of(repository));
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Void.class)))
-                .thenReturn(new ResponseEntity<>(HttpStatus.NO_CONTENT));
-
-        assertDoesNotThrow(() -> gitRepositoryService.deleteRepository(repoId));
-
-        verify(gitRepositoryRepository, times(1)).delete(repository);
-    }
-
-    @Test
-    void testDeleteRepository_Successful_NoContent() {
-        Long repoId = 1L;
-        GitRepository repository = new GitRepository();
-        repository.setRepoId(repoId);
-        repository.setName("my-repo");
-
-        when(gitRepositoryRepository.findByRepoId(repoId)).thenReturn(Optional.of(repository));
-        doNothing().when(gitRepositoryRepository).delete(repository);
-
-        ResponseEntity<Void> noContentResponse = new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        doReturn(noContentResponse).when(restTemplate).exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Void.class));
-
-        gitRepositoryService.deleteRepository(repoId);
-
-        verify(gitRepositoryRepository).delete(repository);
-    }
-
-
-
-    // ----- FAILURE -----
-
-    @Test
-    void testGetAllRepositories_EmptyList() {
-        when(gitRepositoryRepository.findAll()).thenReturn(List.of());
-
-        List<GitRepositoryDTO> result = gitRepositoryService.getAllRepositories();
-
-        assertEquals(0, result.size());
-    }
-
-    @Test
-    void testGetAllRepositoriesByProject_NoProjectFound() {
-        Long projectId = 1L;
-
-        when(projectService.getProjectById(projectId)).thenReturn(Optional.empty());
-
-        List<GitRepositoryDTO> result = gitRepositoryService.getAllRepositoriesByProject(projectId);
-
-        assertEquals(0, result.size());
-    }
-
-    @Test
-    void testGetAllRepositoriesByProject_EmptyRepositoryList() {
-        Long projectId = 1L;
-        Project project = new Project();
-        project.setProjectId(projectId);
-        project.setProjectName("P1");
-        project.setProjectDescription("P1 Description");
-
-        when(projectService.getProjectById(projectId)).thenReturn(Optional.of(project));
-        when(gitRepositoryRepository.findRepositoriesByProject(project)).thenReturn(Collections.emptyList());
-
-        List<GitRepositoryDTO> result = gitRepositoryService.getAllRepositoriesByProject(projectId);
-
-        assertEquals(0, result.size());
-    }
-
-    @Test
-    void testGetAllReposByRole_NoReposFound() {
-        EnumRole role = EnumRole.ADMIN;
-
-        when(gitRepositoryRepository.findAllByRole(role)).thenReturn(Collections.emptyList());
-
-        List<GitRepositoryDTO> result = gitRepositoryService.getAllReposByRole(role);
-
-        assertEquals(0, result.size());
-    }
-
-    @Test
-    void testGetRepositoryById_RepositoryDoesNotExist() {
-        Long repositoryId = 2L;
-
-        when(gitRepositoryRepository.findById(repositoryId)).thenReturn(Optional.empty());
-
-        GitRepository result = gitRepositoryService.getRepositoryById(repositoryId);
-
-        assertNull(result);
-    }
-
-    @Test
-    void testCreateRepository_Unsuccessful() {
-        GitRepository gitRepository = new GitRepository();
-        gitRepository.setName("my-repo");
-
-        // Mock an HTTP error (Bad Request in this case)
-        HttpClientErrorException httpClientErrorException = new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Bad Request");
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(GitRepository.class)))
-                .thenThrow(httpClientErrorException);
-
-        assertThrows(HttpClientErrorException.class, () -> gitRepositoryService.createRepository(gitRepository));
-    }
-
-
-    @Test
-    void testDeleteRepository_Unsuccessful() {
-        Long repoId = 1L;
-        GitRepository repository = new GitRepository();
-        repository.setRepoId(repoId);
-        repository.setName("my-repo");
-
-        when(gitRepositoryRepository.findByRepoId(repoId)).thenReturn(Optional.of(repository));
-
-        HttpClientErrorException httpClientErrorException = new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Bad Request");
-
-        doThrow(httpClientErrorException)
-                .when(restTemplate).exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Void.class));
-
-        RepositoryDeletionException exception = assertThrows(RepositoryDeletionException.class, () -> gitRepositoryService.deleteRepository(repoId));
-
-        assertTrue(exception.getMessage().contains("Error deleting repository with repoId " + repoId));
-    }
-
-
-    @Test
-    void testDeleteRepository_NotFound() {
-        Long repoId = 1L;
-
-        when(gitRepositoryRepository.findByRepoId(repoId)).thenReturn(Optional.empty());
-
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> gitRepositoryService.deleteRepository(repoId));
-
-        assertTrue(exception.getMessage().contains("Repository with repoId " + repoId + " not found."));
-    }
-
-
 }

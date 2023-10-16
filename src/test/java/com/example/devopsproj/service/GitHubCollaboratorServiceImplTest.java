@@ -3,6 +3,8 @@ package com.example.devopsproj.service;
 import com.example.devopsproj.dto.responsedto.CollaboratorDTO;
 import com.example.devopsproj.service.implementations.GitHubCollaboratorServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -27,8 +29,6 @@ class GitHubCollaboratorServiceImplTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    // ----- SUCCESS -----
-
     @Test
     void testCreateHttpHeaders() {
         String accessToken = "your-access-token";
@@ -41,69 +41,77 @@ class GitHubCollaboratorServiceImplTest {
         assertEquals("2022-11-28", headers.getFirst("X-GitHub-Api-Version"));
     }
 
+    @Nested
+    class AddCollaboratorTest {
+        @Test
+        @DisplayName("Testing failure case - Unauthorized")
+        void testAddCollaborator_Unauthorized() {
+            when(restTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(String.class)))
+                    .thenReturn(new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED));
 
-    // ----- FAILURE -----
+            CollaboratorDTO collaboratorDTO = new CollaboratorDTO("owner", "repo", "username", "accessToken");
 
-    @Test
-    void testAddCollaborator_Unauthorized() {
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(String.class)))
-                .thenReturn(new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED));
+            boolean result = gitHubCollaboratorService.addCollaborator(collaboratorDTO);
 
-        CollaboratorDTO collaboratorDTO = new CollaboratorDTO("owner", "repo", "username", "accessToken");
+            assertFalse(result);
+        }
 
-        boolean result = gitHubCollaboratorService.addCollaborator(collaboratorDTO);
+        @Test
+        @DisplayName("Testing failure case - Collaborator not found")
+        void testAddCollaborator_CollaboratorNotFound() {
+            when(restTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(String.class)))
+                    .thenReturn(new ResponseEntity<>("Not Found", HttpStatus.NOT_FOUND));
 
-        assertFalse(result);
+            CollaboratorDTO collaboratorDTO = new CollaboratorDTO("owner", "repo", "username", "accessToken");
+
+            boolean result = gitHubCollaboratorService.addCollaborator(collaboratorDTO);
+
+            assertFalse(result);
+        }
+
+        @Test
+        @DisplayName("Testing failure case - Http Error")
+        void testAddCollaborator_HttpError() {
+            HttpClientErrorException httpClientErrorException = new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Bad Request");
+            when(restTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(String.class)))
+                    .thenThrow(httpClientErrorException);
+
+            CollaboratorDTO collaboratorDTO = new CollaboratorDTO("owner", "repo", "username", "accessToken");
+
+            boolean result = gitHubCollaboratorService.addCollaborator(collaboratorDTO);
+
+            assertFalse(result);
+        }
     }
 
-    @Test
-    void testAddCollaborator_CollaboratorNotFound() {
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(String.class)))
-                .thenReturn(new ResponseEntity<>("Not Found", HttpStatus.NOT_FOUND));
+    @Nested
+    class DeleteCollaboratorTest {
+        @Test
+        @DisplayName("Testing failure case - Unauthorized")
+        void testDeleteCollaborator_Unsuccessful() {
+            HttpClientErrorException httpClientErrorException = new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Unauthorized");
+            when(restTemplate.exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(String.class)))
+                    .thenThrow(httpClientErrorException);
 
-        CollaboratorDTO collaboratorDTO = new CollaboratorDTO("owner", "repo", "username", "accessToken");
+            CollaboratorDTO collaboratorDTO = new CollaboratorDTO("owner", "repo", "username", "accessToken");
 
-        boolean result = gitHubCollaboratorService.addCollaborator(collaboratorDTO);
+            boolean result = gitHubCollaboratorService.deleteCollaborator(collaboratorDTO);
 
-        assertFalse(result);
-    }
+            assertFalse(result);
+        }
 
-    @Test
-    void testAddCollaborator_HttpError() {
-        HttpClientErrorException httpClientErrorException = new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Bad Request");
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(String.class)))
-                .thenThrow(httpClientErrorException);
+        @Test
+        @DisplayName("Testing failure case - Http Error")
+        void testDeleteCollaborator_HttpError() {
+            HttpClientErrorException httpClientErrorException = new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Bad Request");
+            when(restTemplate.exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(String.class)))
+                    .thenThrow(httpClientErrorException);
 
-        CollaboratorDTO collaboratorDTO = new CollaboratorDTO("owner", "repo", "username", "accessToken");
+            CollaboratorDTO collaboratorDTO = new CollaboratorDTO("owner", "repo", "username", "accessToken");
 
-        boolean result = gitHubCollaboratorService.addCollaborator(collaboratorDTO);
+            boolean result = gitHubCollaboratorService.deleteCollaborator(collaboratorDTO);
 
-        assertFalse(result);
-    }
-
-    @Test
-    void testDeleteCollaborator_Unsuccessful() {
-        HttpClientErrorException httpClientErrorException = new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Unauthorized");
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(String.class)))
-                .thenThrow(httpClientErrorException);
-
-        CollaboratorDTO collaboratorDTO = new CollaboratorDTO("owner", "repo", "username", "accessToken");
-
-        boolean result = gitHubCollaboratorService.deleteCollaborator(collaboratorDTO);
-
-        assertFalse(result);
-    }
-
-    @Test
-    void testDeleteCollaborator_HttpError() {
-        HttpClientErrorException httpClientErrorException = new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Bad Request");
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(String.class)))
-                .thenThrow(httpClientErrorException);
-
-        CollaboratorDTO collaboratorDTO = new CollaboratorDTO("owner", "repo", "username", "accessToken");
-
-        boolean result = gitHubCollaboratorService.deleteCollaborator(collaboratorDTO);
-
-        assertFalse(result);
+            assertFalse(result);
+        }
     }
 }

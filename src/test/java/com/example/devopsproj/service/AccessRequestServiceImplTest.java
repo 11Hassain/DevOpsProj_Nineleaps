@@ -10,6 +10,8 @@ import com.example.devopsproj.model.User;
 import com.example.devopsproj.repository.AccessRequestRepository;
 import com.example.devopsproj.service.implementations.AccessRequestServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -32,8 +34,6 @@ class AccessRequestServiceImplTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
-
-    // ----- SUCCESS ------
 
     @Test
     void testCreateRequest_Success() {
@@ -80,154 +80,226 @@ class AccessRequestServiceImplTest {
         assertEquals(accessRequest2.getPmName(), requestDTOList.get(1).getPmName());
     }
 
-    @Test
-    void testGetAllActiveRequests_Success() {
-        AccessRequest accessRequest1 = new AccessRequest();
-        accessRequest1.setAccessRequestId(1L);
-        accessRequest1.setPmName("John Doe");
+    @Nested
+    class GetAllActiveRequestsTest {
+        @Test
+        @DisplayName("Testing success case for active requests")
+        void testGetAllActiveRequests_Success() {
+            AccessRequest accessRequest1 = new AccessRequest();
+            accessRequest1.setAccessRequestId(1L);
+            accessRequest1.setPmName("John Doe");
 
-        AccessRequest accessRequest2 = new AccessRequest();
-        accessRequest2.setAccessRequestId(2L);
-        accessRequest2.setPmName("Jane Smith");
+            AccessRequest accessRequest2 = new AccessRequest();
+            accessRequest2.setAccessRequestId(2L);
+            accessRequest2.setPmName("Jane Smith");
 
-        List<AccessRequest> activeAccessRequestList = Arrays.asList(accessRequest1, accessRequest2);
+            List<AccessRequest> activeAccessRequestList = Arrays.asList(accessRequest1, accessRequest2);
 
-        when(accessRequestRepository.findAllActiveRequests()).thenReturn(activeAccessRequestList);
+            when(accessRequestRepository.findAllActiveRequests()).thenReturn(activeAccessRequestList);
 
-        List<AccessRequestDTO> requestDTOList = accessRequestService.getAllActiveRequests();
+            List<AccessRequestDTO> requestDTOList = accessRequestService.getAllActiveRequests();
 
-        assertNotNull(requestDTOList);
-        assertEquals(2, requestDTOList.size());
+            assertNotNull(requestDTOList);
+            assertEquals(2, requestDTOList.size());
 
-        assertEquals(accessRequest1.getAccessRequestId(), requestDTOList.get(0).getAccessRequestId());
-        assertEquals(accessRequest1.getPmName(), requestDTOList.get(0).getPmName());
+            assertEquals(accessRequest1.getAccessRequestId(), requestDTOList.get(0).getAccessRequestId());
+            assertEquals(accessRequest1.getPmName(), requestDTOList.get(0).getPmName());
 
-        assertEquals(accessRequest2.getAccessRequestId(), requestDTOList.get(1).getAccessRequestId());
-        assertEquals(accessRequest2.getPmName(), requestDTOList.get(1).getPmName());
+            assertEquals(accessRequest2.getAccessRequestId(), requestDTOList.get(1).getAccessRequestId());
+            assertEquals(accessRequest2.getPmName(), requestDTOList.get(1).getPmName());
+        }
+
+        @Test
+        @DisplayName("Testing for no active requests case")
+        void testGetAllActiveRequests_NoActiveRequests() {
+            List<AccessRequest> emptyAccessRequestList = Collections.emptyList();
+
+            when(accessRequestRepository.findAllActiveRequests()).thenReturn(emptyAccessRequestList);
+
+            List<AccessRequestDTO> requestDTOList = accessRequestService.getAllActiveRequests();
+
+            assertNotNull(requestDTOList);
+            assertTrue(requestDTOList.isEmpty());
+        }
     }
 
-    @Test
-    void testGetUpdatedRequests_Success() {
-        Long requestId = 1L;
-        AccessRequestDTO updatedRequestDTO = new AccessRequestDTO();
-        updatedRequestDTO.setAllowed(true);
+    @Nested
+    class GetUpdatedRequestsTest {
+        @Test
+        @DisplayName("Testing success case for update requests")
+        void testGetUpdatedRequests_Success() {
+            Long requestId = 1L;
+            AccessRequestDTO updatedRequestDTO = new AccessRequestDTO();
+            updatedRequestDTO.setAllowed(true);
 
-        AccessRequest existingAccessRequest = new AccessRequest();
-        existingAccessRequest.setAccessRequestId(requestId);
-        existingAccessRequest.setPmName("John Doe");
-        existingAccessRequest.setRequestDescription("Request description");
-        existingAccessRequest.setAllowed(false);
+            AccessRequest existingAccessRequest = new AccessRequest();
+            existingAccessRequest.setAccessRequestId(requestId);
+            existingAccessRequest.setPmName("John Doe");
+            existingAccessRequest.setRequestDescription("Request description");
+            existingAccessRequest.setAllowed(false);
 
-        Project project = new Project();
-        project.setProjectId(10L);
-        project.setProjectName("Sample Project");
+            Project project = new Project();
+            project.setProjectId(10L);
+            project.setProjectName("Sample Project");
 
-        User user = new User();
-        user.setId(20L);
-        user.setName("User 1");
-        user.setEmail("user@gmail.com");
+            User user = new User();
+            user.setId(20L);
+            user.setName("User 1");
+            user.setEmail("user@gmail.com");
 
-        existingAccessRequest.setProject(project);
-        existingAccessRequest.setUser(user);
+            existingAccessRequest.setProject(project);
+            existingAccessRequest.setUser(user);
 
-        when(accessRequestRepository.findById(requestId)).thenReturn(Optional.of(existingAccessRequest));
+            when(accessRequestRepository.findById(requestId)).thenReturn(Optional.of(existingAccessRequest));
 
-        List<AccessRequest> accessRequests = new ArrayList<>();
-        accessRequests.add(existingAccessRequest);
+            List<AccessRequest> accessRequests = new ArrayList<>();
+            accessRequests.add(existingAccessRequest);
 
-        when(accessRequestRepository.findAllActiveRequests()).thenReturn(accessRequests);
+            when(accessRequestRepository.findAllActiveRequests()).thenReturn(accessRequests);
 
-        List<AccessResponseDTO> responseDTOList = accessRequestService.getUpdatedRequests(requestId, updatedRequestDTO);
+            List<AccessResponseDTO> responseDTOList = accessRequestService.getUpdatedRequests(requestId, updatedRequestDTO);
 
-        assertNotNull(responseDTOList);
-        assertEquals(1, responseDTOList.size());
+            assertNotNull(responseDTOList);
+            assertEquals(1, responseDTOList.size());
 
-        AccessResponseDTO responseDTO = responseDTOList.get(0);
-        assertEquals(existingAccessRequest.getAccessRequestId(), responseDTO.getAccessRequestId());
-        assertEquals(existingAccessRequest.getPmName(), responseDTO.getPmName());
-        assertEquals(existingAccessRequest.getRequestDescription(), responseDTO.getAccessDescription());
-        assertEquals(updatedRequestDTO.isAllowed(), responseDTO.isAllowed());
+            AccessResponseDTO responseDTO = responseDTOList.get(0);
+            assertEquals(existingAccessRequest.getAccessRequestId(), responseDTO.getAccessRequestId());
+            assertEquals(existingAccessRequest.getPmName(), responseDTO.getPmName());
+            assertEquals(existingAccessRequest.getRequestDescription(), responseDTO.getAccessDescription());
+            assertEquals(updatedRequestDTO.isAllowed(), responseDTO.isAllowed());
 
-        ProjectDTO projectDTO = responseDTO.getProject();
-        assertNotNull(projectDTO);
-        assertEquals(project.getProjectId(), projectDTO.getProjectId());
-        assertEquals(project.getProjectName(), projectDTO.getProjectName());
+            ProjectDTO projectDTO = responseDTO.getProject();
+            assertNotNull(projectDTO);
+            assertEquals(project.getProjectId(), projectDTO.getProjectId());
+            assertEquals(project.getProjectName(), projectDTO.getProjectName());
 
-        UserDTO userDTO = responseDTO.getUser();
-        assertNotNull(userDTO);
-        assertEquals(user.getId(), userDTO.getId());
-        assertEquals(user.getName(), userDTO.getName());
-        assertEquals(user.getEmail(), userDTO.getEmail());
+            UserDTO userDTO = responseDTO.getUser();
+            assertNotNull(userDTO);
+            assertEquals(user.getId(), userDTO.getId());
+            assertEquals(user.getName(), userDTO.getName());
+            assertEquals(user.getEmail(), userDTO.getEmail());
+        }
+
+        @Test
+        @DisplayName("Testing requests not present case")
+        void testGetUpdatedRequests_OptionalNotPresent() {
+            Long id = 1L;
+            AccessRequestDTO accessRequestDTO = new AccessRequestDTO();
+            accessRequestDTO.setAllowed(true);
+
+            when(accessRequestRepository.findById(id)).thenReturn(Optional.empty());
+
+            List<AccessResponseDTO> responseDTOList = accessRequestService.getUpdatedRequests(id, accessRequestDTO);
+
+            verify(accessRequestRepository, never()).save(any());
+
+            assertNotNull(responseDTOList);
+            assertTrue(responseDTOList.isEmpty());
+        }
     }
 
-    @Test
-    void testGetPMUnreadRequests_Success() {
-        String pmName = "John Doe";
+    @Nested
+    class GetPMUnreadRequestsTest {
+        @Test
+        @DisplayName("Testing success case for PM unread requests")
+        void testGetPMUnreadRequests_Success() {
+            String pmName = "John Doe";
 
-        User user1 = new User();
-        user1.setId(1L);
-        user1.setName("User 1");
+            User user1 = new User();
+            user1.setId(1L);
+            user1.setName("User 1");
 
-        User user2 = new User();
-        user2.setId(2L);
-        user2.setName("User 2");
+            User user2 = new User();
+            user2.setId(2L);
+            user2.setName("User 2");
 
-        AccessRequest accessRequest1 = new AccessRequest();
-        accessRequest1.setAccessRequestId(1L);
-        accessRequest1.setPmName(pmName);
-        accessRequest1.setUser(user1);
+            AccessRequest accessRequest1 = new AccessRequest();
+            accessRequest1.setAccessRequestId(1L);
+            accessRequest1.setPmName(pmName);
+            accessRequest1.setUser(user1);
 
-        AccessRequest accessRequest2 = new AccessRequest();
-        accessRequest2.setAccessRequestId(2L);
-        accessRequest2.setPmName(pmName);
-        accessRequest2.setUser(user2);
+            AccessRequest accessRequest2 = new AccessRequest();
+            accessRequest2.setAccessRequestId(2L);
+            accessRequest2.setPmName(pmName);
+            accessRequest2.setUser(user2);
 
-        List<AccessRequest> unreadRequests = Arrays.asList(accessRequest1, accessRequest2);
+            List<AccessRequest> unreadRequests = Arrays.asList(accessRequest1, accessRequest2);
 
-        when(accessRequestRepository.findAllUnreadPMRequestsByName(pmName)).thenReturn(unreadRequests);
+            when(accessRequestRepository.findAllUnreadPMRequestsByName(pmName)).thenReturn(unreadRequests);
 
-        List<AccessResponseDTO> responseDTOList = accessRequestService.getPMUnreadRequests(pmName);
+            List<AccessResponseDTO> responseDTOList = accessRequestService.getPMUnreadRequests(pmName);
 
-        assertNotNull(responseDTOList);
-        assertEquals(2, responseDTOList.size());
+            assertNotNull(responseDTOList);
+            assertEquals(2, responseDTOList.size());
 
-        assertEquals(accessRequest1.getAccessRequestId(), responseDTOList.get(0).getAccessRequestId());
-        assertEquals(accessRequest2.getAccessRequestId(), responseDTOList.get(1).getAccessRequestId());
+            assertEquals(accessRequest1.getAccessRequestId(), responseDTOList.get(0).getAccessRequestId());
+            assertEquals(accessRequest2.getAccessRequestId(), responseDTOList.get(1).getAccessRequestId());
+        }
+
+        @Test
+        @DisplayName("Testing for no unread requests")
+        void testGetPMUnreadRequests_NoUnreadRequests() {
+            String pmName = "Jane Smith";
+
+            when(accessRequestRepository.findAllUnreadPMRequestsByName(pmName)).thenReturn(Collections.emptyList());
+
+            List<AccessResponseDTO> responseDTOList = accessRequestService.getPMUnreadRequests(pmName);
+
+            assertNotNull(responseDTOList);
+            assertTrue(responseDTOList.isEmpty());
+        }
     }
 
-    @Test
-    void testGetPMRequests_Success() {
-        String pmName = "John Doe";
+    @Nested
+    class GetPMRequestsTest {
+        @Test
+        @DisplayName("Testing success case for PM requests")
+        void testGetPMRequests_Success() {
+            String pmName = "John Doe";
 
-        User user1 = new User();
-        user1.setId(1L);
-        user1.setName("User 1");
+            User user1 = new User();
+            user1.setId(1L);
+            user1.setName("User 1");
 
-        User user2 = new User();
-        user2.setId(2L);
-        user2.setName("User 2");
+            User user2 = new User();
+            user2.setId(2L);
+            user2.setName("User 2");
 
-        AccessRequest accessRequest1 = new AccessRequest();
-        accessRequest1.setAccessRequestId(1L);
-        accessRequest1.setPmName(pmName);
-        accessRequest1.setUser(user1);
+            AccessRequest accessRequest1 = new AccessRequest();
+            accessRequest1.setAccessRequestId(1L);
+            accessRequest1.setPmName(pmName);
+            accessRequest1.setUser(user1);
 
-        AccessRequest accessRequest2 = new AccessRequest();
-        accessRequest2.setAccessRequestId(2L);
-        accessRequest2.setPmName(pmName);
-        accessRequest2.setUser(user2);
+            AccessRequest accessRequest2 = new AccessRequest();
+            accessRequest2.setAccessRequestId(2L);
+            accessRequest2.setPmName(pmName);
+            accessRequest2.setUser(user2);
 
-        List<AccessRequest> readRequests = Arrays.asList(accessRequest1, accessRequest2);
+            List<AccessRequest> readRequests = Arrays.asList(accessRequest1, accessRequest2);
 
-        when(accessRequestRepository.findAllPMRequestsByName(pmName)).thenReturn(readRequests);
+            when(accessRequestRepository.findAllPMRequestsByName(pmName)).thenReturn(readRequests);
 
-        List<AccessResponseDTO> responseDTOList = accessRequestService.getPMRequests(pmName);
+            List<AccessResponseDTO> responseDTOList = accessRequestService.getPMRequests(pmName);
 
-        assertNotNull(responseDTOList);
-        assertEquals(2, responseDTOList.size());
+            assertNotNull(responseDTOList);
+            assertEquals(2, responseDTOList.size());
 
-        assertEquals(accessRequest1.getAccessRequestId(), responseDTOList.get(0).getAccessRequestId());
-        assertEquals(accessRequest2.getAccessRequestId(), responseDTOList.get(1).getAccessRequestId());
+            assertEquals(accessRequest1.getAccessRequestId(), responseDTOList.get(0).getAccessRequestId());
+            assertEquals(accessRequest2.getAccessRequestId(), responseDTOList.get(1).getAccessRequestId());
+        }
+
+        @Test
+        @DisplayName("Testing no PM requests case")
+        void testGetPMRequests_NoRequests() {
+            String pmName = "Jane Smith";
+
+            when(accessRequestRepository.findAllPMRequestsByName(pmName)).thenReturn(Collections.emptyList());
+
+            List<AccessResponseDTO> responseDTOList = accessRequestService.getPMRequests(pmName);
+
+            assertNotNull(responseDTOList);
+            assertTrue(responseDTOList.isEmpty());
+        }
     }
 
     @Test
@@ -272,98 +344,52 @@ class AccessRequestServiceImplTest {
         assertFalse(responseDTO2.isNotified());
     }
 
-    @Test
-    void testSetPMRequestsNotificationTrue_Success() {
-        Long accessRequestId = 1L;
+    @Nested
+    class SetPMRequestsNotificationTrueTest {
+        @Test
+        @DisplayName("Testing success case for PM notifications")
+        void testSetPMRequestsNotificationTrue_Success() {
+            Long accessRequestId = 1L;
 
-        AccessRequest accessRequest = new AccessRequest();
-        accessRequest.setAccessRequestId(accessRequestId);
-        accessRequest.setPmNotified(false);
+            AccessRequest accessRequest = new AccessRequest();
+            accessRequest.setAccessRequestId(accessRequestId);
+            accessRequest.setPmNotified(false);
 
-        when(accessRequestRepository.findById(accessRequestId)).thenReturn(Optional.of(accessRequest));
+            when(accessRequestRepository.findById(accessRequestId)).thenReturn(Optional.of(accessRequest));
 
-        accessRequestService.setPMRequestsNotificationTrue(accessRequestId);
+            accessRequestService.setPMRequestsNotificationTrue(accessRequestId);
 
-        assertTrue(accessRequest.isPmNotified());
+            assertTrue(accessRequest.isPmNotified());
+        }
+
+        @Test
+        @DisplayName("Testing no notifications present case")
+        void testSetPMRequestsNotificationTrue_OptionalNotPresent() {
+            Long accessRequestId = 1L;
+
+            when(accessRequestRepository.findById(accessRequestId)).thenReturn(Optional.empty());
+
+            accessRequestService.setPMRequestsNotificationTrue(accessRequestId);
+
+            verify(accessRequestRepository, never()).save(any());
+        }
     }
 
-    @Test
-    void testClearAllNotifications_Success() {
-        accessRequestService.clearAllNotifications();
+    @Nested
+    class ClearAllNotificationsTest {
+        @Test
+        @DisplayName("Testing success case for clearing all notifications")
+        void testClearAllNotifications_Success() {
+            accessRequestService.clearAllNotifications();
 
-        verify(accessRequestRepository, times(1)).deleteAll();
+            verify(accessRequestRepository, times(1)).deleteAll();
+        }
+
+        @Test
+        @DisplayName("Testing failure case for clearing notifications")
+        void testClearAllNotifications_Exception() {
+            doThrow(new RuntimeException("Error deleting notifications")).when(accessRequestRepository).deleteAll();
+            assertThrows(RuntimeException.class, () -> accessRequestService.clearAllNotifications());
+        }
     }
-
-
-    // ----- FAILURE ------
-
-    @Test
-    void testGetAllActiveRequests_NoActiveRequests() {
-        List<AccessRequest> emptyAccessRequestList = Collections.emptyList();
-
-        when(accessRequestRepository.findAllActiveRequests()).thenReturn(emptyAccessRequestList);
-
-        List<AccessRequestDTO> requestDTOList = accessRequestService.getAllActiveRequests();
-
-        assertNotNull(requestDTOList);
-        assertTrue(requestDTOList.isEmpty());
-    }
-
-    @Test
-    void testGetUpdatedRequests_OptionalNotPresent() {
-        Long id = 1L;
-        AccessRequestDTO accessRequestDTO = new AccessRequestDTO();
-        accessRequestDTO.setAllowed(true);
-
-        when(accessRequestRepository.findById(id)).thenReturn(Optional.empty());
-
-        List<AccessResponseDTO> responseDTOList = accessRequestService.getUpdatedRequests(id, accessRequestDTO);
-
-        verify(accessRequestRepository, never()).save(any());
-
-        assertNotNull(responseDTOList);
-        assertTrue(responseDTOList.isEmpty());
-    }
-
-    @Test
-    void testGetPMUnreadRequests_NoUnreadRequests() {
-        String pmName = "Jane Smith";
-
-        when(accessRequestRepository.findAllUnreadPMRequestsByName(pmName)).thenReturn(Collections.emptyList());
-
-        List<AccessResponseDTO> responseDTOList = accessRequestService.getPMUnreadRequests(pmName);
-
-        assertNotNull(responseDTOList);
-        assertTrue(responseDTOList.isEmpty());
-    }
-
-    @Test
-    void testGetPMRequests_NoRequests() {
-        String pmName = "Jane Smith";
-
-        when(accessRequestRepository.findAllPMRequestsByName(pmName)).thenReturn(Collections.emptyList());
-
-        List<AccessResponseDTO> responseDTOList = accessRequestService.getPMRequests(pmName);
-
-        assertNotNull(responseDTOList);
-        assertTrue(responseDTOList.isEmpty());
-    }
-
-    @Test
-    void testSetPMRequestsNotificationTrue_OptionalNotPresent() {
-        Long accessRequestId = 1L;
-
-        when(accessRequestRepository.findById(accessRequestId)).thenReturn(Optional.empty());
-
-        accessRequestService.setPMRequestsNotificationTrue(accessRequestId);
-
-        verify(accessRequestRepository, never()).save(any());
-    }
-
-    @Test
-    void testClearAllNotifications_Exception() {
-        doThrow(new RuntimeException("Error deleting notifications")).when(accessRequestRepository).deleteAll();
-        assertThrows(RuntimeException.class, () -> accessRequestService.clearAllNotifications());
-    }
-
 }

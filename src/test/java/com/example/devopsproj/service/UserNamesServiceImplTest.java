@@ -7,6 +7,8 @@ import com.example.devopsproj.repository.UserNamesRepository;
 import com.example.devopsproj.service.implementations.UserNamesServiceImpl;
 import com.example.devopsproj.utils.GitHubUserValidator;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 
@@ -33,67 +35,71 @@ class UserNamesServiceImplTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    // ----- SUCCESS -----
+    @Nested
+    class SaveUsernameTest {
+        @Test
+        @DisplayName("Testing success case - valid user")
+        void testSaveUsernameWithValidUser() {
+            UserNamesDTO userNamesDTO = new UserNamesDTO();
+            userNamesDTO.setUsername("UserName1");
+            userNamesDTO.setAccessToken("valid_github_access_token");
 
-    @Test
-    void testGetGitHubUserNamesByRole_WithValidRole() {
-        EnumRole role = EnumRole.ADMIN;
-        UserNames user1 = new UserNames();
-        user1.setUsername("Username1");
+            when(gitHubUserValidator.isGitHubUserValid(userNamesDTO.getUsername(), userNamesDTO.getAccessToken()))
+                    .thenReturn(true);
 
-        UserNames user2 = new UserNames();
-        user2.setUsername("Username2");
+            UserNamesDTO result = userNamesService.saveUsername(userNamesDTO);
 
-        when(userNamesRepository.findByUserRole(role)).thenReturn(Arrays.asList(user1, user2));
+            assertNotNull(result);
+        }
 
-        List<String> userNames = userNamesService.getGitHubUserNamesByRole(role);
+        @Test
+        @DisplayName("Testing failure case - invalid user")
+        void testSaveUsernameWithInvalidUser() {
+            UserNamesDTO userNamesDTO = new UserNamesDTO();
+            userNamesDTO.setUsername("InvalidUser");
+            userNamesDTO.setAccessToken("invalid_github_access_token");
 
-        assertNotNull(userNames);
-        assertEquals(2, userNames.size());
-        assertTrue(userNames.contains("Username1"));
-        assertTrue(userNames.contains("Username2"));
+            when(gitHubUserValidator.isGitHubUserValid(userNamesDTO.getUsername(), userNamesDTO.getAccessToken()))
+                    .thenReturn(false);
+
+            UserNamesDTO result = userNamesService.saveUsername(userNamesDTO);
+
+            assertNull(result);
+        }
     }
 
-    @Test
-    void testSaveUsernameWithValidUser() {
-        UserNamesDTO userNamesDTO = new UserNamesDTO();
-        userNamesDTO.setUsername("UserName1");
-        userNamesDTO.setAccessToken("valid_github_access_token");
+    @Nested
+    class GetGitHubUserNamesByRoleTest {
+        @Test
+        @DisplayName("Testing success case - valid role")
+        void testGetGitHubUserNamesByRole_WithValidRole() {
+            EnumRole role = EnumRole.ADMIN;
+            UserNames user1 = new UserNames();
+            user1.setUsername("Username1");
 
-        when(gitHubUserValidator.isGitHubUserValid(userNamesDTO.getUsername(), userNamesDTO.getAccessToken()))
-                .thenReturn(true);
+            UserNames user2 = new UserNames();
+            user2.setUsername("Username2");
 
-        UserNamesDTO result = userNamesService.saveUsername(userNamesDTO);
+            when(userNamesRepository.findByUserRole(role)).thenReturn(Arrays.asList(user1, user2));
 
-        assertNotNull(result);
+            List<String> userNames = userNamesService.getGitHubUserNamesByRole(role);
+
+            assertNotNull(userNames);
+            assertEquals(2, userNames.size());
+            assertTrue(userNames.contains("Username1"));
+            assertTrue(userNames.contains("Username2"));
+        }
+
+        @Test
+        @DisplayName("Testing failure case - no users")
+        void testGetGitHubUserNamesByRole_WithNoUsers() {
+            EnumRole role = EnumRole.USER;
+            when(userNamesRepository.findByUserRole(role)).thenReturn(Collections.emptyList());
+
+            List<String> userNames = userNamesService.getGitHubUserNamesByRole(role);
+
+            assertNotNull(userNames);
+            assertTrue(userNames.isEmpty());
+        }
     }
-
-    // ----- FAILURE -----
-
-
-    @Test
-    void testGetGitHubUserNamesByRole_WithNoUsers() {
-        EnumRole role = EnumRole.USER;
-        when(userNamesRepository.findByUserRole(role)).thenReturn(Collections.emptyList());
-
-        List<String> userNames = userNamesService.getGitHubUserNamesByRole(role);
-
-        assertNotNull(userNames);
-        assertTrue(userNames.isEmpty());
-    }
-
-    @Test
-    void testSaveUsernameWithInvalidUser() {
-        UserNamesDTO userNamesDTO = new UserNamesDTO();
-        userNamesDTO.setUsername("InvalidUser");
-        userNamesDTO.setAccessToken("invalid_github_access_token");
-
-        when(gitHubUserValidator.isGitHubUserValid(userNamesDTO.getUsername(), userNamesDTO.getAccessToken()))
-                .thenReturn(false);
-
-        UserNamesDTO result = userNamesService.saveUsername(userNamesDTO);
-
-        assertNull(result);
-    }
-
 }
