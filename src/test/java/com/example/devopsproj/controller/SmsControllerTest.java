@@ -1,12 +1,13 @@
 package com.example.devopsproj.controller;
 
-import com.example.devopsproj.controller.SmsController;
 import com.example.devopsproj.dto.otpdto.SmsPojo;
 import com.example.devopsproj.dto.otpdto.StoreOTP;
 import com.example.devopsproj.dto.otpdto.TempOTP;
 import com.example.devopsproj.service.interfaces.IUserService;
 import com.example.devopsproj.service.implementations.SmsService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,62 +37,63 @@ class SmsControllerTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    private static final String TOPIC_DESTINATION = "/lesson/sms";
+    @Nested
+    class SmsSubmitTest {
+        @Test
+        @DisplayName("Testing success case - OTP sent")
+        void testSmsSubmit_Success() {
+            SmsPojo sms = new SmsPojo();
+            doNothing().when(service).send(sms);
 
-    // ----- SUCCESS -----
+            ResponseEntity<String> response = smsController.smsSubmit(sms);
 
-    @Test
-    void testSmsSubmit_Success() {
-        SmsPojo sms = new SmsPojo();
-        doNothing().when(service).send(sms);
+            assertNotNull(response);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals("OTP sent", response.getBody());
+        }
 
-        ResponseEntity<String> response = smsController.smsSubmit(sms);
+        @Test
+        @DisplayName("Testing failure case (internal server error)")
+        void testSmsSubmit_Exception() {
+            SmsPojo sms = new SmsPojo();
+            doThrow(new RuntimeException("Something went wrong")).when(service).send(sms);
 
-        assertNotNull(response);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("OTP sent", response.getBody());
+            ResponseEntity<String> response = smsController.smsSubmit(sms);
+
+            assertNotNull(response);
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+            assertEquals("Something went wrong", response.getBody());
+        }
     }
 
-    @Test
-    void testVerifyOTPSignUp_CorrectOTP() {
-        int otp = 123456;
-        StoreOTP.setOtp(otp);
+    @Nested
+    class VerifyOTPSignUpTest {
+        @Test
+        @DisplayName("Testing success case - OTP verified")
+        void testVerifyOTPSignUp_CorrectOTP() {
+            int otp = 123456;
+            StoreOTP.setOtp(otp);
 
-        TempOTP tempOTP = new TempOTP();
-        tempOTP.setOtp(otp);
+            TempOTP tempOTP = new TempOTP();
+            tempOTP.setOtp(otp);
 
-        Boolean result = smsController.verifyOTPSignUp(tempOTP, new MockHttpServletResponse());
+            Boolean result = smsController.verifyOTPSignUp(tempOTP, new MockHttpServletResponse());
 
-        assertTrue(result);
+            assertTrue(result);
+        }
+
+        @Test
+        @DisplayName("Testing failure case - incorrect OTP")
+        void testVerifyOTPSignUp_IncorrectOTP() {
+            int storedOtp = 123456;
+            StoreOTP.setOtp(storedOtp);
+
+            TempOTP tempOTP = new TempOTP();
+            tempOTP.setOtp(789012);
+
+            Boolean result = smsController.verifyOTPSignUp(tempOTP, new MockHttpServletResponse());
+
+            assertFalse(result);
+        }
     }
-
-
-
-    // ----- FAILURE -----
-
-    @Test
-    void testSmsSubmit_Exception() {
-        SmsPojo sms = new SmsPojo();
-        doThrow(new RuntimeException("Something went wrong")).when(service).send(sms);
-
-        ResponseEntity<String> response = smsController.smsSubmit(sms);
-
-        assertNotNull(response);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("Something went wrong", response.getBody());
-    }
-
-    @Test
-    void testVerifyOTPSignUp_IncorrectOTP() {
-        int storedOtp = 123456;
-        StoreOTP.setOtp(storedOtp);
-
-        TempOTP tempOTP = new TempOTP();
-        tempOTP.setOtp(789012);
-
-        Boolean result = smsController.verifyOTPSignUp(tempOTP, new MockHttpServletResponse());
-
-        assertFalse(result);
-    }
-
 }
