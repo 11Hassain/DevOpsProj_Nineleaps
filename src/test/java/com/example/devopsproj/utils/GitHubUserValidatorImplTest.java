@@ -18,22 +18,6 @@ class GitHubUserValidatorImplTest {
         MockitoAnnotations.openMocks(this);
     }
 
-//    @Test
-//    void testIsGitHubUserValid_ValidUser() {
-//        // Arrange
-//        String username = "validUsername";
-//        String accessToken = "validAccessToken";
-//
-//        // Assume that GitHubUserValidation.isGitHubUserValid(username, accessToken) returns true
-//        boolean expectedResult = true;
-//
-//        // Act
-//        boolean result = gitHubUserValidator.isGitHubUserValid(username, accessToken);
-//
-//        // Assert
-//        assertEquals(expectedResult, result);
-//    }
-
     @Test
     void testIsGitHubUserValid_InvalidUser() {
         String username = "invalidUsername";
