@@ -5,6 +5,8 @@ import com.example.devopsproj.dto.responsedto.UserNamesDTO;
 import com.example.devopsproj.service.implementations.JwtServiceImpl;
 import com.example.devopsproj.service.implementations.UserNamesServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -36,102 +38,116 @@ class UserNamesControllerTest {
 
     private static final String INVALID_TOKEN = "Invalid Token";
 
-    // ----- SUCCESS (For VALID TOKEN) -----
+    @Nested
+    class SaveUsernameTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testSaveUsername_ValidToken_UserSavedSuccessfully() {
+            UserNamesDTO userNamesDTO = new UserNamesDTO();
+            String accessToken = "valid-access-token";
 
-    @Test
-    void testSaveUsername_ValidToken_UserSavedSuccessfully() {
-        UserNamesDTO userNamesDTO = new UserNamesDTO();
-        String accessToken = "valid-access-token";
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            when(userNamesService.saveUsername(userNamesDTO)).thenReturn(userNamesDTO);
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(userNamesService.saveUsername(userNamesDTO)).thenReturn(userNamesDTO);
+            ResponseEntity<Object> response = userNamesController.saveUsername(userNamesDTO, accessToken);
 
-        ResponseEntity<Object> response = userNamesController.saveUsername(userNamesDTO, accessToken);
+            assertNotNull(response);
+            assertEquals(HttpStatus.CREATED, response.getStatusCode());
+            assertEquals(userNamesDTO, response.getBody());
+        }
 
-        assertNotNull(response);
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals(userNamesDTO, response.getBody());
+        @Test
+        @DisplayName("Testing case where Git username already exists")
+        void testSaveUsername_ValidToken_UserAlreadyExists() {
+            UserNamesDTO userNamesDTO = new UserNamesDTO();
+            String accessToken = "valid-access-token";
+
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            when(userNamesService.saveUsername(userNamesDTO)).thenThrow(DataIntegrityViolationException.class);
+
+            ResponseEntity<Object> response = userNamesController.saveUsername(userNamesDTO, accessToken);
+
+            assertNotNull(response);
+            assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+            assertEquals("Username already exists", response.getBody());
+        }
+
+        @Test
+        @DisplayName("Testing user not found case")
+        void testSaveUsername_ValidToken_UserNotFound() {
+            UserNamesDTO userNamesDTO = new UserNamesDTO();
+            String accessToken = "valid-access-token";
+
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
+            when(userNamesService.saveUsername(userNamesDTO)).thenReturn(null);
+
+            ResponseEntity<Object> response = userNamesController.saveUsername(userNamesDTO, accessToken);
+
+            assertNotNull(response);
+            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+            assertEquals("Github user not found", response.getBody());
+        }
+
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testSaveUsername_InvalidToken() {
+            UserNamesDTO userNamesDTO = new UserNamesDTO();
+
+            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
+
+            ResponseEntity<Object> response = userNamesController.saveUsername(userNamesDTO, "invalid-access-token");
+
+            assertNotNull(response);
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals(INVALID_TOKEN, response.getBody());
+        }
     }
 
-    @Test
-    void testSaveUsername_ValidToken_UserAlreadyExists() {
-        UserNamesDTO userNamesDTO = new UserNamesDTO();
-        String accessToken = "valid-access-token";
+    @Nested
+    class GetUserNamesByRoleTest {
+        @Test
+        @DisplayName("Testing success case with valid token")
+        void testGetUserNamesByRole_ValidTokenAndRole() {
+            String role = "USER";
+            String accessToken = "valid-access-token";
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(userNamesService.saveUsername(userNamesDTO)).thenThrow(DataIntegrityViolationException.class);
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
 
-        ResponseEntity<Object> response = userNamesController.saveUsername(userNamesDTO, accessToken);
+            List<String> expectedUsernames = Arrays.asList("user1", "user2");
+            when(userNamesService.getGitHubUserNamesByRole(EnumRole.USER)).thenReturn(expectedUsernames);
 
-        assertNotNull(response);
-        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertEquals("Username already exists", response.getBody());
-    }
+            ResponseEntity<Object> response = userNamesController.getUserNamesByRole(role, accessToken);
 
-    @Test
-    void testSaveUsername_ValidToken_UserNotFound() {
-        UserNamesDTO userNamesDTO = new UserNamesDTO();
-        String accessToken = "valid-access-token";
+            assertNotNull(response);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-        when(userNamesService.saveUsername(userNamesDTO)).thenReturn(null);
+            List<String> responseUsernames = (List<String>) response.getBody();
+            assertNotNull(responseUsernames);
+            assertEquals(expectedUsernames.size(), responseUsernames.size());
+            assertTrue(expectedUsernames.containsAll(responseUsernames));
+        }
 
-        ResponseEntity<Object> response = userNamesController.saveUsername(userNamesDTO, accessToken);
+        @Test
+        @DisplayName("Testing failure case with invalid token")
+        void testGetUserNamesByRole_InvalidToken() {
+            String role = "USER";
+            String accessToken = "invalid-access-token";
 
-        assertNotNull(response);
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals("Github user not found", response.getBody());
-    }
+            when(jwtService.isTokenTrue(accessToken)).thenReturn(false);
 
-    @Test
-    void testGetUserNamesByRole_ValidTokenAndRole() {
-        String role = "USER";
-        String accessToken = "valid-access-token";
+            ResponseEntity<Object> response = userNamesController.getUserNamesByRole(role, accessToken);
 
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(true);
-
-        List<String> expectedUsernames = Arrays.asList("user1", "user2");
-        when(userNamesService.getGitHubUserNamesByRole(EnumRole.USER)).thenReturn(expectedUsernames);
-
-        ResponseEntity<Object> response = userNamesController.getUserNamesByRole(role, accessToken);
-
-        assertNotNull(response);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-
-        List<String> responseUsernames = (List<String>) response.getBody();
-        assertNotNull(responseUsernames);
-        assertEquals(expectedUsernames.size(), responseUsernames.size());
-        assertTrue(expectedUsernames.containsAll(responseUsernames));
+            assertNotNull(response);
+            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        }
     }
 
 
-    // ----- FAILURE (For INVALID TOKEN) -----
 
-    @Test
-    void testSaveUsername_InvalidToken() {
-        UserNamesDTO userNamesDTO = new UserNamesDTO();
 
-        when(jwtService.isTokenTrue(anyString())).thenReturn(false);
 
-        ResponseEntity<Object> response = userNamesController.saveUsername(userNamesDTO, "invalid-access-token");
 
-        assertNotNull(response);
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals(INVALID_TOKEN, response.getBody());
-    }
 
-    @Test
-    void testGetUserNamesByRole_InvalidToken() {
-        String role = "USER";
-        String accessToken = "invalid-access-token";
-
-        when(jwtService.isTokenTrue(accessToken)).thenReturn(false);
-
-        ResponseEntity<Object> response = userNamesController.getUserNamesByRole(role, accessToken);
-
-        assertNotNull(response);
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-    }
 
 
 }
