@@ -86,9 +86,9 @@ public class ProjectController {
     // Soft delete a project.
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteProject(@PathVariable("id") Long id) {
-        ResponseEntity<String> response = projectService.deleteProject(id);
-        return response;
+        return projectService.deleteProject(id);
     }
+
     // Add a user to a project.
     @PutMapping("/{projectId}/users/{userId}")
     public ResponseEntity<Object> addUserToProject(

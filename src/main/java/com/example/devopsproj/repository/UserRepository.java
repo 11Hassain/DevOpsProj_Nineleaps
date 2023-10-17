@@ -52,7 +52,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE u.email = :email")
     User existsByEmail(String email);
 
-    @Query("SELECT t.user FROM Token t WHERE t.token = :tokenValue")
+    @Query("SELECT t.user FROM Token t WHERE t.tokens = :tokenValue")
     User findUserByToken(@Param("tokenValue") String tokenValue);
 
     User findByPhoneNumber(String phoneNumber);

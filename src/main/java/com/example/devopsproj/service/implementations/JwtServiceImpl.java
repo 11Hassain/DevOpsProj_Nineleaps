@@ -61,29 +61,20 @@ public class JwtServiceImpl implements JwtService {
                 .compact();
     }
 
-    // Check if a token exists in the UserRepository, indicating its validity
+    // Checks if a token is valid and exists in the system.
     @Override
     public boolean isTokenTrue(String token) {
         User user = userRepository.findUserByToken(token);
-        if (user != null) {
-            // Token is valid
-            return true;
-        }
-        // Token is invalid
-        return false;
+        // True if the token is true
+        return user != null;
     }
 
-    // Check if a token is valid by verifying the username, expiration, and token expiry
     @Override
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         User user = userRepository.findUserByToken(token);
-        if (user != null && username.equals(userDetails.getUsername()) && !isTokenExpired(token)) {
-            // Token is valid
-            return true;
-        }
-        // Token is invalid
-        return false;
+        // True if token is valid
+        return user != null && username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
     // Check if a token is expired based on its expiration date

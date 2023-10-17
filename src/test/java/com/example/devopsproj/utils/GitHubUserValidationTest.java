@@ -1,10 +1,13 @@
 package com.example.devopsproj.utils;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -74,6 +77,25 @@ public class GitHubUserValidationTest {
     }
 
 
+
+    @Test
+    void testPrivateConstructor() throws Exception {
+        // Use reflection to access the private constructor
+        Constructor<GitHubUserValidation> constructor = GitHubUserValidation.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+
+        // Attempt to create an instance of GitHubUserValidation
+        try {
+            constructor.newInstance();
+        } catch (InvocationTargetException e) {
+            // Check if the actual exception is an UnsupportedOperationException
+            if (e.getCause() != null) {
+                Assertions.assertEquals(UnsupportedOperationException.class, e.getCause().getClass());
+            } else {
+                Assertions.fail("Expected an UnsupportedOperationException but got no cause exception.");
+            }
+        }
+    }
 
 
 

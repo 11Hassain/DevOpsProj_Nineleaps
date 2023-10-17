@@ -163,15 +163,10 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
                 requestEntity,
                 String.class);
 
-        // Check if the response status code indicates success (HTTP 200 - OK)
-        if (responseEntity.getStatusCode() == HttpStatus.OK) {
-            // Optionally, you can parse the response body for more information
-            String responseBody = responseEntity.getBody();
-        }
-
         // Return true if the token is valid, otherwise return false
         return responseEntity.getStatusCode() == HttpStatus.OK;
     }
+
     // Helper method to convert a GitRepository entity to a GitRepositoryDTO
     private GitRepositoryDTO convertToDto(GitRepository gitRepository) {
         GitRepositoryDTO gitRepositoryDTO = new GitRepositoryDTO();

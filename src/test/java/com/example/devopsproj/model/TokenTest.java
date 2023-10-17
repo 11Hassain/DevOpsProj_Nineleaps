@@ -13,7 +13,7 @@ public class TokenTest {
     void setUp() {
         token = Token.builder()
                 .id(1)
-                .token("example-token")
+                .tokens("example-token")
                 .tokenType(TokenType.BEARER)
                 .revoked(false)
                 .expired(false)
@@ -28,7 +28,7 @@ public class TokenTest {
 
         // Assert
         assertNull(newToken.getId());
-        assertNull(newToken.getToken());
+        assertNull(newToken.getTokens());
         assertEquals(TokenType.BEARER, newToken.getTokenType());
         assertFalse(newToken.isRevoked());
         assertFalse(newToken.isExpired());
@@ -39,7 +39,7 @@ public class TokenTest {
     void testTokenBuilder() {
         // Assert
         assertEquals(1, token.getId());
-        assertEquals("example-token", token.getToken());
+        assertEquals("example-token", token.getTokens());
         assertEquals(TokenType.BEARER, token.getTokenType());
         assertFalse(token.isRevoked());
         assertFalse(token.isExpired());
@@ -53,7 +53,7 @@ public class TokenTest {
         // Arrange
         Token differentToken = Token.builder()
                 .id(2)
-                .token("different-token")
+                .tokens("different-token")
                 .tokenType(TokenType.BEARER)
                 .revoked(false)
                 .expired(false)
@@ -77,14 +77,14 @@ public class TokenTest {
 
         // Set values using setters
         token.setId(1);
-        token.setToken("example_token");
+        token.setTokens("example_token");
         token.setTokenType(TokenType.BEARER);
         token.setRevoked(false);
         token.setExpired(false);
 
         // Retrieve values using getters
         assertEquals(1, token.getId());
-        assertEquals("example_token", token.getToken());
+        assertEquals("example_token", token.getTokens());
         assertEquals(TokenType.BEARER, token.getTokenType());
         assertEquals(false, token.isRevoked());
         assertEquals(false, token.isExpired());

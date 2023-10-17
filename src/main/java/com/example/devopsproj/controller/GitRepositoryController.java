@@ -3,7 +3,6 @@ import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.dto.responsedto.GitRepositoryDTO;
 import com.example.devopsproj.model.GitRepository;
 import com.example.devopsproj.service.interfaces.GitRepositoryService;
-import com.example.devopsproj.service.interfaces.JwtService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;

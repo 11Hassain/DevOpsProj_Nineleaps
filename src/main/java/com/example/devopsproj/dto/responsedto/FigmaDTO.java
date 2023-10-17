@@ -7,13 +7,13 @@ import lombok.*;
 import org.hibernate.validator.constraints.URL;
 
 @NoArgsConstructor
-//@AllArgsConstructor
 @Setter
 @Getter
 @ToString
 public class FigmaDTO {
     @NotNull(message = "projectDTO cannot be null")
     private ProjectDTO projectDTO;
+
 
     @Getter
     @NotBlank(message = "figmaURL cannot be blank")
@@ -30,12 +30,6 @@ public class FigmaDTO {
     public FigmaDTO(String figmaURL) {
         this.figmaURL = figmaURL;
     }
-
-
-    public String getFigmaURL() {
-        return figmaURL;
-    }
-
 
 
     public void setFigmaURL(String figmaURL) {

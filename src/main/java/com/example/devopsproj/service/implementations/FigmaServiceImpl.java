@@ -6,7 +6,7 @@ import com.example.devopsproj.dto.responsedto.ProjectDTO;
 import com.example.devopsproj.exceptions.FigmaCreationException;
 import com.example.devopsproj.exceptions.FigmaNotFoundException;
 import com.example.devopsproj.exceptions.FigmaServiceException;
-import com.example.devopsproj.exceptions.UnauthorizedException;
+
 import com.example.devopsproj.model.Figma;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.repository.FigmaRepository;
@@ -18,7 +18,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor

@@ -10,7 +10,6 @@ import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.repository.UserRepository;
 import com.example.devopsproj.service.interfaces.ProjectService;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.service.spi.ServiceException;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -188,7 +187,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (optionalProject.isPresent()) {
             Project existingProject = optionalProject.get();
 
-            if (existingProject.getDeleted()) {
+            if (Boolean.TRUE.equals(existingProject.getDeleted())) {
                 return ResponseEntity.ok("Project doesn't exist");
             }
 

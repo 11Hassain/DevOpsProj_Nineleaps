@@ -244,18 +244,19 @@ public class UserServiceImpl implements IUserService, UserService {
     public String deleteUserById(Long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
 
-        if (!userOptional.isPresent()) {
+        if (userOptional.isEmpty()) {
             return "Invalid user ID";
         }
 
         User user = userOptional.get();
-        if (user.getDeleted()) {
+        if (Boolean.TRUE.equals(user.getDeleted())) {
             return "User doesn't exist";
         }
 
         boolean isDeleted = softDeleteUser(userId);
         return isDeleted ? "User successfully deleted" : "404 Not found";
     }
+
 
 
 

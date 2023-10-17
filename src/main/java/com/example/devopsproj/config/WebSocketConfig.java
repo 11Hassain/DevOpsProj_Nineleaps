@@ -11,8 +11,7 @@ public class WebSocketConfig {
 
     @Bean
     public SimpMessagingTemplate simpMessagingTemplate(MessageChannel messageChannel) {
-        SimpMessagingTemplate template = new SimpMessagingTemplate(messageChannel);
-        return template;
+        return new SimpMessagingTemplate(messageChannel);
     }
 
     @Bean

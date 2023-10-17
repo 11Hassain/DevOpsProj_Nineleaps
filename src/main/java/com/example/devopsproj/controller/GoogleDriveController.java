@@ -1,16 +1,15 @@
 package com.example.devopsproj.controller;
 
 import com.example.devopsproj.dto.responsedto.GoogleDriveDTO;
-import com.example.devopsproj.dto.responsedto.ProjectDTO;
-import com.example.devopsproj.model.GoogleDrive;
+
 import com.example.devopsproj.service.interfaces.GoogleDriveService;
-import com.example.devopsproj.service.interfaces.JwtService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -41,7 +40,7 @@ public class GoogleDriveController {
         Optional<GoogleDriveDTO> optionalGoogleDriveDTO = googleDriveService.getGoogleDriveById(driveId);
 
         return optionalGoogleDriveDTO
-                .map(googleDriveDTO -> ResponseEntity.ok(googleDriveDTO))
+                .map(ResponseEntity::ok) // Replace the lambda with method reference
                 .orElse(ResponseEntity.notFound().build());
     }
 
