@@ -240,53 +240,46 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ResponseEntity<String> removeUserFromProject(Long projectId, Long userId) {
-        try {
-            Optional<Project> optionalProject = projectRepository.findById(projectId);
-            Optional<User> optionalUser = userRepository.findById(userId);
+        Optional<Project> optionalProject = projectRepository.findById(projectId);
+        Optional<User> optionalUser = userRepository.findById(userId);
 
-            if (optionalProject.isPresent() && optionalUser.isPresent()) {
-                Project project = optionalProject.get();
-                User user = optionalUser.get();
-                project.getUsers().remove(user);
-                projectRepository.save(project);
+        if (optionalProject.isPresent() && optionalUser.isPresent()) {
+            Project project = optionalProject.get();
+            User user = optionalUser.get();
 
-                // Create userDTOList and projectUserDTO as needed
-
-                return ResponseEntity.ok("User removed");
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project or User not found");
+            if (!project.getUsers().contains(user)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User is not part of the project");
             }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(UNABLE_TO_REMOVE_USER_MESSAGE);
+
+            project.getUsers().remove(user);
+            projectRepository.save(project);
+
+            return ResponseEntity.ok("User removed");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project or User not found");
         }
     }
 
 
 
     @Override
-    public ResponseEntity<String> removeUserFromProjectAndRepo(Long projectId, Long userId, CollaboratorDTO collaboratorDTO) {
-        try {
-            Optional<Project> optionalProject = projectRepository.findById(projectId);
-            Optional<User> optionalUser = userRepository.findById(userId);
+    public ResponseEntity<String> removeUserFromProjectAndRepo(Long projectId, Long userId, CollaboratorDTO collaboratorDTO){
+        Optional<Project> optionalProject = projectRepository.findById(projectId);
+        Optional<User> optionalUser = userRepository.findById(userId);
 
-            if (optionalProject.isPresent() && optionalUser.isPresent()) {
-                Project project = optionalProject.get();
-                User user = optionalUser.get();
-                project.getUsers().remove(user);
-                projectRepository.save(project);
+        if (optionalProject.isPresent() && optionalUser.isPresent()) {
+            Project project = optionalProject.get();
+            User user = optionalUser.get();
+            project.getUsers().remove(user);
+            projectRepository.save(project);
 
-                // Create userDTOList and projectUserDTO as needed
-
-                boolean deleted = collaboratorService.deleteCollaborator(collaboratorDTO);
-                if (!deleted) {
-                    return ResponseEntity.ok(UNABLE_TO_REMOVE_USER_MESSAGE);
-                }
-                return ResponseEntity.ok("User removed");
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project or User not found");
+            boolean deleted = collaboratorService.deleteCollaborator(collaboratorDTO);
+            if (!deleted) {
+                return ResponseEntity.badRequest().build();
             }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(UNABLE_TO_REMOVE_USER_MESSAGE);
+            return ResponseEntity.ok("User removed");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project or User not found");
         }
     }
 

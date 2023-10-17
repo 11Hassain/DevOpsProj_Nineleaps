@@ -69,7 +69,6 @@ public class UserController {
     }
 
 
-
     @GetMapping("/role/{role}")
     public ResponseEntity<Object> getUserByRoleId(@PathVariable("role") String role) {
         EnumRole userRole = EnumRole.valueOf(role.toUpperCase());

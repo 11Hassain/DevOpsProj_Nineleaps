@@ -1,6 +1,7 @@
 package com.example.devopsproj.service.interfaces;
 
 import com.example.devopsproj.dto.responsedto.HelpDocumentsDTO;
+import com.example.devopsproj.model.HelpDocuments;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,5 +21,6 @@ public interface HelpDocumentsService {
     Optional<HelpDocumentsDTO> getDocumentById(Long fileId);
     ResponseEntity<String> deleteDocument(Long fileId);
 
+    void saveFile(HelpDocuments helpDocuments, MultipartFile file, String fileExtension) throws IOException;
 }
 

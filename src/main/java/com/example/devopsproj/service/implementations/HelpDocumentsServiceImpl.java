@@ -138,18 +138,21 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
         }
     }
 
-
-
-
-    // Helper method to save file data to a HelpDocuments object
-    private void saveFile(HelpDocuments helpDocuments, MultipartFile file, String fileExtension) throws IOException {
+    @Override
+    public void saveFile(HelpDocuments helpDocuments, MultipartFile file, String fileExtension) throws IOException {
         if (file != null && !file.isEmpty()) {
-            helpDocuments.setFileName(file.getOriginalFilename());
-            helpDocuments.setData(file.getBytes());
+            String originalFilename = file.getOriginalFilename();
+            if (originalFilename != null) {
+                helpDocuments.setFileName(originalFilename);
+                helpDocuments.setData(file.getBytes());
+                helpDocuments.setFileExtension(fileExtension);
+            }
+        } else {
+            // Handle the case where the file is empty or null
+            helpDocuments.setFileName(null);
+            helpDocuments.setData(new byte[0]);
             helpDocuments.setFileExtension(fileExtension);
         }
     }
-
-
 
 }

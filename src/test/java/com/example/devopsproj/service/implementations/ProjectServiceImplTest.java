@@ -75,6 +75,7 @@ public class ProjectServiceImplTest {
         assertEquals(projectDTO.getProjectName(), createdProject.getProjectName());
         assertEquals(projectDTO.getProjectDescription(), createdProject.getProjectDescription());
     }
+
     @Test
     public void testCreateProject_SaveError() {
         // Arrange
@@ -141,8 +142,6 @@ public class ProjectServiceImplTest {
     }
 
 
-
-
     @Test
     public void testGetAllProjectsWithUsers_NoProjectsFound() {
         // Arrange
@@ -156,6 +155,7 @@ public class ProjectServiceImplTest {
         assertNotNull(projectsWithUsers);
         assertTrue(projectsWithUsers.isEmpty()); // No projects, so the result should be an empty list
     }
+
     @Test
     public void testGetAllProjects_Success() {
         // Arrange
@@ -191,6 +191,7 @@ public class ProjectServiceImplTest {
         assertNotNull(projects);
         assertTrue(projects.isEmpty()); // No projects, so the result should be an empty list
     }
+
     @Test
     public void testUpdateProject_Success() {
         // Arrange
@@ -223,6 +224,7 @@ public class ProjectServiceImplTest {
         // Assert
         assertNull(updatedProject); // The method should return null for a null input
     }
+
     @Test
     public void testGetAllUsersByProjectId_Success() {
         // Arrange
@@ -261,6 +263,7 @@ public class ProjectServiceImplTest {
 
         assertEquals("No users found for project with ID: " + projectId, exception.getMessage());
     }
+
     @Test
     public void testGetAllUsersByProjectIdAndRole_Success() {
         // Arrange
@@ -302,7 +305,6 @@ public class ProjectServiceImplTest {
 
         assertEquals("No users found for project with ID: 1 and role: USER", exception.getMessage());
     }
-
 
 
     //    @Test
@@ -401,7 +403,6 @@ public class ProjectServiceImplTest {
     }
 
 
-
     @Test
     public void testAddUserToProject_UserAlreadyExists() {
         // Arrange
@@ -457,7 +458,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testAddUserToProject_InternalServerError() {
+    public void testAddUserToProject_InternalServerErrorr() {
         // Arrange
         Long projectId = 1L;
         Long userId = 2L;
@@ -473,82 +474,29 @@ public class ProjectServiceImplTest {
     }
 
 
-    @Test
-    public void testRemoveUserFromProject_UserSuccessfullyRemoved() {
-        // Arrange
-        Long projectId = 1L;
-        Long userId = 2L;
+//    @Test
+//    public void testRemoveUserFromProject_UserNotFound() {
+//        // Arrange
+//        Long projectId = 1L;
+//        Long userId = 2L;
+//
+//        Project project = new Project();
+//        project.setProjectId(projectId);
+//        project.setProjectName("Project1");
+//        project.setProjectDescription("Description1");
+//
+//        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+//        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+//
+//        // Act
+//        ResponseEntity<String> response = projectService.removeUserFromProject(projectId, userId);
+//
+//        // Assert
+//        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+//        assertEquals("Project or User not found", response.getBody());
+//        verify(projectRepository, never()).save(any());
+//    }
 
-        Project project = new Project();
-        project.setProjectId(projectId);
-
-        User user = new User();
-        user.setId(userId);
-
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(projectRepository.save(project)).thenReturn(project);
-
-        // Act
-        ResponseEntity<String> response = projectService.removeUserFromProject(projectId, userId);
-
-        // Assert
-        assertNotNull(response);
-        //   assertEquals(HttpStatus.OK, response.getStatusCode());
-        //   assertEquals("User removed", response.getBody());
-    }
-
-
-    @Test
-    public void testRemoveUserFromProject_UserNotFound() {
-        // Arrange
-        Long projectId = 1L;
-        Long userId = 2L;
-
-        Project project = new Project();
-        project.setProjectId(projectId);
-        project.setProjectName("Project1");
-        project.setProjectDescription("Description1");
-
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
-
-        // Act
-        ResponseEntity<String> response = projectService.removeUserFromProject(projectId, userId);
-
-        // Assert
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals("Project or User not found", response.getBody());
-        verify(projectRepository, never()).save(any());
-    }
-
-    @Test
-    public void testRemoveUserFromProject_ExceptionDuringSave() {
-        // Arrange
-        Long projectId = 1L;
-        Long userId = 2L;
-
-        Project project = new Project();
-        project.setProjectId(projectId);
-        project.setProjectName("Project1");
-        project.setProjectDescription("Description1");
-
-        User user = new User();
-        user.setId(userId);
-        user.setName("User1");
-        user.setEmail("user1@example.com");
-
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(projectRepository.save(project)).thenThrow(new RuntimeException("Save failed"));
-
-        // Act
-        ResponseEntity<String> response = projectService.removeUserFromProject(projectId, userId);
-
-        // Assert
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("Unable to remove user", response.getBody());
-    }
 
     @Test
     public void testSoftDeleteProject_Success() {
@@ -653,6 +601,7 @@ public class ProjectServiceImplTest {
         assertEquals(expectedCount, count); // It should return the positive count
         verify(projectRepository, times(1)).countAllProjects();
     }
+
     @Test
     public void testGetCountAllProjectsByRole_NullCount() {
         // Arrange
@@ -861,6 +810,7 @@ public class ProjectServiceImplTest {
         assertEquals(3, result); // It should return the count of users with the specified role
         verify(projectRepository, times(1)).countAllUsersByProjectIdAndRole(projectId, enumRole);
     }
+
     @Test
     public void testGetCountAllActiveProjects_NoActiveProjects() {
         // Arrange
@@ -888,6 +838,7 @@ public class ProjectServiceImplTest {
         assertEquals(5, result); // It should return the count of active projects
         verify(projectRepository, times(1)).countAllActiveProjects();
     }
+
     @Test
     public void testGetCountAllInActiveProjects_NoInactiveProjects() {
         // Arrange
@@ -1119,77 +1070,6 @@ public class ProjectServiceImplTest {
 
 
     @Test
-    public void testGetProjectDetailsById() {
-        // Arrange
-        Long projectId = 1L;
-        String projectName = "Test Project";
-        String projectDescription = "Test Description";
-        boolean status = false;
-        String pmName = "Project Manager";
-        String figmaURL = "https://figma.com/project";
-        String driveLink = "https://drive.google.com/project";
-        LocalDateTime lastUpdated = LocalDateTime.now();
-
-        // Create a Figma and GoogleDrive object
-        Figma figma = new Figma();
-        figma.setFigmaURL(figmaURL);
-
-        GoogleDrive googleDrive = new GoogleDrive();
-        googleDrive.setDriveLink(driveLink);
-
-        // Create a project with the above details
-        Project project = new Project();
-        project.setProjectId(projectId);
-        project.setProjectName(projectName);
-        project.setProjectDescription(projectDescription);
-        project.setDeleted(status);
-        project.setLastUpdated(lastUpdated);
-
-        // Create a Project Manager user
-        User pmUser = new User();
-        pmUser.setEnumRole(EnumRole.PROJECT_MANAGER);
-        pmUser.setName(pmName);
-
-        // Create a GitRepository
-        GitRepository gitRepository = new GitRepository();
-        gitRepository.setName("GitRepo1");
-        gitRepository.setDescription("Git Repository Description");
-
-        // Add the GitRepository to the project's list of repositories
-        List<GitRepository> repositories = new ArrayList<>();
-        repositories.add(gitRepository);
-        project.setRepositories(repositories);
-
-        // Set the project's Figma and GoogleDrive
-        project.setFigma(figma);
-        project.setGoogleDrive(googleDrive);
-
-        // Create a list of users for the project
-        List<User> users = new ArrayList<>();
-        users.add(pmUser);
-        project.setUsers(users);
-
-        // Mock the repository to return the project
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-
-        // Act
-        ProjectDTO result = projectService.getProjectDetailsById(projectId);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(projectName, result.getProjectName());
-        assertEquals(projectDescription, result.getProjectDescription());
-//        assertEquals(status, result.getStatus());
-        assertEquals(pmName, result.getPmName());
-        assertEquals(1, result.getRepositories().size());
-        assertEquals("GitRepo1", result.getRepositories().get(0).getName());
-        assertEquals("Git Repository Description", result.getRepositories().get(0).getDescription());
-        assertEquals(figmaURL, result.getFigma().getFigmaURL());
-        assertEquals(driveLink, result.getGoogleDrive().getDriveLink());
-        assertEquals(lastUpdated, result.getLastUpdated());
-    }
-
-    @Test
     public void testMapProjectToProjectDTO() {
         // Arrange
         Long projectId = 1L;
@@ -1229,7 +1109,6 @@ public class ProjectServiceImplTest {
         assertEquals(projectName, project.getProjectName());
         // Add additional assertions for other mapped properties if needed
     }
-
 
 
     @Test
@@ -1282,6 +1161,26 @@ public class ProjectServiceImplTest {
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
         assertEquals("Project or User not found", responseEntity.getBody());
     }
+
+    @Test
+    void testRemoveUserFromProjectAndRepo_badRequest() {
+        Long projectId = 1L;
+        Long userId = 1L;
+        CollaboratorDTO collaboratorDTO = new CollaboratorDTO();
+
+        Project project = new Project();
+        project.setUsers(new ArrayList<>());
+        User user = new User();
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(collaboratorService.deleteCollaborator(collaboratorDTO)).thenReturn(false);
+
+        ResponseEntity<String> responseEntity = projectService.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO);
+
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+    }
+
 
     @Test
     void testExistsProjectById_ProjectDoesNotExist() {
@@ -1383,6 +1282,7 @@ public class ProjectServiceImplTest {
         // Assert
         assertEquals(expectedResult, result);
     }
+
     @Test
     void testGetCountAllInActiveProjects() {
         // Arrange
@@ -1412,6 +1312,7 @@ public class ProjectServiceImplTest {
         // Assert
         assertEquals(expectedResult, result);
     }
+
     @Test
     void testAddRepositoryToProjectWithException() {
         // Arrange
@@ -1633,8 +1534,319 @@ public class ProjectServiceImplTest {
     }
 
 
+    @Test
+    void testGetProjectDetailsById() {
+        Long projectId = 1L;
+        EnumRole projectManagerRole = EnumRole.PROJECT_MANAGER;
+
+        User user = new User();
+        user.setId(1L);
+        user.setName("Project Manager");
+        user.setEmail("pm@gmail.com");
+        user.setEnumRole(projectManagerRole);
+
+        GitRepository gitRepository = new GitRepository();
+        gitRepository.setRepoId(1L);
+        gitRepository.setName("Repo A");
+        gitRepository.setDescription("Description A");
+
+        Figma figma = new Figma();
+        figma.setFigmaURL("https://example.com/figma");
+
+        GoogleDrive googleDrive = new GoogleDrive();
+        googleDrive.setDriveLink("https://drive.google.com/drive");
+
+        Project project = new Project();
+        project.setProjectId(1L);
+        project.setProjectName("Project A");
+        project.setProjectDescription("Description A");
+        project.setDeleted(false);
+        project.setUsers(List.of(user));
+        project.setRepositories(List.of(gitRepository));
+        project.setFigma(figma);
+        project.setGoogleDrive(googleDrive);
+        project.setLastUpdated(LocalDateTime.now());
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+
+        ProjectDTO result = projectService.getProjectDetailsById(projectId);
+
+        assertNotNull(result);
+        assertEquals("Project A", result.getProjectName());
+        assertEquals("Description A", result.getProjectDescription());
+        assertFalse(result.isStatus());
+        assertEquals("Project Manager", result.getPmName());
+        assertEquals(1, result.getRepositories().size());
+        assertEquals("Repo A", result.getRepositories().get(0).getName());
+        assertEquals("Description A", result.getRepositories().get(0).getDescription());
+        assertEquals("https://example.com/figma", result.getFigma().getFigmaURL());
+        assertEquals("https://drive.google.com/drive", result.getGoogleDrive().getDriveLink());
+        assertNotNull(result.getLastUpdated());
+    }
+
+
+    @Test
+    void testGetProjectDetailsById_NoProjectManager() {
+        Long projectId = 1L;
+
+        // Create a project with users where none of them have the PROJECT_MANAGER role
+        Project project = new Project();
+        project.setProjectName("TestProject");
+        project.setProjectDescription("Description");
+        project.setDeleted(false);
+        project.setLastUpdated(LocalDateTime.now());
+        project.setRepositories(new ArrayList<>());
+
+        List<User> users = new ArrayList<>();
+        User user1 = new User();
+        user1.setEnumRole(EnumRole.USER);
+        user1.setName("User1");
+        users.add(user1);
+
+        User user2 = new User();
+        user2.setEnumRole(EnumRole.USER);
+        user2.setName("User2");
+        users.add(user2);
+
+        project.setUsers(users);
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+
+        ProjectDTO result = projectService.getProjectDetailsById(projectId);
+
+        assertNull(result.getPmName());
+        assertTrue(result.getRepositories().isEmpty());
+    }
+
+
+    @Test
+    void testAddUserToProject_Success() {
+        Long projectId = 1L;
+        Long userId = 1L;
+
+        User user = new User();
+        user.setId(userId);
+        user.setName("User");
+        user.setEmail("user@example.com");
+        user.setEnumRole(EnumRole.USER);
+
+        Project project = new Project();
+        project.setProjectId(projectId);
+        project.setProjectName("Project A");
+        project.setProjectDescription("Description A");
+        project.setUsers(new ArrayList<>());
+        project.getUsers().add(user);
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(projectRepository.save(project)).thenReturn(project);
+
+        ResponseEntity<Object> responseEntity = projectService.addUserToProject(projectId, userId);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+        ProjectUserDTO projectUserDTO = (ProjectUserDTO) responseEntity.getBody();
+        assertNotNull(projectUserDTO);
+        assertEquals(project.getProjectId(), projectUserDTO.getProjectId());
+        assertEquals(project.getProjectName(), projectUserDTO.getProjectName());
+        assertEquals(project.getProjectDescription(), projectUserDTO.getProjectDescription());
+        assertEquals(2, projectUserDTO.getUsers().size());
+        assertEquals(user.getId(), projectUserDTO.getUsers().get(0).getId());
+        assertEquals(user.getName(), projectUserDTO.getUsers().get(0).getName());
+        assertEquals(user.getEmail(), projectUserDTO.getUsers().get(0).getEmail());
+        assertEquals(user.getEnumRole(), projectUserDTO.getUsers().get(0).getEnumRole());
+    }
+
+    @Test
+    void testAddUserToProject_ProjectNotFound() {
+        Long projectId = 1L;
+        Long userId = 1L;
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
+
+        User user = new User();
+        user.setId(1L);
+        user.setName("User");
+        user.setEmail("user@gmail.com");
+        user.setEnumRole(EnumRole.USER);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        ResponseEntity<Object> responseEntity = projectService.addUserToProject(projectId, userId);
+
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        assertNull(responseEntity.getBody());
+    }
+
+    @Test
+    void testAddUserToProject_UserNotFound() {
+        Long projectId = 1L;
+        Long userId = 1L;
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(new Project()));
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        ResponseEntity<Object> responseEntity = projectService.addUserToProject(projectId, userId);
+
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        assertNull(responseEntity.getBody());
+    }
+
+    @Test
+    void testAddUserToProject_InternalServerError() {
+        Long projectId = 1L;
+        Long userId = 1L;
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(new Project()));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(new User()));
+        when(projectRepository.save(any(Project.class))).thenThrow(new RuntimeException("Internal Server Error"));
+
+        ResponseEntity<Object> responseEntity = projectService.addUserToProject(projectId, userId);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+        assertNull(responseEntity.getBody());
+    }
+
+    @Test
+    void testAddUserToProjectByUserIdAndProjectId_UserExistsInProject() {
+        Long projectId = 1L;
+        Long userId = 2L;
+
+        Project project = new Project();
+        project.setProjectId(projectId);
+        project.setProjectName("Project1");
+
+        User user = new User();
+        user.setId(userId);
+
+        List<User> userList = new ArrayList<>();
+        userList.add(user);
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(projectRepository.existUserInProject(projectId, userId)).thenReturn(userList);
+
+        ResponseEntity<Object> response = projectService.addUserToProject(projectId, userId);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+    }
+
+
+    @Test
+    void testRemoveUserFromProject_Success() {
+        Long projectId = 1L;
+        Long userId = 1L;
+
+        List<User> userList = new ArrayList<>();
+        User user1 = new User();
+        User user2 = new User();
+        User user3 = new User();
+        userList.add(user1);
+        userList.add(user2);
+        userList.add(user3);
+
+        Project project = new Project();
+        project.setUsers(userList);
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user1));
+
+        when(projectRepository.save(project)).thenReturn(project);
+
+        ResponseEntity<String> responseEntity = projectService.removeUserFromProject(projectId, userId);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals("User removed", responseEntity.getBody());
+    }
+
+    @Test
+    void testRemoveUserFromProject_ProjectNotFound() {
+        Long projectId = 1L;
+        Long userId = 1L;
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
+        when(userRepository.findById(userId)).thenReturn(Optional.of(new User()));
+
+        ResponseEntity<String> responseEntity = projectService.removeUserFromProject(projectId, userId);
+
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        assertEquals("Project or User not found", responseEntity.getBody());
+    }
+
+    @Test
+    void testRemoveUserFromProject_UserNotFound() {
+        Long projectId = 1L;
+        Long userId = 1L;
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(new Project()));
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        ResponseEntity<String> responseEntity = projectService.removeUserFromProject(projectId, userId);
+
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        assertEquals("Project or User not found", responseEntity.getBody());
+    }
+
+    @Test
+    void testRemoveUserFromProject_UserNotPartOfProject() {
+        Long projectId = 1L;
+        Long userId = 1L;
+
+        Project project = new Project();
+        project.setUsers(new ArrayList<>());
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(new User()));
+
+        ResponseEntity<String> responseEntity = projectService.removeUserFromProject(projectId, userId);
+
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        assertEquals("User is not part of the project", responseEntity.getBody());
+    }
+
+    @Test
+    void testDeleteProject_ProjectExistsAndIsDeleted() {
+        Long projectId = 1L;
+        Project existingProject = new Project();
+        existingProject.setDeleted(true);
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(existingProject));
+
+        ResponseEntity<String> response = projectService.deleteProject(projectId);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Project doesn't exist", response.getBody());
+    }
+
+    @Test
+    void testDeleteProject_ProjectExistsAndIsNotDeleted() {
+        Long projectId = 2L;
+        Project existingProject = new Project();
+        existingProject.setDeleted(false);
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(existingProject));
+
+        ResponseEntity<String> response = projectService.deleteProject(projectId);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Deleted project successfully", response.getBody());
+    }
+
+    @Test
+    void testDeleteProject_ProjectDoesNotExist() {
+        Long projectId = 3L;
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> projectService.deleteProject(projectId));
+    }
+}
+
+
+
+
 
 
     
 
-}
+

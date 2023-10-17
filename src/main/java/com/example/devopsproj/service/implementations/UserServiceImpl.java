@@ -240,6 +240,7 @@ public class UserServiceImpl implements IUserService, UserService {
         return projectDTOs;
     }
 
+
     @Override
     public String deleteUserById(Long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
@@ -257,9 +258,7 @@ public class UserServiceImpl implements IUserService, UserService {
         return isDeleted ? "User successfully deleted" : "404 Not found";
     }
 
-
-
-
+  
     @Override
     public List<Project> getUsersByRoleAndUserId(Long userId, EnumRole userRole) {
         return userRepository.findByRoleAndUserId(userId, userRole);

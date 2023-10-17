@@ -2,28 +2,11 @@ package com.example.devopsproj.utils;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
-
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-
-import org.mockito.Mockito;
-import org.mockito.MockedStatic;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-
-
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class GitHubUserValidationTest {
 
@@ -32,7 +15,6 @@ public class GitHubUserValidationTest {
 
     private static final String INVALID_USERNAME = "invalidusername";
     private static final String INVALID_ACCESS_TOKEN = "invalidaccesstoken";
-
 
 
     @Test
@@ -96,6 +78,10 @@ public class GitHubUserValidationTest {
             }
         }
     }
+
+
+
+
 
 
 

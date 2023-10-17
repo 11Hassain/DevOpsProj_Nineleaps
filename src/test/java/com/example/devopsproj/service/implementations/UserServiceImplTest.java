@@ -7,9 +7,7 @@ import com.example.devopsproj.dto.responsedto.GitRepositoryDTO;
 import com.example.devopsproj.dto.responsedto.ProjectDTO;
 import com.example.devopsproj.dto.responsedto.UserDTO;
 import com.example.devopsproj.dto.responsedto.UserProjectsDTO;
-import com.example.devopsproj.model.GitRepository;
-import com.example.devopsproj.model.Project;
-import com.example.devopsproj.model.User;
+import com.example.devopsproj.model.*;
 import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.repository.UserRepository;
 import com.example.devopsproj.service.implementations.JwtServiceImpl;
@@ -1061,4 +1059,58 @@ class UserServiceImplTest {
 
 
 
+    @Test
+    void testDeleteUserById_UserExistsAndIsDeleted() {
+        Long userId = 1L;
+        User existingUser = new User();
+        existingUser.setDeleted(true);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+
+        String result = userService.deleteUserById(userId);
+
+        assertEquals("User doesn't exist", result);
+    }
+
+    @Test
+    void testDeleteUserById_UserDoesNotExist() {
+        Long userId = 3L;
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        String result = userService.deleteUserById(userId);
+
+        assertEquals("Invalid user ID", result);
+    }
+    @Test
+    void testGetUsersWithMultipleProjects_NoUsers() {
+        when(projectRepository.findAllProjects()).thenReturn(Collections.emptyList());
+
+        List<UserProjectsDTO> result = userService.getUsersWithMultipleProjects();
+
+        assertEquals(Collections.emptyList(), result);
+    }
+
+    @Test
+    void testGetUsersWithMultipleProjects_NoMultipleProjects() {
+        Project project1 = new Project();
+        project1.setProjectName("Project1");
+
+        Project project2 = new Project();
+        project2.setProjectName("Project2");
+
+        List<Project> projects = Arrays.asList(project1, project2);
+
+        when(projectRepository.findAllProjects()).thenReturn(projects);
+
+        List<UserProjectsDTO> result = userService.getUsersWithMultipleProjects();
+
+        assertEquals(Collections.emptyList(), result);
+
+
+
+    }
 }
+
+
+

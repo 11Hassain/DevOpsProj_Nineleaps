@@ -406,7 +406,73 @@ public class HelpDocumentsServiceTest {
     }
 
 
+    @Test
+    void testSaveFile_Success() throws IOException {
+        HelpDocuments helpDocuments = new HelpDocuments();
+        MultipartFile file = createMockMultipartFile();
+        String fileExtension = "pdf";
 
+        helpDocumentsService.saveFile(helpDocuments, file, fileExtension);
+
+        assertEquals("test.pdf", helpDocuments.getFileName());
+        assertArrayEquals("Mock PDF Content".getBytes(), helpDocuments.getData());
+        assertEquals("pdf", helpDocuments.getFileExtension());
+    }
+
+    @Test
+    void testSaveFile_NullFile() throws IOException {
+        HelpDocuments helpDocuments = new HelpDocuments();
+        MultipartFile file = null;
+        String fileExtension = "pdf";
+
+        helpDocumentsService.saveFile(helpDocuments, file, fileExtension);
+
+        assertNull(helpDocuments.getFileName());
+        assertArrayEquals(new byte[0], helpDocuments.getData());
+        assertEquals("pdf", helpDocuments.getFileExtension());
+    }
+
+    @Test
+    void testSaveFile_EmptyFile() throws IOException {
+        HelpDocuments helpDocuments = new HelpDocuments();
+        MultipartFile file = createEmptyMultipartFile(); // Create an empty MultipartFile
+        String fileExtension = "pdf";
+
+        helpDocumentsService.saveFile(helpDocuments, file, fileExtension);
+
+        assertNull(helpDocuments.getFileName());
+        assertArrayEquals(new byte[0], helpDocuments.getData());
+        assertEquals("pdf", helpDocuments.getFileExtension());
+    }
+
+    @Test
+    void testSaveFile_NullOriginalFilename() throws IOException {
+        HelpDocuments helpDocuments = new HelpDocuments();
+        MultipartFile file = createMockMultipartFileWithNullOriginalFilename(); // Create a MultipartFile with null original filename
+        String fileExtension = "pdf";
+
+        helpDocumentsService.saveFile(helpDocuments, file, fileExtension);
+
+        assertEquals("", helpDocuments.getFileName());
+        assertArrayEquals("Mock PDF Content".getBytes(), helpDocuments.getData());
+        assertEquals("pdf", helpDocuments.getFileExtension());
+    }
+
+    private MultipartFile createMockMultipartFile() {
+        return new MockMultipartFile("file", "test.pdf", "application/pdf", "Mock PDF Content".getBytes());
+    }
+
+    private MultipartFile createEmptyMultipartFile() {
+        return new MockMultipartFile("file", "test.pdf", "application/pdf", new byte[0]);
+    }
+
+    private MultipartFile createMockMultipartFileWithNullOriginalFilename() {
+        // Create a MockMultipartFile with a null original filename
+        return new MockMultipartFile("file", null, "application/pdf", "Mock PDF Content".getBytes());
+    }
 }
+
+
+
 
 
