@@ -227,17 +227,22 @@ public class UserServiceImpl implements IUserService, UserService {
 
         List<ProjectDTO> projectDTOs = new ArrayList<>();
         for (Project project : projects) {
-            ProjectDTO projectDTO = modelMapper.map(project, ProjectDTO.class);
+            ProjectDTO projectDTO = new ProjectDTO();
+            projectDTO.setProjectId(project.getProjectId());
+            projectDTO.setProjectName(project.getProjectName());
+
+            // Add list of repos to the repositories list
             List<GitRepository> repositories = project.getRepositories();
             List<GitRepositoryDTO> repositoryDTOs = new ArrayList<>();
             for (GitRepository repository : repositories) {
-                GitRepositoryDTO repositoryDTO = modelMapper.map(repository, GitRepositoryDTO.class);
+                GitRepositoryDTO repositoryDTO = new GitRepositoryDTO();
+                repositoryDTO.setRepoId(repository.getRepoId());
+                repositoryDTO.setName(repository.getName());
                 repositoryDTOs.add(repositoryDTO);
             }
             projectDTO.setRepositories(repositoryDTOs);
             projectDTOs.add(projectDTO);
         }
-
         return projectDTOs;
     }
 

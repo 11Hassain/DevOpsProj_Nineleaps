@@ -620,16 +620,7 @@ class UserServiceImplTest {
         assertEquals("alice@example.com", result.get(1).getEmail());
         assertEquals(EnumRole.ADMIN, result.get(1).getEnumRole());
     }
-    @Test
-    void testGetAllProjectsAndRepositoriesByUserId_NonExistingUser() {
-        Long userId = 1L;
 
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
-
-        assertThrows(EntityNotFoundException.class, () -> {
-            userService.getAllProjectsAndRepositoriesByUserId(userId);
-        });
-    }
     @Test
     void testGetAllProjectsAndRepositoriesByUserId_ExistingUserWithProjects() {
         Long userId = 1L;
@@ -1172,5 +1163,113 @@ class UserServiceImplTest {
     }
 
 
+
+    @Test
+    void testGetProjectsByRoleAndUserIdWithFigmaAndDrive() {
+        User user = new User();
+        user.setId(1L);
+        EnumRole userRole = EnumRole.USER;
+        Project project = new Project();
+        Figma figma = new Figma();
+        figma.setFigmaURL("https://example.com/figma");
+        project.setFigma(figma);
+        project.setRepositories(new ArrayList<>());
+        GoogleDrive googleDrive = new GoogleDrive();
+        googleDrive.setDriveLink("https://example.com/drive");
+        project.setGoogleDrive(googleDrive);
+        List<Project> projects = Collections.singletonList(project);
+
+        when(userRepository.findByRoleAndUserId(1L, userRole)).thenReturn(projects);
+
+        List<ProjectDTO> response = userService.getProjectsByRoleIdAndUserId(1L, "user");
+
+        assertNotNull(response);
+    }
+
+    @Test
+    void testGetProjectsByRoleAndUserIdWithNullFigmaAndDrive() {
+        User user = new User();
+        user.setId(1L);
+        EnumRole userRole = EnumRole.USER;
+        Project project = new Project();
+        project.setRepositories(new ArrayList<>());
+        List<Project> projects = Collections.singletonList(project);
+
+        when(userRepository.findByRoleAndUserId(1L, userRole)).thenReturn(projects);
+
+        List<ProjectDTO> response = userService.getProjectsByRoleIdAndUserId(1L, "user");
+;
+        assertNotNull(response);
+    }
+
+    @Test
+    void testGetAllProjectsAndRepositoriesByUserId() {
+        User user = new User();
+        user.setId(1L);
+        user.setName("John");
+        user.setProjects(new ArrayList<>());
+
+        Project project1 = new Project();
+        project1.setProjectId(101L);
+        project1.setProjectName("Project A");
+        project1.setRepositories(new ArrayList<>());
+
+        Project project2 = new Project();
+        project2.setProjectId(102L);
+        project2.setProjectName("Project B");
+        project2.setRepositories(new ArrayList<>());
+
+        GitRepository repo1 = new GitRepository();
+        repo1.setRepoId(201L);
+        repo1.setName("Repo 1");
+
+        GitRepository repo2 = new GitRepository();
+        repo2.setRepoId(202L);
+        repo2.setName("Repo 2");
+
+        project1.getRepositories().add(repo1);
+        project1.getRepositories().add(repo2);
+
+        user.getProjects().add(project1);
+        user.getProjects().add(project2);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        List<ProjectDTO> result = userService.getAllProjectsAndRepositoriesByUserId(1L);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+
+        ProjectDTO projectDTO1 = result.get(0);
+        assertEquals(101L, projectDTO1.getProjectId());
+        assertEquals("Project A", projectDTO1.getProjectName());
+        assertEquals(2, projectDTO1.getRepositories().size());
+
+        ProjectDTO projectDTO2 = result.get(1);
+        assertEquals(102L, projectDTO2.getProjectId());
+        assertEquals("Project B", projectDTO2.getProjectName());
+        assertEquals(0, projectDTO2.getRepositories().size());
+
+        GitRepositoryDTO repoDTO1 = projectDTO1.getRepositories().get(0);
+        assertEquals(201L, repoDTO1.getRepoId());
+        assertEquals("Repo 1", repoDTO1.getName());
+
+        GitRepositoryDTO repoDTO2 = projectDTO1.getRepositories().get(1);
+        assertEquals(202L, repoDTO2.getRepoId());
+        assertEquals("Repo 2", repoDTO2.getName());
+
+        verify(userRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void testGetAllProjectsAndRepositoriesByUserId_NonExistingUser() {
+        Long userId = 1L;
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> {
+            userService.getAllProjectsAndRepositoriesByUserId(userId);
+        });
+    }
 
 }
