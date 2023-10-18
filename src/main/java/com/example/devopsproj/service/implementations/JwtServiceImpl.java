@@ -88,7 +88,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     // Extract all claims from a JWT token
-    private Claims extractAllClaims(String token) {
+    Claims extractAllClaims(String token) {
         return Jwts
                 .parserBuilder()
                 .setSigningKey(getSignInKey())

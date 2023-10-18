@@ -55,7 +55,6 @@ public class UserController {
         }
         return new ResponseEntity<>(projectDTOList, HttpStatus.OK);
     }
-
     @PutMapping("/update/{id}") // Update user by id
     public ResponseEntity<Object> updateUser(@PathVariable("id") Long id, @Valid @RequestBody UserDTO userDTO) {
         UserDTO updatedUserDTO = userServiceImpl.updateUser(id, userDTO);
@@ -67,6 +66,7 @@ public class UserController {
         String deletionResult = userServiceImpl.deleteUserById(userId);
         return ResponseEntity.ok(deletionResult);
     }
+
 
 
     @GetMapping("/role/{role}")

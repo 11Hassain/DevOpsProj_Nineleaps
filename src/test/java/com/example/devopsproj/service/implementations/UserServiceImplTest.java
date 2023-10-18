@@ -1107,10 +1107,70 @@ class UserServiceImplTest {
 
         assertEquals(Collections.emptyList(), result);
 
-
-
     }
+
+
+    @Test
+    void testDeleteUserById() {
+        // Arrange
+        Long userId = 1L;
+        User user = new User();
+        user.setDeleted(false);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        // Act
+        String result = userService.deleteUserById(userId);
+
+        // Assert
+        assertEquals("User successfully deleted", result);
+    }
+
+    @Test
+    void testDeleteUserById_InvalidUserID() {
+        // Arrange
+        Long userId = 1L;
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // Act
+        String result = userService.deleteUserById(userId);
+
+        // Assert
+        assertEquals("Invalid user ID", result);
+    }
+
+    @Test
+    void testDeleteUsersById_UserAlreadyDeleted() {
+        // Arrange
+        Long userId = 1L;
+        User user = new User();
+        user.setDeleted(true);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        // Act
+        String result = userService.deleteUserById(userId);
+
+        // Assert
+        assertEquals("User doesn't exist", result);
+    }
+
+    @Test
+    public void testDeleteUserById_SoftDeleteFailure() {
+        // Arrange
+        Long userId = 1L;
+        User user = new User();
+        user.setDeleted(false);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        // Use doNothing to specify that softDeleteUser doesn't throw an exception
+        doNothing().when(userRepository).softDelete(userId);
+
+        // Act
+        String result = userService.deleteUserById(userId);
+
+        // Assert
+        assertEquals("User successfully deleted", result);
+    }
+
+
+
 }
-
-
-

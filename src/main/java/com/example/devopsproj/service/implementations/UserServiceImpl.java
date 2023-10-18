@@ -13,6 +13,7 @@ import com.example.devopsproj.utils.JwtUtils;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -241,24 +242,43 @@ public class UserServiceImpl implements IUserService, UserService {
     }
 
 
+//    @Override
+//    public String deleteUserById(Long userId) {
+//        Optional<User> userOptional = userRepository.findById(userId);
+//
+//        if (userOptional.isEmpty()) {
+//            return "Invalid user ID";
+//        }
+//
+//        User user = userOptional.get();
+//        if (Boolean.TRUE.equals(user.getDeleted())) {
+//            return "User doesn't exist";
+//        }
+//
+//        boolean isDeleted = softDeleteUser(userId);
+//        return isDeleted ? "User successfully deleted" : "404 Not found";
+//    }
+
+
     @Override
     public String deleteUserById(Long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
-
         if (userOptional.isEmpty()) {
             return "Invalid user ID";
         }
-
         User user = userOptional.get();
         if (Boolean.TRUE.equals(user.getDeleted())) {
             return "User doesn't exist";
         }
 
-        boolean isDeleted = softDeleteUser(userId);
-        return isDeleted ? "User successfully deleted" : "404 Not found";
+        if (softDeleteUser(userId)) {
+            return "User successfully deleted";
+        } else {
+            return "404 Not found";
+        }
     }
 
-  
+
     @Override
     public List<Project> getUsersByRoleAndUserId(Long userId, EnumRole userRole) {
         return userRepository.findByRoleAndUserId(userId, userRole);
@@ -299,6 +319,11 @@ public class UserServiceImpl implements IUserService, UserService {
             return "Log out unsuccessful";
         }
     }
+
+//    @Override
+//    public ResponseEntity<Object> getProjectsByRoleIdAndUserId(Long userId, String role) {
+//        return null;
+//    }
 
     @Override
     public List<ProjectDTO> getProjectsByRoleIdAndUserId(Long userId, String role) {
@@ -347,5 +372,3 @@ public class UserServiceImpl implements IUserService, UserService {
 
 
 }
-
-

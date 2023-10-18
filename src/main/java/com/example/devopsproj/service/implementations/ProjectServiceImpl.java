@@ -84,17 +84,14 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<ProjectWithUsersDTO> getAllProjectsWithUsers() {
-        List<Project> projects = projectRepository.findAllProjects();
+        List<Project> projects = projectRepository.findAll();
         List<ProjectWithUsersDTO> projectsWithUsers = new ArrayList<>();
 
         for (Project project : projects) {
-            List<UserDTO> userList = getAllUsersByProjectId(project.getProjectId());
-            if (userList == null) {
-                userList = new ArrayList<>();
-            }
+            List<User> userList = projectRepository.findAllUsersByProjectId(project.getProjectId());
             List<UserDTO> userDTOList = userList.stream()
                     .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
-                    .toList(); // Use Stream.toList() to collect into a list
+                    .toList();
 
             ProjectWithUsersDTO projectWithUsers = new ProjectWithUsersDTO(
                     project.getProjectId(),
@@ -465,7 +462,6 @@ public class ProjectServiceImpl implements ProjectService {
             Project project = optionalProject.get();
             String projectName = project.getProjectName();
             String projectDescription = project.getProjectDescription();
-            boolean status = project.getDeleted();
             List<User> users = project.getUsers();
             String pmName = null;
             for (User user : users) {
@@ -493,7 +489,6 @@ public class ProjectServiceImpl implements ProjectService {
             return new ProjectDTO(
                     projectName,
                     projectDescription,
-                    status,
                     pmName,
                     repositoryDTOS,
                     figmaDTO,

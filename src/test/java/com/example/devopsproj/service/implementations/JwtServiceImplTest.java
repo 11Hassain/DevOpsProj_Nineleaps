@@ -75,4 +75,29 @@ class JwtServiceImplTest {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
 
+
+//    @Test
+//    void testExtractUsername() {
+//        // Arrange
+//        String token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJTd2VkYSIsImlhdCI6MTY5NTExNTM1NCwiZXhwIjoxNjk1MTE2Nzk0fQ.YyIDPHxQyO0THIgWeRUDuGJF_U9mXBAVnQYyYAd_OR8zKvmpAXTSMt3_ldTEOzOa2E34toqSpkSgj9-eQYLziw";
+//        Claims mockClaims = mock(Claims.class);
+//        when(jwtService.extractAllClaims(token)).thenReturn(mockClaims);
+//        when(mockClaims.getSubject()).thenReturn("Sweda");
+//
+//        // Act
+//        String username = jwtService.extractUsername(token);
+//
+//        // Assert
+//        assertEquals("Sweda", username);
+//    }
+
+//    @Test
+//    void testExtractUsernameWithInvalidToken() {
+//        // Arrange
+//        String invalidToken = "invalid_jwt_token_here";
+//        when(jwtService.extractAllClaims(invalidToken)).thenThrow(ExpiredJwtException.class);
+//
+//        // Act and Assert
+//        assertThrows(ExpiredJwtException.class, () -> jwtService.extractUsername(invalidToken));
+//    }
 }

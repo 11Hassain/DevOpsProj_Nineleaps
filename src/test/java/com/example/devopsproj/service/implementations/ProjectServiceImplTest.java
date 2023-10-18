@@ -48,7 +48,7 @@ public class ProjectServiceImplTest {
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
@@ -1839,6 +1839,64 @@ public class ProjectServiceImplTest {
         when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> projectService.deleteProject(projectId));
+    }
+
+
+    @Test
+    void testGetAllProjectsWithUsers() {
+        List<Project> projects = new ArrayList<>();
+        List<User> users = new ArrayList<>();
+
+        Project project1 = new Project();
+        project1.setProjectId(1L);
+        project1.setProjectName("P1");
+        project1.setProjectDescription("Description P1");
+        project1.setLastUpdated(LocalDateTime.now());
+
+        Project project2 = new Project();
+        project2.setProjectId(2L);
+        project2.setProjectName("P2");
+        project2.setProjectDescription("Description P2");
+        project2.setLastUpdated(LocalDateTime.now());
+
+        User user1 = new User();
+        user1.setId(1L);
+        user1.setName("U1");
+        user1.setEmail("user1@gmail.com");
+        user1.setEnumRole(EnumRole.USER);
+
+        User user2 = new User();
+        user2.setId(2L);
+        user2.setName("U2");
+        user2.setEmail("user2@gmail.com");
+        user2.setEnumRole(EnumRole.USER);
+
+        projects.add(project1);
+        projects.add(project2);
+        users.add(user1);
+        users.add(user2);
+
+        when(projectRepository.findAll()).thenReturn(projects);
+        when(projectRepository.findAllUsersByProjectId(anyLong())).thenReturn(users);
+
+        List<ProjectWithUsersDTO> result = projectService.getAllProjectsWithUsers();
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+
+        ProjectWithUsersDTO projectWithUsers1 = result.get(0);
+        assertEquals(project1.getProjectId(), projectWithUsers1.getProjectId());
+        assertEquals(project1.getProjectName(), projectWithUsers1.getProjectName());
+        assertEquals(project1.getProjectDescription(), projectWithUsers1.getProjectDescription());
+        assertEquals(project1.getLastUpdated(), projectWithUsers1.getLastUpdated());
+        assertEquals(2, projectWithUsers1.getUsers().size());
+
+        ProjectWithUsersDTO projectWithUsers2 = result.get(1);
+        assertEquals(project2.getProjectId(), projectWithUsers2.getProjectId());
+        assertEquals(project2.getProjectName(), projectWithUsers2.getProjectName());
+        assertEquals(project2.getProjectDescription(), projectWithUsers2.getProjectDescription());
+        assertEquals(project2.getLastUpdated(), projectWithUsers2.getLastUpdated());
+        assertEquals(2, projectWithUsers2.getUsers().size());
     }
 }
 

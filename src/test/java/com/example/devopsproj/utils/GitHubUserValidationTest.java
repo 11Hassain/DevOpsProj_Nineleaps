@@ -7,6 +7,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class GitHubUserValidationTest {
 
@@ -79,6 +80,51 @@ public class GitHubUserValidationTest {
         }
     }
 
+
+
+//    @Test
+//    public void testValidGitHubUser() {
+//        String username = "exampleuser";
+//        String accessToken = "yourAccessToken";
+//
+//        boolean isValid = GitHubUserValidation.isGitHubUserValid(username, accessToken);
+//
+//        assertTrue(isValid);
+//    }
+
+    @Test
+    public void testInvalidGitHubUsers() {
+        String username = "nonexistentuser";
+        String accessToken = "yourAccessToken";
+
+        boolean isValid = GitHubUserValidation.isGitHubUserValid(username, accessToken);
+
+        assertFalse(isValid);
+    }
+
+//    @Test
+//    public void testGitHubAPIFailure() {
+//        String username = "exampleuser";
+//        String accessToken = "yourAccessToken";
+//
+//        boolean isValid = GitHubUserValidation.isGitHubUserValid(username, accessToken);
+//
+//        // Depending on the behavior of the GitHub API, this test may fail or succeed.
+//        // It's included to test how your code handles a potential failure scenario.
+//    }
+
+    @Test
+    public void testInterruptedExceptionHandling() {
+        // Create a scenario where the thread is interrupted
+        Thread.currentThread().interrupt();
+        String username = "exampleuser";
+        String accessToken = "yourAccessToken";
+
+        boolean isValid = GitHubUserValidation.isGitHubUserValid(username, accessToken);
+
+        // Since the thread is already interrupted, the method should return false.
+        assertFalse(isValid);
+    }
 
 
 

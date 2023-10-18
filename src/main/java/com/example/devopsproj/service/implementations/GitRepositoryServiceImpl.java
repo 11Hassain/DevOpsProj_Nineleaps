@@ -3,7 +3,7 @@ package com.example.devopsproj.service.implementations;
 import com.example.devopsproj.dto.responsedto.GitRepositoryDTO;
 
 
-
+import com.example.devopsproj.dto.responsedto.ProjectDTO;
 import com.example.devopsproj.exceptions.FigmaNotFoundException;
 import com.example.devopsproj.exceptions.NotFoundException;
 import com.example.devopsproj.exceptions.RepositoryCreationException;
@@ -11,6 +11,7 @@ import com.example.devopsproj.exceptions.RepositoryDeletionException;
 import com.example.devopsproj.model.GitRepository;
 import com.example.devopsproj.commons.enumerations.EnumRole;
 
+import com.example.devopsproj.model.Project;
 import com.example.devopsproj.repository.GitRepositoryRepository;
 
 import com.example.devopsproj.service.interfaces.GitRepositoryService;
@@ -116,10 +117,16 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
 
     @Override
     public List<GitRepositoryDTO> getAllRepositoriesByProject(Long id) {
-        // Return an empty list
-        return Collections.emptyList();
+        ProjectDTO project = projectServiceImpl.getProjectById(id);
+        if (project != null) {
+            List<GitRepository> repositories = gitRepositoryRepository.findRepositoriesByProject(mapProjectDTOToProject(project));
+            return repositories.stream()
+                    .map(repository -> new GitRepositoryDTO(repository.getName(), repository.getDescription()))
+                    .toList();
+        } else {
+            return Collections.emptyList();
+        }
     }
-
     // Get a list of Git repositories by role
     @Override
     @Transactional(readOnly = true)
@@ -146,26 +153,7 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
             throw new FigmaNotFoundException("An error occurred while retrieving the Git repository by ID");
         }
     }
-    // Check if a GitHub access token is valid
-    @Override
-    public boolean isAccessTokenValid(String accessToken) {
-        // Create HTTP headers with the provided access token
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
 
-        // Create an HTTP request entity with the headers
-        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
-
-        // Send an HTTP GET request to a GitHub API endpoint to validate the token
-        ResponseEntity<String> responseEntity = restTemplate.exchange(
-                "https://api.github.com/user",
-                HttpMethod.GET,
-                requestEntity,
-                String.class);
-
-        // Return true if the token is valid, otherwise return false
-        return responseEntity.getStatusCode() == HttpStatus.OK;
-    }
 
     // Helper method to convert a GitRepository entity to a GitRepositoryDTO
     private GitRepositoryDTO convertToDto(GitRepository gitRepository) {
@@ -174,5 +162,13 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
         gitRepositoryDTO.setName(gitRepository.getName());
         gitRepositoryDTO.setDescription(gitRepository.getDescription());
         return gitRepositoryDTO;
+    }
+
+    public Project mapProjectDTOToProject(ProjectDTO projectDTO) {
+        Project project = new Project();
+        project.setProjectId(projectDTO.getProjectId());
+        project.setProjectName(projectDTO.getProjectName());
+        // Map other properties as needed
+        return project;
     }
 }

@@ -2,17 +2,21 @@ package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.dto.responsedto.GitRepositoryDTO;
+import com.example.devopsproj.dto.responsedto.ProjectDTO;
 import com.example.devopsproj.exceptions.NotFoundException;
 import com.example.devopsproj.exceptions.RepositoryDeletionException;
 import com.example.devopsproj.model.GitRepository;
 
+import com.example.devopsproj.model.Project;
 import com.example.devopsproj.repository.GitRepositoryRepository;
 import com.example.devopsproj.repository.ProjectRepository;
+import com.example.devopsproj.service.interfaces.GitRepositoryService;
 import com.example.devopsproj.service.interfaces.ProjectService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
@@ -38,6 +42,8 @@ public class GitRepositoryServiceImplTest {
     @Mock
     private ProjectRepository projectRepository;
 
+    @Mock
+    private ProjectServiceImpl projectServiceImpl;
     @Mock
     private ProjectService projectService;
 
@@ -217,27 +223,6 @@ public class GitRepositoryServiceImplTest {
         assertNotNull(result);
         assertEquals(expectedRepository, result);
     }
-    @Test
-    public void testIsAccessTokenValid_ValidToken() {
-        // Arrange
-        String accessToken = "validAccessToken";
-        String responseBody = "{\"message\": \"Hello, world!\"}"; // Simulated response body for a valid token
-        ResponseEntity<String> responseEntity = new ResponseEntity<>(responseBody, HttpStatus.OK);
-
-        // Mock the behavior of the restTemplate.exchange method to return the responseEntity
-        when(restTemplate.exchange(
-                eq("https://api.github.com/user"),
-                eq(HttpMethod.GET),
-                any(HttpEntity.class),
-                eq(String.class)))
-                .thenReturn(responseEntity);
-
-        // Act
-        boolean result = gitRepositoryService.isAccessTokenValid(accessToken);
-
-        // Assert
-        assertTrue(result);
-    }
 
     @Test
     void testDeleteRepository_Successful() {
@@ -341,7 +326,40 @@ public class GitRepositoryServiceImplTest {
 
 
 
+    @Test
+    public void testGetAllRepositoriesByProjectWithValidProject() {
+        // Create a test project and a list of repositories.
+        ProjectDTO testProject = new ProjectDTO(/* initialize with required data */);
+        List<GitRepository> testRepositories = new ArrayList<>();
+        // Add some repositories to the testRepositories list.
+
+        // Define the behavior of your mocked dependencies.
+        Mockito.when(projectServiceImpl.getProjectById(Mockito.anyLong())).thenReturn(testProject);
+        Mockito.when(gitRepositoryRepository.findRepositoriesByProject(Mockito.any(Project.class))).thenReturn(testRepositories);
 
 
+        // Test the method
+        List<GitRepositoryDTO> result = gitRepositoryService.getAllRepositoriesByProject(1L); // Assuming project id 1
 
+        // Add assertions based on your test data and business logic.
+        assertEquals(testRepositories.size(), result.size());
+    }
+
+    @Test
+    public void testGetAllRepositoriesByProjectWithNonExistentProject() {
+        // Mock the ProjectService to return null when looking for a non-existent project.
+        Mockito.when(projectServiceImpl.getProjectById(Mockito.anyLong())).thenReturn(null);
+
+        // Test the method
+        List<GitRepositoryDTO> result = gitRepositoryService.getAllRepositoriesByProject(2L); // Assuming project id 2
+
+        // Add assertions to verify the result (it should be an empty list).
+        assertTrue(result.isEmpty());
+    }
 }
+
+
+
+
+
+

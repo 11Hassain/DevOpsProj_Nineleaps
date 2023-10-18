@@ -20,5 +20,5 @@ public interface GitRepositoryService {
 
    GitRepository getRepositoryById(Long id);
 
-    boolean isAccessTokenValid(String accessToken);
+
 }
