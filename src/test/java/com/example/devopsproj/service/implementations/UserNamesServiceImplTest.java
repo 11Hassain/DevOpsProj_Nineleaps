@@ -26,7 +26,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class UserNamesServiceImplTest {
+ class UserNamesServiceImplTest {
 
     @InjectMocks
     private UserNamesServiceImpl userNamesService;

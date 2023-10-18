@@ -13,7 +13,7 @@ import com.example.devopsproj.utils.JwtUtils;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -247,24 +247,6 @@ public class UserServiceImpl implements IUserService, UserService {
     }
 
 
-//    @Override
-//    public String deleteUserById(Long userId) {
-//        Optional<User> userOptional = userRepository.findById(userId);
-//
-//        if (userOptional.isEmpty()) {
-//            return "Invalid user ID";
-//        }
-//
-//        User user = userOptional.get();
-//        if (Boolean.TRUE.equals(user.getDeleted())) {
-//            return "User doesn't exist";
-//        }
-//
-//        boolean isDeleted = softDeleteUser(userId);
-//        return isDeleted ? "User successfully deleted" : "404 Not found";
-//    }
-
-
     @Override
     public String deleteUserById(Long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
@@ -325,10 +307,7 @@ public class UserServiceImpl implements IUserService, UserService {
         }
     }
 
-//    @Override
-//    public ResponseEntity<Object> getProjectsByRoleIdAndUserId(Long userId, String role) {
-//        return null;
-//    }
+
 
     @Override
     public List<ProjectDTO> getProjectsByRoleIdAndUserId(Long userId, String role) {

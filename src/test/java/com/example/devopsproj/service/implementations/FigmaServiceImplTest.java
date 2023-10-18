@@ -23,7 +23,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.util.*;
 
-public class FigmaServiceImplTest {
+ class FigmaServiceImplTest {
 
     @Mock
     private FigmaRepository figmaRepository;
@@ -43,7 +43,7 @@ public class FigmaServiceImplTest {
 
 
     @Test
-    public void testCreateFigma_Success() throws FigmaCreationException {
+   void testCreateFigma_Success() throws FigmaCreationException {
         // Prepare input data
         FigmaDTO figmaDTO = new FigmaDTO(new ProjectDTO(1L, "ProjectName"), "https://figma.com/project1");
 
@@ -65,7 +65,7 @@ public class FigmaServiceImplTest {
     }
 
     @Test
-    public void testGetAllFigmaProjects_Successs() {
+    void testGetAllFigmaProjects_Successs() {
         // Prepare mock data
         Project project1 = new Project();
         project1.setProjectId(1L);
@@ -83,7 +83,7 @@ public class FigmaServiceImplTest {
     }
 
     @Test
-    public void testGetAllFigmaProjects_Exception() {
+    void testGetAllFigmaProjects_Exception() {
         // Mock an exception when calling projectRepository.findAllProjects
         when(projectRepository.findAllProjects()).thenThrow(new RuntimeException("Simulated Exception"));
 
@@ -97,7 +97,7 @@ public class FigmaServiceImplTest {
     }
 
     @Test
-    public void testCreateFigma_DataIntegrityViolationException() {
+    void testCreateFigma_DataIntegrityViolationException() {
         FigmaDTO figmaDTO = new FigmaDTO(new ProjectDTO(1L, "ProjectName"), "https://figma.com/project1");
 
         Project project = new Project();
@@ -110,7 +110,7 @@ public class FigmaServiceImplTest {
     }
 
     @Test
-    public void testCreateFigma_Exception() {
+    void testCreateFigma_Exception() {
         FigmaDTO figmaDTO = new FigmaDTO(new ProjectDTO(1L, "ProjectName"), "https://figma.com/project1");
 
         Project project = new Project();
@@ -123,7 +123,7 @@ public class FigmaServiceImplTest {
     }
 
     @Test
-    public void testGetAllFigmaProjects_Success() {
+    void testGetAllFigmaProjects_Success() {
         // Arrange
         Project project1 = new Project();
         Figma figma1 = new Figma();
@@ -137,8 +137,8 @@ public class FigmaServiceImplTest {
         when(projectRepository.findAllProjects()).thenReturn(List.of(project1, project2));
 
         // Mock the figmaRepository findFigmaByProjectId method for each project
-        when(figmaRepository.findFigmaByProjectId(eq(project1.getProjectId()))).thenReturn(Optional.of(figma1));
-        when(figmaRepository.findFigmaByProjectId(eq(project2.getProjectId()))).thenReturn(Optional.of(figma2));
+        when(figmaRepository.findFigmaByProjectId((project1.getProjectId()))).thenReturn(Optional.of(figma1));
+        when(figmaRepository.findFigmaByProjectId((project2.getProjectId()))).thenReturn(Optional.of(figma2));
 
         // Act
         List<Figma> figmaProjects = figmaService.getAllFigmaProjects();
@@ -267,7 +267,7 @@ public class FigmaServiceImplTest {
 
 
     @Test
-    public void testGetAllFigmaProjects_EmptyList() {
+    void testGetAllFigmaProjects_EmptyList() {
         // Arrange
         // Mock the projectRepository findAllProjects method to return an empty list
         when(projectRepository.findAllProjects()).thenReturn(Collections.emptyList());
@@ -282,7 +282,7 @@ public class FigmaServiceImplTest {
 
 
     @Test
-    public void testGetFigmaById_FigmaNotFound() {
+    void testGetFigmaById_FigmaNotFound() {
         // Arrange
         Long figmaId = 1L;
 
@@ -298,7 +298,7 @@ public class FigmaServiceImplTest {
 
 
     @Test
-    public void testDeleteFigma_Success() {
+    void testDeleteFigma_Success() {
         // Arrange
         Long figmaId = 1L;
 
@@ -310,7 +310,7 @@ public class FigmaServiceImplTest {
     }
 
     @Test
-    public void testDeleteFigma_FigmaNotFound() {
+    void testDeleteFigma_FigmaNotFound() {
         // Arrange
         Long figmaId = 1L;
 
@@ -322,7 +322,7 @@ public class FigmaServiceImplTest {
     }
 
     @Test
-    public void testDeleteFigma_ExceptionOccurred() {
+    void testDeleteFigma_ExceptionOccurred() {
         // Arrange
         Long figmaId = 1L;
 
@@ -334,7 +334,7 @@ public class FigmaServiceImplTest {
     }
 
     @Test
-    public void testGetFigmaURLByProjectId_FigmaFound() {
+    void testGetFigmaURLByProjectId_FigmaFound() {
         // Arrange
         Long projectId = 1L;
         String figmaURL = "https://example.com/figma";
@@ -342,7 +342,7 @@ public class FigmaServiceImplTest {
         figma.setFigmaURL(figmaURL); // Set the figmaURL using the setter method
 
         // Mock the figmaRepository.findFigmaByProjectId method to return a Figma object
-        when(figmaRepository.findFigmaByProjectId(eq(projectId))).thenReturn(Optional.of(figma));
+        when(figmaRepository.findFigmaByProjectId((projectId))).thenReturn(Optional.of(figma));
 
         // Act
         String result = figmaService.getFigmaURLByProjectId(projectId);
@@ -353,12 +353,12 @@ public class FigmaServiceImplTest {
     }
 
     @Test
-    public void testGetFigmaURLByProjectId_FigmaNotFound() {
+    void testGetFigmaURLByProjectId_FigmaNotFound() {
         // Arrange
         Long projectId = 1L;
 
         // Mock the figmaRepository.findFigmaByProjectId method to return an empty Optional
-        when(figmaRepository.findFigmaByProjectId(eq(projectId))).thenReturn(Optional.empty());
+        when(figmaRepository.findFigmaByProjectId((projectId))).thenReturn(Optional.empty());
 
         // Act
         String result = figmaService.getFigmaURLByProjectId(projectId);
@@ -369,7 +369,7 @@ public class FigmaServiceImplTest {
 
 
     @Test
-    public void testGetScreenshotsForFigmaIdWithScreenshots_Success() {
+    void testGetScreenshotsForFigmaIdWithScreenshots_Success() {
         // Arrange
         Long figmaId = 1L;
         Map<String, String> screenshotImagesByUser = new HashMap<>();
@@ -391,7 +391,7 @@ public class FigmaServiceImplTest {
     }
 
     @Test
-    public void testGetScreenshotsForFigmaIdWithNoScreenshots_Success() {
+    void testGetScreenshotsForFigmaIdWithNoScreenshots_Success() {
         // Arrange
         Long figmaId = 1L;
         Figma figma = new Figma();
@@ -408,7 +408,7 @@ public class FigmaServiceImplTest {
     }
 
     @Test
-    public void testGetScreenshotsForFigmaIdWithEmptyScreenshots_Success() {
+    void testGetScreenshotsForFigmaIdWithEmptyScreenshots_Success() {
         // Arrange
         Long figmaId = 1L;
         Figma figma = new Figma();
@@ -425,7 +425,7 @@ public class FigmaServiceImplTest {
     }
 
     @Test
-    public void testGetScreenshotsForFigmaIdWithFigmaNotFound_Success() {
+    void testGetScreenshotsForFigmaIdWithFigmaNotFound_Success() {
         // Arrange
         Long figmaId = 1L;
         when(figmaRepository.findById(figmaId)).thenReturn(Optional.empty()); // Figma not found
@@ -438,7 +438,7 @@ public class FigmaServiceImplTest {
         assertEquals(0, screenshotDTOList.size());
     }
     @Test
-    public void testGetAllFigmaDTOs_Success() {
+    void testGetAllFigmaDTOs_Success() {
         // Arrange
         Project project1 = new Project();
         project1.setProjectId(1L);
@@ -469,7 +469,7 @@ public class FigmaServiceImplTest {
 
 
     @Test
-    public void testGetAllFigmaDTOs_NoActiveProjects_Success() {
+    void testGetAllFigmaDTOs_NoActiveProjects_Success() {
         // Arrange
         when(projectRepository.findAllProjects()).thenReturn(new ArrayList<>());
 
@@ -481,7 +481,7 @@ public class FigmaServiceImplTest {
     }
 
     @Test
-    public void testGetAllFigmaDTOs_NullFigmaForProject_Success() {
+    void testGetAllFigmaDTOs_NullFigmaForProject_Success() {
         // Arrange
         Project project1 = new Project();
         project1.setProjectId(1L);
@@ -507,7 +507,7 @@ public class FigmaServiceImplTest {
     }
 
     @Test
-    public void testMapProjectToProjectDTO() {
+    void testMapProjectToProjectDTO() {
         // Arrange
         Project project = new Project();
         project.setProjectId(1L);
@@ -522,7 +522,7 @@ public class FigmaServiceImplTest {
     }
 
     @Test
-    public void testMapFigmaToFigmatDTO() {
+    void testMapFigmaToFigmatDTO() {
         // Arrange
         Figma figma = new Figma();
         figma.setFigmaId(101L);
@@ -536,7 +536,7 @@ public class FigmaServiceImplTest {
         assertEquals(figma.getFigmaURL(), figmaDTO.getFigmaURL());
     }
     @Test
-    public void testMapProjectDTOToProject() {
+    void testMapProjectDTOToProject() {
         // Arrange
         ProjectDTO projectDTO = new ProjectDTO();
         projectDTO.setProjectId(1L);
@@ -551,7 +551,7 @@ public class FigmaServiceImplTest {
     }
 
     @Test
-    public void testMapFigmaDTOToFigma() {
+    void testMapFigmaDTOToFigma() {
         // Arrange
         FigmaDTO figmaDTO = new FigmaDTO();
         figmaDTO.setFigmaId(101L);

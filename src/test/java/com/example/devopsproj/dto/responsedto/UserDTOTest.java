@@ -165,10 +165,9 @@ class UserDTOTest {
         UserDTO userDTO1 = new UserDTO(1L, "John", "john@example.com", EnumRole.USER);
         UserDTO userDTO2 = new UserDTO(1L, "John", "john@example.com", EnumRole.USER);
 
-        // Assert that they are equal
-        assertTrue(userDTO1.equals(userDTO2));
+        // Assert that they are equal using assertEquals
+        assertEquals(userDTO1, userDTO2);
     }
-
     @Test
     void testEqualsWithDifferentIds() {
         // Create two UserDTO objects with different IDs
@@ -176,7 +175,7 @@ class UserDTOTest {
         UserDTO userDTO2 = new UserDTO(2L, "John", "john@example.com", EnumRole.USER);
 
         // Assert that they are not equal
-        assertFalse(userDTO1.equals(userDTO2));
+        assertNotEquals(userDTO1,userDTO2);
     }
 
     @Test
@@ -186,7 +185,7 @@ class UserDTOTest {
         UserDTO userDTO2 = new UserDTO(1L, "Alice", "john@example.com", EnumRole.USER);
 
         // Assert that they are not equal
-        assertFalse(userDTO1.equals(userDTO2));
+        assertNotEquals(userDTO1,userDTO2);
     }
 
     @Test
@@ -196,7 +195,7 @@ class UserDTOTest {
         UserDTO userDTO2 = new UserDTO(1L, "John", "alice@example.com", EnumRole.USER);
 
         // Assert that they are not equal
-        assertFalse(userDTO1.equals(userDTO2));
+        assertNotEquals(userDTO1,userDTO2);
     }
 
     @Test
@@ -206,7 +205,7 @@ class UserDTOTest {
         UserDTO userDTO2 = new UserDTO(1L, "John", "john@example.com", EnumRole.ADMIN);
 
         // Assert that they are not equal
-        assertFalse(userDTO1.equals(userDTO2));
+        assertNotEquals(userDTO1,userDTO2);
     }
 
     @Test
@@ -214,7 +213,8 @@ class UserDTOTest {
         UserDTO userDTO = new UserDTO(1L, "John", "john@example.com", EnumRole.USER);
 
         // Assert that it's not equal to null
-        assertFalse(userDTO.equals(null));
+
+        assertNotEquals(null,userDTO);
     }
 
     @Test
@@ -222,7 +222,20 @@ class UserDTOTest {
         UserDTO userDTO = new UserDTO(1L, "John", "john@example.com", EnumRole.USER);
 
         // Assert that it's not equal to an object of a different class
-        assertFalse(userDTO.equals("Not a UserDTO"));
+        assertNotEquals("Not a UserDTO", userDTO);
+    }
+
+    @Test
+     void testEquals_NullObject() {
+        UserDTO userDTO = new UserDTO(1L, "John", "john@example.com", EnumRole.USER);
+        assertFalse(userDTO.equals(null));
+    }
+
+    @Test
+    void testEquals_DifferentClassObject() {
+        UserDTO userDTO = new UserDTO(1L, "John", "john@example.com", EnumRole.USER);
+        Object differentObject = new Object();
+        assertFalse(userDTO.equals(differentObject));
     }
     @Test
     void testGetToken() {

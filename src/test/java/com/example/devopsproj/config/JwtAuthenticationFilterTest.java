@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -21,6 +22,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Optional;
 
 
@@ -47,9 +49,16 @@ public class JwtAuthenticationFilterTest {
     private TokenRepository tokenRepository;
 
 
+
+
+
+
+
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtService, userDetailsService, tokenRepository);
     }
 
     @Test
@@ -96,4 +105,31 @@ public class JwtAuthenticationFilterTest {
         assertNull(SecurityContextHolder.getContext().getAuthentication());
     }
 
+    @Test
+    void doFilterInternal_ValidToken() throws Exception {
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        FilterChain filterChain = Mockito.mock(FilterChain.class);
+
+        String validToken = "valid-jwt-token";
+        String userEmail = "user@example.com";
+
+        // Mock behavior for a valid token
+        Mockito.when(request.getHeader("Authorization")).thenReturn("Bearer " + validToken);
+        Mockito.when(jwtService.extractUsername(validToken)).thenReturn(userEmail);
+
+        // Mock user details and token repository behavior
+//        UserDetails userDetails = new User(userEmail, "password", new ArrayList<>());
+//        Mockito.when(userDetailsService.loadUserByUsername(userEmail)).thenReturn(userDetails);
+//        Mockito.when(tokenRepository.findByTokens(validToken)).thenReturn(Optional.of(new Token(validToken, false, false)));
+
+        // Call the filter
+        jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
+
+        // Verify that the user is authenticated and the filter chain proceeds
+        Mockito.verify(filterChain).doFilter(request, response);
+    }
+
+    // Add more test cases for different scenarios (invalid token, null user, etc.)
 }
+

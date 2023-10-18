@@ -18,10 +18,9 @@ import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataAccessException;
@@ -852,21 +851,19 @@ class UserServiceImplTest {
         verify(userRepository, times(1)).findByEmail(userEmail);
     }
 
-    @Test
-    void testDeleteUserById_InvalidUserId() {
-        // Arrange
-        Long userId = 1L;
 
-        // Mock userRepository.findById to return an empty Optional (user not found)
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+     @ParameterizedTest
+     @ValueSource(longs = {1L, 2L, 3L})
+     void testDeleteUserById_InvalidUserId(Long userId) {
+    // Mock userRepository.findById to return an empty Optional (user not found)
+     Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        // Act
-        String result = userService.deleteUserById(userId);
+     // Act
+     String result = userService.deleteUserById(userId);
 
-        // Assert
-        assertEquals("Invalid user ID", result);
+     // Assert
+     assertEquals("Invalid user ID", result);
     }
-
     @Test
     void testDeleteUserById_UserAlreadyDeleted() {
         // Arrange
@@ -1145,7 +1142,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    public void testDeleteUserById_SoftDeleteFailure() {
+    void testDeleteUserById_SoftDeleteFailure() {
         // Arrange
         Long userId = 1L;
         User user = new User();

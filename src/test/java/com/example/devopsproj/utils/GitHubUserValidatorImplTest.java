@@ -8,7 +8,7 @@ import org.mockito.MockitoAnnotations;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-public class GitHubUserValidatorImplTest {
+ class GitHubUserValidatorImplTest {
 
     @InjectMocks
     private GitHubUserValidatorImpl gitHubUserValidator;

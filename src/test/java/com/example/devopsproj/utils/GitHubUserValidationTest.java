@@ -9,7 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class GitHubUserValidationTest {
+ class GitHubUserValidationTest {
 
     private static final String VALID_USERNAME = "validusername";
     private static final String VALID_ACCESS_TOKEN = "validaccesstoken";
@@ -19,32 +19,32 @@ public class GitHubUserValidationTest {
 
 
     @Test
-    public void testInvalidGitHubUser() throws InterruptedException {
+     void testInvalidGitHubUser() throws InterruptedException {
         assertFalse(GitHubUserValidation.isGitHubUserValid(INVALID_USERNAME, VALID_ACCESS_TOKEN));
     }
 
     @Test
-    public void testInvalidAccessToken() throws InterruptedException {
+     void testInvalidAccessToken() throws InterruptedException {
         assertFalse(GitHubUserValidation.isGitHubUserValid(VALID_USERNAME, INVALID_ACCESS_TOKEN));
     }
 
     @Test
-    public void testEmptyUsername() throws InterruptedException {
+    void testEmptyUsername() throws InterruptedException {
         assertFalse(GitHubUserValidation.isGitHubUserValid("", VALID_ACCESS_TOKEN));
     }
 
     @Test
-    public void testNullUsername() throws InterruptedException {
+     void testNullUsername() throws InterruptedException {
         assertFalse(GitHubUserValidation.isGitHubUserValid(null, VALID_ACCESS_TOKEN));
     }
 
     @Test
-    public void testEmptyAccessToken() throws InterruptedException {
+    void testEmptyAccessToken() throws InterruptedException {
         assertFalse(GitHubUserValidation.isGitHubUserValid(VALID_USERNAME, ""));
     }
 
     @Test
-    public void testNullAccessToken() throws InterruptedException {
+     void testNullAccessToken() throws InterruptedException {
         assertFalse(GitHubUserValidation.isGitHubUserValid(VALID_USERNAME, null));
     }
 
@@ -93,7 +93,7 @@ public class GitHubUserValidationTest {
 //    }
 
     @Test
-    public void testInvalidGitHubUsers() {
+     void testInvalidGitHubUsers() {
         String username = "nonexistentuser";
         String accessToken = "yourAccessToken";
 
@@ -102,19 +102,10 @@ public class GitHubUserValidationTest {
         assertFalse(isValid);
     }
 
-//    @Test
-//    public void testGitHubAPIFailure() {
-//        String username = "exampleuser";
-//        String accessToken = "yourAccessToken";
-//
-//        boolean isValid = GitHubUserValidation.isGitHubUserValid(username, accessToken);
-//
-//        // Depending on the behavior of the GitHub API, this test may fail or succeed.
-//        // It's included to test how your code handles a potential failure scenario.
-//    }
+
 
     @Test
-    public void testInterruptedExceptionHandling() {
+     void testInterruptedExceptionHandling() {
         // Create a scenario where the thread is interrupted
         Thread.currentThread().interrupt();
         String username = "exampleuser";

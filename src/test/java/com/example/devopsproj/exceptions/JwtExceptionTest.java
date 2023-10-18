@@ -10,11 +10,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class JwtExceptionTest {
 
-    private JwtException jwtException;
+    private JwtExceptionHandler jwtException;
 
     @BeforeEach
     void setUp() {
-        jwtException = new JwtException();
+        jwtException = new JwtExceptionHandler();
     }
 
     @Test

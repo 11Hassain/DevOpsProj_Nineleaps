@@ -27,7 +27,7 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class ProjectServiceImplTest {
+ class ProjectServiceImplTest {
 
     @Mock
     private ProjectRepository projectRepository;
@@ -52,7 +52,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testCreateProject_Success() {
+     void testCreateProject_Success() {
         // Arrange
         ProjectDTO projectDTO = new ProjectDTO();
         projectDTO.setProjectId(1L);
@@ -77,7 +77,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testCreateProject_SaveError() {
+     void testCreateProject_SaveError() {
         // Arrange
         ProjectDTO projectDTO = new ProjectDTO();
         projectDTO.setProjectName("Test Project");
@@ -90,7 +90,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetProjectById_Success() {
+     void testGetProjectById_Success() {
         // Arrange
         Long projectId = 1L;
         Project project = new Project();
@@ -108,7 +108,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetProjectById_NotFound() {
+     void testGetProjectById_NotFound() {
         // Arrange
         Long projectId = 2L;
 
@@ -124,7 +124,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetAll_Success() {
+     void testGetAll_Success() {
         // Arrange
         List<Project> mockProjects = new ArrayList<>();
         mockProjects.add(new Project(1L, "Project1", "Description1", LocalDateTime.now(), false));
@@ -143,7 +143,7 @@ public class ProjectServiceImplTest {
 
 
     @Test
-    public void testGetAllProjectsWithUsers_NoProjectsFound() {
+     void testGetAllProjectsWithUsers_NoProjectsFound() {
         // Arrange
         // Mock the repository to return an empty list of projects
         when(projectRepository.findAllProjects()).thenReturn(new ArrayList<>());
@@ -157,7 +157,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetAllProjects_Success() {
+     void testGetAllProjects_Success() {
         // Arrange
         List<Project> mockProjects = new ArrayList<>();
         Project project1 = new Project(1L, "Project1", "Description1", LocalDateTime.now(), false);
@@ -179,7 +179,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetAllProjects_EmptyList() {
+    void testGetAllProjects_EmptyList() {
         // Arrange
         // Mock the repository to return an empty list of projects
         when(projectRepository.findAllProjects()).thenReturn(new ArrayList<>());
@@ -193,7 +193,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testUpdateProject_Success() {
+     void testUpdateProject_Success() {
         // Arrange
         Project projectToUpdate = new Project(1L, "UpdatedProject", "UpdatedDescription", LocalDateTime.now(), false);
 
@@ -213,7 +213,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testUpdateProject_NullInput() {
+     void testUpdateProject_NullInput() {
         // Arrange
         // Mock the repository to return null when trying to save a null project
         when(projectRepository.save(null)).thenReturn(null);
@@ -226,7 +226,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetAllUsersByProjectId_Success() {
+     void testGetAllUsersByProjectId_Success() {
         // Arrange
         Long projectId = 1L;
         List<User> mockUsers = new ArrayList<>();
@@ -249,7 +249,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetAllUsersByProjectId_NoUsersFound() {
+     void testGetAllUsersByProjectId_NoUsersFound() {
         // Arrange
         Long projectId = 1L;
 
@@ -265,7 +265,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetAllUsersByProjectIdAndRole_Success() {
+     void testGetAllUsersByProjectIdAndRole_Success() {
         // Arrange
         Long projectId = 1L;
         EnumRole role = EnumRole.USER;
@@ -290,7 +290,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetAllUsersByProjectIdAndRole_NoUsersFound() {
+     void testGetAllUsersByProjectIdAndRole_NoUsersFound() {
         // Arrange
         Long projectId = 1L;
         EnumRole role = EnumRole.USER;
@@ -324,7 +324,7 @@ public class ProjectServiceImplTest {
 //        assertEquals("Internal server error.", exception.getMessage());
 //    }
     @Test
-    public void testUpdateProject_Successs() {
+   void testUpdateProject_Successs() {
         // Arrange
         Long projectId = 1L;
         ProjectDTO projectDTO = new ProjectDTO();
@@ -353,7 +353,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testUpdateProject_ProjectNotFound() {
+    void testUpdateProject_ProjectNotFound() {
         // Arrange
         Long projectId = 1L;
         ProjectDTO projectDTO = new ProjectDTO();
@@ -372,7 +372,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testDeleteProject_Success() {
+    void testDeleteProject_Success() {
         // Arrange
         Long projectId = 1L;
         Project existingProject = new Project(projectId, "Project1", "Description1", LocalDateTime.now(), false);
@@ -388,7 +388,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testDeleteProject_ProjectNotFound() {
+    void testDeleteProject_ProjectNotFound() {
         // Arrange
         Long projectId = 1L;
 
@@ -404,7 +404,7 @@ public class ProjectServiceImplTest {
 
 
     @Test
-    public void testAddUserToProject_UserAlreadyExists() {
+    void testAddUserToProject_UserAlreadyExists() {
         // Arrange
         Long projectId = 1L;
         Long userId = 2L;
@@ -441,7 +441,7 @@ public class ProjectServiceImplTest {
 
 
     @Test
-    public void testAddUserToProject_ProjectOrUserNotFound() {
+    void testAddUserToProject_ProjectOrUserNotFound() {
         // Arrange
         Long projectId = 1L;
         Long userId = 2L;
@@ -458,7 +458,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testAddUserToProject_InternalServerErrorr() {
+     void testAddUserToProject_InternalServerErrorr() {
         // Arrange
         Long projectId = 1L;
         Long userId = 2L;
@@ -474,32 +474,10 @@ public class ProjectServiceImplTest {
     }
 
 
-//    @Test
-//    public void testRemoveUserFromProject_UserNotFound() {
-//        // Arrange
-//        Long projectId = 1L;
-//        Long userId = 2L;
-//
-//        Project project = new Project();
-//        project.setProjectId(projectId);
-//        project.setProjectName("Project1");
-//        project.setProjectDescription("Description1");
-//
-//        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-//        when(userRepository.findById(userId)).thenReturn(Optional.empty());
-//
-//        // Act
-//        ResponseEntity<String> response = projectService.removeUserFromProject(projectId, userId);
-//
-//        // Assert
-//        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-//        assertEquals("Project or User not found", response.getBody());
-//        verify(projectRepository, never()).save(any());
-//    }
 
 
     @Test
-    public void testSoftDeleteProject_Success() {
+    void testSoftDeleteProject_Success() {
         // Arrange
         Long projectId = 1L;
 
@@ -515,7 +493,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testSoftDeleteProject_Failure() {
+   void testSoftDeleteProject_Failure() {
         // Arrange
         Long projectId = 1L;
 
@@ -531,7 +509,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testExistsProjectById_Exists() {
+     void testExistsProjectById_Exists() {
         // Arrange
         Long projectId = 1L;
 
@@ -547,7 +525,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testExistsProjectById_NotExists() {
+   void testExistsProjectById_NotExists() {
         // Arrange
         Long projectId = 1L;
 
@@ -563,7 +541,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetCountAllProjects_NullCount() {
+   void testGetCountAllProjects_NullCount() {
         // Arrange
         when(projectRepository.countAllProjects()).thenReturn(null);
 
@@ -576,7 +554,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetCountAllProjects_ZeroCount() {
+    void testGetCountAllProjects_ZeroCount() {
         // Arrange
         when(projectRepository.countAllProjects()).thenReturn(0);
 
@@ -589,7 +567,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetCountAllProjects_PositiveCount() {
+     void testGetCountAllProjects_PositiveCount() {
         // Arrange
         int expectedCount = 5;
         when(projectRepository.countAllProjects()).thenReturn(expectedCount);
@@ -603,7 +581,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetCountAllProjectsByRole_NullCount() {
+     void testGetCountAllProjectsByRole_NullCount() {
         // Arrange
         EnumRole role = EnumRole.USER;
         when(projectRepository.countAllProjectsByRole(role)).thenReturn(null);
@@ -617,7 +595,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetCountAllProjectsByRole_ZeroCount() {
+   void testGetCountAllProjectsByRole_ZeroCount() {
         // Arrange
         EnumRole role = EnumRole.USER;
         when(projectRepository.countAllProjectsByRole(role)).thenReturn(0);
@@ -631,7 +609,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetCountAllProjectsByRole_PositiveCount() {
+    void testGetCountAllProjectsByRole_PositiveCount() {
         // Arrange
         EnumRole role = EnumRole.USER;
         int expectedCount = 5;
@@ -646,7 +624,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetCountAllProjectsByUserId_NullCount() {
+     void testGetCountAllProjectsByUserId_NullCount() {
         // Arrange
         Long userId = 1L;
         when(projectRepository.countAllProjectsByUserId(userId)).thenReturn(null);
@@ -660,7 +638,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetCountAllProjectsByUserId_ZeroCount() {
+     void testGetCountAllProjectsByUserId_ZeroCount() {
         // Arrange
         Long userId = 1L;
         when(projectRepository.countAllProjectsByUserId(userId)).thenReturn(0);
@@ -674,7 +652,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetCountAllProjectsByUserId_PositiveCount() {
+    void testGetCountAllProjectsByUserId_PositiveCount() {
         // Arrange
         Long userId = 1L;
         int expectedCount = 5;
@@ -689,7 +667,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetCountAllUsersByProjectId_NullCount() {
+     void testGetCountAllUsersByProjectId_NullCount() {
         // Arrange
         Long projectId = 1L;
         when(projectRepository.countAllUsersByProjectId(projectId)).thenReturn(null);
@@ -703,7 +681,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetCountAllUsersByProjectId_ZeroCount() {
+    void testGetCountAllUsersByProjectId_ZeroCount() {
         // Arrange
         Long projectId = 1L;
         when(projectRepository.countAllUsersByProjectId(projectId)).thenReturn(0);
@@ -717,7 +695,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetCountAllUsersByProjectId_PositiveCount() {
+     void testGetCountAllUsersByProjectId_PositiveCount() {
         // Arrange
         Long projectId = 1L;
         int expectedCount = 5;
@@ -733,7 +711,7 @@ public class ProjectServiceImplTest {
 
 
     @Test
-    public void testGetCountAllPeopleAndProjectName_NoProjects() {
+   void testGetCountAllPeopleAndProjectName_NoProjects() {
         // Arrange
         when(projectRepository.findAllProjects()).thenReturn(new ArrayList<>());
 
@@ -748,7 +726,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetCountAllPeopleAndProjectName_WithProjects() {
+    void testGetCountAllPeopleAndProjectName_WithProjects() {
         // Arrange
         Project project1 = new Project();
         project1.setProjectId(1L);
@@ -780,7 +758,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetCountAllUsersByProjectIdAndRole_NoUsers() {
+    void testGetCountAllUsersByProjectIdAndRole_NoUsers() {
         // Arrange
         Long projectId = 1L;
         EnumRole enumRole = EnumRole.USER;
@@ -796,7 +774,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetCountAllUsersByProjectIdAndRole_WithUsers() {
+   void testGetCountAllUsersByProjectIdAndRole_WithUsers() {
         // Arrange
         Long projectId = 1L;
         EnumRole enumRole = EnumRole.USER;
@@ -812,7 +790,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetCountAllActiveProjects_NoActiveProjects() {
+     void testGetCountAllActiveProjects_NoActiveProjects() {
         // Arrange
         when(projectRepository.countAllActiveProjects()).thenReturn(0);
 
@@ -826,7 +804,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetCountAllActiveProjects_WithActiveProjects() {
+    void testGetCountAllActiveProjects_WithActiveProjects() {
         // Arrange
         when(projectRepository.countAllActiveProjects()).thenReturn(5); // 5 active projects
 
@@ -840,7 +818,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetCountAllInActiveProjects_NoInactiveProjects() {
+     void testGetCountAllInActiveProjects_NoInactiveProjects() {
         // Arrange
         when(projectRepository.countAllInActiveProjects()).thenReturn(0);
 
@@ -854,7 +832,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetCountAllInActiveProjects_WithInactiveProjects() {
+    void testGetCountAllInActiveProjects_WithInactiveProjects() {
         // Arrange
         when(projectRepository.countAllInActiveProjects()).thenReturn(3); // 3 inactive projects
 
@@ -868,7 +846,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetUsersByProjectIdAndRole_NoUsersFound() {
+     void testGetUsersByProjectIdAndRole_NoUsersFound() {
         // Arrange
         Long projectId = 1L;
         String role = "USER";
@@ -907,7 +885,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testAddRepositoryToProject_Success() {
+     void testAddRepositoryToProject_Success() {
         // Arrange
         Long projectId = 1L;
         Long repoId = 2L;
@@ -932,7 +910,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testAddRepositoryToDeletedProject() {
+     void testAddRepositoryToDeletedProject() {
         // Arrange
         Long projectId = 1L;
         Long repoId = 2L;
@@ -956,7 +934,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testAddRepositoryToNonExistentProject() {
+   void testAddRepositoryToNonExistentProject() {
         // Arrange
         Long projectId = 1L;
         Long repoId = 2L;
@@ -974,7 +952,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testAddRepositoryToNonExistentRepository() {
+     void testAddRepositoryToNonExistentRepository() {
         // Arrange
         Long projectId = 1L;
         Long repoId = 2L;
@@ -995,7 +973,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetProjectsWithoutFigmaURL() {
+    void testGetProjectsWithoutFigmaURL() {
         // Arrange
         Project project1 = new Project();
         project1.setProjectId(1L);
@@ -1032,7 +1010,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testGetProjectsWithoutGoogleDriveLink() {
+    void testGetProjectsWithoutGoogleDriveLink() {
         // Arrange
         Project project1 = new Project();
         project1.setProjectId(1L);
@@ -1070,7 +1048,7 @@ public class ProjectServiceImplTest {
 
 
     @Test
-    public void testMapProjectToProjectDTO() {
+    void testMapProjectToProjectDTO() {
         // Arrange
         Long projectId = 1L;
         String projectName = "Test Project";
@@ -1090,7 +1068,7 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void testMapProjectDTOToProject() {
+    void testMapProjectDTOToProject() {
         // Arrange
         Long projectId = 1L;
         String projectName = "Test Project";

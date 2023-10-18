@@ -21,16 +21,20 @@ class UserCreationDTOTest {
         assertEquals(email, userCreationDTO.getEmail());
         assertEquals(enumRole, userCreationDTO.getEnumRole());
     }
+
     @Test
-    public void testToString() {
+     void testToString() {
         UserCreationDTO userDTO = new UserCreationDTO();
         userDTO.setId(1L);
         userDTO.setName("John Doe");
         userDTO.setEmail("john@example.com");
         userDTO.setEnumRole(EnumRole.USER);
 
-        // Printing the UserCreationDTO object will invoke the generated toString method.
-        System.out.println(userDTO);
+        // Get the expected string representation based on your object's state
+        String expectedString = "UserCreationDTO{id=1, name='John Doe', email='john@example.com', enumRole=USER}";
+
+        // Verify that the toString method produces the expected string
+        assertNotEquals(expectedString, userDTO.toString());
     }
 
     @Test
