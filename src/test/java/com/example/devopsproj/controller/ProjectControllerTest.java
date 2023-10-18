@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class ProjectControllerTest {
+ class ProjectControllerTest {
 
     @InjectMocks
     private ProjectController projectController;
@@ -47,7 +47,7 @@ public class ProjectControllerTest {
     }
 
     @Test
-    public void testCreateProjectWithValidInput() throws Exception {
+    void testCreateProjectWithValidInput() throws Exception {
         // Create a valid ProjectDTO
         ProjectDTO validProjectDTO = new ProjectDTO();
         validProjectDTO.setProjectName("Valid Project");
@@ -68,7 +68,7 @@ public class ProjectControllerTest {
     }
 
     @Test
-    public void testGetProjectByIdWithValidId() throws Exception {
+     void testGetProjectByIdWithValidId() throws Exception {
         // Create a valid ProjectDTO and a corresponding ID
         ProjectDTO validProjectDTO = new ProjectDTO();
         validProjectDTO.setProjectId(1L);
@@ -90,7 +90,7 @@ public class ProjectControllerTest {
     }
 
     @Test
-    public void testGetProjectByIdWithInvalidId() {
+     void testGetProjectByIdWithInvalidId() {
         // Mock the projectService to return null when given an invalid ID
         when(projectService.getProjectById(2L)).thenReturn(null);
 
@@ -104,7 +104,7 @@ public class ProjectControllerTest {
         assertEquals(null, responseEntity.getBody());
     }
     @Test
-    public void testGetAllProjects() {
+    void testGetAllProjects() {
         // Create a list of ProjectDTO objects
         List<ProjectDTO> projectDTOs = new ArrayList<>();
         projectDTOs.add(new ProjectDTO(1L, "Project 1", "Description 1", null, false));
@@ -128,7 +128,7 @@ public class ProjectControllerTest {
     }
 
     @Test
-    public void testGetAllProjectsWithUsers() {
+    void testGetAllProjectsWithUsers() {
         // Create a list of ProjectWithUsersDTO objects
         List<ProjectWithUsersDTO> projectsWithUsers = new ArrayList<>();
         // Using the constructor with projectId, projectName, projectDescription, lastUpdated, and users
@@ -155,7 +155,7 @@ public class ProjectControllerTest {
     }
 
     @Test
-    public void testGetAllUsersByProjectId() {
+     void testGetAllUsersByProjectId() {
         // Define a projectId for testing
         Long projectId = 1L;
 
@@ -182,7 +182,7 @@ public class ProjectControllerTest {
     }
 
     @Test
-    public void testGetAllUsersByProjectIdByRole() {
+    void testGetAllUsersByProjectIdByRole() {
         // Define a projectId and role for testing
         Long projectId = 1L;
         String role = "ADMIN"; // Example role
@@ -209,7 +209,7 @@ public class ProjectControllerTest {
         }
     }
     @Test
-    public void testUpdateProject() {
+     void testUpdateProject() {
         // Define a projectId for testing
         Long projectId = 1L;
 
@@ -231,7 +231,7 @@ public class ProjectControllerTest {
     }
 
     @Test
-    public void testDeleteProject() {
+    void testDeleteProject() {
         // Define a projectId for testing
         Long projectId = 1L;
 
@@ -251,7 +251,7 @@ public class ProjectControllerTest {
     }
 
     @Test
-    public void testAddUserToProject() {
+    void testAddUserToProject() {
         // Define a projectId and userId for testing
         Long projectId = 1L;
         Long userId = 2L;
@@ -302,7 +302,7 @@ public class ProjectControllerTest {
         assertEquals(responseEntity, response);
     }
     @Test
-    public void testRemoveUserFromProject() {
+     void testRemoveUserFromProject() {
         // Define a projectId and userId for testing
         Long projectId = 1L;
         Long userId = 2L;
@@ -323,7 +323,7 @@ public class ProjectControllerTest {
     }
 
     @Test
-    public void testRemoveUserFromProjectAndRepo() {
+     void testRemoveUserFromProjectAndRepo() {
         // Define a projectId, userId, and CollaboratorDTO for testing
         Long projectId = 1L;
         Long userId = 2L;
@@ -344,7 +344,7 @@ public class ProjectControllerTest {
         assertEquals("User removed from project and repository successfully", responseBody);
     }
     @Test
-    public void testGetUsersByProjectIdAndRole() {
+     void testGetUsersByProjectIdAndRole() {
         // Define a projectId and role for testing
         Long projectId = 1L;
         String role = "ADMIN"; // Example role
@@ -372,7 +372,7 @@ public class ProjectControllerTest {
     }
 
     @Test
-    public void testAddRepositoryToProject() {
+     void testAddRepositoryToProject() {
         // Define a projectId and repoId for testing
         Long projectId = 1L;
         Long repoId = 2L;
@@ -393,7 +393,7 @@ public class ProjectControllerTest {
     }
 
     @Test
-    public void testCountAllPeopleByProjectIdAndName() {
+     void testCountAllPeopleByProjectIdAndName() {
         // Create a list of ProjectNamePeopleCountDTO objects with some sample data
         List<ProjectNamePeopleCountDTO> peopleCountDTOs = new ArrayList<>();
         ProjectNamePeopleCountDTO peopleCountDTO = new ProjectNamePeopleCountDTO(1L, "Project 1", 5);
@@ -417,7 +417,7 @@ public class ProjectControllerTest {
         }
     }
     @Test
-    public void testCountAllProjects() {
+     void testCountAllProjects() {
         // Mock the projectService to return a count of projects (e.g., 5)
         when(projectService.getCountAllProjects()).thenReturn(5);
 
@@ -432,7 +432,7 @@ public class ProjectControllerTest {
         assertEquals(5, responseBody);
     }
     @Test
-    public void testCountAllProjectsByRole() {
+    void testCountAllProjectsByRole() {
         // Mock role parameter and project count
         String role = "ADMIN"; // Replace with the role you want to test
         EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
@@ -453,7 +453,7 @@ public class ProjectControllerTest {
     }
 
     @Test
-    public void testCountAllProjectsByUserId() {
+    void testCountAllProjectsByUserId() {
         // Mock user ID parameter and project count
         Long userId = 123L; // Replace with the user ID you want to test
         int projectCount = 8; // Replace with the expected project count
@@ -473,7 +473,7 @@ public class ProjectControllerTest {
     }
 
     @Test
-    public void testCountAllUsersByProjectId() {
+    void testCountAllUsersByProjectId() {
         // Mock project ID parameter and user count
         Long projectId = 456L; // Replace with the project ID you want to test
         int userCount = 10; // Replace with the expected user count
@@ -492,7 +492,7 @@ public class ProjectControllerTest {
         assertEquals(userCount, responseBody);
     }
     @Test
-    public void testCountAllUsersByProjectIdByRole() {
+    void testCountAllUsersByProjectIdByRole() {
         // Mock project ID and role parameters
         Long projectId = 789L; // Replace with the project ID you want to test
         String role = "ADMIN"; // Replace with the role you want to test
@@ -514,7 +514,7 @@ public class ProjectControllerTest {
     }
 
     @Test
-    public void testCountAllActiveProjects() {
+     void testCountAllActiveProjects() {
         // Mock the projectService to return a count of active projects (e.g., 7)
         when(projectService.getCountAllActiveProjects()).thenReturn(7);
 
@@ -530,7 +530,7 @@ public class ProjectControllerTest {
     }
 
     @Test
-    public void testCountAllInActiveProjects() {
+     void testCountAllInActiveProjects() {
         // Mock the projectService to return a count of inactive projects (e.g., 3)
         when(projectService.getCountAllInActiveProjects()).thenReturn(3);
 
@@ -546,7 +546,7 @@ public class ProjectControllerTest {
     }
 
     @Test
-    public void testCountAllInActiveProjectsNoData() {
+     void testCountAllInActiveProjectsNoData() {
         // Mock the projectService to return 0 when there are no inactive projects
         when(projectService.getCountAllInActiveProjects()).thenReturn(0);
 
@@ -563,7 +563,7 @@ public class ProjectControllerTest {
 
 
     @Test
-    public void testGetProjectDetailsById() {
+     void testGetProjectDetailsById() {
         // Mock the projectService to return a ProjectDTO when given a valid projectId
         Long projectId = 1L;
         ProjectDTO expectedProjectDetails = new ProjectDTO(/* Initialize with expected data */);
@@ -581,7 +581,7 @@ public class ProjectControllerTest {
     }
 
     @Test
-    public void testGetProjectDetailsByIdInvalidId() {
+     void testGetProjectDetailsByIdInvalidId() {
         // Mock the projectService to return an empty optional when given an invalid projectId (e.g., project with ID 2 does not exist)
         Long invalidProjectId = 2L;
         when(projectService.getProjectDetailsById(invalidProjectId)).thenReturn(null);

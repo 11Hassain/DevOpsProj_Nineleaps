@@ -36,7 +36,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class UserNamesControllerTest {
+ class UserNamesControllerTest {
 
     @InjectMocks
     private UserNamesController userNamesController;
@@ -51,13 +51,13 @@ public class UserNamesControllerTest {
     private ObjectMapper objectMapper;
 
     @BeforeEach
-    public void setUp() {
+     void setUp() {
         MockitoAnnotations.openMocks(this);
         objectMapper = new ObjectMapper();
     }
 
     @Test
-    public void testSaveUsername_Success() throws Exception {
+     void testSaveUsername_Success() throws Exception {
         // Prepare test data
         UserNamesDTO userNamesDTO = new UserNamesDTO();
         userNamesDTO.setUsername("testUser");
@@ -81,7 +81,7 @@ public class UserNamesControllerTest {
     }
 
     @Test
-    public void testGetUserNamesByRole_ValidRole() {
+     void testGetUserNamesByRole_ValidRole() {
         // Arrange
         String role = "ADMIN";
         EnumRole enumRole = EnumRole.ADMIN;

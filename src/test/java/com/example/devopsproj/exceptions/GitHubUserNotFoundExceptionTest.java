@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class GitHubUserNotFoundExceptionTest {
+ class GitHubUserNotFoundExceptionTest {
 
     @Test
-    public void testGitHubUserNotFoundExceptionWithMessage() {
+     void testGitHubUserNotFoundExceptionWithMessage() {
         // Arrange
         String message = "GitHub user not found";
 

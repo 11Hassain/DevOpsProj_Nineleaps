@@ -10,7 +10,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UserTest {
+ class UserTest {
 
     private User user;
 
@@ -222,19 +222,19 @@ public class UserTest {
     }
 
     @Test
-    public void testGetDeleted() {
+     void testGetDeleted() {
         user.setDeleted(true);
         assertEquals(true, user.getDeleted());
     }
 
     @Test
-    public void testGetEnumRole() {
+     void testGetEnumRole() {
         user.setEnumRole(EnumRole.USER);
         assertEquals(EnumRole.USER, user.getEnumRole());
     }
 
     @Test
-    public void testConstructorWithIdAndName() {
+     void testConstructorWithIdAndName() {
         long id = 1L;
         String name = "John Doe";
         user = new User(id, name);

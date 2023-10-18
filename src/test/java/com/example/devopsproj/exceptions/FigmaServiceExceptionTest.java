@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class FigmaServiceExceptionTest {
+ class FigmaServiceExceptionTest {
 
     @Test
-    public void testFigmaServiceExceptionWithMessage() {
+     void testFigmaServiceExceptionWithMessage() {
         // Arrange
         String message = "Figma service error";
 
@@ -21,7 +21,7 @@ public class FigmaServiceExceptionTest {
     }
 
     @Test
-    public void testFigmaServiceExceptionWithMessageAndCause() {
+     void testFigmaServiceExceptionWithMessageAndCause() {
         // Arrange
         String message = "Figma service error";
         Throwable cause = new RuntimeException("Root cause exception");

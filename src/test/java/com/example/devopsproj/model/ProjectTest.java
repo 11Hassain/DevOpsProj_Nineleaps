@@ -16,12 +16,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ProjectTest {
+ class ProjectTest {
 
     @Mock
     private ProjectRepository projectRepository;
     @Test
-    public void testAllArgsConstructor() {
+     void testAllArgsConstructor() {
         Long projectId = 1L;
         String projectName = "Project1";
         String projectDescription = "Description";
@@ -56,7 +56,7 @@ public class ProjectTest {
 
 
     @Test
-    public void testGetterSetter() {
+     void testGetterSetter() {
         Project project = new Project();
 
         Long projectId = 1L;
@@ -93,7 +93,7 @@ public class ProjectTest {
         assertEquals(googleDrive, project.getGoogleDrive());
     }
     @Test
-    public void testUsersField() {
+     void testUsersField() {
         // Arrange
         Project project = new Project();
         List<User> users = new ArrayList<>();
@@ -112,7 +112,7 @@ public class ProjectTest {
     }
 
     @Test
-    public void testFigmaField() {
+     void testFigmaField() {
         // Arrange
         Project project = new Project();
         Figma figma = mock(Figma.class);
@@ -127,7 +127,7 @@ public class ProjectTest {
     }
 
     @Test
-    public void testGoogleDriveField() {
+     void testGoogleDriveField() {
         // Arrange
         Project project = new Project();
         GoogleDrive googleDrive = mock(GoogleDrive.class);
@@ -142,7 +142,7 @@ public class ProjectTest {
     }
 
     @Test
-    public void testGetRepositoriesWithNullRepositories() {
+     void testGetRepositoriesWithNullRepositories() {
         // Arrange
         Project project = new Project();
 
@@ -155,7 +155,7 @@ public class ProjectTest {
     }
 
     @Test
-    public void testGetDeleted() {
+     void testGetDeleted() {
         // Arrange
         Project project = new Project();
         boolean deleted = true;
@@ -170,7 +170,7 @@ public class ProjectTest {
     }
 
     @Test
-    public void testSetProjectName() {
+     void testSetProjectName() {
         // Arrange
         Project project = new Project();
         String projectName = "New Project Name";

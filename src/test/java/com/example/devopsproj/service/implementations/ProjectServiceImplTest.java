@@ -198,7 +198,7 @@ import static org.mockito.Mockito.*;
         Project projectToUpdate = new Project(1L, "UpdatedProject", "UpdatedDescription", LocalDateTime.now(), false);
 
         // Mock the repository to return the updated project when saved
-        when(projectRepository.save(eq(projectToUpdate))).thenReturn(projectToUpdate);
+        when(projectRepository.save(projectToUpdate)).thenReturn(projectToUpdate);
 
         // Act
         Project updatedProject = projectService.updateProject(projectToUpdate);

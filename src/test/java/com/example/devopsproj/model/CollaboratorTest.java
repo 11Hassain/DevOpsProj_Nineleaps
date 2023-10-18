@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CollaboratorTest {
+ class CollaboratorTest {
 
     @Test
-    public void testCollaboratorInitialization() {
+     void testCollaboratorInitialization() {
         Collaborator collaborator = new Collaborator();
 
         assertNull(collaborator.getId());
@@ -17,7 +17,7 @@ public class CollaboratorTest {
     }
 
     @Test
-    public void testCollaboratorSetterGetter() {
+     void testCollaboratorSetterGetter() {
         Long id = 1L;
         String owner = "John";
         String repo = "exampleRepo";

@@ -7,7 +7,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class NotFoundExceptionTest {
+ class NotFoundExceptionTest {
 
     @Test
     void testNotFoundExceptionWithMessage() {

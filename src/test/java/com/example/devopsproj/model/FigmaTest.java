@@ -9,10 +9,10 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class FigmaTest {
+ class FigmaTest {
 
     @Test
-    public void testFigmaInitialization() {
+     void testFigmaInitialization() {
         Figma figma = new Figma();
 
         assertNull(figma.getFigmaId());
@@ -23,7 +23,7 @@ public class FigmaTest {
     }
 
     @Test
-    public void testFigmaSetterGetter() {
+     void testFigmaSetterGetter() {
         Long figmaId = 1L;
         String figmaURL = "https://example.com/figma";
         String user = "JohnDoe";
@@ -75,7 +75,7 @@ public class FigmaTest {
         assertEquals(project, figma.getProject());
     }
     @Test
-    public void testAllArgsConstructor() {
+     void testAllArgsConstructor() {
         Long figmaId = 1L;
         String figmaURL = "https://example.com/figma";
         String user = "JohnDoe";
@@ -95,7 +95,7 @@ public class FigmaTest {
     }
 
     @Test
-    public void testNoArgsConstructor() {
+     void testNoArgsConstructor() {
         Figma figma = new Figma();
 
         assertNull(figma.getFigmaId());

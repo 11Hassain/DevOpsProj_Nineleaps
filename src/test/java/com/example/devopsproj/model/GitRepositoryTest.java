@@ -10,10 +10,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class GitRepositoryTest {
+ class GitRepositoryTest {
 
     @Test
-    public void testAllArgsConstructor() {
+     void testAllArgsConstructor() {
         Long repoId = 1L;
         String name = "Repository1";
         String description = "Description1";
@@ -30,7 +30,7 @@ public class GitRepositoryTest {
     }
 
     @Test
-    public void testNoArgsConstructor() {
+     void testNoArgsConstructor() {
         GitRepository gitRepository = new GitRepository();
 
         assertNull(gitRepository.getRepoId());
@@ -41,7 +41,7 @@ public class GitRepositoryTest {
     }
 
     @Test
-    public void testGetterSetter() {
+     void testGetterSetter() {
         GitRepository gitRepository = new GitRepository();
 
         Long repoId = 1L;

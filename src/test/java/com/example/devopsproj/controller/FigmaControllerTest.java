@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
-public class FigmaControllerTest {
+class FigmaControllerTest {
     private MockMvc mockMvc;
 
     private FigmaController figmaController;
@@ -49,7 +49,7 @@ public class FigmaControllerTest {
 
 
     @Test
-    public void testCreateFigmaSuccess() {
+   void testCreateFigmaSuccess() {
         // Create a sample FigmaDTO
         FigmaDTO figmaDTO = new FigmaDTO();
         // Set properties in figmaDTO
@@ -67,7 +67,7 @@ public class FigmaControllerTest {
     }
 
     @Test
-    public void testCreateFigmaDataIntegrityViolationException() {
+    void testCreateFigmaDataIntegrityViolationException() {
         // Create a sample FigmaDTO
         FigmaDTO figmaDTO = new FigmaDTO();
         // Set properties in figmaDTO
@@ -82,7 +82,7 @@ public class FigmaControllerTest {
     }
 
     @Test
-    public void testCreateFigmaRuntimeException() {
+     void testCreateFigmaRuntimeException() {
         // Create a sample FigmaDTO
         FigmaDTO figmaDTO = new FigmaDTO();
         // Set properties in figmaDTO
@@ -146,7 +146,7 @@ public class FigmaControllerTest {
 
 
     @Test
-    public void testDeleteFigma_Success() {
+     void testDeleteFigma_Success() {
         Long figmaId = 1L;
 
         // Mock the service method to perform a successful deletion
@@ -164,7 +164,7 @@ public class FigmaControllerTest {
     }
 
     @Test
-    public void testGetFigmaByProjectId_Success() {
+     void testGetFigmaByProjectId_Success() {
         Long projectId = 1L;
         String figmaURL = "https://example.com/figma";
 
@@ -183,7 +183,7 @@ public class FigmaControllerTest {
     }
 
     @Test
-    public void testGetFigmaByProjectId_FigmaNotFound() {
+     void testGetFigmaByProjectId_FigmaNotFound() {
         Long projectId = 2L;
 
         // Mock the service method to return null, indicating no Figma found
@@ -199,7 +199,7 @@ public class FigmaControllerTest {
         assertEquals(200, response.getStatusCodeValue());
     }
     @Test
-    public void testGetFigma_Success() {
+   void testGetFigma_Success() {
         Long figmaId = 1L;
         FigmaDTO expectedFigmaDTO = new FigmaDTO(new ProjectDTO(/* populate project DTO */), "https://example.com/figma");
 
@@ -229,7 +229,7 @@ public class FigmaControllerTest {
     }
 
     @Test
-    public void testGetFigma_FigmaNotFound() {
+     void testGetFigma_FigmaNotFound() {
         Long figmaId = 2L;
 
         // Mock the service method to return an empty Optional, indicating no Figma found

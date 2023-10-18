@@ -15,7 +15,7 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class AccessRequestServiceTest {
+ class AccessRequestServiceTest {
     @InjectMocks
     private AccessRequestServiceImpl accessRequestService;
 
@@ -24,13 +24,13 @@ public class AccessRequestServiceTest {
 
 
     @BeforeEach
-    public void setUp() {
+     void setUp() {
         MockitoAnnotations.openMocks(this); // Initialize mocks
 
     }
 
     @Test
-    public void testCreateRequest_Success() {
+     void testCreateRequest_Success() {
         // Arrange
         AccessRequestDTO inputDTO = new AccessRequestDTO();
         inputDTO.setAccessRequestId(1L); // Set input data as needed
@@ -53,7 +53,7 @@ public class AccessRequestServiceTest {
         verify(accessRequestRepository, times(1)).save(any(AccessRequest.class));
     }
     @Test
-    public void testGetAllRequests_RequestsExist() {
+     void testGetAllRequests_RequestsExist() {
         // Arrange
         AccessRequest accessRequest1 = new AccessRequest();
         accessRequest1.setAccessRequestId(1L);
@@ -81,7 +81,7 @@ public class AccessRequestServiceTest {
     }
 
     @Test
-    public void testGetAllRequests_NoRequestsExist() {
+     void testGetAllRequests_NoRequestsExist() {
         // Arrange
         when(accessRequestRepository.findAll()).thenReturn(new ArrayList<>());
 
@@ -93,7 +93,7 @@ public class AccessRequestServiceTest {
     }
 
     @Test
-    public void testGetAllActiveRequests_ActiveRequestsExist() {
+     void testGetAllActiveRequests_ActiveRequestsExist() {
         // Arrange
         AccessRequest accessRequest1 = new AccessRequest();
         accessRequest1.setAccessRequestId(1L);
@@ -121,7 +121,7 @@ public class AccessRequestServiceTest {
     }
 
     @Test
-    public void testGetAllActiveRequests_NoActiveRequestsExist() {
+     void testGetAllActiveRequests_NoActiveRequestsExist() {
         // Arrange
         when(accessRequestRepository.findAllActiveRequests()).thenReturn(new ArrayList<>());
 
@@ -132,7 +132,7 @@ public class AccessRequestServiceTest {
         assertEquals(0, result.size());
     }
     @Test
-    public void testGetUpdatedRequests_ExistingAccessRequest() {
+     void testGetUpdatedRequests_ExistingAccessRequest() {
         // Arrange
         Long requestId = 1L;
         AccessRequestDTO updatedRequestDTO = new AccessRequestDTO();
@@ -156,7 +156,7 @@ public class AccessRequestServiceTest {
     }
 
     @Test
-    public void testGetUpdatedRequests_NonExistingAccessRequest() {
+     void testGetUpdatedRequests_NonExistingAccessRequest() {
         // Arrange
         Long requestId = 1L;
         AccessRequestDTO updatedRequestDTO = new AccessRequestDTO();
@@ -173,7 +173,7 @@ public class AccessRequestServiceTest {
         assertEquals(0, result.size());
     }
     @Test
-    public void testGetPMUnreadRequests() {
+     void testGetPMUnreadRequests() {
         // Arrange
         String pmName = "PM1";
 
@@ -215,7 +215,7 @@ public class AccessRequestServiceTest {
 
     }
     @Test
-    public void testGetPMRequests_Success() {
+     void testGetPMRequests_Success() {
         // Arrange
         String pmName = "PM1";
 
@@ -244,7 +244,7 @@ public class AccessRequestServiceTest {
         // You can add more assertions here to validate the contents of the DTOs if needed
     }
     @Test
-    public void testGetPMRequests_NoRequestsFound() {
+     void testGetPMRequests_NoRequestsFound() {
         // Arrange
         String pmName = "PM1";
 
@@ -263,7 +263,7 @@ public class AccessRequestServiceTest {
     }
 
     @Test
-    public void testMapAccessRequestsToResponseDTOs() {
+     void testMapAccessRequestsToResponseDTOs() {
         // Arrange
         AccessRequest accessRequest1 = new AccessRequest();
         accessRequest1.setAccessRequestId(1L);
@@ -311,7 +311,7 @@ public class AccessRequestServiceTest {
     }
 
     @Test
-    public void testSetPMRequestsNotificationTrue_Success() {
+     void testSetPMRequestsNotificationTrue_Success() {
         // Arrange
         Long accessRequestId = 1L;
         AccessRequest accessRequest = new AccessRequest();
@@ -329,7 +329,7 @@ public class AccessRequestServiceTest {
     }
 
     @Test
-    public void testSetPMRequestsNotificationTrue_NotFound() {
+     void testSetPMRequestsNotificationTrue_NotFound() {
         // Arrange
         Long accessRequestId = 1L;
 
@@ -343,7 +343,7 @@ public class AccessRequestServiceTest {
         verify(accessRequestRepository, never()).save(any());
     }
     @Test
-    public void testClearAllNotifications() {
+     void testClearAllNotifications() {
         // Act
         accessRequestService.clearAllNotifications();
 
@@ -352,7 +352,7 @@ public class AccessRequestServiceTest {
     }
 
     @Test
-    public void testGetUpdatedRequests() {
+     void testGetUpdatedRequests() {
         // Create a sample User object
         User sampleUser = new User();
         sampleUser.setId(1L);

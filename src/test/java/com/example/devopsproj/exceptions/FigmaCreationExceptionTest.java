@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class FigmaCreationExceptionTest {
+class FigmaCreationExceptionTest {
 
     @Test
-    public void testFigmaCreationExceptionWithMessage() {
+     void testFigmaCreationExceptionWithMessage() {
         String message = "Figma creation failed";
         FigmaCreationException exception = new FigmaCreationException(message);
 
@@ -16,7 +16,7 @@ public class FigmaCreationExceptionTest {
     }
 
     @Test
-    public void testFigmaCreationExceptionWithMessageAndCause() {
+     void testFigmaCreationExceptionWithMessageAndCause() {
         String message = "Figma creation failed";
         Throwable cause = new RuntimeException("Root cause exception");
         FigmaCreationException exception = new FigmaCreationException(message, cause);

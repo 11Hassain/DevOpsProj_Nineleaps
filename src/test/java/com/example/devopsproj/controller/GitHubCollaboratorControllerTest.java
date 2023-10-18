@@ -9,7 +9,7 @@ import static org.mockito.Mockito.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-public class GitHubCollaboratorControllerTest {
+ class GitHubCollaboratorControllerTest {
 
     private GitHubCollaboratorService collaboratorService;
     private GitHubCollaboratorController collaboratorController;
@@ -21,7 +21,7 @@ public class GitHubCollaboratorControllerTest {
     }
 
     @Test
-    public void testAddCollaborator_Success() {
+     void testAddCollaborator_Success() {
         // Prepare test data
         CollaboratorDTO collaboratorDTO = new CollaboratorDTO();
 
@@ -42,7 +42,7 @@ public class GitHubCollaboratorControllerTest {
 
 
     @Test
-    public void testDeleteCollaborator_Success() {
+     void testDeleteCollaborator_Success() {
         // Prepare test data
         CollaboratorDTO collaboratorDTO = new CollaboratorDTO();
 

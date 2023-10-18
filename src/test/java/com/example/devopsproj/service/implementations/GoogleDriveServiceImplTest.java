@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class GoogleDriveServiceImplTest {
+ class GoogleDriveServiceImplTest {
 
     @Mock
     private GoogleDriveRepository googleDriveRepository;
@@ -36,12 +36,12 @@ public class GoogleDriveServiceImplTest {
     private GoogleDriveServiceImpl googleDriveService;
 
     @BeforeEach
-    public void setUp() {
+     void setUp() {
         MockitoAnnotations.initMocks(this);
     }
 
     @Test
-    public void testCreateGoogleDrive_Success() {
+     void testCreateGoogleDrive_Success() {
         // Arrange
         GoogleDriveDTO googleDriveDTO = new GoogleDriveDTO();
         googleDriveDTO.setDriveLink("https://example.com/drive");
@@ -77,7 +77,7 @@ public class GoogleDriveServiceImplTest {
     }
 
     @Test
-    public void testGetAllGoogleDrives_Success() {
+     void testGetAllGoogleDrives_Success() {
         // Arrange
         Project project1 = new Project();
         project1.setProjectId(1L);
@@ -111,7 +111,7 @@ public class GoogleDriveServiceImplTest {
     }
 
     @Test
-    public void testGetGoogleDriveById_Success() {
+     void testGetGoogleDriveById_Success() {
         // Arrange
         Project project = new Project();
         project.setProjectId(1L);
@@ -139,7 +139,7 @@ public class GoogleDriveServiceImplTest {
     }
 
     @Test
-    public void testGetGoogleDriveById_NotFound() {
+     void testGetGoogleDriveById_NotFound() {
         // Arrange
         Long driveId = 101L;
 
@@ -153,7 +153,7 @@ public class GoogleDriveServiceImplTest {
     }
 
     @Test
-    public void testDeleteGoogleDriveById_Success() {
+     void testDeleteGoogleDriveById_Success() {
         // Arrange
         Long driveId = 1L;
 
@@ -177,7 +177,7 @@ public class GoogleDriveServiceImplTest {
     }
 
     @Test
-    public void testDeleteGoogleDriveById_NotFound() {
+     void testDeleteGoogleDriveById_NotFound() {
         // Arrange
         Long driveId = 1L;
 
@@ -195,7 +195,7 @@ public class GoogleDriveServiceImplTest {
 
 
     @Test
-    public void testGetGoogleDriveByProjectId_NotFound() {
+     void testGetGoogleDriveByProjectId_NotFound() {
         // Arrange
         Long projectId = 1L;
 
@@ -213,7 +213,7 @@ public class GoogleDriveServiceImplTest {
     }
 
     @Test
-    public void testCreateGoogleDrive_Successs() {
+     void testCreateGoogleDrive_Successs() {
         // Arrange
         GoogleDriveDTO googleDriveDTO = new GoogleDriveDTO();
         googleDriveDTO.setDriveLink("https://example.com/drive");
@@ -240,7 +240,7 @@ public class GoogleDriveServiceImplTest {
         assertEquals(projectDTO.getProjectName(), createdGoogleDrive.getProjectDTO().getProjectName());
     }
     @Test
-    public void testMapProjectToProjectDTO() {
+     void testMapProjectToProjectDTO() {
         // Arrange
         Project project = new Project();
         project.setProjectId(1L);
@@ -255,7 +255,7 @@ public class GoogleDriveServiceImplTest {
     }
 
     @Test
-    public void testMapProjectDTOToProject() {
+     void testMapProjectDTOToProject() {
         // Arrange
         ProjectDTO projectDTO = new ProjectDTO();
         projectDTO.setProjectId(1L);
@@ -270,7 +270,7 @@ public class GoogleDriveServiceImplTest {
     }
 
     @Test
-    public void testGetGoogleDriveByProjectIdNotFound() {
+     void testGetGoogleDriveByProjectIdNotFound() {
         // Mock data
         long projectId = 1L;
 
@@ -285,7 +285,7 @@ public class GoogleDriveServiceImplTest {
     }
 
     @Test
-    public void testMapToGoogleDriveDTO() {
+     void testMapToGoogleDriveDTO() {
         // Mock data
         long projectId = 1L;
         String projectName = "ProjectName";

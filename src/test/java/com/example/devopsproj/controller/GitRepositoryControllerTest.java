@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 
 
 
-public class GitRepositoryControllerTest {
+ class GitRepositoryControllerTest {
 
     private GitRepositoryService gitRepositoryService;
     private GitRepositoryController gitRepositoryController;
@@ -38,7 +38,7 @@ public class GitRepositoryControllerTest {
     }
 
     @Test
-    public void testCreateRepository_Success() {
+     void testCreateRepository_Success() {
         // Prepare test data
         GitRepository gitRepository = new GitRepository();
         gitRepository.setName("test-repo");
@@ -60,7 +60,7 @@ public class GitRepositoryControllerTest {
     }
 
     @Test
-    public void testGetAllRepositories_Success() {
+     void testGetAllRepositories_Success() {
         // Prepare mock data
         List<GitRepositoryDTO> mockRepositories = new ArrayList<>();
         mockRepositories.add(new GitRepositoryDTO("1", "repo1")); // Use String for repoId
@@ -89,7 +89,7 @@ public class GitRepositoryControllerTest {
         }
     }
     @Test
-    public void testGetAllReposByProject_Success() {
+    void testGetAllReposByProject_Success() {
         // Prepare mock data
         Long projectId = 1L; // Project ID to be used in the controller method
 
@@ -121,7 +121,7 @@ public class GitRepositoryControllerTest {
     }
 
     @Test
-    public void testGetAllReposByRole_Success() {
+   void testGetAllReposByRole_Success() {
         // Prepare mock data
         String role = "ADMIN"; // Role to be used in the controller method
 
@@ -152,7 +152,7 @@ public class GitRepositoryControllerTest {
         }
     }
     @Test
-    public void testGetRepositoryById_Success() {
+     void testGetRepositoryById_Success() {
         // Prepare mock data
         Long repoId = 1L; // Repository ID to be used in the controller method
         String repoName = "repo1";
@@ -179,7 +179,7 @@ public class GitRepositoryControllerTest {
     }
 
     @Test
-    public void testDeleteRepository_Success() {
+     void testDeleteRepository_Success() {
         // Prepare mock data
         Long repoId = 1L; // Repository ID to be used in the controller method
 

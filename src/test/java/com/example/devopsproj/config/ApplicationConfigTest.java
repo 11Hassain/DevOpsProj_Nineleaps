@@ -15,7 +15,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
-public class ApplicationConfigTest {
+ class ApplicationConfigTest {
 
     private ApplicationConfig applicationConfig;
 

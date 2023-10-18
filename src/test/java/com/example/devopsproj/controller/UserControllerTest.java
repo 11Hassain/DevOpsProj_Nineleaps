@@ -32,14 +32,14 @@ import java.util.stream.Collectors;
 
 @SpringBootApplication
 @EnableWebMvc
-public class UserControllerTest {
+ class UserControllerTest {
 
     private final UserServiceImpl userService = mock(UserServiceImpl.class);
     private final UserController userController = new UserController(userService);
 
 
     @Test
-    public void testSaveUser_Success() {
+     void testSaveUser_Success() {
         // Create a sample UserCreationDTO
         UserCreationDTO userCreationDTO = new UserCreationDTO();
         userCreationDTO.setName("John Doe");
@@ -82,7 +82,7 @@ public class UserControllerTest {
         assertEquals(responseEntity, response);
     }
     @Test
-    public void testGetUserById_UserFound() {
+    void testGetUserById_UserFound() {
         // Create a sample User object
         User user = new User();
         user.setId(1L);
@@ -123,7 +123,7 @@ public class UserControllerTest {
 
 
     @Test
-    public void testGetUserById_UserNotFound() {
+     void testGetUserById_UserNotFound() {
         // Mock the behavior of userServiceImpl.getUserById(userId) to return an empty Optional
         when(userService.getUserById(1L)).thenReturn(Optional.empty());
 
@@ -138,7 +138,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testGetProjectsByRoleIdAndUserId_ProjectsFound() {
+     void testGetProjectsByRoleIdAndUserId_ProjectsFound() {
         // Create a sample user ID and role
         Long userId = 1L;
         String role = "USER";
@@ -176,7 +176,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testUpdateUser_UserUpdatedSuccessfully() {
+     void testUpdateUser_UserUpdatedSuccessfully() {
         // Create a sample user ID
         Long userId = 1L;
 
@@ -205,7 +205,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testDeleteUserById_UserDeletedSuccessfully() {
+     void testDeleteUserById_UserDeletedSuccessfully() {
         // Create a sample user ID
         Long userId = 1L;
 
@@ -229,7 +229,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testGetUserByRoleId_UsersFound() {
+     void testGetUserByRoleId_UsersFound() {
         // Define a sample role
         String role = "USER";
 
@@ -260,7 +260,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testGetUserByRoleId_NoUsersFound() {
+     void testGetUserByRoleId_NoUsersFound() {
         // Define a role that does not have any associated users
         String role = "ADMIN"; // You can choose a role that is not present in your sample data
 
@@ -279,7 +279,7 @@ public class UserControllerTest {
         assertTrue(((List<UserDTO>) responseEntity.getBody()).isEmpty());
     }
     @Test
-    public void testGetCountAllUsers_CountGreaterThanZero() {
+     void testGetCountAllUsers_CountGreaterThanZero() {
         // Define a sample count
         int count = 5;
 
@@ -300,7 +300,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testGetCountAllUsers_CountIsZero() {
+     void testGetCountAllUsers_CountIsZero() {
         // Define a sample count of 0
         int count = 0;
 
@@ -320,7 +320,7 @@ public class UserControllerTest {
         assertEquals(0, responseEntity.getBody());
     }
     @Test
-    public void testGetCountAllUsersByRole_CountGreaterThanZero() {
+     void testGetCountAllUsersByRole_CountGreaterThanZero() {
         // Define a sample role and count
         String role = "USER";
         int count = 5;
@@ -342,7 +342,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testGetCountAllUsersByRole_CountIsZero() {
+    void testGetCountAllUsersByRole_CountIsZero() {
         // Define a sample role and count of 0
         String role = "USER";
         int count = 0;
@@ -363,7 +363,7 @@ public class UserControllerTest {
         assertEquals(0, responseEntity.getBody());
     }
     @Test
-    public void testGetCountAllUsersByProjectId_CountGreaterThanZero() {
+     void testGetCountAllUsersByProjectId_CountGreaterThanZero() {
         // Define a sample project ID and count
         Long projectId = 1L;
         int count = 5;
@@ -385,7 +385,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testGetCountAllUsersByProjectId_CountIsZero() {
+     void testGetCountAllUsersByProjectId_CountIsZero() {
         // Define a sample project ID and count of 0
         Long projectId = 2L;
         int count = 0;
@@ -407,7 +407,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testGetAllProjectsByUserId_ProjectsFound() {
+     void testGetAllProjectsByUserId_ProjectsFound() {
         // Define a sample user ID
         Long userId = 1L;
 
@@ -429,7 +429,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testGetAllProjectsByUserId_NoProjectsFound() {
+     void testGetAllProjectsByUserId_NoProjectsFound() {
         // Define a sample user ID
         Long userId = 2L;
 
@@ -460,7 +460,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testGetAllUsers_UsersFound() {
+     void testGetAllUsers_UsersFound() {
         // Mock the behavior of userServiceImpl.getAllUsers
         List<UserDTO> users = createSampleUsers(); // Create sample users
         when(userService.getAllUsers()).thenReturn(users);
@@ -479,7 +479,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testGetAllUsers_NoUsersFound() {
+     void testGetAllUsers_NoUsersFound() {
         // Mock the behavior of userServiceImpl.getAllUsers
         when(userService.getAllUsers()).thenReturn(Collections.emptyList());
 
@@ -506,7 +506,7 @@ public class UserControllerTest {
         return users;
     }
     @Test
-    public void testGetAllUsersWithProjects_UserProjectsFound() {
+     void testGetAllUsersWithProjects_UserProjectsFound() {
         // Mock the behavior of userServiceImpl.getAllUsersWithProjects
         List<UserProjectsDTO> userProjectsDTOs = createSampleUserProjects(); // Create sample user projects
         when(userService.getAllUsersWithProjects()).thenReturn(userProjectsDTOs);
@@ -525,7 +525,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testGetAllUsersWithProjects_NoUserProjectsFound() {
+     void testGetAllUsersWithProjects_NoUserProjectsFound() {
         // Mock the behavior of userServiceImpl.getAllUsersWithProjects
         when(userService.getAllUsersWithProjects()).thenReturn(Collections.emptyList());
 
@@ -553,7 +553,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testGetUsersWithMultipleProjects_UsersFound() {
+     void testGetUsersWithMultipleProjects_UsersFound() {
         // Mock the behavior of userServiceImpl.getUsersWithMultipleProjects
         List<UserProjectsDTO> usersWithMultipleProjects = createSampleUsersWithMultipleProjects(); // Create sample users with multiple projects
         when(userService.getUsersWithMultipleProjects()).thenReturn(usersWithMultipleProjects);
@@ -572,7 +572,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testGetUsersWithMultipleProjects_NoUsersFound() {
+     void testGetUsersWithMultipleProjects_NoUsersFound() {
         // Mock the behavior of userServiceImpl.getUsersWithMultipleProjects
         when(userService.getUsersWithMultipleProjects()).thenReturn(Collections.emptyList());
 
@@ -600,7 +600,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testGetUserWithoutProject_UsersFound() {
+     void testGetUserWithoutProject_UsersFound() {
         // Mock the behavior of userServiceImpl.getAllUsersWithoutProjects
         List<UserDTO> usersWithoutProjects = createSampleUsersWithoutProjects(); // Create sample users without projects
         when(userService.getAllUsersWithoutProjects(any(EnumRole.class), any(Long.class))).thenReturn(usersWithoutProjects);
@@ -619,7 +619,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testGetUserWithoutProject_NoUsersFound() {
+     void testGetUserWithoutProject_NoUsersFound() {
         // Mock the behavior of userServiceImpl.getAllUsersWithoutProjects to return an empty list
         when(userService.getAllUsersWithoutProjects(any(EnumRole.class), any(Long.class))).thenReturn(Collections.emptyList());
 
@@ -648,7 +648,7 @@ public class UserControllerTest {
 
 
     @Test
-    public void testUserLogout_Success() {
+     void testUserLogout_Success() {
         // Mock the behavior of userServiceImpl.userLogout to return a success message
         when(userService.userLogout(1L)).thenReturn("User successfully logged out"); // Modify the user ID as needed
 
@@ -666,7 +666,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testUserLogout_Error() {
+    void testUserLogout_Error() {
         // Mock the behavior of userServiceImpl.userLogout to return an error message
         when(userService.userLogout(1L)).thenReturn("Error: Logout failed"); // Modify the user ID as needed
 

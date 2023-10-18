@@ -30,7 +30,7 @@ import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 
-public class HelpDocumentsServiceTest {
+ class HelpDocumentsServiceTest {
 
     @Mock
     private ProjectRepository projectRepository;
@@ -43,12 +43,12 @@ public class HelpDocumentsServiceTest {
     private HelpDocumentsServiceImpl helpDocumentsService;
 
     @BeforeEach
-    public void setUp() {
+     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testUploadFiles() throws IOException {
+     void testUploadFiles() throws IOException {
         // Create a sample project ID and extension
         long projectId = 1L;
         String fileExtension = "pdf";
@@ -93,7 +93,7 @@ public class HelpDocumentsServiceTest {
     }
 
     @Test
-    public void testGetFileExtension() {
+     void testGetFileExtension() {
         // Create a mock MultipartFile with a sample file name
         MockMultipartFile mockFile = new MockMultipartFile(
                 "file",               // file name
@@ -111,7 +111,7 @@ public class HelpDocumentsServiceTest {
 
 
     @Test
-    public void testGetPdfFilesList() {
+     void testGetPdfFilesList() {
         // Create a sample project ID
         long projectId = 1L;
 
@@ -148,7 +148,7 @@ public class HelpDocumentsServiceTest {
     }
 
     @Test
-    public void testGetPdfFilesListEmptyResult() {
+     void testGetPdfFilesListEmptyResult() {
         // Create a sample project ID with no matching HelpDocuments
         long projectId = 1L;
 
@@ -170,7 +170,7 @@ public class HelpDocumentsServiceTest {
     }
 
 //    @Test
-//    public void testGetFileExtensionWithValidFile() {
+//     void testGetFileExtensionWithValidFile() {
 //        // Arrange
 //        HelpDocumentsRepository helpDocumentsRepository = Mockito.mock(HelpDocumentsRepository.class);
 //        ProjectRepository projectRepository = Mockito.mock(ProjectRepository.class);
@@ -191,7 +191,7 @@ public class HelpDocumentsServiceTest {
 //    }
 
     @Test
-    public void testDownloadPdfFile() {
+     void testDownloadPdfFile() {
         // Create a sample file name
         String fileName = "document1.pdf";
 
@@ -228,7 +228,7 @@ public class HelpDocumentsServiceTest {
 
 
     @Test
-    public void testDownloadPdfFileNotFound() {
+     void testDownloadPdfFileNotFound() {
         // Create a sample file name that does not exist in the repository
         String fileName = "non_existent.pdf";
 
@@ -247,7 +247,7 @@ public class HelpDocumentsServiceTest {
     }
 
     @Test
-    public void testGetDocumentById() {
+     void testGetDocumentById() {
         // Create a sample HelpDocuments object
         Long fileId = 1L;
         String fileName = "document1.pdf";
@@ -272,7 +272,7 @@ public class HelpDocumentsServiceTest {
     }
 
     @Test
-    public void testGetDocumentByIdWhenNotExists() {
+     void testGetDocumentByIdWhenNotExists() {
         // Create a sample non-existent file ID
         Long fileId = 999L;
 
@@ -290,7 +290,7 @@ public class HelpDocumentsServiceTest {
     }
 
     @Test
-    public void testDeleteDocument() {
+     void testDeleteDocument() {
         // Create a sample file ID
         Long fileId = 1L;
 
@@ -312,7 +312,7 @@ public class HelpDocumentsServiceTest {
     }
 
     @Test
-    public void testDeleteDocumentWhenNotExists() {
+     void testDeleteDocumentWhenNotExists() {
         // Create a sample non-existent file ID
         Long fileId = 999L;
 

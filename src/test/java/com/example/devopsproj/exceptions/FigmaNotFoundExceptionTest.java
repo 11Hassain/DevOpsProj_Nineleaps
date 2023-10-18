@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class FigmaNotFoundExceptionTest {
+ class FigmaNotFoundExceptionTest {
 
     @Test
-    public void testFigmaNotFoundExceptionWithMessage() {
+     void testFigmaNotFoundExceptionWithMessage() {
         String message = "Figma not found";
         FigmaNotFoundException exception = new FigmaNotFoundException(message);
 
@@ -16,7 +16,7 @@ public class FigmaNotFoundExceptionTest {
     }
 
     @Test
-    public void testFigmaNotFoundExceptionWithMessageAndCause() {
+     void testFigmaNotFoundExceptionWithMessageAndCause() {
         String message = "Figma not found";
         Throwable cause = new RuntimeException("Root cause exception");
         FigmaNotFoundException exception = new FigmaNotFoundException(message, cause);

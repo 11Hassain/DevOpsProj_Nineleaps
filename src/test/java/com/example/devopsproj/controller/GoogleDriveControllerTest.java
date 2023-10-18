@@ -17,7 +17,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-public class GoogleDriveControllerTest {
+ class GoogleDriveControllerTest {
 
     @InjectMocks
     private GoogleDriveController googleDriveController;
@@ -31,7 +31,7 @@ public class GoogleDriveControllerTest {
     }
 
     @Test
-    public void testCreateGoogleDrive_Success() {
+     void testCreateGoogleDrive_Success() {
         // Prepare mock data
         GoogleDriveDTO inputDTO = new GoogleDriveDTO();
         inputDTO.setDriveId(1L);
@@ -53,7 +53,7 @@ public class GoogleDriveControllerTest {
         // Add more assertions for other properties if necessary
     }
     @Test
-    public void testGetAllGoogleDrives_Success() {
+    void testGetAllGoogleDrives_Success() {
         // Prepare mock data
         List<GoogleDriveDTO> googleDriveDTOs = new ArrayList<>();
         googleDriveDTOs.add(new GoogleDriveDTO("Drive 1", 1L));
@@ -75,7 +75,7 @@ public class GoogleDriveControllerTest {
     }
 
     @Test
-    public void testGetGoogleDriveById_Exists() {
+     void testGetGoogleDriveById_Exists() {
         // Prepare mock data
         Long driveId = 1L;
         GoogleDriveDTO googleDriveDTO = new GoogleDriveDTO("Drive 1", driveId);
@@ -96,7 +96,7 @@ public class GoogleDriveControllerTest {
     }
 
     @Test
-    public void testGetGoogleDriveById_NotFound() {
+     void testGetGoogleDriveById_NotFound() {
         // Prepare mock data
         Long driveId = 1L;
         Optional<GoogleDriveDTO> optionalGoogleDriveDTO = Optional.empty();
@@ -111,7 +111,7 @@ public class GoogleDriveControllerTest {
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
     @Test
-    public void testDeleteGoogleDriveById_Success() {
+    void testDeleteGoogleDriveById_Success() {
         // Prepare mock data
         Long driveId = 1L;
         String successMessage = "Drive deleted successfully";
@@ -130,7 +130,7 @@ public class GoogleDriveControllerTest {
     }
 
     @Test
-    public void testGetGoogleDriveByProjectId_Exists() {
+     void testGetGoogleDriveByProjectId_Exists() {
         // Prepare mock data
         Long projectId = 1L;
         GoogleDriveDTO googleDriveDTO = new GoogleDriveDTO("Drive 1", projectId);
@@ -150,7 +150,7 @@ public class GoogleDriveControllerTest {
     }
 
     @Test
-    public void testGetGoogleDriveByProjectId_NotFound() {
+     void testGetGoogleDriveByProjectId_NotFound() {
         // Prepare mock data
         Long projectId = 1L;
         ResponseEntity<GoogleDriveDTO> expectedResponse = ResponseEntity.notFound().build();

@@ -19,7 +19,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-public class AccessRequestControllerTest {
+class AccessRequestControllerTest {
 
     @InjectMocks
     private AccessRequestController accessRequestController;
@@ -36,7 +36,7 @@ public class AccessRequestControllerTest {
     }
 
     @Test
-    public void testCreateAccessRequest_Success() {
+     void testCreateAccessRequest_Success() {
         AccessRequestDTO requestDTO = new AccessRequestDTO();
         when(accessRequestService.createRequest(requestDTO)).thenReturn(requestDTO);
 
@@ -47,7 +47,7 @@ public class AccessRequestControllerTest {
     }
 
     @Test
-    public void testCreateAccessRequest_Failure() {
+     void testCreateAccessRequest_Failure() {
         AccessRequestDTO requestDTO = new AccessRequestDTO();
         when(accessRequestService.createRequest(requestDTO)).thenReturn(null); // Mocking a failure by returning null
 
@@ -126,7 +126,7 @@ public class AccessRequestControllerTest {
     }
 
     @Test
-    public void testGetAllActiveRequests_NoRequests() {
+     void testGetAllActiveRequests_NoRequests() {
         when(accessRequestService.getAllActiveRequests()).thenReturn(Collections.emptyList());
 
         ResponseEntity<Object> response = accessRequestController.getAllActiveRequests();
@@ -136,7 +136,7 @@ public class AccessRequestControllerTest {
     }
 
     @Test
-    public void testGetAllActiveRequests_WithRequests() {
+    void testGetAllActiveRequests_WithRequests() {
         List<AccessRequestDTO> requestDTOList = Collections.singletonList(new AccessRequestDTO());
         when(accessRequestService.getAllActiveRequests()).thenReturn(requestDTOList);
 
@@ -148,7 +148,7 @@ public class AccessRequestControllerTest {
 
 
     @Test
-    public void testGetAllRequests_NoRequests() {
+     void testGetAllRequests_NoRequests() {
         when(accessRequestService.getAllRequests()).thenReturn(Collections.emptyList());
 
         ResponseEntity<Object> response = accessRequestController.getAllRequests();
@@ -159,7 +159,7 @@ public class AccessRequestControllerTest {
     }
 
     @Test
-    public void testGetAllRequests_WithRequests() {
+     void testGetAllRequests_WithRequests() {
         List<AccessRequestDTO> requestDTOList = Collections.singletonList(new AccessRequestDTO());
         when(accessRequestService.getAllRequests()).thenReturn(requestDTOList);
 
@@ -171,7 +171,7 @@ public class AccessRequestControllerTest {
     }
 
     @Test
-    public void testUpdateAccessRequest_Success() {
+     void testUpdateAccessRequest_Success() {
         Long requestId = 1L;
         AccessRequestDTO requestDTO = new AccessRequestDTO();
         List<AccessResponseDTO> responseDTOList = Collections.singletonList(new AccessResponseDTO());
@@ -186,7 +186,7 @@ public class AccessRequestControllerTest {
     }
 
     @Test
-    public void testUpdateAccessRequest_NotFound() {
+    void testUpdateAccessRequest_NotFound() {
         Long requestId = 1L;
         AccessRequestDTO requestDTO = new AccessRequestDTO();
 
@@ -199,7 +199,7 @@ public class AccessRequestControllerTest {
     }
 
     @Test
-    public void testGetUnreadPMRequestsNotification_NoUnreadRequests() {
+    void testGetUnreadPMRequestsNotification_NoUnreadRequests() {
         String pmName = "John";
         List<AccessResponseDTO> unreadRequests = Collections.emptyList();
 
@@ -212,7 +212,7 @@ public class AccessRequestControllerTest {
     }
 
     @Test
-    public void testGetUnreadPMRequestsNotification_WithUnreadRequests() {
+     void testGetUnreadPMRequestsNotification_WithUnreadRequests() {
         String pmName = "John";
         List<AccessResponseDTO> unreadRequests = Collections.singletonList(new AccessResponseDTO());
 
@@ -226,7 +226,7 @@ public class AccessRequestControllerTest {
     }
 
     @Test
-    public void testGetPMRequestsNotification_WithRequests() {
+     void testGetPMRequestsNotification_WithRequests() {
         String pmName = "John";
         List<AccessResponseDTO> result = Collections.singletonList(new AccessResponseDTO());
 
@@ -240,7 +240,7 @@ public class AccessRequestControllerTest {
     }
 
     @Test
-    public void testSetPMRequestsNotificationToTrue_Success() {
+     void testSetPMRequestsNotificationToTrue_Success() {
         Long accessRequestId = 1L;
 
         ResponseEntity<String> response = accessRequestController.setPMRequestsNotificationToTrue(accessRequestId);
@@ -251,7 +251,7 @@ public class AccessRequestControllerTest {
     }
 
     @Test
-    public void testDeleteAllNotifications_Success() {
+     void testDeleteAllNotifications_Success() {
         ResponseEntity<String> response = accessRequestController.deleteAllNotifications();
 
         verify(accessRequestService, times(1)).clearAllNotifications();

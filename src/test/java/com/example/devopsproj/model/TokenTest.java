@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TokenTest {
+ class TokenTest {
 
     private Token token;
 
@@ -71,7 +71,7 @@ public class TokenTest {
         assertNotNull(token.toString());
     }
     @Test
-    public void testGettersAndSetters() {
+     void testGettersAndSetters() {
         // Create a Token instance
         Token token = new Token();
 

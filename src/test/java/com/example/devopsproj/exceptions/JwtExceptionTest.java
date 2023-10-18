@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class JwtExceptionTest {
+class JwtExceptionTest {
 
     private JwtExceptionHandler jwtException;
 

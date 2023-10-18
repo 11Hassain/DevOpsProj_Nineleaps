@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class GoogleDriveTest {
+ class GoogleDriveTest {
 
     @Test
-    public void testNoArgsConstructor() {
+     void testNoArgsConstructor() {
         GoogleDrive googleDrive = new GoogleDrive();
 
         assertNull(googleDrive.getDriveId());
@@ -18,7 +18,7 @@ public class GoogleDriveTest {
     }
 
     @Test
-    public void testGetterSetter() {
+     void testGetterSetter() {
         GoogleDrive googleDrive = new GoogleDrive();
 
         Long driveId = 1L;

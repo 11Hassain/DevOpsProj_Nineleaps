@@ -19,7 +19,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-public class SmsControllerTest {
+ class SmsControllerTest {
 
     @InjectMocks
     private SmsController smsController;
@@ -74,7 +74,7 @@ public class SmsControllerTest {
         assertEquals("Something went wrong", response.getBody());
     }
     @Test
-    public void testVerifyOTPSignUp_CorrectOTP() {
+     void testVerifyOTPSignUp_CorrectOTP() {
         // Create a sample TempOTP
         TempOTP tempOTP = new TempOTP();
         tempOTP.setOtp(1234);
@@ -90,7 +90,7 @@ public class SmsControllerTest {
     }
 
     @Test
-    public void testVerifyOTPSignUp_IncorrectOTP() {
+     void testVerifyOTPSignUp_IncorrectOTP() {
         // Create a sample TempOTP
         TempOTP tempOTP = new TempOTP();
         tempOTP.setOtp(1234);

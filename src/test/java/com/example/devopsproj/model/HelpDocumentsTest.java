@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class HelpDocumentsTest {
+ class HelpDocumentsTest {
 
     @Test
-    public void testAllArgsConstructor() {
+     void testAllArgsConstructor() {
         Long helpDocumentId = 1L;
         byte[] data = new byte[]{1, 2, 3};
         String fileName = "document.pdf";
@@ -29,7 +29,7 @@ public class HelpDocumentsTest {
     }
 
     @Test
-    public void testNoArgsConstructor() {
+     void testNoArgsConstructor() {
         HelpDocuments helpDocuments = new HelpDocuments();
 
         assertNull(helpDocuments.getHelpDocumentId());
@@ -41,7 +41,7 @@ public class HelpDocumentsTest {
     }
 
     @Test
-    public void testGetterSetter() {
+     void testGetterSetter() {
         HelpDocuments helpDocuments = new HelpDocuments();
 
         Long helpDocumentId = 1L;

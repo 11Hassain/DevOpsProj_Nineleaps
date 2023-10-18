@@ -10,7 +10,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UserNamesTest {
+ class UserNamesTest {
 
     private UserNames userNames;
 
@@ -96,7 +96,7 @@ public class UserNamesTest {
         assertEquals(user, userNames.getUser());
     }
     @Test
-    public void testRepositoriesRelationship() {
+     void testRepositoriesRelationship() {
         // Create a UserNames instance
         UserNames userNames = new UserNames();
 

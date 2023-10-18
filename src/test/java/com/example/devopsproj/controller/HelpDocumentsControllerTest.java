@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-public class HelpDocumentsControllerTest {
+class HelpDocumentsControllerTest {
 
     @InjectMocks
     private HelpDocumentsController helpDocumentsController;
@@ -37,7 +37,7 @@ public class HelpDocumentsControllerTest {
     }
 
     @Test
-    public void testUploadFile_Success() throws IOException {
+     void testUploadFile_Success() throws IOException {
         // Prepare mock data
         long projectId = 1L;
         String fileExtension = "pdf";
@@ -56,7 +56,7 @@ public class HelpDocumentsControllerTest {
     }
 
     @Test
-    public void testUploadFile_NoFile() throws IOException {
+     void testUploadFile_NoFile() throws IOException {
         // Prepare mock data
         long projectId = 1L;
 
@@ -71,7 +71,7 @@ public class HelpDocumentsControllerTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
     @Test
-    public void testGetPdfFilesList_Success() {
+     void testGetPdfFilesList_Success() {
         // Prepare mock data
         long projectId = 1L;
         List<String> pdfFiles = new ArrayList<>();
@@ -98,7 +98,7 @@ public class HelpDocumentsControllerTest {
 
 
     @Test
-    public void testGetPdfFilesList_NoFilesFound() {
+     void testGetPdfFilesList_NoFilesFound() {
         // Prepare mock data
         long projectId = 1L;
 
@@ -120,7 +120,7 @@ public class HelpDocumentsControllerTest {
 
 
     @Test
-    public void testDownloadPdfFile_Success() {
+     void testDownloadPdfFile_Success() {
         // Prepare test data
         String fileName = "sample.pdf";
         byte[] pdfContent = "Sample PDF content".getBytes(); // Replace with actual PDF content
@@ -152,7 +152,7 @@ public class HelpDocumentsControllerTest {
     }
 
     @Test
-    public void testDownloadPdfFile_FileNotFound() {
+     void testDownloadPdfFile_FileNotFound() {
         // Prepare mock data
         String fileName = "non_existent.pdf";
 

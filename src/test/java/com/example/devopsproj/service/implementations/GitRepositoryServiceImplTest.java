@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-public class GitRepositoryServiceImplTest {
+ class GitRepositoryServiceImplTest {
 
     @Mock
     private RestTemplate restTemplate;
@@ -51,12 +51,12 @@ public class GitRepositoryServiceImplTest {
     private GitRepositoryServiceImpl gitRepositoryService;
 
     @BeforeEach
-    public void setUp() {
+     void setUp() {
         MockitoAnnotations.initMocks(this);
     }
 
     @Test
-    public void testCreateRepository_Success() {
+     void testCreateRepository_Success() {
         // Arrange
         GitRepository gitRepository = new GitRepository();
         gitRepository.setName("test-repo");
@@ -86,7 +86,7 @@ public class GitRepositoryServiceImplTest {
     }
 
     @Test
-    public void testCreateRepository_Failure() {
+     void testCreateRepository_Failure() {
         // Arrange
         GitRepository gitRepository = new GitRepository();
         gitRepository.setName("test-repo");
@@ -113,7 +113,7 @@ public class GitRepositoryServiceImplTest {
     }
 
     @Test
-    public void testGetAllRepositories_Success() {
+     void testGetAllRepositories_Success() {
         // Arrange
         List<GitRepository> mockGitRepositories = new ArrayList<>();
         mockGitRepositories.add(new GitRepository("Repo1"));
@@ -136,7 +136,7 @@ public class GitRepositoryServiceImplTest {
     }
 
     @Test
-    public void testGetAllRepositories_EmptyList() {
+     void testGetAllRepositories_EmptyList() {
         // Arrange
         List<GitRepository> mockGitRepositories = new ArrayList<>();
 
@@ -156,7 +156,7 @@ public class GitRepositoryServiceImplTest {
 
 
     @Test
-    public void testGetAllReposByRole_Success() {
+     void testGetAllReposByRole_Success() {
         // Arrange
         EnumRole enumRole = EnumRole.ADMIN; // Replace with the appropriate role
 
@@ -186,7 +186,7 @@ public class GitRepositoryServiceImplTest {
 
     // Don't forget to verify that the repository method was called
     @Test
-    public void testGetAllReposByRole_RepositoryMethodCalled() {
+     void testGetAllReposByRole_RepositoryMethodCalled() {
         // Arrange
         EnumRole enumRole = EnumRole.USER; // Replace with the appropriate role
 
@@ -206,7 +206,7 @@ public class GitRepositoryServiceImplTest {
         verify(gitRepositoryRepository, times(1)).findAllByRole(enumRole);
     }
     @Test
-    public void testGetRepositoryById_Success() {
+     void testGetRepositoryById_Success() {
         // Arrange
         Long repositoryId = 1L;
         GitRepository expectedRepository = new GitRepository();
@@ -327,7 +327,7 @@ public class GitRepositoryServiceImplTest {
 
 
     @Test
-    public void testGetAllRepositoriesByProjectWithValidProject() {
+     void testGetAllRepositoriesByProjectWithValidProject() {
         // Create a test project and a list of repositories.
         ProjectDTO testProject = new ProjectDTO(/* initialize with required data */);
         List<GitRepository> testRepositories = new ArrayList<>();
@@ -346,7 +346,7 @@ public class GitRepositoryServiceImplTest {
     }
 
     @Test
-    public void testGetAllRepositoriesByProjectWithNonExistentProject() {
+     void testGetAllRepositoriesByProjectWithNonExistentProject() {
         // Mock the ProjectService to return null when looking for a non-existent project.
         Mockito.when(projectServiceImpl.getProjectById(Mockito.anyLong())).thenReturn(null);
 
