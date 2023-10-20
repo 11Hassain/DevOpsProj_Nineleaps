@@ -11,6 +11,7 @@ import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.security.Key;
@@ -32,7 +33,8 @@ public class JwtServiceImpl implements JwtService {
 
     private final UserRepository userRepository;
 
-    private static final String SECRET_KEY =System.getenv("JWT_SECRET_KEY");
+    @Value("${jwt.secret-key}")
+    private String secretKey;
 
     private static final Logger logger = LoggerFactory.getLogger(JwtServiceImpl.class);
 
@@ -62,7 +64,7 @@ public class JwtServiceImpl implements JwtService {
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 *60* 24))
-                .signWith(getSigningInKey(), SignatureAlgorithm.HS512)
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -71,7 +73,7 @@ public class JwtServiceImpl implements JwtService {
     public boolean isTokenTrue(String token) {
         User user = userRepository.findUserByToken(token);
         // True if the token is true
-        return user != null;
+        return user!=null;
     }
 
     @Override
@@ -96,7 +98,7 @@ public class JwtServiceImpl implements JwtService {
     public Claims extractAllClaims(String token) {
         return Jwts
                 .parserBuilder()
-                .setSigningKey(getSigningInKey())
+                .setSigningKey(getSignInKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -104,11 +106,8 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public Key getSigningInKey(){
-        return Keys.secretKeyFor(SignatureAlgorithm.HS512);
-    }
 }

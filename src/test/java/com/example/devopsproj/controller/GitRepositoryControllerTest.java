@@ -4,7 +4,6 @@ import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.dto.responsedto.GitRepositoryDTO;
 import com.example.devopsproj.model.GitRepository;
 import com.example.devopsproj.service.implementations.GitRepositoryServiceImpl;
-import com.example.devopsproj.service.implementations.JwtServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -19,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
@@ -29,8 +27,6 @@ class GitRepositoryControllerTest {
     private GitRepositoryController gitRepositoryController;
     @Mock
     private GitRepositoryServiceImpl gitRepositoryService;
-    @Mock
-    private JwtServiceImpl jwtService;
 
     @BeforeEach
     void setUp() {
@@ -44,26 +40,12 @@ class GitRepositoryControllerTest {
         void testCreateRepository_ValidToken(){
             GitRepository gitRepository = new GitRepository();
 
-            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
             when(gitRepositoryService.createRepository(gitRepository)).thenReturn(gitRepository);
 
-            ResponseEntity<Object> response = gitRepositoryController.createRepository(gitRepository, "valid-access-token");
+            ResponseEntity<Object> response = gitRepositoryController.createRepository(gitRepository);
 
             assertEquals(HttpStatus.OK, response.getStatusCode());
             assertEquals(gitRepository, response.getBody());
-        }
-
-        @Test
-        @DisplayName("Testing failure case with invalid token")
-        void testCreateRepository_InvalidToken(){
-            GitRepository gitRepository = new GitRepository();
-
-            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
-
-            ResponseEntity<Object> response = gitRepositoryController.createRepository(gitRepository,"invalid-access-token");
-
-            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-            assertEquals("Invalid Token", response.getBody());
         }
     }
 
@@ -79,24 +61,12 @@ class GitRepositoryControllerTest {
             gitRepositoryDTOList.add(g1);
             gitRepositoryDTOList.add(g2);
 
-            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
             when(gitRepositoryService.getAllRepositories()).thenReturn(gitRepositoryDTOList);
 
-            ResponseEntity<Object> response = gitRepositoryController.getAllRepositories("valid-access-token");
+            ResponseEntity<Object> response = gitRepositoryController.getAllRepositories();
 
             assertEquals(HttpStatus.OK, response.getStatusCode());
             assertEquals(gitRepositoryDTOList, response.getBody());
-        }
-
-        @Test
-        @DisplayName("Testing failure case with invalid token")
-        void testGetAllRepositories_InvalidToken(){
-            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
-
-            ResponseEntity<Object> response = gitRepositoryController.getAllRepositories("invalid-access-token");
-
-            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-            assertEquals("Invalid Token", response.getBody());
         }
     }
 
@@ -114,26 +84,12 @@ class GitRepositoryControllerTest {
             gitRepositoryDTOList.add(g1);
             gitRepositoryDTOList.add(g2);
 
-            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
             when(gitRepositoryService.getAllRepositoriesByProject(projectId)).thenReturn(gitRepositoryDTOList);
 
-            ResponseEntity<Object> response = gitRepositoryController.getAllReposByProject(projectId, "valid-access-token");
+            ResponseEntity<Object> response = gitRepositoryController.getAllReposByProject(projectId);
 
             assertEquals(HttpStatus.OK, response.getStatusCode());
             assertEquals(gitRepositoryDTOList, response.getBody());
-        }
-
-        @Test
-        @DisplayName("Testing failure case with invalid token")
-        void testGetAllReposByProject_InvalidToken(){
-            Long repoId = 1L;
-
-            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
-
-            ResponseEntity<Object> response = gitRepositoryController.getAllReposByProject(repoId, "invalid-access-token");
-
-            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-            assertEquals("Invalid Token", response.getBody());
         }
     }
 
@@ -151,26 +107,12 @@ class GitRepositoryControllerTest {
             gitRepositoryDTOList.add(g1);
             gitRepositoryDTOList.add(g2);
 
-            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
             when(gitRepositoryService.getAllReposByRole(EnumRole.PROJECT_MANAGER)).thenReturn(gitRepositoryDTOList);
 
-            ResponseEntity<Object> response = gitRepositoryController.getAllReposByRole(role, "valid-access-token");
+            ResponseEntity<Object> response = gitRepositoryController.getAllReposByRole(role);
 
             assertEquals(HttpStatus.OK, response.getStatusCode());
             assertEquals(gitRepositoryDTOList, response.getBody());
-        }
-
-        @Test
-        @DisplayName("Testing failure case with invalid token")
-        void testGetAllReposByRole_InvalidToken(){
-            String role = EnumRole.USER.getEnumRole();
-
-            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
-
-            ResponseEntity<Object> response = gitRepositoryController.getAllReposByRole(role, "invalid-access-token");
-
-            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-            assertEquals("Invalid Token", response.getBody());
         }
     }
 
@@ -186,10 +128,9 @@ class GitRepositoryControllerTest {
             gRepo.setName("R1");
             gRepo.setDescription("R1 Description");
 
-            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
             when(gitRepositoryService.getRepositoryById(repoId)).thenReturn(gRepo);
 
-            ResponseEntity<Object> response = gitRepositoryController.getRepositoryById(repoId, "valid-access-token");
+            ResponseEntity<Object> response = gitRepositoryController.getRepositoryById(repoId);
 
             assertEquals(HttpStatus.OK, response.getStatusCode());
 
@@ -207,25 +148,11 @@ class GitRepositoryControllerTest {
         void testGetRepositoryById_ValidToken_RepoNotFound(){
             Long repoId = 1L;
 
-            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
             when(gitRepositoryService.getRepositoryById(repoId)).thenReturn(null);
 
-            ResponseEntity<Object> response = gitRepositoryController.getRepositoryById(repoId, "valid-access-token");
+            ResponseEntity<Object> response = gitRepositoryController.getRepositoryById(repoId);
 
             assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        }
-
-        @Test
-        @DisplayName("Testing failure case with invalid token")
-        void testGetRepositoryById_InvalidToken(){
-            Long repoId = 1L;
-
-            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
-
-            ResponseEntity<Object> response = gitRepositoryController.getRepositoryById(repoId, "invalid-access-token");
-
-            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-            assertEquals("Invalid Token", response.getBody());
         }
     }
 
@@ -236,9 +163,7 @@ class GitRepositoryControllerTest {
         void testDeleteRepository_ValidToken_Success(){
             Long repoId = 1L;
 
-            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-
-            ResponseEntity<Object> response = gitRepositoryController.deleteRepository(repoId, "valid-access-token");
+            ResponseEntity<Object> response = gitRepositoryController.deleteRepository(repoId);
 
             assertEquals(HttpStatus.OK, response.getStatusCode());
             assertEquals("Deleted successfully", response.getBody());
@@ -249,28 +174,13 @@ class GitRepositoryControllerTest {
         void testDeleteRepository_ValidToken_Failed(){
             Long repoId = 1L;
 
-            when(jwtService.isTokenTrue(anyString())).thenReturn(true);
-
             // Mock an exception when trying to delete the repository
             doThrow(new RuntimeException("Deletion error")).when(gitRepositoryService).deleteRepository(repoId);
 
-            ResponseEntity<Object> response = gitRepositoryController.deleteRepository(repoId, "valid-access-token");
+            ResponseEntity<Object> response = gitRepositoryController.deleteRepository(repoId);
 
             assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
             assertEquals("Error", response.getBody());
-        }
-
-        @Test
-        @DisplayName("Testing failure case with invalid token")
-        void testDeleteRepository_InvalidToken(){
-            Long repoId = 1L;
-
-            when(jwtService.isTokenTrue(anyString())).thenReturn(false);
-
-            ResponseEntity<Object> response = gitRepositoryController.deleteRepository(repoId, "invalid-access-token");
-
-            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-            assertEquals("Invalid Token", response.getBody());
         }
     }
 }

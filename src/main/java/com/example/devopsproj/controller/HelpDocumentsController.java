@@ -4,7 +4,6 @@ import com.example.devopsproj.dto.responsedto.HelpDocumentsDTO;
 import com.example.devopsproj.exceptions.NotFoundException;
 import com.example.devopsproj.model.HelpDocuments;
 import com.example.devopsproj.service.implementations.HelpDocumentsServiceImpl;
-import com.example.devopsproj.service.implementations.JwtServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -36,9 +35,6 @@ import java.util.Optional;
 public class HelpDocumentsController {
 
     private final HelpDocumentsServiceImpl helpDocumentsServiceImpl;
-    private final JwtServiceImpl jwtServiceImpl;
-
-    private static final String INVALID_TOKEN = "Invalid Token";
 
     @PostMapping("/upload")
     @Operation(
@@ -52,20 +48,16 @@ public class HelpDocumentsController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> uploadFile(
             @RequestParam("projectId") long projectId,
-            @RequestParam(name = "projectFile", required = false) MultipartFile projectFile,
-            @RequestHeader("AccessToken") String accessToken)
+            @RequestParam(name = "projectFile", required = false) MultipartFile projectFile)
             throws IOException {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+
             try {
                 String fileExtension = helpDocumentsServiceImpl.getFileExtension(projectFile);
                 return helpDocumentsServiceImpl.uploadFiles(projectId, projectFile, fileExtension);
             } catch (IllegalArgumentException e) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid parameters");
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
 
@@ -79,19 +71,15 @@ public class HelpDocumentsController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getPdfFilesList(@RequestParam("projectId") long projectId,
-                                             @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<Object> getPdfFilesList(@RequestParam("projectId") long projectId) {
+
             try{
                 List<HelpDocumentsDTO> fileInfos = helpDocumentsServiceImpl.getAllDocumentsByProjectId(projectId);
                 return ResponseEntity.ok().body(fileInfos);
             }catch (NotFoundException e){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No PDF files found");
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @GetMapping("/files/{fileName}")
@@ -104,10 +92,8 @@ public class HelpDocumentsController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> downloadPdfFile(@PathVariable("fileName") String fileName,
-                                             @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<Object> downloadPdfFile(@PathVariable("fileName") String fileName) {
+
             HelpDocuments pdfFile = helpDocumentsServiceImpl.getPdfFile(fileName);
             if (pdfFile == null) {
                 return ResponseEntity.notFound().build();
@@ -118,9 +104,7 @@ public class HelpDocumentsController {
             return ResponseEntity.ok()
                     .headers(headers)
                     .body(pdfFile.getData());
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @DeleteMapping("/files/{fileId}")
@@ -132,10 +116,8 @@ public class HelpDocumentsController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized")
             }
     )
-    public ResponseEntity<String> deleteFile(@PathVariable("fileId") Long fileId,
-                                             @RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if(isTokenValid){
+    public ResponseEntity<String> deleteFile(@PathVariable("fileId") Long fileId){
+
             Optional<HelpDocumentsDTO> helpDocumentsDTO = helpDocumentsServiceImpl.getDocumentById(fileId);
             if(helpDocumentsDTO.isPresent()){
                 helpDocumentsServiceImpl.deleteDocument(fileId);
@@ -143,9 +125,7 @@ public class HelpDocumentsController {
             }else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Document not found");
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
 }

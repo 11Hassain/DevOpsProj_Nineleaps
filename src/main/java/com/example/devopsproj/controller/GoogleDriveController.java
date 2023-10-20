@@ -3,7 +3,6 @@ package com.example.devopsproj.controller;
 import com.example.devopsproj.dto.responsedto.ProjectDTO;
 import com.example.devopsproj.model.GoogleDrive;
 import com.example.devopsproj.service.implementations.GoogleDriveServiceImpl;
-import com.example.devopsproj.service.implementations.JwtServiceImpl;
 import com.example.devopsproj.dto.responsedto.GoogleDriveDTO;
 import com.example.devopsproj.utils.DTOModelMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,9 +33,6 @@ import java.util.Optional;
 public class GoogleDriveController {
 
     private final GoogleDriveServiceImpl googleDriveServiceImpl;
-    private final JwtServiceImpl jwtServiceImpl;
-
-    private static final String INVALID_TOKEN = "Invalid Token";
 
     @PostMapping("/createGoogleDrive")
     @Operation(
@@ -47,19 +43,14 @@ public class GoogleDriveController {
             }
     )
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> createGoogleDrive(@Valid @RequestBody GoogleDriveDTO googleDriveDTO,
-                                                            @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<Object> createGoogleDrive(@Valid @RequestBody GoogleDriveDTO googleDriveDTO) {
             GoogleDrive googleDrive = googleDriveServiceImpl.createGoogleDrive(googleDriveDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(new GoogleDriveDTO(
                     DTOModelMapper.mapProjectToProjectDTO(googleDrive.getProject()),
                     googleDrive.getDriveLink(),
                     googleDrive.getDriveId()
             ));
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @GetMapping("/getAllGoogleDrives")
@@ -71,9 +62,8 @@ public class GoogleDriveController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getAllGoogleDrives(@RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<Object> getAllGoogleDrives() {
+
             List<GoogleDrive> googleDrives = googleDriveServiceImpl.getAllGoogleDrives();
             List<GoogleDriveDTO> googleDriveDTOs = new ArrayList<>();
             for (GoogleDrive googleDrive : googleDrives) {
@@ -84,9 +74,7 @@ public class GoogleDriveController {
                 ));
             }
             return ResponseEntity.ok(googleDriveDTOs);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @GetMapping("/getGoogleDriveById/{driveId}")
@@ -99,19 +87,13 @@ public class GoogleDriveController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<GoogleDriveDTO> getGoogleDriveById(@PathVariable Long driveId,
-                                                     @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<GoogleDriveDTO> getGoogleDriveById(@PathVariable Long driveId) {
+
             Optional<GoogleDriveDTO> optionalGoogleDriveDTO = googleDriveServiceImpl.getGoogleDriveById(driveId);
             return optionalGoogleDriveDTO
                     .map(googleDriveDTO -> ResponseEntity.ok().body(googleDriveDTO))
                     .orElse(ResponseEntity.notFound().build());
-        } else {
-            GoogleDriveDTO errorDTO = new GoogleDriveDTO();
-            errorDTO.setMessage(INVALID_TOKEN);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorDTO);
-        }
+
     }
 
     @DeleteMapping("/deleteGoogleDriveById/{driveId}")
@@ -124,19 +106,15 @@ public class GoogleDriveController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> deleteGoogleDriveById(@PathVariable Long driveId,
-                                                        @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<String> deleteGoogleDriveById(@PathVariable Long driveId) {
+
             boolean deleted = googleDriveServiceImpl.deleteGoogleDriveById(driveId);
             if (deleted) {
                 return ResponseEntity.ok("Google Drive with ID: " + driveId + " deleted successfully.");
             } else {
                 return ResponseEntity.notFound().build();
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @GetMapping("/getGoogleDriveByProjectId/{projectId}")
@@ -149,10 +127,8 @@ public class GoogleDriveController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<GoogleDriveDTO> getGoogleDriveByProjectId(@PathVariable Long projectId,
-                                                                    @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<GoogleDriveDTO> getGoogleDriveByProjectId(@PathVariable Long projectId) {
+
             Optional<GoogleDrive> optionalGoogleDrive = googleDriveServiceImpl.getGoogleDriveByProjectId(projectId);
             return optionalGoogleDrive.map(googleDrive -> {
                 GoogleDriveDTO googleDriveDTO = new GoogleDriveDTO(
@@ -162,11 +138,7 @@ public class GoogleDriveController {
                 );
                 return ResponseEntity.ok(googleDriveDTO);
             }).orElse(ResponseEntity.notFound().build());
-        } else {
-            GoogleDriveDTO errorDTO = new GoogleDriveDTO();
-            errorDTO.setMessage(INVALID_TOKEN);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorDTO);
-        }
+
     }
 
 }

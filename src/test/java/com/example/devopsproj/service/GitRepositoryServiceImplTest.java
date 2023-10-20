@@ -3,12 +3,14 @@ package com.example.devopsproj.service;
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.dto.responsedto.GitRepositoryDTO;
 import com.example.devopsproj.exceptions.NotFoundException;
+import com.example.devopsproj.exceptions.RepositoryCreationException;
 import com.example.devopsproj.exceptions.RepositoryDeletionException;
 import com.example.devopsproj.model.GitRepository;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.repository.GitRepositoryRepository;
 import com.example.devopsproj.service.implementations.GitRepositoryServiceImpl;
 import com.example.devopsproj.service.implementations.ProjectServiceImpl;
+import com.example.devopsproj.service.interfaces.GitRepositoryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -77,6 +79,28 @@ class GitRepositoryServiceImplTest {
                     .thenThrow(httpClientErrorException);
 
             assertThrows(HttpClientErrorException.class, () -> gitRepositoryService.createRepository(gitRepository));
+        }
+
+        @Test
+        @DisplayName("Testing repository creation fail case")
+        void testCreateRepositoryFailure() {
+            ResponseEntity<GitRepository> failedResponse = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+
+            when(restTemplate.exchange(
+                    anyString(),
+                    any(HttpMethod.class),
+                    any(HttpEntity.class),
+                    eq(GitRepository.class))
+            ).thenReturn(failedResponse);
+
+            GitRepository gitRepository = new GitRepository();
+            gitRepository.setName("test-repo");
+
+            try {
+                gitRepositoryService.createRepository(gitRepository);
+            } catch (RepositoryCreationException ex) {
+                assertTrue(ex.getMessage().contains("Error creating repository test-repo"));
+            }
         }
     }
 
@@ -172,11 +196,13 @@ class GitRepositoryServiceImplTest {
 
             List<GitRepositoryDTO> result = gitRepositoryService.getAllRepositories();
 
-            assertEquals(2, result.size());
-            assertEquals("Repo1", result.get(0).getName());
-            assertEquals("Repo1 Description", result.get(0).getDescription());
-            assertEquals("Repo2", result.get(1).getName());
-            assertEquals("Repo2 Description", result.get(1).getDescription());
+            assertAll(
+                    () -> assertEquals(2, result.size(), "Number of repositories should be 2"),
+                    () -> assertEquals("Repo1", result.get(0).getName(), "First repository name should be 'Repo1'"),
+                    () -> assertEquals("Repo1 Description", result.get(0).getDescription(), "First repository description should be 'Repo1 Description'"),
+                    () -> assertEquals("Repo2", result.get(1).getName(), "Second repository name should be 'Repo2'"),
+                    () -> assertEquals("Repo2 Description", result.get(1).getDescription(), "Second repository description should be 'Repo2 Description'")
+            );
         }
 
         @Test
@@ -218,12 +244,15 @@ class GitRepositoryServiceImplTest {
 
             List<GitRepositoryDTO> result = gitRepositoryService.getAllRepositoriesByProject(projectId);
 
-            assertEquals(2, result.size());
-            assertEquals("Repo1", result.get(0).getName());
-            assertEquals("Repo1 Description", result.get(0).getDescription());
-            assertEquals("Repo2", result.get(1).getName());
-            assertEquals("Repo2 Description", result.get(1).getDescription());
+            assertAll(
+                    () -> assertEquals(2, result.size(), "Number of repositories should be 2"),
+                    () -> assertEquals("Repo1", result.get(0).getName(), "First repository name should be 'Repo1'"),
+                    () -> assertEquals("Repo1 Description", result.get(0).getDescription(), "First repository description should be 'Repo1 Description'"),
+                    () -> assertEquals("Repo2", result.get(1).getName(), "Second repository name should be 'Repo2'"),
+                    () -> assertEquals("Repo2 Description", result.get(1).getDescription(), "Second repository description should be 'Repo2 Description'")
+            );
         }
+
 
         @Test
         @DisplayName("Testing failure case - Project not found")
@@ -277,14 +306,17 @@ class GitRepositoryServiceImplTest {
 
             List<GitRepositoryDTO> result = gitRepositoryService.getAllReposByRole(role);
 
-            assertEquals(2, result.size());
-            assertEquals(1L, result.get(0).getRepoId());
-            assertEquals("Repo1", result.get(0).getName());
-            assertEquals("Repo1 Description", result.get(0).getDescription());
-            assertEquals(2L, result.get(1).getRepoId());
-            assertEquals("Repo2", result.get(1).getName());
-            assertEquals("Repo2 Description", result.get(1).getDescription());
+            assertAll(
+                    () -> assertEquals(2, result.size(), "Number of repositories should be 2"),
+                    () -> assertEquals(1L, result.get(0).getRepoId(), "First repository id should be 1L"),
+                    () -> assertEquals("Repo1", result.get(0).getName(), "First repository name should be 'Repo1'"),
+                    () -> assertEquals("Repo1 Description", result.get(0).getDescription(), "First repository description should be 'Repo1 Description'"),
+                    () -> assertEquals(2L, result.get(1).getRepoId(), "Second repository id should be 2L"),
+                    () -> assertEquals("Repo2", result.get(1).getName(), "Second repository name should be 'Repo2'"),
+                    () -> assertEquals("Repo2 Description", result.get(1).getDescription(), "Second repository description should be 'Repo2 Description'")
+            );
         }
+
 
         @Test
         @DisplayName("Testing failure case - no repos found")
@@ -339,9 +371,12 @@ class GitRepositoryServiceImplTest {
 
         GitRepositoryDTO gitRepositoryDTO = gitRepositoryService.convertToDto(gitRepository);
 
-        assertNotNull(gitRepositoryDTO);
-        assertEquals(gitRepository.getRepoId(), gitRepositoryDTO.getRepoId());
-        assertEquals(gitRepository.getName(), gitRepositoryDTO.getName());
-        assertEquals(gitRepository.getDescription(), gitRepositoryDTO.getDescription());
+        assertAll("GitRepository to GitRepositoryDTO conversion",
+                () -> assertNotNull(gitRepositoryDTO, "GitRepositoryDTO should not be null"),
+                () -> assertEquals(gitRepository.getRepoId(), gitRepositoryDTO.getRepoId(), "RepoId should match"),
+                () -> assertEquals(gitRepository.getName(), gitRepositoryDTO.getName(), "Name should match"),
+                () -> assertEquals(gitRepository.getDescription(), gitRepositoryDTO.getDescription(), "Description should match")
+        );
     }
+
 }

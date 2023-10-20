@@ -4,7 +4,6 @@ import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.dto.responsedto.*;
 import com.example.devopsproj.dto.requestdto.UserCreationDTO;
 import com.example.devopsproj.model.User;
-import com.example.devopsproj.service.implementations.JwtServiceImpl;
 import com.example.devopsproj.service.implementations.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -32,9 +31,6 @@ import java.util.Optional;
 public class UserController {
 
     private final UserServiceImpl userServiceImpl;
-    private final JwtServiceImpl jwtServiceImpl;
-
-    private static final String INVALID_TOKEN = "Invalid Token";
 
     @PostMapping("/") // Save the user
     @Operation(
@@ -45,15 +41,9 @@ public class UserController {
             }
     )
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> saveUser(@Valid @RequestBody UserCreationDTO userCreationDTO,
-                                         @RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            User savedUser = userServiceImpl.saveUser(userCreationDTO);
-            return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+    public ResponseEntity<Object> saveUser(@Valid @RequestBody UserCreationDTO userCreationDTO){
+        User savedUser = userServiceImpl.saveUser(userCreationDTO);
+        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
     @GetMapping("/{user_id}") // Find user by user id
@@ -65,20 +55,14 @@ public class UserController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
             }
     )
-    public ResponseEntity<Object> getUserById(@PathVariable Long userId,
-                                               @RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            Optional<User> optionalUser = userServiceImpl.getUserById(userId);
-            if(optionalUser.isPresent()){
-                User user = optionalUser.get();
-                UserDTO userDTO = new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole(), user.getLastUpdated(), user.getLastLogout());
-                return new ResponseEntity<>(userDTO, HttpStatus.OK);
-            }
-            else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
+    public ResponseEntity<Object> getUserById(@PathVariable Long userId){
+        Optional<User> optionalUser = userServiceImpl.getUserById(userId);
+        if(optionalUser.isPresent()){
+            User user = optionalUser.get();
+            UserDTO userDTO = new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole(), user.getLastUpdated(), user.getLastLogout());
+            return new ResponseEntity<>(userDTO, HttpStatus.OK);
         }
+        else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PutMapping("/update/{id}") // Update user by id
@@ -90,15 +74,9 @@ public class UserController {
             }
     )
     public ResponseEntity<Object> updateUser(@PathVariable("id") Long id,
-                                             @Valid @RequestBody UserDTO userDTO,
-                                             @RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            UserDTO userDTOs = userServiceImpl.updateUser(id, userDTO);
-            return new ResponseEntity<>(userDTOs, HttpStatus.OK);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+                                             @Valid @RequestBody UserDTO userDTO){
+        UserDTO userDTOs = userServiceImpl.updateUser(id, userDTO);
+        return new ResponseEntity<>(userDTOs, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{user_id}") // Soft-deleting user
@@ -110,30 +88,24 @@ public class UserController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
             }
     )
-    public ResponseEntity<String> deleteUserById(@PathVariable Long userId,
-                                                 @RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            if(userServiceImpl.existsById(userId)) {
-                boolean checkIfDeleted = userServiceImpl.existsByIdIsDeleted(userId); //check if deleted = true?
-                if (checkIfDeleted) {
-                    return ResponseEntity.ok("User doesn't exist");
-                    //user is present in db but deleted=true(soft deleted)
-                }
-                boolean isDeleted = userServiceImpl.softDeleteUser(userId); //soft deletes user with id (yes/no)
-                if(isDeleted){
-                    return ResponseEntity.ok("User successfully deleted");
-                    //successfully deleting user (soft delete) (user exists in db)
-                }
-                else{
-                    return ResponseEntity.notFound().build();
-                    //gives 404 Not Found error response
-                }
+    public ResponseEntity<String> deleteUserById(@PathVariable Long userId){
+        if(userServiceImpl.existsById(userId)) {
+            boolean checkIfDeleted = userServiceImpl.existsByIdIsDeleted(userId); //check if deleted = true?
+            if (checkIfDeleted) {
+                return ResponseEntity.ok("User doesn't exist");
+                //user is present in db but deleted=true(soft deleted)
             }
-            else return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
+            boolean isDeleted = userServiceImpl.softDeleteUser(userId); //soft deletes user with id (yes/no)
+            if(isDeleted){
+                return ResponseEntity.ok("User successfully deleted");
+                //successfully deleting user (soft delete) (user exists in db)
+            }
+            else{
+                return ResponseEntity.notFound().build();
+                //gives 404 Not Found error response
+            }
         }
+        else return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/role/{role}") // Get list of users by role
@@ -144,19 +116,13 @@ public class UserController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
             }
     )
-    public ResponseEntity<Object> getUserByRoleId(@PathVariable("role") String role,
-                                                       @RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            EnumRole userRole = EnumRole.valueOf(role.toUpperCase()); //getting value of role(string)
-            List<User> users = userServiceImpl.getUsersByRole(userRole);
-            List<UserDTO> userDTOList = users.stream()
-                    .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole(), user.getLastUpdated(), user.getLastLogout()))
-                    .toList();
-            return new ResponseEntity<>(userDTOList, HttpStatus.OK);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+    public ResponseEntity<Object> getUserByRoleId(@PathVariable("role") String role){
+        EnumRole userRole = EnumRole.valueOf(role.toUpperCase()); //getting value of role(string)
+        List<User> users = userServiceImpl.getUsersByRole(userRole);
+        List<UserDTO> userDTOList = users.stream()
+                .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole(), user.getLastUpdated(), user.getLastLogout()))
+                .toList();
+        return new ResponseEntity<>(userDTOList, HttpStatus.OK);
     }
 
     @GetMapping("/count") // Get count of all the users
@@ -167,18 +133,13 @@ public class UserController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
             }
     )
-    public ResponseEntity<Object> getCountAllUsers(@RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            Integer countUsers = userServiceImpl.getCountAllUsers();
-            if (countUsers == 0){
-                return ResponseEntity.ok(0);
-            }
-            else {
-                return ResponseEntity.ok(countUsers);
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
+    public ResponseEntity<Object> getCountAllUsers(){
+        Integer countUsers = userServiceImpl.getCountAllUsers();
+        if (countUsers == 0){
+            return ResponseEntity.ok(0);
+        }
+        else {
+            return ResponseEntity.ok(countUsers);
         }
     }
 
@@ -190,20 +151,14 @@ public class UserController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
             }
     )
-    public ResponseEntity<Object> getCountAllUsersByRole(@PathVariable String role,
-                                          @RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            EnumRole userRole = EnumRole.valueOf(role.toUpperCase());
-            Integer countUsersByRole = userServiceImpl.getCountAllUsersByRole(userRole);
-            if(countUsersByRole == 0){
-                return ResponseEntity.ok(0);
-            }
-            else {
-                return ResponseEntity.ok(countUsersByRole);
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
+    public ResponseEntity<Object> getCountAllUsersByRole(@PathVariable String role){
+        EnumRole userRole = EnumRole.valueOf(role.toUpperCase());
+        Integer countUsersByRole = userServiceImpl.getCountAllUsersByRole(userRole);
+        if(countUsersByRole == 0){
+            return ResponseEntity.ok(0);
+        }
+        else {
+            return ResponseEntity.ok(countUsersByRole);
         }
     }
 
@@ -215,19 +170,13 @@ public class UserController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
             }
     )
-    public ResponseEntity<Object> getCountAllUsersByProjectId(@PathVariable Long projectId,
-                                                              @RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            Integer countUsersByProject = userServiceImpl.getCountAllUsersByProjectId(projectId);
-            if (countUsersByProject == 0){
-                return ResponseEntity.ok(0);
-            }
-            else {
-                return ResponseEntity.ok(countUsersByProject);
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
+    public ResponseEntity<Object> getCountAllUsersByProjectId(@PathVariable Long projectId){
+        Integer countUsersByProject = userServiceImpl.getCountAllUsersByProjectId(projectId);
+        if (countUsersByProject == 0){
+            return ResponseEntity.ok(0);
+        }
+        else {
+            return ResponseEntity.ok(countUsersByProject);
         }
     }
 
@@ -239,15 +188,9 @@ public class UserController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
             }
     )
-    public ResponseEntity<Object> getAllProjectsByUserId(@PathVariable Long id,
-                                                         @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            List<ProjectDTO> projects = userServiceImpl.getAllProjectsAndRepositoriesByUserId(id);
-            return ResponseEntity.ok(projects);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+    public ResponseEntity<Object> getAllProjectsByUserId(@PathVariable Long id) {
+        List<ProjectDTO> projects = userServiceImpl.getAllProjectsAndRepositoriesByUserId(id);
+        return ResponseEntity.ok(projects);
     }
 
     @GetMapping("{id}/role/{role}/projects")
@@ -261,13 +204,7 @@ public class UserController {
     )
     public ResponseEntity<Object> getProjectsByRoleIdAndUserId(
             @PathVariable("id") Long userId,
-            @PathVariable("role") String role,
-            @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (!isTokenValid) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
-
+            @PathVariable("role") String role) {
         ResponseEntity<Object> response = userServiceImpl.getProjectsByRoleAndUserId(userId, role);
 
         if (response.getStatusCode() == HttpStatus.OK) {
@@ -285,13 +222,8 @@ public class UserController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
             }
     )
-    public ResponseEntity<Object> getAllUsers(@RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<Object> getAllUsers(){
             return ResponseEntity.ok(userServiceImpl.getAllUsers());
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
     }
 
     @GetMapping("/getAll")
@@ -302,14 +234,9 @@ public class UserController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
             }
     )
-    public ResponseEntity<Object> getAllUsersWithProjects(@RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            List<UserProjectsDTO> userProjectsDTOs = userServiceImpl.getAllUsersWithProjects();
-            return ResponseEntity.ok(userProjectsDTOs);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+    public ResponseEntity<Object> getAllUsersWithProjects(){
+        List<UserProjectsDTO> userProjectsDTOs = userServiceImpl.getAllUsersWithProjects();
+        return ResponseEntity.ok(userProjectsDTOs);
     }
 
     @GetMapping("/getMultiple")
@@ -320,14 +247,9 @@ public class UserController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
             }
     )
-    public ResponseEntity<Object> getUsersWithMultipleProjects(@RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            List<UserProjectsDTO> usersWithMultipleProjects = userServiceImpl.getUsersWithMultipleProjects();
-            return ResponseEntity.ok(usersWithMultipleProjects);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+    public ResponseEntity<Object> getUsersWithMultipleProjects() {
+        List<UserProjectsDTO> usersWithMultipleProjects = userServiceImpl.getUsersWithMultipleProjects();
+        return ResponseEntity.ok(usersWithMultipleProjects);
     }
     @GetMapping("/withoutProject")
     @Operation(
@@ -339,16 +261,10 @@ public class UserController {
     )
     public ResponseEntity<Object> getUserWithoutProject(
             @RequestParam("role") String role,
-            @RequestParam("projectId") Long projectId,
-            @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
-            List<UserDTO> userDTOList = userServiceImpl.getAllUsersWithoutProjects(enumRole, projectId);
-            return ResponseEntity.status(HttpStatus.OK).body(userDTOList);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+            @RequestParam("projectId") Long projectId) {
+        EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
+        List<UserDTO> userDTOList = userServiceImpl.getAllUsersWithoutProjects(enumRole, projectId);
+        return ResponseEntity.status(HttpStatus.OK).body(userDTOList);
     }
 
     @PostMapping("/{userId}/logout")
@@ -359,14 +275,8 @@ public class UserController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized - Authentication failed")
             }
     )
-    public ResponseEntity<String> userLogout(@PathVariable("userId") Long id,
-                                             @RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            String response = userServiceImpl.userLogout(id);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+    public ResponseEntity<String> userLogout(@PathVariable("userId") Long id){
+        String response = userServiceImpl.userLogout(id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

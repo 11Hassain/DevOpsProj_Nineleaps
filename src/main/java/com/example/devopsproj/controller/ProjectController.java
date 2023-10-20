@@ -6,7 +6,6 @@ import com.example.devopsproj.exceptions.ConflictException;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.model.User;
 import com.example.devopsproj.model.UserNames;
-import com.example.devopsproj.service.implementations.JwtServiceImpl;
 import com.example.devopsproj.service.implementations.ProjectServiceImpl;
 import com.example.devopsproj.exceptions.NotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,9 +37,6 @@ import java.util.Optional;
 public class ProjectController {
 
     private final ProjectServiceImpl projectServiceImpl;
-    private final JwtServiceImpl jwtServiceImpl;
-
-    private static final String INVALID_TOKEN = "Invalid Token";
     private static final String INTERNAL_SERVER_ERROR = "Something went wrong";
 
 
@@ -53,15 +49,10 @@ public class ProjectController {
             }
     )
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> createProject(@Valid @RequestBody ProjectDTO projectDTO,
-                                                @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<Object> createProject(@Valid @RequestBody ProjectDTO projectDTO) {
+
             ProjectDTO createdProjectDTO = projectServiceImpl.createProject(projectDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdProjectDTO);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
     }
 
     @GetMapping("/{id}") // Get project by id
@@ -75,12 +66,8 @@ public class ProjectController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getProjectById(@PathVariable("id") Long id,
-                                                 @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (!isTokenValid) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+    public ResponseEntity<Object> getProjectById(@PathVariable("id") Long id) {
+
         try {
             return projectServiceImpl.getProject(id);
         } catch (NotFoundException e) {
@@ -99,9 +86,8 @@ public class ProjectController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getAll(@RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<Object> getAll() {
+
             try {
                 List<Project> projects = projectServiceImpl.getAll();
                 List<ProjectDTO> projectDTOs = projects.stream()
@@ -113,9 +99,7 @@ public class ProjectController {
             } catch (NotFoundException e) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @GetMapping("/allProjects")
@@ -129,11 +113,8 @@ public class ProjectController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getAllProjectsWithUsers(@RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (!isTokenValid) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+    public ResponseEntity<Object> getAllProjectsWithUsers() {
+
         try {
             List<ProjectWithUsersDTO> projectsWithUsers = projectServiceImpl.getAllProjectsWithUsers();
             return new ResponseEntity<>(projectsWithUsers, HttpStatus.OK);
@@ -154,12 +135,7 @@ public class ProjectController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getAllUsersByProjectId(@PathVariable Long projectId,
-                                                         @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (!isTokenValid) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+    public ResponseEntity<Object> getAllUsersByProjectId(@PathVariable Long projectId) {
         try {
             List<UserDTO> userDTOList = projectServiceImpl.getAllUsersByProjectId(projectId);
             if (userDTOList.isEmpty()) {
@@ -188,10 +164,8 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getAllUsersByProjectIdByRole(
             @PathVariable Long projectId,
-            @PathVariable String role,
-            @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+            @PathVariable String role) {
+
             try {
                 EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
                 List<User> userList = projectServiceImpl.getAllUsersByProjectIdAndRole(projectId, enumRole);
@@ -211,9 +185,7 @@ public class ProjectController {
             } catch (Exception e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @PutMapping("/update/{projectId}") // Update project
@@ -228,10 +200,8 @@ public class ProjectController {
     )
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> updateProject(@PathVariable("projectId") Long projectId,
-                                                @Valid @RequestBody ProjectDTO projectDTO,
-                                                @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+                                                @Valid @RequestBody ProjectDTO projectDTO) {
+
             try {
                 Optional<Project> optionalProject = projectServiceImpl.getProjectById(projectId);
                 if (optionalProject.isPresent()) {
@@ -248,9 +218,7 @@ public class ProjectController {
             } catch (Exception e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @DeleteMapping("/delete/{id}") // Delete project (soft)
@@ -264,10 +232,8 @@ public class ProjectController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> deleteProject(@PathVariable("id") Long id,
-                                                @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<String> deleteProject(@PathVariable("id") Long id) {
+
             if (projectServiceImpl.existsProjectById(id)) {
                 boolean checkIfDeleted = projectServiceImpl.existsByIdIsDeleted(id);
                 if (checkIfDeleted) {
@@ -280,9 +246,7 @@ public class ProjectController {
                     return ResponseEntity.notFound().build();
                 }
             } else return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @PutMapping("/{projectId}/users/{userId}") // Add user to project
@@ -299,10 +263,8 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> addUserToProject(
             @PathVariable("projectId") Long projectId,
-            @PathVariable("userId") Long userId,
-            @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+            @PathVariable("userId") Long userId) {
+
             try {
                 ResponseEntity<Object> response = projectServiceImpl.addUserToProjectByUserIdAndProjectId(projectId, userId);
                 return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
@@ -313,9 +275,7 @@ public class ProjectController {
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(INTERNAL_SERVER_ERROR);
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @DeleteMapping("/{projectId}/users/{userId}") // Remove user from the project
@@ -331,10 +291,8 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> removeUserFromProject(
             @PathVariable("projectId") Long projectId,
-            @PathVariable("userId") Long userId,
-            @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+            @PathVariable("userId") Long userId) {
+
             try {
                 ResponseEntity<String> response = projectServiceImpl.removeUserFromProjectByUserIdAndProjectId(projectId, userId);
                 return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
@@ -343,9 +301,7 @@ public class ProjectController {
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(INTERNAL_SERVER_ERROR);
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @DeleteMapping("/{projectId}/users/{userId}/repo") // Remove user from the project and repo as well
@@ -362,10 +318,8 @@ public class ProjectController {
     public ResponseEntity<String> removeUserFromProjectAndRepo(
             @PathVariable("projectId") Long projectId,
             @PathVariable("userId") Long userId,
-            @Valid @RequestBody CollaboratorDTO collaboratorDTO,
-            @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+            @Valid @RequestBody CollaboratorDTO collaboratorDTO) {
+
             try {
                 ResponseEntity<String> response = projectServiceImpl.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO);
                 if (response.getStatusCode() == HttpStatus.BAD_REQUEST){
@@ -378,9 +332,7 @@ public class ProjectController {
             } catch (Exception e){
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(INTERNAL_SERVER_ERROR);
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @GetMapping("/{projectId}/users/role/{role}") // Get users based on role
@@ -396,15 +348,11 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getUsersByProjectIdAndRole(
             @PathVariable("projectId") Long projectId,
-            @PathVariable("role") String role,
-            @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+            @PathVariable("role") String role) {
+
             List<UserDTO> userDTOList = projectServiceImpl.getUsersByProjectIdAndRole(projectId, role);
             return new ResponseEntity<>(userDTOList, HttpStatus.OK);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @PutMapping("/{projectId}/repository/{repoId}") // Add Repo to Project based on Project ID, Repo ID
@@ -420,10 +368,8 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> addRepositoryToProject(
             @PathVariable("projectId") Long projectId,
-            @PathVariable("repoId") Long repoId,
-            @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+            @PathVariable("repoId") Long repoId) {
+
             try {
                 ResponseEntity<Object> result = projectServiceImpl.addRepositoryToProject(projectId, repoId);
                 if (result.getStatusCode() == HttpStatus.NOT_FOUND){
@@ -434,9 +380,7 @@ public class ProjectController {
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @GetMapping("/without-figma-url")
@@ -449,15 +393,11 @@ public class ProjectController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getProjectsWithoutFigmaURL(
-            @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<Object> getProjectsWithoutFigmaURL() {
+
             List<ProjectDTO> projects = projectServiceImpl.getProjectsWithoutFigmaURL();
             return ResponseEntity.ok(projects);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @GetMapping("/without-google-drive")
@@ -470,15 +410,11 @@ public class ProjectController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getProjectsWithoutGoogleDriveLink(
-            @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<Object> getProjectsWithoutGoogleDriveLink() {
+
             List<ProjectDTO> projects = projectServiceImpl.getProjectsWithoutGoogleDriveLink();
             return ResponseEntity.ok(projects);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @GetMapping("/countPeople")
@@ -491,18 +427,15 @@ public class ProjectController {
                     @ApiResponse(responseCode = "500", description = "Internal Server Error")
             }
     )
-    public ResponseEntity<Object> countAllPeopleByProjectIdAndName(@RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<Object> countAllPeopleByProjectIdAndName() {
+
             List<ProjectNamePeopleCountDTO> peopleCountDTOs = projectServiceImpl.getCountAllPeopleAndProjectName();
             if (peopleCountDTOs.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Empty");
             } else {
                 return ResponseEntity.ok(peopleCountDTOs);
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @GetMapping("/count")
@@ -515,18 +448,15 @@ public class ProjectController {
                     @ApiResponse(responseCode = "500", description = "Internal Server Error")
             }
     )
-    public ResponseEntity<Object> countAllProjects(@RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<Object> countAllProjects() {
+
             Integer countProjects = projectServiceImpl.getCountAllProjects();
             if (countProjects == 0) {
                 return ResponseEntity.ok(0);
             } else {
                 return ResponseEntity.ok(countProjects);
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @GetMapping("/count/role/{role}")
@@ -539,10 +469,8 @@ public class ProjectController {
                     @ApiResponse(responseCode = "500", description = "Internal Server Error")
             }
     )
-    public ResponseEntity<Object> countAllProjectsByRole(@PathVariable("role") String role,
-                                                         @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<Object> countAllProjectsByRole(@PathVariable("role") String role) {
+
             EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
             Integer countProjects = projectServiceImpl.getCountAllProjectsByRole(enumRole);
             if (countProjects == 0) {
@@ -550,9 +478,7 @@ public class ProjectController {
             } else {
                 return ResponseEntity.ok(countProjects);
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @GetMapping("/count/user/{userId}")
@@ -565,19 +491,15 @@ public class ProjectController {
                     @ApiResponse(responseCode = "500", description = "Internal Server Error")
             }
     )
-    public ResponseEntity<Object> countAllProjectsByUserId(@PathVariable("userId") Long id,
-                                                           @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<Object> countAllProjectsByUserId(@PathVariable("userId") Long id) {
+
             Integer countProjects = projectServiceImpl.getCountAllProjectsByUserId(id);
             if (countProjects == 0) {
                 return ResponseEntity.ok(0);
             } else {
                 return ResponseEntity.ok(countProjects);
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @GetMapping("/{projectId}/count")
@@ -590,19 +512,15 @@ public class ProjectController {
                     @ApiResponse(responseCode = "500", description = "Internal Server Error")
             }
     )
-    public ResponseEntity<Object> countAllUsersByProjectId(@PathVariable Long projectId,
-                                                           @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<Object> countAllUsersByProjectId(@PathVariable Long projectId) {
+
             Integer countUsers = projectServiceImpl.getCountAllUsersByProjectId(projectId);
             if (countUsers == 0) {
                 return ResponseEntity.ok(0);
             } else {
                 return ResponseEntity.ok(countUsers);
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @GetMapping("/{projectId}/count/{role}")
@@ -617,10 +535,8 @@ public class ProjectController {
     )
     public ResponseEntity<Object> countAllUsersByProjectIdByRole(
             @PathVariable Long projectId,
-            @PathVariable String role,
-            @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+            @PathVariable String role) {
+
             EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
             Integer countUsers = projectServiceImpl.getCountAllUsersByProjectIdAndRole(projectId, enumRole);
             if (countUsers == 0) {
@@ -628,9 +544,7 @@ public class ProjectController {
             } else {
                 return ResponseEntity.ok(countUsers);
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @GetMapping("/count/active")
@@ -643,18 +557,15 @@ public class ProjectController {
                     @ApiResponse(responseCode = "500", description = "Internal Server Error")
             }
     )
-    public ResponseEntity<Object> countAllActiveProjects(@RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<Object> countAllActiveProjects() {
+
             Integer countProjects = projectServiceImpl.getCountAllActiveProjects();
             if (countProjects == 0) {
                 return ResponseEntity.ok(0);
             } else {
                 return ResponseEntity.ok(countProjects);
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @GetMapping("/count/inactive")
@@ -667,18 +578,15 @@ public class ProjectController {
                     @ApiResponse(responseCode = "500", description = "Internal Server Error")
             }
     )
-    public ResponseEntity<Object> countAllInActiveProjects(@RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<Object> countAllInActiveProjects() {
+
             Integer countProjects = projectServiceImpl.getCountAllInActiveProjects();
             if (countProjects == 0) {
                 return ResponseEntity.ok(0);
             } else {
                 return ResponseEntity.ok(countProjects);
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @GetMapping("/{projectId}/details")
@@ -690,18 +598,14 @@ public class ProjectController {
                     @ApiResponse(responseCode = "500", description = "Internal Server Error")
             }
     )
-    public ResponseEntity<Object> getProjectDetailsById(@RequestHeader("AccessToken") String accessToken,
-                                                        @PathVariable Long projectId) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if(isTokenValid){
+    public ResponseEntity<Object> getProjectDetailsById(@PathVariable Long projectId) {
+
             try {
                 ProjectDTO projectDetails = projectServiceImpl.getProjectDetailsById(projectId);
                 return new ResponseEntity<>(projectDetails, HttpStatus.OK);
             } catch (Exception e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 }

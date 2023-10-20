@@ -2,7 +2,6 @@ package com.example.devopsproj.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-//import org.apache.http.HttpStatus;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -64,7 +63,6 @@ class TokenExchangeControllerTest {
     void testTokenExchange_ErrorHandling() throws IOException {
         // Mock the HTTP client to throw an IOException
         mockStatic(HttpClients.class);
-        CloseableHttpClient httpClient = mock(CloseableHttpClient.class);
         when(HttpClients.createDefault()).thenReturn(httpClient);
 
         when(httpClient.execute(any(HttpPost.class))).thenThrow(new IOException("Simulated exception"));

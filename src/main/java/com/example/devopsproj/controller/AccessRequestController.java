@@ -1,7 +1,6 @@
 package com.example.devopsproj.controller;
 
 import com.example.devopsproj.service.implementations.AccessRequestServiceImpl;
-import com.example.devopsproj.service.implementations.JwtServiceImpl;
 import com.example.devopsproj.dto.requestdto.AccessRequestDTO;
 import com.example.devopsproj.dto.responsedto.AccessResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,9 +32,6 @@ import java.util.List;
 public class AccessRequestController {
 
     private final AccessRequestServiceImpl accessRequestServiceImpl;
-    private final JwtServiceImpl jwtServiceImpl;
-
-    private static final String INVALID_TOKEN = "Invalid Token";
 
     @PostMapping("/")
     @Operation(
@@ -46,17 +42,12 @@ public class AccessRequestController {
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> createAccessRequest(@Valid @RequestBody AccessRequestDTO accessRequestDTO, @RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            AccessRequestDTO accessRequestDTO1 = accessRequestServiceImpl.createRequest(accessRequestDTO);
-            if (accessRequestDTO1 == null){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid RequestDTO");
-            }
-            return ResponseEntity.ok(accessRequestDTO1);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
+    public ResponseEntity<Object> createAccessRequest(@Valid @RequestBody AccessRequestDTO accessRequestDTO){
+        AccessRequestDTO accessRequestDTO1 = accessRequestServiceImpl.createRequest(accessRequestDTO);
+        if (accessRequestDTO1 == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid RequestDTO");
         }
+        return ResponseEntity.ok(accessRequestDTO1);
     }
 
     @GetMapping("/allActive")
@@ -69,17 +60,12 @@ public class AccessRequestController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getAllActiveRequests(@RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            List<AccessRequestDTO>  accessRequestDTOList= accessRequestServiceImpl.getAllActiveRequests();
-            if (accessRequestDTOList.isEmpty()){
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No requests");
-            }
-            return ResponseEntity.ok(accessRequestDTOList);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
+    public ResponseEntity<Object> getAllActiveRequests(){
+        List<AccessRequestDTO>  accessRequestDTOList= accessRequestServiceImpl.getAllActiveRequests();
+        if (accessRequestDTOList.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No requests");
         }
+        return ResponseEntity.ok(accessRequestDTOList);
     }
 
 
@@ -93,17 +79,12 @@ public class AccessRequestController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getAllRequests(@RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            List<AccessRequestDTO>  accessRequestDTOList= accessRequestServiceImpl.getAllRequests();
-            if (accessRequestDTOList.isEmpty()){
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No requests");
-            }
-            return ResponseEntity.ok(accessRequestDTOList);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
+    public ResponseEntity<Object> getAllRequests(){
+        List<AccessRequestDTO>  accessRequestDTOList= accessRequestServiceImpl.getAllRequests();
+        if (accessRequestDTOList.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No requests");
         }
+        return ResponseEntity.ok(accessRequestDTOList);
     }
 
     @PutMapping("/update/{accessRequestId}")
@@ -117,19 +98,13 @@ public class AccessRequestController {
     )
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> updateAccessRequest(
-            @PathVariable("accessRequestId") Long requestId,
-            @Valid @RequestBody AccessRequestDTO accessRequestDTO,
-            @RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
-            List<AccessResponseDTO> accessResponseDTOList = accessRequestServiceImpl.getUpdatedRequests(requestId, accessRequestDTO);
-            if (accessResponseDTOList.isEmpty()){
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-            else return ResponseEntity.ok(accessResponseDTOList);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
+        @PathVariable("accessRequestId") Long requestId,
+        @Valid @RequestBody AccessRequestDTO accessRequestDTO){
+        List<AccessResponseDTO> accessResponseDTOList = accessRequestServiceImpl.getUpdatedRequests(requestId, accessRequestDTO);
+        if (accessResponseDTOList.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
+        else return ResponseEntity.ok(accessResponseDTOList);
     }
 
     @GetMapping("/unread/PM")
@@ -142,18 +117,12 @@ public class AccessRequestController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getUnreadPMRequestsNotification(@RequestParam("pmName") String pmName,
-                                                @RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<Object> getUnreadPMRequestsNotification(@RequestParam("pmName") String pmName){
             List<AccessResponseDTO> accessResponseDTOList = accessRequestServiceImpl.getPMUnreadRequests(pmName);
             if (accessResponseDTOList.isEmpty()){
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
             else return ResponseEntity.ok(accessResponseDTOList);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
     }
 
     @GetMapping("/all/PM")
@@ -166,18 +135,14 @@ public class AccessRequestController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getPMRequestsNotification(@RequestParam("pmName") String pmName,
-                                                            @RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<Object> getPMRequestsNotification(@RequestParam("pmName") String pmName){
+
             List<AccessResponseDTO> accessResponseDTOList = accessRequestServiceImpl.getPMRequests(pmName);
             if (accessResponseDTOList.isEmpty()){
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
             else return ResponseEntity.ok(accessResponseDTOList);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @PutMapping("/notifiedPM")
@@ -190,16 +155,12 @@ public class AccessRequestController {
     )
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> setPMRequestsNotificationToTrue(
-            @RequestParam("accessRequestId") Long accessRequestId,
-            @RequestHeader("AccessToken") String accessToken
+            @RequestParam("accessRequestId") Long accessRequestId
     ){
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid){
+
             accessRequestServiceImpl.setPMRequestsNotificationTrue(accessRequestId);
             return ResponseEntity.ok("Notification read");
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @DeleteMapping("/clearAll")
@@ -211,14 +172,11 @@ public class AccessRequestController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> deleteAllNotifications(@RequestHeader("AccessToken") String accessToken){
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if(isTokenValid){
+    public ResponseEntity<Object> deleteAllNotifications(){
+
             accessRequestServiceImpl.clearAllNotifications();
             return ResponseEntity.noContent().build();
-        }else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
 }

@@ -1,7 +1,6 @@
 package com.example.devopsproj.controller;
 
 import com.example.devopsproj.service.implementations.GitHubCollaboratorServiceImpl;
-import com.example.devopsproj.service.implementations.JwtServiceImpl;
 import com.example.devopsproj.dto.responsedto.CollaboratorDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,9 +26,6 @@ import org.springframework.web.bind.annotation.*;
 public class GitHubCollaboratorController {
 
     private final GitHubCollaboratorServiceImpl collaboratorService;
-    private final JwtServiceImpl jwtServiceImpl;
-
-    private static final String INVALID_TOKEN = "Invalid Token";
 
     @PostMapping("/add")
     @Operation(
@@ -41,19 +37,15 @@ public class GitHubCollaboratorController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> addCollaborator(@Valid @RequestBody CollaboratorDTO collaboratorDTO,
-                                                  @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<String> addCollaborator(@Valid @RequestBody CollaboratorDTO collaboratorDTO) {
+
             boolean added = collaboratorService.addCollaborator(collaboratorDTO);
             if (added) {
                 return ResponseEntity.ok("Invitation to add collaborator sent successfully.");
             } else {
                 return ResponseEntity.badRequest().body("Failed to add collaborator.");
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
 
     }
 
@@ -67,18 +59,14 @@ public class GitHubCollaboratorController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> deleteCollaborator(@Valid @RequestBody CollaboratorDTO collaboratorDTO,
-                                                     @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<String> deleteCollaborator(@Valid @RequestBody CollaboratorDTO collaboratorDTO) {
+
             boolean deleted = collaboratorService.deleteCollaborator(collaboratorDTO);
             if (deleted) {
                 return ResponseEntity.ok("Collaborator removed successfully.");
             } else {
                 return ResponseEntity.badRequest().body("Failed to remove collaborator.");
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 }

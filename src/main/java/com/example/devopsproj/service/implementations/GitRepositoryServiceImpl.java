@@ -12,6 +12,8 @@ import com.example.devopsproj.service.interfaces.GitRepositoryService;
 import java.util.Collections;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,8 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
     private final GitRepositoryRepository gitRepositoryRepository;
     private final ProjectServiceImpl projectServiceImpl;
     private final JdbcTemplate jdbcTemplate;
+
+    private static final Logger logger = LoggerFactory.getLogger(GitRepositoryServiceImpl.class);
 
     private static final String API_BASE_URL = "https://api.github.com";
     private static final String USER_REPOS_ENDPOINT = "/user/repos";

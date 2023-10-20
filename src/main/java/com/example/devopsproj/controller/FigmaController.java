@@ -3,7 +3,6 @@ package com.example.devopsproj.controller;
 import com.example.devopsproj.exceptions.NotFoundException;
 import com.example.devopsproj.model.Figma;
 import com.example.devopsproj.service.implementations.FigmaServiceImpl;
-import com.example.devopsproj.service.implementations.JwtServiceImpl;
 import com.example.devopsproj.dto.responsedto.FigmaDTO;
 import com.example.devopsproj.dto.responsedto.FigmaScreenshotDTO;
 import com.example.devopsproj.utils.DTOModelMapper;
@@ -35,9 +34,6 @@ import java.util.*;
 public class FigmaController {
 
     private final FigmaServiceImpl figmaServiceImpl;
-    private final JwtServiceImpl jwtServiceImpl;
-
-    private static final String INVALID_TOKEN = "Invalid Token";
 
     @PostMapping("/create")
     @Operation(
@@ -49,10 +45,8 @@ public class FigmaController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> createFigma(@Valid @RequestBody FigmaDTO figmaDTO,
-                                              @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<String> createFigma(@Valid @RequestBody FigmaDTO figmaDTO) {
+
             try {
                 figmaServiceImpl.createFigma(figmaDTO);
 
@@ -61,9 +55,7 @@ public class FigmaController {
             } catch (DataIntegrityViolationException e) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("Could not create figma");
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @GetMapping("/getAll")
@@ -75,9 +67,8 @@ public class FigmaController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getAllFigmaProjects(@RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<Object> getAllFigmaProjects() {
+
             List<Figma> figmaProjects = figmaServiceImpl.getAllFigmaProjects();
 
             List<FigmaDTO> figmaDTOs = figmaProjects.stream()
@@ -98,9 +89,7 @@ public class FigmaController {
                     .toList();
 
             return ResponseEntity.ok(figmaDTOs);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @GetMapping("/get/{figmaId}")
@@ -113,19 +102,15 @@ public class FigmaController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getFigma(@PathVariable Long figmaId,
-                                           @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<Object> getFigma(@PathVariable Long figmaId) {
+
             Optional<FigmaDTO> optionalFigmaDTO = figmaServiceImpl.getFigmaById(figmaId);
             if (optionalFigmaDTO.isPresent()) {
                 return ResponseEntity.ok(optionalFigmaDTO);
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @PostMapping("/{figmaId}/user")
@@ -140,11 +125,9 @@ public class FigmaController {
     )
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> addUserAndScreenshotsToFigma(@PathVariable("figmaId") Long figmaId,
-                                                               @Valid @RequestBody FigmaDTO figmaDTO,
-                                                               @RequestHeader("AccessToken") String accessToken)
+                                                               @Valid @RequestBody FigmaDTO figmaDTO)
     {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+
             try {
                 String result = figmaServiceImpl.saveUserAndScreenshotsToFigma(figmaId, figmaDTO);
                 return ResponseEntity.ok(result);
@@ -153,9 +136,7 @@ public class FigmaController {
             } catch (RuntimeException e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
 
@@ -168,15 +149,11 @@ public class FigmaController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> deleteFigma(@PathVariable Long figmaId,
-                                              @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<String> deleteFigma(@PathVariable Long figmaId) {
+
             figmaServiceImpl.deleteFigma(figmaId);
             return ResponseEntity.ok("Figma deleted successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @GetMapping("/project/{projectId}")
@@ -189,19 +166,15 @@ public class FigmaController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getFigmaByProjectId(@PathVariable Long projectId,
-                                                      @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<Object> getFigmaByProjectId(@PathVariable Long projectId) {
+
             try {
                 String figmaURL = figmaServiceImpl.getFigmaURLByProjectId(projectId);
                 return ResponseEntity.ok(figmaURL);
             } catch (NotFoundException e){
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 
     @GetMapping("/{figmaId}/screenshots")
@@ -215,10 +188,8 @@ public class FigmaController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getScreenshotsForFigmaId(@PathVariable("figmaId") Long figmaId,
-                                                         @RequestHeader("AccessToken") String accessToken) {
-        boolean isTokenValid = jwtServiceImpl.isTokenTrue(accessToken);
-        if (isTokenValid) {
+    public ResponseEntity<Object> getScreenshotsForFigmaId(@PathVariable("figmaId") Long figmaId) {
+
             try {
                 List<FigmaScreenshotDTO> figmaScreenshotDTOS = figmaServiceImpl.getScreenshotsByFigmaId(figmaId);
                 return ResponseEntity.ok(figmaScreenshotDTOS);
@@ -227,8 +198,6 @@ public class FigmaController {
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_TOKEN);
-        }
+
     }
 }

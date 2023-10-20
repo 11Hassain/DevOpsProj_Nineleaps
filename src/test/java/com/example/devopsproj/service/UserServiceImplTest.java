@@ -12,7 +12,6 @@ import com.example.devopsproj.repository.UserRepository;
 import com.example.devopsproj.service.implementations.JwtServiceImpl;
 import com.example.devopsproj.service.implementations.ProjectServiceImpl;
 import com.example.devopsproj.service.implementations.UserServiceImpl;
-import com.example.devopsproj.utils.JwtUtils;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,9 +41,7 @@ class UserServiceImplTest {
     @Mock
     private ProjectRepository projectRepository;
     @Mock
-    private JwtServiceImpl jwtService;
-    @Mock
-    private JwtUtils jwtUtils;
+    private JwtServiceImpl jwtServiceImpl;
 
     @BeforeEach
     void setUp() {
@@ -128,6 +125,7 @@ class UserServiceImplTest {
         }
     }
 
+    @Nested
     class GetUserByIdTest {
         @Test
         @DisplayName("Testing success case - user found")
@@ -609,6 +607,48 @@ class UserServiceImplTest {
             assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
             assertNull(response.getBody());
         }
+
+        @Test
+        @DisplayName("Testing valid Figma and GDrive case")
+        void testGetProjectsByRoleAndUserIdWithFigmaAndDrive() {
+            User user = new User();
+            user.setId(1L);
+            EnumRole userRole = EnumRole.USER;
+            Project project = new Project();
+            Figma figma = new Figma();
+            figma.setFigmaURL("https://example.com/figma");
+            project.setFigma(figma);
+            project.setRepositories(new ArrayList<>());
+            GoogleDrive googleDrive = new GoogleDrive();
+            googleDrive.setDriveLink("https://example.com/drive");
+            project.setGoogleDrive(googleDrive);
+            List<Project> projects = Collections.singletonList(project);
+
+            when(userRepository.findByRoleAndUserId(1L, userRole)).thenReturn(projects);
+
+            ResponseEntity<Object> response = userService.getProjectsByRoleAndUserId(1L, "user");
+
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertNotNull(response.getBody());
+        }
+
+        @Test
+        @DisplayName("Testing null Figma and null GDrive case")
+        void testGetProjectsByRoleAndUserIdWithNullFigmaAndDrive() {
+            User user = new User();
+            user.setId(1L);
+            EnumRole userRole = EnumRole.USER;
+            Project project = new Project();
+            project.setRepositories(new ArrayList<>());
+            List<Project> projects = Collections.singletonList(project);
+
+            when(userRepository.findByRoleAndUserId(1L, userRole)).thenReturn(projects);
+
+            ResponseEntity<Object> response = userService.getProjectsByRoleAndUserId(1L, "user");
+
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertNotNull(response.getBody());
+        }
     }
 
     @Nested
@@ -686,86 +726,33 @@ class UserServiceImplTest {
         }
     }
 
-    @Test
-    void testGetProjectsByRoleAndUserIdWithFigmaAndDrive() {
-        User user = new User();
-        user.setId(1L);
-        EnumRole userRole = EnumRole.USER;
-        Project project = new Project();
-        Figma figma = new Figma();
-        figma.setFigmaURL("https://example.com/figma");
-        project.setFigma(figma);
-        project.setRepositories(new ArrayList<>());
-        GoogleDrive googleDrive = new GoogleDrive();
-        googleDrive.setDriveLink("https://example.com/drive");
-        project.setGoogleDrive(googleDrive);
-        List<Project> projects = Collections.singletonList(project);
-
-        when(userRepository.findByRoleAndUserId(1L, userRole)).thenReturn(projects);
-
-        ResponseEntity<Object> response = userService.getProjectsByRoleAndUserId(1L, "user");
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-    }
-
-    @Test
-    void testGetProjectsByRoleAndUserIdWithNullFigmaAndDrive() {
-        User user = new User();
-        user.setId(1L);
-        EnumRole userRole = EnumRole.USER;
-        Project project = new Project();
-        project.setRepositories(new ArrayList<>());
-        List<Project> projects = Collections.singletonList(project);
-
-        when(userRepository.findByRoleAndUserId(1L, userRole)).thenReturn(projects);
-
-        ResponseEntity<Object> response = userService.getProjectsByRoleAndUserId(1L, "user");
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-    }
-
     @Nested
     class LoginVerificationTest {
         @Test
-        @DisplayName("Testing success case for login verification")
-        void testLoginVerification_Successful() {
-            String userEmail = "johndoe@example.com";
+        @DisplayName("Testing user not found case")
+        void testLoginVerification_Success() {
+            String email = "test@example.com";
             User user = new User();
             user.setId(1L);
-            user.setName("John Doe");
-            user.setEmail(userEmail);
+            user.setName("Test User");
+            user.setEmail(email);
             user.setEnumRole(EnumRole.USER);
+            user.setLastUpdated(LocalDateTime.now());
 
-            when(userRepository.existsByEmail(userEmail)).thenReturn(user);
+            when(userRepository.existsByEmail(email)).thenReturn(user);
+            when(jwtServiceImpl.generateToken(user)).thenReturn("valid_token");
 
-            String mockToken = "mocked-jwt-token";
-            when(jwtService.generateToken(user)).thenReturn(mockToken);
+            UserDTO userDTO = userService.loginVerification(email);
 
-            doNothing().when(jwtUtils).saveUserToken(user, mockToken);
-
-            UserDTO result = userService.loginVerification(userEmail);
-
-            assertNotNull(result);
-            assertEquals(user.getId(), result.getId());
-            assertEquals(user.getName(), result.getName());
-            assertEquals(user.getEmail(), result.getEmail());
-            assertEquals(user.getEnumRole(), result.getEnumRole());
-            assertNotNull(result.getLastUpdated());
-            assertEquals(mockToken, result.getToken());
+            assertNotNull(userDTO);
+            assertEquals(1L, userDTO.getId());
+            assertEquals("Test User", userDTO.getName());
+            assertEquals(email, userDTO.getEmail());
+            assertEquals(EnumRole.USER, userDTO.getEnumRole());
+            assertEquals(user.getLastUpdated(), userDTO.getLastUpdated());
+            assertEquals("valid_token", userDTO.getToken());
         }
 
-        @Test
-        @DisplayName("Testing user not found case")
-        void testLoginVerification_UserNotFound() {
-            String userEmail = "nonexistent@example.com";
-            when(userRepository.existsByEmail(userEmail)).thenReturn(null);
-
-            UserDTO result = userService.loginVerification(userEmail);
-
-            assertNull(result);
-        }
 
         @Test
         @DisplayName("Testing failure case for non-existent user")
