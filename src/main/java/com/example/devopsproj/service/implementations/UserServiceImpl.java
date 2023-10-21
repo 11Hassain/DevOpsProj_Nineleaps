@@ -9,7 +9,6 @@ import com.example.devopsproj.dto.requestdto.UserCreationDTO;
 import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.service.interfaces.IUserService;
 import com.example.devopsproj.service.interfaces.UserService;
-import com.example.devopsproj.utils.JwtUtils;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -29,7 +28,6 @@ public class UserServiceImpl implements IUserService, UserService {
 
     private final UserRepository userRepository;
     private final JwtServiceImpl jwtServiceImpl;
-    private final JwtUtils jwtUtils;
     private final ProjectRepository projectRepository;
     private final ModelMapper modelMapper;
 
@@ -287,7 +285,6 @@ public class UserServiceImpl implements IUserService, UserService {
         userDTO.setLastUpdated(user.getLastUpdated());
         //generate token
         String jwtToken = jwtServiceImpl.generateToken(user);
-        jwtUtils.saveUserToken(user,jwtToken);
         userDTO.setToken(jwtToken);
         return userDTO;
     }
