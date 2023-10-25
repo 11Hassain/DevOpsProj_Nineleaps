@@ -3,6 +3,7 @@ import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.dto.responsedto.GitRepositoryDTO;
 import com.example.devopsproj.model.GitRepository;
 import com.example.devopsproj.service.interfaces.GitRepositoryService;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -21,33 +22,45 @@ public class GitRepositoryController {
 
     // Create a new Git repository.
     @PostMapping("/add")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ApiOperation("Create a Git repository")
+    @ResponseStatus(HttpStatus.CREATED) // Replace with the appropriate status code
     public ResponseEntity<Object> createRepository(@RequestBody GitRepository gitRepository) {
         return ResponseEntity.ok(gitRepositoryService.createRepository(gitRepository));
     }
 
+
     // Get a list of all Git repositories.
     @GetMapping("/get")
+    @ApiOperation("Get a list of all Git repositories")
+    @ResponseStatus(HttpStatus.OK) // Replace with the appropriate status code
     public ResponseEntity<Object> getAllRepositories() {
         return ResponseEntity.ok(gitRepositoryService.getAllRepositories());
     }
 
     // Get a list of Git repositories by project ID.
     @GetMapping("/project/{id}")
+    @ApiOperation("Get a list of Git repositories by project ID")
+    @ResponseStatus(HttpStatus.OK) // Replace with the appropriate status code
     public ResponseEntity<Object> getAllReposByProject(@PathVariable Long id) {
         List<GitRepositoryDTO> gitRepositoryDTOS = gitRepositoryService.getAllRepositoriesByProject(id);
         return new ResponseEntity<>(gitRepositoryDTOS, HttpStatus.OK);
     }
 
+
     // Get a list of Git repositories by role.
     @GetMapping("/get/role/{role}")
+    @ApiOperation("Get a list of Git repositories by role")
+    @ResponseStatus(HttpStatus.OK) // Replace with the appropriate status code
     public ResponseEntity<Object> getAllReposByRole(@PathVariable("role") String role) {
         EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
         return ResponseEntity.ok(gitRepositoryService.getAllReposByRole(enumRole));
     }
 
+
     // Get a Git repository by ID.
     @GetMapping("/get/{id}")
+    @ApiOperation("Get a Git repository by ID")
+    @ResponseStatus(HttpStatus.OK) // Replace with the appropriate status code
     public ResponseEntity<Object> getRepositoryById(@PathVariable Long id) {
         GitRepository repository = gitRepositoryService.getRepositoryById(id);
         GitRepositoryDTO repositoryDTO = new GitRepositoryDTO(repository.getName(), repository.getDescription());
@@ -56,8 +69,11 @@ public class GitRepositoryController {
 
     // Delete a Git repository by ID.
     @DeleteMapping("/delete/{repoId}")
+    @ApiOperation("Delete a Git repository by ID")
+    @ResponseStatus(HttpStatus.OK) // Replace with the appropriate status code
     public ResponseEntity<Object> deleteRepository(@PathVariable Long repoId) {
         gitRepositoryService.deleteRepository(repoId);
         return ResponseEntity.ok("Deleted successfully");
     }
+
 }

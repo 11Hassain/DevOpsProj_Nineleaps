@@ -3,8 +3,10 @@ package com.example.devopsproj.controller;
 
 import com.example.devopsproj.service.interfaces.HelpDocumentsService;
 
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,33 +20,40 @@ public class HelpDocumentsController {
     private final HelpDocumentsService helpDocumentsService;
 
 
-    // Upload a file associated with a specific project.
     @PostMapping("/upload")
+    @ApiOperation("Upload a project file")
+    @ResponseStatus(HttpStatus.OK) // Replace with the appropriate status code
     public ResponseEntity<Object> uploadFile(
             @RequestParam("projectId") long projectId,
             @RequestParam(name = "projectFile", required = false) MultipartFile projectFile) throws IOException {
+        // Extract the file extension from the uploaded file.
         String fileExtension = helpDocumentsService.getFileExtension(projectFile);
+        // Delegate the file upload to the service and return the result.
         return helpDocumentsService.uploadFiles(projectId, projectFile, fileExtension);
     }
 
-    // Get a list of PDF files associated with a specific project.
     @GetMapping("/files")
+    @ApiOperation("Get a list of PDF files associated with a specific project")
+    @ResponseStatus(HttpStatus.OK) // Replace with the appropriate status code
     public ResponseEntity<Object> getPdfFilesList(@RequestParam("projectId") long projectId) {
+        // Retrieve a list of PDF files associated with the specified project.
         return helpDocumentsService.getPdfFilesList(projectId);
     }
 
-
-    // Download a PDF file by its file name.
     @GetMapping("/files/{fileName}")
+    @ApiOperation("Download a PDF file by its file name")
+    @ResponseStatus(HttpStatus.OK) // Replace with the appropriate status code
     public ResponseEntity<byte[]> downloadPdfFile(@PathVariable("fileName") String fileName) {
+        // Download the PDF file by its given file name.
         return helpDocumentsService.downloadPdfFile(fileName);
     }
 
-
-
-    // Delete a document by its file ID.
     @DeleteMapping("/files/{fileId}")
+    @ApiOperation("Delete a document by its file ID")
+    @ResponseStatus(HttpStatus.OK) // Replace with the appropriate status code
     public ResponseEntity<String> deleteFile(@PathVariable("fileId") Long fileId) {
+        // Delete the document with the specified file ID.
         return helpDocumentsService.deleteDocument(fileId);
     }
+
 }

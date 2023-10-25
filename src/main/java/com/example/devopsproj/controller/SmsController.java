@@ -6,16 +6,14 @@ import com.example.devopsproj.dto.responsedto.StoreOTP;
 import com.example.devopsproj.dto.responsedto.TempOTP;
 
 import com.example.devopsproj.service.implementations.SmsService;
+import io.swagger.annotations.ApiOperation;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,10 +35,13 @@ public class SmsController {
 
     private static final Logger logger = LoggerFactory.getLogger(SmsController.class);
 
+    // Send an SMS.
     @PostMapping("/send")
+    @ApiOperation("Send an SMS")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> smsSubmit(@RequestBody SmsPojo sms) {
         try {
-            logger.info("try"); // Replace with the appropriate log level (info, debug, error, etc.)
+            logger.info("Sending SMS"); // Replace with the appropriate log level (info, debug, error, etc.)
             smsService.send(sms);
         } catch (Exception e) {
             logger.error("Something went wrong", e);
@@ -50,13 +51,16 @@ public class SmsController {
         return new ResponseEntity<>("OTP sent", HttpStatus.OK);
     }
 
-    // Endpoint to verify the OTP for sign-up using phone number and OTP
+    // Verify the OTP for sign-up using phone number and OTP.
     @PostMapping("/verifyOTP")
-    public String verifyOTPSignUp(@RequestBody TempOTP sms,HttpServletResponse response){
-        if(sms.getOtp()== StoreOTP.getOtp()) {
-            return "correct otp";
+    @ApiOperation("Verify the OTP for sign-up")
+    @ResponseStatus(HttpStatus.OK)
+    public String verifyOTPSignUp(@RequestBody TempOTP sms, HttpServletResponse response) {
+        if (sms.getOtp() == StoreOTP.getOtp()) {
+            return "Correct OTP";
         } else {
-            return  "not a correct otp";
+            return "Not a correct OTP";
         }
     }
+
 }

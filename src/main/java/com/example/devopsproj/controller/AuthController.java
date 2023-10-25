@@ -1,5 +1,6 @@
 package com.example.devopsproj.controller;
 import com.example.devopsproj.service.interfaces.UserService;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,8 @@ public class AuthController {
 
     // Get email from a custom "emailToVerify" header.
     @GetMapping("/get-email")
-    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation("Get email from token")
+    @ResponseStatus(HttpStatus.OK) // Replace with the appropriate status code
     public ResponseEntity<Object> getEmailFromToken(@RequestHeader("emailToVerify") String emailToVerify) {
         Object object = userService.loginVerification(emailToVerify);
         if (object == null) {
@@ -25,4 +27,5 @@ public class AuthController {
             return ResponseEntity.ok(userService.loginVerification(emailToVerify));
         }
     }
+
 }
