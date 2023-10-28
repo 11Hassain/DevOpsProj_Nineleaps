@@ -14,7 +14,6 @@ import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.service.interfaces.FigmaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -82,15 +81,21 @@ public class FigmaServiceImpl implements FigmaService {
 
     @Override
     public void deleteFigma(Long figmaId) {
-        try {
-            // Delete the Figma project by ID
-            figmaRepository.deleteById(figmaId);
-        } catch (EmptyResultDataAccessException e) {
-            throw new FigmaNotFoundException("Figma with ID " + figmaId + " not found", e);
-        } catch (Exception e) {
-            throw new FigmaServiceException("An error occurred while deleting Figma by ID", e);
+
+    }
+
+    @Override
+    public void softDeleteFigma(Long figmaId) {
+        Optional<Figma> figmaOptional = figmaRepository.findById(figmaId);
+        if (figmaOptional.isPresent()) {
+            Figma figma = figmaOptional.get();
+            figma.setDeleted(true);
+            figmaRepository.save(figma);
+        } else {
+            throw new FigmaNotFoundException("Figma with ID " + figmaId + " not found");
         }
     }
+
     @Override
     public String getFigmaURLByProjectId(Long projectId) {
         Optional<Figma> optionalFigma = figmaRepository.findFigmaByProjectId(projectId);

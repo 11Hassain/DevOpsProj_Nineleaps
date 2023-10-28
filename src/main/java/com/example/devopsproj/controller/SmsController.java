@@ -6,7 +6,6 @@ import com.example.devopsproj.dto.responsedto.StoreOTP;
 import com.example.devopsproj.dto.responsedto.TempOTP;
 
 import com.example.devopsproj.service.implementations.SmsService;
-import io.swagger.annotations.ApiOperation;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,10 +15,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-
-
-
 
 @RequestMapping("/api/v1/OTP")
 @RestController
@@ -37,11 +32,9 @@ public class SmsController {
 
     // Send an SMS.
     @PostMapping("/send")
-    @ApiOperation("Send an SMS")
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> smsSubmit(@RequestBody SmsPojo sms) {
         try {
-            logger.info("Sending SMS"); // Replace with the appropriate log level (info, debug, error, etc.)
+            logger.info("try"); // Replace with the appropriate log level (info, debug, error, etc.)
             smsService.send(sms);
         } catch (Exception e) {
             logger.error("Something went wrong", e);
@@ -53,13 +46,11 @@ public class SmsController {
 
     // Verify the OTP for sign-up using phone number and OTP.
     @PostMapping("/verifyOTP")
-    @ApiOperation("Verify the OTP for sign-up")
-    @ResponseStatus(HttpStatus.OK)
-    public String verifyOTPSignUp(@RequestBody TempOTP sms, HttpServletResponse response) {
-        if (sms.getOtp() == StoreOTP.getOtp()) {
-            return "Correct OTP";
+    public String verifyOTPSignUp(@RequestBody TempOTP sms,HttpServletResponse response){
+        if(sms.getOtp()== StoreOTP.getOtp()) {
+            return "correct otp";
         } else {
-            return "Not a correct OTP";
+            return  "not a correct otp";
         }
     }
 

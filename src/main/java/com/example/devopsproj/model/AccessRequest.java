@@ -30,6 +30,10 @@ public class AccessRequest implements Serializable {
     @JoinColumn(name = "project_id")
     private Project project;
 
+
+    @Column(name = "deleted")
+    private boolean deleted = false;
+
     @Column(name = "description")
     private String requestDescription;
 

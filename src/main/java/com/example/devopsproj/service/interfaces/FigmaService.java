@@ -21,6 +21,8 @@ public interface FigmaService {
 
     ProjectDTO mapProjectToProjectDTO(Project project);
 
+    void softDeleteFigma(Long figmaId);
+
     String getFigmaURLByProjectId(Long projectId);
 
 

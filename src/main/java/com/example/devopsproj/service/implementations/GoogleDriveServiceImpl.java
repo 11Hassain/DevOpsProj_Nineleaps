@@ -66,17 +66,17 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
     // Delete a Google Drive entry by its ID
     @Override
     public ResponseEntity<String> deleteGoogleDriveById(Long driveId) {
-        // Check if a Google Drive entry with the specified ID exists
         Optional<GoogleDrive> optionalGoogleDrive = googleDriveRepository.findById(driveId);
         if (optionalGoogleDrive.isPresent()) {
-            // If it exists, delete it from the repository and return a success response
-            googleDriveRepository.deleteById(driveId);
-            return ResponseEntity.ok("Google Drive with ID: " + driveId + " deleted successfully.");
+            GoogleDrive googleDrive = optionalGoogleDrive.get();
+            googleDrive.setDeleted(true); // Soft delete
+            googleDriveRepository.save(googleDrive);
+            return ResponseEntity.ok("Google Drive with ID: " + driveId + " has been soft-deleted successfully.");
         } else {
-            // If it doesn't exist, return a not found response
             return ResponseEntity.notFound().build();
         }
     }
+
 
 
     // Get a Google Drive entry by its associated Project ID

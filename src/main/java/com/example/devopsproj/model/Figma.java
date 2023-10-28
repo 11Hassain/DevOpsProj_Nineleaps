@@ -27,6 +27,10 @@ public class Figma implements Serializable {
     @Column(name = "users")
     private String user;
 
+    @Column(name = "deleted")
+    private Boolean deleted = false;
+
+
     @ElementCollection
     @CollectionTable(name = "figma_screenshots", joinColumns = @JoinColumn(name = "figma_id"))
     @MapKeyColumn(name = "user")  // Add this annotation to use 'user' as the map key

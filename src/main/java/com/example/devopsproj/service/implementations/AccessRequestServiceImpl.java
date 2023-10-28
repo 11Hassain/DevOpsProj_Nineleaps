@@ -157,8 +157,11 @@ public class AccessRequestServiceImpl implements AccessRequestService {
 
     @Override
     @Transactional
-    public void clearAllNotifications(){
-        accessRequestRepository.deleteAll();
+    public void clearAllNotifications() {
+        List<AccessRequest> accessRequests = accessRequestRepository.findAll();
+        for (AccessRequest accessRequest : accessRequests) {
+            accessRequest.setDeleted(true);
+        }
+        accessRequestRepository.saveAll(accessRequests);
     }
-
 }

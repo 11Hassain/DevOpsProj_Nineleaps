@@ -49,11 +49,11 @@ public class HelpDocumentsController {
     }
 
     @DeleteMapping("/files/{fileId}")
-    @ApiOperation("Delete a document by its file ID")
-    @ResponseStatus(HttpStatus.OK) // Replace with the appropriate status code
+    @ApiOperation("Soft delete a document by its file ID")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> deleteFile(@PathVariable("fileId") Long fileId) {
-        // Delete the document with the specified file ID.
-        return helpDocumentsService.deleteDocument(fileId);
+        return helpDocumentsService.softDeleteDocument(fileId);
     }
+
 
 }

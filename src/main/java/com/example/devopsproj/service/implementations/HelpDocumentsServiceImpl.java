@@ -124,19 +124,25 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
         }
     }
 
-    // Delete a document by its ID
     @Override
     public ResponseEntity<String> deleteDocument(Long fileId) {
-        // Retrieve the HelpDocuments object by its ID
-        Optional<HelpDocuments> helpDocuments = helpDocumentsRepository.findById(fileId);
+        return null;
+    }
 
+    // Delete a document by its ID
+    @Override
+    public ResponseEntity<String> softDeleteDocument(Long fileId) {
+        Optional<HelpDocuments> helpDocuments = helpDocumentsRepository.findById(fileId);
         if (helpDocuments.isPresent()) {
-            helpDocumentsRepository.deleteById(fileId);
-            return ResponseEntity.ok("Document deleted successfully");
+            HelpDocuments document = helpDocuments.get();
+            document.setDeleted(true); // Soft delete
+            helpDocumentsRepository.save(document);
+            return ResponseEntity.ok("Document with ID: " + fileId + " has been soft-deleted successfully.");
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Document not found");
         }
     }
+
 
     @Override
     public void saveFile(HelpDocuments helpDocuments, MultipartFile file, String fileExtension) throws IOException {

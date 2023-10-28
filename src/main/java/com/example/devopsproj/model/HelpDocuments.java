@@ -31,6 +31,10 @@ public class HelpDocuments {
     @Column(name = "image")
     private String fileExtension;
 
+    @Column(name = "deleted")
+    private boolean deleted = false;
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
     private Project project;

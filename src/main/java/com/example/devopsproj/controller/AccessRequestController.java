@@ -105,12 +105,13 @@ public class AccessRequestController {
 
 
     @DeleteMapping("/clearAll")
-    @ApiOperation("Delete all notifications")
-    @ResponseStatus(HttpStatus.OK) // Replace with the appropriate status code
+    @ApiOperation("Soft delete all notifications")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> deleteAllNotifications() {
         accessRequestService.clearAllNotifications();
-        return ResponseEntity.ok("All notifications cleared");
+        return ResponseEntity.ok("All notifications have been soft-deleted");
     }
+
 
 }
 

@@ -1,6 +1,4 @@
 package com.example.devopsproj.service.implementations;
-
-
 import com.example.devopsproj.dto.responsedto.SmsPojo;
 import com.example.devopsproj.dto.responsedto.StoreOTP;
 import com.twilio.Twilio;
@@ -17,8 +15,6 @@ import java.security.SecureRandom;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-
-
 
 @Component
 @Getter

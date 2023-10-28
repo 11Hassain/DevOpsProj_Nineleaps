@@ -21,6 +21,9 @@ public interface HelpDocumentsService {
     Optional<HelpDocumentsDTO> getDocumentById(Long fileId);
     ResponseEntity<String> deleteDocument(Long fileId);
 
+    // Delete a document by its ID
+    ResponseEntity<String> softDeleteDocument(Long fileId);
+
     void saveFile(HelpDocuments helpDocuments, MultipartFile file, String fileExtension) throws IOException;
 }
 

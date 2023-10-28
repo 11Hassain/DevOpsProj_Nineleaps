@@ -55,8 +55,8 @@ public class GoogleDriveController {
 
     // Delete a Google Drive entry by ID.
     @DeleteMapping("/deleteGoogleDriveById/{driveId}")
-    @ApiOperation("Delete a Google Drive entry by ID")
-    @ResponseStatus(HttpStatus.OK) // Replace with the appropriate status code
+    @ApiOperation("Soft delete a Google Drive entry by ID")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> deleteGoogleDriveById(@PathVariable Long driveId) {
         return googleDriveService.deleteGoogleDriveById(driveId);
     }

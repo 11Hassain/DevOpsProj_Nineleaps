@@ -21,5 +21,7 @@ public interface AccessRequestRepository extends JpaRepository<AccessRequest, Lo
     @Query("SELECT a FROM AccessRequest a WHERE a.pmName = :pmName")
     List<AccessRequest> findAllPMRequestsByName(@Param("pmName") String pmName);
 
+    List<AccessRequest> findByDeletedFalse();
+
 
 }

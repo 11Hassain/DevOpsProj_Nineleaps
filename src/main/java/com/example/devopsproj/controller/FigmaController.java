@@ -2,30 +2,22 @@ package com.example.devopsproj.controller;
 
 import com.example.devopsproj.dto.responsedto.FigmaDTO;
 import com.example.devopsproj.dto.responsedto.FigmaScreenshotDTO;
-
-
 import com.example.devopsproj.service.interfaces.FigmaService;
-
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
-
 import java.util.*;
 
 
 @RestController
 @RequestMapping("/api/v1/figmas")
-//@RequiredArgsConstructor
 public class FigmaController {
     private final FigmaService figmaService;
 
     public FigmaController(FigmaService figmaService) {
         this.figmaService = figmaService;
     }
-
-
-
 
     // Create a new Figma project.
     @PostMapping("/create")
@@ -46,12 +38,13 @@ public class FigmaController {
     }
 
     @DeleteMapping("/{figmaId}")
-    @ApiOperation("Delete a Figma project")
-    @ResponseStatus(HttpStatus.OK) // Replace with the appropriate status code
+    @ApiOperation("Soft delete a Figma project")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> deleteFigma(@PathVariable Long figmaId) {
-        figmaService.deleteFigma(figmaId);
-        return ResponseEntity.ok("Figma deleted successfully");
+        figmaService.softDeleteFigma(figmaId);
+        return ResponseEntity.ok("Figma soft-deleted successfully");
     }
+
 
 
     @GetMapping("/project/{projectId}")

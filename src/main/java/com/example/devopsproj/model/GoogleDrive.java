@@ -21,6 +21,9 @@ public class GoogleDrive implements Serializable {
     @Column(name = "drive_link", nullable = false)
     private String driveLink;
 
+    @Column(name = "deleted")
+    private Boolean deleted = false;
+
     @OneToOne
     @JoinColumn(name = "project_id")
     private Project project;
