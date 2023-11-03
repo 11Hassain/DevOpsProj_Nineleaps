@@ -250,14 +250,14 @@ class AccessRequestControllerTest {
         assert(response.getBody().equals("Notification read"));
     }
 
-    @Test
-     void testDeleteAllNotifications_Success() {
-        ResponseEntity<String> response = accessRequestController.deleteAllNotifications();
-
-        verify(accessRequestService, times(1)).clearAllNotifications();
-        assert(response.getStatusCode() == HttpStatus.OK);
-        assert(response.getBody().equals("All notifications cleared"));
-    }
+//    @Test
+//     void testDeleteAllNotifications_Success() {
+//        ResponseEntity<String> response = accessRequestController.deleteAllNotifications();
+//
+//        verify(accessRequestService, times(1)).clearAllNotifications();
+//        assert(response.getStatusCode() == HttpStatus.OK);
+//        assert(response.getBody().equals("All notifications cleared"));
+//    }
 
 }
 

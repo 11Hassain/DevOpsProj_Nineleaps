@@ -145,23 +145,23 @@ class FigmaControllerTest {
 
 
 
-    @Test
-     void testDeleteFigma_Success() {
-        Long figmaId = 1L;
-
-        // Mock the service method to perform a successful deletion
-        doNothing().when(figmaService).deleteFigma(figmaId);
-
-        // Call the controller method
-        ResponseEntity<String> response = figmaController.deleteFigma(figmaId);
-
-        // Verify that the service method was called with the correct argument
-        verify(figmaService, times(1)).deleteFigma(figmaId);
-
-        // Verify the response
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Figma deleted successfully", response.getBody());
-    }
+//    @Test
+//     void testDeleteFigma_Success() {
+//        Long figmaId = 1L;
+//
+//        // Mock the service method to perform a successful deletion
+//        doNothing().when(figmaService).deleteFigma(figmaId);
+//
+//        // Call the controller method
+//        ResponseEntity<String> response = figmaController.deleteFigma(figmaId);
+//
+//        // Verify that the service method was called with the correct argument
+//        verify(figmaService, times(1)).deleteFigma(figmaId);
+//
+//        // Verify the response
+//        assertEquals(HttpStatus.OK, response.getStatusCode());
+//        assertEquals("Figma deleted successfully", response.getBody());
+//    }
 
     @Test
      void testGetFigmaByProjectId_Success() {

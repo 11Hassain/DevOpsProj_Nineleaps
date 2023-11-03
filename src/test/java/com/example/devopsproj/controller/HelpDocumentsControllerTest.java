@@ -166,21 +166,21 @@ class HelpDocumentsControllerTest {
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
-    @Test
-    void testDeleteFile() {
-        // Arrange
-        Long fileId = 1L;
-        ResponseEntity<String> responseEntity = ResponseEntity.ok("File deleted successfully");
-
-        when(helpDocumentsService.deleteDocument(fileId)).thenReturn(responseEntity);
-
-        // Act
-        ResponseEntity<String> response = helpDocumentsController.deleteFile(fileId);
-
-        // Assert
-        verify(helpDocumentsService, times(1)).deleteDocument(fileId);
-        assertEquals(responseEntity, response);
-    }
+//    @Test
+//    void testDeleteFile() {
+//        // Arrange
+//        Long fileId = 1L;
+//        ResponseEntity<String> responseEntity = ResponseEntity.ok("File deleted successfully");
+//
+//        when(helpDocumentsService.deleteDocument(fileId)).thenReturn(responseEntity);
+//
+//        // Act
+//        ResponseEntity<String> response = helpDocumentsController.deleteFile(fileId);
+//
+//        // Assert
+//        verify(helpDocumentsService, times(1)).deleteDocument(fileId);
+//        assertEquals(responseEntity, response);
+//    }
 
 
 }

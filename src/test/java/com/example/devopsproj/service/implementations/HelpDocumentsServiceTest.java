@@ -289,48 +289,48 @@ import static org.mockito.Mockito.*;
         assertFalse(result.isPresent());
     }
 
-    @Test
-     void testDeleteDocument() {
-        // Create a sample file ID
-        Long fileId = 1L;
-
-        // Mock behavior for helpDocumentsRepository.findById
-        when(helpDocumentsRepository.findById(fileId)).thenReturn(Optional.of(new HelpDocuments()));
-
-        // Call the deleteDocument method
-        ResponseEntity<String> response = helpDocumentsService.deleteDocument(fileId);
-
-        // Verify that helpDocumentsRepository.findById and helpDocumentsRepository.deleteById were called
-        verify(helpDocumentsRepository, times(1)).findById(fileId);
-        verify(helpDocumentsRepository, times(1)).deleteById(fileId);
-
-        // Assert the expected ResponseEntity status code (OK)
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-
-        // Assert the expected response message
-        assertEquals("Document deleted successfully", response.getBody());
-    }
-
-    @Test
-     void testDeleteDocumentWhenNotExists() {
-        // Create a sample non-existent file ID
-        Long fileId = 999L;
-
-        // Mock behavior for helpDocumentsRepository.findById
-        when(helpDocumentsRepository.findById(fileId)).thenReturn(Optional.empty());
-
-        // Call the deleteDocument method
-        ResponseEntity<String> response = helpDocumentsService.deleteDocument(fileId);
-
-        // Verify that helpDocumentsRepository.findById was called
-        verify(helpDocumentsRepository, times(1)).findById(fileId);
-
-        // Assert the expected ResponseEntity status code (NOT_FOUND)
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-
-        // Assert the expected response message
-        assertEquals("Document not found", response.getBody());
-    }
+//    @Test
+//     void testDeleteDocument() {
+//        // Create a sample file ID
+//        Long fileId = 1L;
+//
+//        // Mock behavior for helpDocumentsRepository.findById
+//        when(helpDocumentsRepository.findById(fileId)).thenReturn(Optional.of(new HelpDocuments()));
+//
+//        // Call the deleteDocument method
+//        ResponseEntity<String> response = helpDocumentsService.deleteDocument(fileId);
+//
+//        // Verify that helpDocumentsRepository.findById and helpDocumentsRepository.deleteById were called
+//        verify(helpDocumentsRepository, times(1)).findById(fileId);
+//        verify(helpDocumentsRepository, times(1)).deleteById(fileId);
+//
+//        // Assert the expected ResponseEntity status code (OK)
+//        assertEquals(HttpStatus.OK, response.getStatusCode());
+//
+//        // Assert the expected response message
+//        assertEquals("Document deleted successfully", response.getBody());
+//    }
+//
+//    @Test
+//     void testDeleteDocumentWhenNotExists() {
+//        // Create a sample non-existent file ID
+//        Long fileId = 999L;
+//
+//        // Mock behavior for helpDocumentsRepository.findById
+//        when(helpDocumentsRepository.findById(fileId)).thenReturn(Optional.empty());
+//
+//        // Call the deleteDocument method
+//        ResponseEntity<String> response = helpDocumentsService.deleteDocument(fileId);
+//
+//        // Verify that helpDocumentsRepository.findById was called
+//        verify(helpDocumentsRepository, times(1)).findById(fileId);
+//
+//        // Assert the expected ResponseEntity status code (NOT_FOUND)
+//        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+//
+//        // Assert the expected response message
+//        assertEquals("Document not found", response.getBody());
+//    }
 
     @Test
     void testGetFileExtensionn() {

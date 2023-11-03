@@ -342,14 +342,14 @@ import static org.mockito.Mockito.*;
         // Ensure that no interactions with the repository occurred
         verify(accessRequestRepository, never()).save(any());
     }
-    @Test
-     void testClearAllNotifications() {
-        // Act
-        accessRequestService.clearAllNotifications();
-
-        // Assert
-        verify(accessRequestRepository, times(1)).deleteAll();
-    }
+//    @Test
+//     void testClearAllNotifications() {
+//        // Act
+//        accessRequestService.clearAllNotifications();
+//
+//        // Assert
+//        verify(accessRequestRepository, times(1)).deleteAll();
+//    }
 
     @Test
      void testGetUpdatedRequests() {

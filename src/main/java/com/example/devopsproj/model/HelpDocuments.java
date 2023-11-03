@@ -40,4 +40,12 @@ public class HelpDocuments {
     private Project project;
 
 
+    public HelpDocuments(Long helpDocumentId, byte[] data, String fileName, String category, String fileExtension, Project project) {
+        this.helpDocumentId = helpDocumentId;
+        this.data = data;
+        this.fileName = fileName;
+        this.category = category;
+        this.fileExtension = fileExtension;
+        this.project = project;
+    }
 }

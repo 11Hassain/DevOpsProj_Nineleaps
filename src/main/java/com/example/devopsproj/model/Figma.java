@@ -40,6 +40,14 @@ public class Figma implements Serializable {
     @OneToOne
     @JoinColumn(name = "project_id")
     private Project project;
+
+    public Figma(Long figmaId, String figmaURL, String user, Map<String, String> screenshotImagesByUser, Project project) {
+        this.figmaId = figmaId;
+        this.figmaURL = figmaURL;
+        this.user = user;
+        this.screenshotImagesByUser = screenshotImagesByUser;
+        this.project = project;
+    }
 }
 
 
