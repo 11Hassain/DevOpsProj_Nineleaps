@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements IUserService, UserService {
@@ -308,33 +309,45 @@ public class UserServiceImpl implements IUserService, UserService {
 
     @Override
     public List<ProjectDTO> getProjectsByRoleIdAndUserId(Long userId, String role) {
-        EnumRole userRole = EnumRole.valueOf(role.toUpperCase()); // Getting the value of role (string)
+        EnumRole userRole = EnumRole.valueOf(role.toUpperCase()); // Getting the value of the role (string)
         List<Project> projects = getUsersByRoleAndUserId(userId, userRole);
 
         return projects.stream()
-                .map(project -> {
-                    List<GitRepositoryDTO> repositoryDTOList = project.getRepositories().stream()
-                            .map(repository -> new GitRepositoryDTO(repository.getName(), repository.getDescription()))
-                            .toList(); // Replace 'Stream.collect(Collectors.toList())' with 'Stream.toList()'
-
-                    Figma figma = project.getFigma();
-                    String figmaURL = figma != null ? figma.getFigmaURL() : null; // Retrieve the Figma URL
-                    FigmaDTO figmaDTO = new FigmaDTO(figmaURL);
-
-                    GoogleDrive googleDrive = project.getGoogleDrive();
-                    String driveLink = googleDrive != null ? googleDrive.getDriveLink() : null; // Retrieve the driveLink
-
-                    return new ProjectDTO(
-                            project.getProjectId(),
-                            project.getProjectName(),
-                            project.getProjectDescription(),
-                            repositoryDTOList,
-                            figmaDTO,
-                            new GoogleDriveDTO(driveLink) // Pass the GoogleDriveDTO object with driveLink value
-                    );
-                })
-                .toList(); // Replace 'Stream.collect(Collectors.toList())' with 'Stream.toList()'
+                .map(this::mapProjectToDTO)
+                .toList(); // Use 'Stream.toList()' to collect the results into a List
     }
+
+    private ProjectDTO mapProjectToDTO(Project project) {
+        List<GitRepositoryDTO> repositoryDTOList = mapRepositoriesToDTO(project.getRepositories());
+        FigmaDTO figmaDTO = mapFigmaToDTO(project.getFigma());
+        GoogleDriveDTO googleDriveDTO = mapGoogleDriveToDTO(project.getGoogleDrive());
+
+        return new ProjectDTO(
+                project.getProjectId(),
+                project.getProjectName(),
+                project.getProjectDescription(),
+                repositoryDTOList,
+                figmaDTO,
+                googleDriveDTO
+        );
+    }
+
+    private List<GitRepositoryDTO> mapRepositoriesToDTO(List<GitRepository> repositories) {
+        return repositories.stream()
+                .map(repository -> new GitRepositoryDTO(repository.getName(), repository.getDescription()))
+                .toList(); // Use 'Stream.toList()' to collect the results into a List
+    }
+
+    private FigmaDTO mapFigmaToDTO(Figma figma) {
+        String figmaURL = (figma != null) ? figma.getFigmaURL() : null;
+        return new FigmaDTO(figmaURL);
+    }
+
+    private GoogleDriveDTO mapGoogleDriveToDTO(GoogleDrive googleDrive) {
+        String driveLink = (googleDrive != null) ? googleDrive.getDriveLink() : null;
+        return new GoogleDriveDTO(driveLink);
+    }
+
 
 
 

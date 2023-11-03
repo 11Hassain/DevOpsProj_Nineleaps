@@ -460,44 +460,63 @@ public class ProjectServiceImpl implements ProjectService {
         Optional<Project> optionalProject = projectRepository.findById(projectId);
         if (optionalProject.isPresent()) {
             Project project = optionalProject.get();
-            String projectName = project.getProjectName();
-            String projectDescription = project.getProjectDescription();
-            List<User> users = project.getUsers();
-            String pmName = null;
-            for (User user : users) {
-                // Find the Project Manager's name
-                if (user.getEnumRole() == EnumRole.PROJECT_MANAGER) {
-                    pmName = user.getName();
-                    break;
-                }
-            }
-            List<GitRepository> repositories = project.getRepositories();
-            List<GitRepositoryDTO> repositoryDTOS = new ArrayList<>();
-            for (GitRepository repository : repositories) {
-                // Map GitRepository entities to GitRepositoryDTOs
-                GitRepositoryDTO repositoryDTO = new GitRepositoryDTO();
-                repositoryDTO.setName(repository.getName());
-                repositoryDTO.setDescription(repository.getDescription());
-                repositoryDTOS.add(repositoryDTO);
-            }
-            Figma figma = project.getFigma();
-            String figmaURL = figma != null ? figma.getFigmaURL() : null;
-            FigmaDTO figmaDTO = new FigmaDTO(figmaURL);
-            GoogleDrive googleDrive = project.getGoogleDrive();
-            String driveLink = googleDrive != null ? googleDrive.getDriveLink() : null;
-            LocalDateTime lastUpdated = project.getLastUpdated();
-            return new ProjectDTO(
-                    projectName,
-                    projectDescription,
-                    pmName,
-                    repositoryDTOS,
-                    figmaDTO,
-                    new GoogleDriveDTO(driveLink),
-                    lastUpdated
-            );
+            return mapProjectToDTO(project);
         } else {
             return new ProjectDTO(); // Return an empty ProjectDTO if the project doesn't exist
         }
+    }
+
+    private ProjectDTO mapProjectToDTO(Project project) {
+        String projectName = project.getProjectName();
+        String projectDescription = project.getProjectDescription();
+        String pmName = findProjectManagerName(project);
+        List<GitRepositoryDTO> repositoryDTOS = mapGitRepositoriesToDTOs(project.getRepositories());
+        FigmaDTO figmaDTO = mapFigmaToDTO(project.getFigma());
+        GoogleDriveDTO googleDriveDTO = mapGoogleDriveToDTO(project.getGoogleDrive());
+        LocalDateTime lastUpdated = project.getLastUpdated();
+
+        return new ProjectDTO(
+                projectName,
+                projectDescription,
+                pmName,
+                repositoryDTOS,
+                figmaDTO,
+                googleDriveDTO,
+                lastUpdated
+        );
+    }
+
+    private String findProjectManagerName(Project project) {
+        List<User> users = project.getUsers();
+        String pmName = null;
+        for (User user : users) {
+            if (user.getEnumRole() == EnumRole.PROJECT_MANAGER) {
+                pmName = user.getName();
+                break;
+            }
+        }
+        return pmName;
+    }
+
+    private List<GitRepositoryDTO> mapGitRepositoriesToDTOs(List<GitRepository> repositories) {
+        List<GitRepositoryDTO> repositoryDTOS = new ArrayList<>();
+        for (GitRepository repository : repositories) {
+            GitRepositoryDTO repositoryDTO = new GitRepositoryDTO();
+            repositoryDTO.setName(repository.getName());
+            repositoryDTO.setDescription(repository.getDescription());
+            repositoryDTOS.add(repositoryDTO);
+        }
+        return repositoryDTOS;
+    }
+
+    private FigmaDTO mapFigmaToDTO(Figma figma) {
+        String figmaURL = (figma != null) ? figma.getFigmaURL() : null;
+        return new FigmaDTO(figmaURL);
+    }
+
+    private GoogleDriveDTO mapGoogleDriveToDTO(GoogleDrive googleDrive) {
+        String driveLink = (googleDrive != null) ? googleDrive.getDriveLink() : null;
+        return new GoogleDriveDTO(driveLink);
     }
 
     // Map a Project entity to a ProjectDTO

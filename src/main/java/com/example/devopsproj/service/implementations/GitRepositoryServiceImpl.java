@@ -168,7 +168,6 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
         Project project = new Project();
         project.setProjectId(projectDTO.getProjectId());
         project.setProjectName(projectDTO.getProjectName());
-        // Map other properties as needed
         return project;
     }
 }
