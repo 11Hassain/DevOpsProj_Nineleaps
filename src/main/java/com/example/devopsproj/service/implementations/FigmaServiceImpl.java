@@ -3,9 +3,8 @@ package com.example.devopsproj.service.implementations;
 import com.example.devopsproj.dto.responsedto.FigmaDTO;
 import com.example.devopsproj.dto.responsedto.FigmaScreenshotDTO;
 import com.example.devopsproj.dto.responsedto.ProjectDTO;
-import com.example.devopsproj.exceptions.FigmaCreationException;
 import com.example.devopsproj.exceptions.FigmaNotFoundException;
-import com.example.devopsproj.exceptions.FigmaServiceException;
+
 
 import com.example.devopsproj.model.Figma;
 import com.example.devopsproj.model.Project;

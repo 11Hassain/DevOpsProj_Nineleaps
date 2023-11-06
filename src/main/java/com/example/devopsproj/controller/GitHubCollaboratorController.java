@@ -1,4 +1,5 @@
 package com.example.devopsproj.controller;
+import com.example.devopsproj.constants.GitHubCollaboratorConstants;
 import com.example.devopsproj.dto.responsedto.CollaboratorDTO;
 import com.example.devopsproj.service.interfaces.GitHubCollaboratorService;
 import com.example.devopsproj.service.interfaces.JwtService;
@@ -19,20 +20,20 @@ public class GitHubCollaboratorController {
     // Add a collaborator to a GitHub repository.
     @PostMapping("/add")
     @ApiOperation("Add a collaborator")
-    @ResponseStatus(HttpStatus.CREATED) // Replace with the appropriate status code
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> addCollaborator(@RequestBody CollaboratorDTO collaboratorDTO) {
         collaboratorService.addCollaborator(collaboratorDTO);
-        return ResponseEntity.ok("Invitation to add collaborator sent successfully.");
+        return ResponseEntity.ok(GitHubCollaboratorConstants.ADD_COLLABORATOR_SUCCESS);
     }
 
 
     // Delete a collaborator from a GitHub repository.
     @DeleteMapping("/delete")
     @ApiOperation("Delete a collaborator from a GitHub repository")
-    @ResponseStatus(HttpStatus.OK) // Replace with the appropriate status code
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> deleteCollaborator(@RequestBody CollaboratorDTO collaboratorDTO) {
         collaboratorService.deleteCollaborator(collaboratorDTO);
-        return ResponseEntity.ok("Collaborator removed successfully.");
+        return ResponseEntity.ok(GitHubCollaboratorConstants.DELETE_COLLABORATOR_SUCCESS);
     }
 
 }

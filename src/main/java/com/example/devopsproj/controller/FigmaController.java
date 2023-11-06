@@ -1,5 +1,7 @@
 package com.example.devopsproj.controller;
 
+import com.example.devopsproj.constants.CommonConstants;
+import com.example.devopsproj.constants.FigmaConstants;
 import com.example.devopsproj.dto.responsedto.FigmaDTO;
 import com.example.devopsproj.dto.responsedto.FigmaScreenshotDTO;
 import com.example.devopsproj.service.interfaces.FigmaService;
@@ -19,13 +21,14 @@ public class FigmaController {
         this.figmaService = figmaService;
     }
 
+
     // Create a new Figma project.
     @PostMapping("/create")
     @ApiOperation("Create a Figma project")
-    @ResponseStatus(HttpStatus.CREATED) // Replace with the appropriate status code
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> createFigma(@RequestBody FigmaDTO figmaDTO) {
         figmaService.createFigma(figmaDTO);
-        return ResponseEntity.ok("Figma created successfully");
+        return ResponseEntity.ok(CommonConstants.CREATED_SUCCESSFULLY);
     }
 
     // Get all Figma projects.
@@ -42,7 +45,7 @@ public class FigmaController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> deleteFigma(@PathVariable Long figmaId) {
         figmaService.softDeleteFigma(figmaId);
-        return ResponseEntity.ok("Figma soft-deleted successfully");
+        return ResponseEntity.ok(CommonConstants.DELETED_SUCCESSFULLY);
     }
 
 
@@ -70,11 +73,11 @@ public class FigmaController {
     // Add a user and screenshots to a Figma project.
     @PostMapping("/{figmaId}/user")
     @ApiOperation("Add a user and screenshots to a Figma project")
-    @ResponseStatus(HttpStatus.CREATED) // Replace with the appropriate status code
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> addUserAndScreenshotsToFigma(@PathVariable("figmaId") Long figmaId,
                                                                @RequestBody FigmaDTO figmaDTO) {
         figmaService.addUserAndScreenshots(figmaId, figmaDTO);
-        return ResponseEntity.ok("User and screenshot added");
+        return ResponseEntity.ok(FigmaConstants.USER_SCREENSHOTS_ADDED);
     }
 
 
