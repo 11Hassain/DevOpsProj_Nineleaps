@@ -42,7 +42,7 @@ public class UserController {
     )
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> saveUser(@Valid @RequestBody UserCreationDTO userCreationDTO){
-        User savedUser = userServiceImpl.saveUser(userCreationDTO);
+        UserDTO savedUser = userServiceImpl.saveUser(userCreationDTO);
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 

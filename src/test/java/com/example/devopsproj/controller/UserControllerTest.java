@@ -45,14 +45,14 @@ class UserControllerTest {
         void testSaveUser_ValidToken(){
             UserCreationDTO userCreationDTO = new UserCreationDTO();
 
-            User user = new User();
+            UserDTO user = new UserDTO();
             user.setName("Ram");
 
             when(userService.saveUser(userCreationDTO)).thenReturn(user);
 
             ResponseEntity<Object> response = userController.saveUser(userCreationDTO);
 
-            User user1 = (User) response.getBody();
+            UserDTO user1 = (UserDTO) response.getBody();
 
             assertEquals(HttpStatus.CREATED, response.getStatusCode());
             assert user1 != null;

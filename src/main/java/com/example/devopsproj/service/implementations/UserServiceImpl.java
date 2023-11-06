@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -37,7 +36,7 @@ public class UserServiceImpl implements IUserService, UserService {
 
     //implementing user creation using DTO pattern
     @Override
-    public User saveUser(@RequestBody UserCreationDTO userCreationDTO) {
+    public UserDTO saveUser(UserCreationDTO userCreationDTO) {
         User user = new User();
         user.setId(userCreationDTO.getId());
         user.setName(userCreationDTO.getName());
@@ -45,7 +44,16 @@ public class UserServiceImpl implements IUserService, UserService {
         user.setEnumRole(userCreationDTO.getEnumRole());
         user.setLastUpdated(LocalDateTime.now());
         user.setLastLogout(LocalDateTime.now());
-        return userRepository.save(user);
+        userRepository.save(user);
+
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(user.getId());
+        userDTO.setName(user.getName());
+        userDTO.setEmail(user.getEmail());
+        userDTO.setEnumRole(user.getEnumRole());
+        userDTO.setLastUpdated(user.getLastUpdated());
+        userDTO.setLastLogout(user.getLastLogout());
+        return userDTO;
     }
 
     @Override

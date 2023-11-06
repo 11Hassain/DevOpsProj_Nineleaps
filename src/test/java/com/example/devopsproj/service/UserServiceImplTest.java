@@ -66,7 +66,7 @@ class UserServiceImplTest {
 
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
-        User savedUserResult = userService.saveUser(userCreationDTO);
+        UserDTO savedUserResult = userService.saveUser(userCreationDTO);
 
         assertEquals(userCreationDTO.getId(), savedUserResult.getId());
         assertEquals(userCreationDTO.getName(), savedUserResult.getName());

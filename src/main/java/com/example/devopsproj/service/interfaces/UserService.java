@@ -7,14 +7,13 @@ import com.example.devopsproj.dto.responsedto.UserDTO;
 import com.example.devopsproj.dto.responsedto.UserProjectsDTO;
 import com.example.devopsproj.model.User;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
     //implementing user creation using DTO pattern
-    User saveUser(@RequestBody UserCreationDTO userCreationDTO);
+    UserDTO saveUser(UserCreationDTO userCreationDTO);
 
     UserDTO updateUser(Long id, UserDTO userDTO);
 
