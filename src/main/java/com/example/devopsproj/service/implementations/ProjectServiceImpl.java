@@ -11,6 +11,8 @@ import com.example.devopsproj.repository.UserRepository;
 import com.example.devopsproj.service.interfaces.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -35,9 +37,13 @@ public class ProjectServiceImpl implements ProjectService {
     private final GitHubCollaboratorServiceImpl collaboratorService;
 
 
+    private static final Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
+
     // Create a project from a ProjectDTO and return the mapped DTO
     @Override
     public ProjectDTO createProject(ProjectDTO projectDTO) {
+        logger.info("Creating a new project: {}", projectDTO.getProjectName());
+
         Project project = new Project();
         project.setProjectId(projectDTO.getProjectId());
         project.setProjectName(projectDTO.getProjectName());
@@ -47,43 +53,56 @@ public class ProjectServiceImpl implements ProjectService {
         // Save the project and return it as a mapped DTO
         projectRepository.save(project);
 
+        logger.info("Created project: {}", projectDTO.getProjectName());
+
         return modelMapper.map(project, ProjectDTO.class);
     }
+
 
     // Get a project by its ID
     @Override
     public ProjectDTO getProjectById(Long id) {
+        logger.info("Retrieving project with ID: {}", id);
+
         Optional<Project> optionalProject = projectRepository.findById(id);
         if (optionalProject.isPresent()) {
             Project project = optionalProject.get();
             // Convert the Project to ProjectDTO and return it
-            return mapProjectToProjectDTO(project);
+            ProjectDTO projectDTO = mapProjectToProjectDTO(project);
+            logger.info("Retrieved project: {}", projectDTO.getProjectName());
+            return projectDTO;
         } else {
             // Handle the case where the project with the given ID is not found
+            logger.error("Project not found with ID: {}", id);
             throw new ProjectNotFoundException("Project not found with ID: " + id);
         }
     }
 
-
     // Get a list of all projects
     @Override
     public List<ProjectDTO> getAll() {
+        logger.info("Retrieving all projects");
+
         List<Project> projects = projectRepository.findAll();
         if (projects.isEmpty()) {
+            logger.warn("No projects found");
             throw new NotFoundException("No projects found");
         }
-        return projects.stream()
-                .map(project -> new ProjectDTO(project.getProjectId(), project.getProjectName(), project.getProjectDescription(), project.getLastUpdated(), project.getDeleted()))
+
+        List<ProjectDTO> projectDTOs = projects.stream()
+                .map(project -> mapProjectToProjectDTO(project))
                 .toList(); // Use Stream.toList() to collect into a list
+
+        logger.info("Retrieved {} projects", projectDTOs.size());
+
+        return projectDTOs;
     }
 
-
-
-
     // Get a list of all projects, including inactive ones
-
     @Override
     public List<ProjectWithUsersDTO> getAllProjectsWithUsers() {
+        logger.info("Retrieving all projects with users");
+
         List<Project> projects = projectRepository.findAll();
         List<ProjectWithUsersDTO> projectsWithUsers = new ArrayList<>();
 
@@ -104,59 +123,81 @@ public class ProjectServiceImpl implements ProjectService {
             projectsWithUsers.add(projectWithUsers);
         }
 
+        logger.info("Retrieved {} projects with users", projectsWithUsers.size());
+
         return projectsWithUsers;
     }
 
-
     @Override
     public List<Project> getAllProjects() {
-        return projectRepository.findAllProjects();
+        logger.info("Retrieving all projects");
+
+        List<Project> projects = projectRepository.findAll();
+        logger.info("Retrieved {} projects", projects.size());
+
+        return projects;
     }
-
-
 
     // Update a project
     @Override
     public Project updateProject(Project updatedProject) {
+        logger.info("Updating project with ID: {}", updatedProject.getProjectId());
+
         return projectRepository.save(updatedProject);
     }
 
     // Get all users associated with a project by its ID
     @Override
     public List<UserDTO> getAllUsersByProjectId(Long projectId) {
+        logger.info("Retrieving all users for project with ID: {}", projectId);
+
         List<User> users = projectRepository.findAllUsersByProjectId(projectId);
 
         if (users.isEmpty()) {
+            logger.warn("No users found for project with ID: {}", projectId);
             throw new NotFoundException("No users found for project with ID: " + projectId);
         }
 
-        return users.stream()
+        List<UserDTO> userDTOs = users.stream()
                 .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
                 .toList(); // Use Stream.toList() to collect into a list
+
+        logger.info("Retrieved {} users for project with ID: {}", userDTOs.size(), projectId);
+
+        return userDTOs;
     }
 
     // Get all users associated with a project by its ID and role
     @Override
     public List<UserDTO> getAllUsersByProjectIdAndRole(Long projectId, EnumRole role) {
+        logger.info("Retrieving all users for project with ID: {} and role: {}", projectId, role);
+
         List<User> users = projectRepository.findAllUsersByProjectIdAndRole(projectId, role);
 
         if (users.isEmpty()) {
+            logger.warn("No users found for project with ID: {} and role: {}", projectId, role);
             throw new NotFoundException("No users found for project with ID: " + projectId + " and role: " + role);
         }
 
-        return users.stream()
+        List<UserDTO> userDTOs = users.stream()
                 .map(user -> {
                     UserNames usernames = user.getUserNames();
                     String username = (usernames != null) ? usernames.getUsername() : null;
                     return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole(), username);
                 })
                 .toList(); // Use Stream.toList() to collect into a list
+
+        logger.info("Retrieved {} users for project with ID: {} and role: {}", userDTOs.size(), projectId, role);
+
+        return userDTOs;
     }
 
 
 
     @Override
     public ProjectDTO updateProject(Long projectId, ProjectDTO projectDTO) {
+        logger.info("Updating project with ID: {}", projectId);
+
         Optional<Project> optionalProject = projectRepository.findById(projectId);
 
         if (optionalProject.isPresent()) {
@@ -167,36 +208,42 @@ public class ProjectServiceImpl implements ProjectService {
 
             Project updatedProject = projectRepository.save(existingProject);
 
+            logger.info("Updated project with ID: {}", projectId);
+
             // Return the ProjectDTO directly
             return new ProjectDTO(updatedProject.getProjectId(), updatedProject.getProjectName(), updatedProject.getProjectDescription(), updatedProject.getLastUpdated());
         } else {
+            logger.error("Project with ID {} not found", projectId);
             throw new NotFoundException("Project with ID " + projectId + " not found");
         }
     }
 
-
-
-
     @Override
     public ResponseEntity<String> deleteProject(Long id) {
+        logger.info("Deleting project with ID: {}", id);
+
         Optional<Project> optionalProject = projectRepository.findById(id);
 
         if (optionalProject.isPresent()) {
             Project existingProject = optionalProject.get();
 
             if (Boolean.TRUE.equals(existingProject.getDeleted())) {
+                logger.info("Project with ID {} doesn't exist", id);
                 return ResponseEntity.ok("Project doesn't exist");
             }
 
             existingProject.setDeleted(true);
             existingProject.setLastUpdated(LocalDateTime.now());
             projectRepository.save(existingProject);
+
+            logger.info("Deleted project with ID: {}", id);
+
             return ResponseEntity.ok("Deleted project successfully");
         } else {
+            logger.error("Project with ID {} not found", id);
             throw new NotFoundException("Project with ID " + id + " not found");
         }
     }
-
 
 
 
@@ -212,6 +259,7 @@ public class ProjectServiceImpl implements ProjectService {
                 User user = optionalUser.get();
 
                 if (existUserInProject(project.getProjectId(), user.getId())) {
+                    logger.warn("User with ID {} already exists in project with ID {}", user.getId(), project.getProjectId());
                     return new ResponseEntity<>(HttpStatus.CONFLICT);
                 }
 
@@ -224,67 +272,101 @@ public class ProjectServiceImpl implements ProjectService {
 
                 ProjectUserDTO projectUserDTO = new ProjectUserDTO(project.getProjectId(), project.getProjectName(), project.getProjectDescription(), userDTOList);
 
+                logger.info("User with ID {} added to project with ID {}", user.getId(), project.getProjectId());
                 return new ResponseEntity<>(projectUserDTO, HttpStatus.OK);
             } else {
+                if (!optionalProject.isPresent()) {
+                    logger.warn("Project with ID {} not found", projectId);
+                }
+                if (!optionalUser.isPresent()) {
+                    logger.warn("User with ID {} not found", userId);
+                }
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
         } catch (Exception e) {
+            logger.error("Internal server error occurred while adding user to project. Project ID: {}, User ID: {}", projectId, userId, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     private static final String UNABLE_TO_REMOVE_USER_MESSAGE = "Unable to remove user";
 
+
     @Override
     public ResponseEntity<String> removeUserFromProject(Long projectId, Long userId) {
-        Optional<Project> optionalProject = projectRepository.findById(projectId);
-        Optional<User> optionalUser = userRepository.findById(userId);
+        try {
+            Optional<Project> optionalProject = projectRepository.findById(projectId);
+            Optional<User> optionalUser = userRepository.findById(userId);
 
-        if (optionalProject.isPresent() && optionalUser.isPresent()) {
-            Project project = optionalProject.get();
-            User user = optionalUser.get();
+            if (optionalProject.isPresent() && optionalUser.isPresent()) {
+                Project project = optionalProject.get();
+                User user = optionalUser.get();
 
-            if (!project.getUsers().contains(user)) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User is not part of the project");
+                if (!project.getUsers().contains(user)) {
+                    logger.info("User with ID {} is not part of the project with ID {}", user.getId(), project.getProjectId());
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User is not part of the project");
+                }
+
+                project.getUsers().remove(user);
+                projectRepository.save(project);
+
+                logger.info("User with ID {} removed from project with ID {}", user.getId(), project.getProjectId());
+                return ResponseEntity.ok("User removed");
+            } else {
+                if (!optionalProject.isPresent()) {
+                    logger.warn("Project with ID {} not found", projectId);
+                }
+                if (!optionalUser.isPresent()) {
+                    logger.warn("User with ID {} not found", userId);
+                }
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project or User not found");
             }
-
-            project.getUsers().remove(user);
-            projectRepository.save(project);
-
-            return ResponseEntity.ok("User removed");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project or User not found");
+        } catch (Exception e) {
+            logger.error(UNABLE_TO_REMOVE_USER_MESSAGE, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(UNABLE_TO_REMOVE_USER_MESSAGE);
         }
     }
-
 
 
     @Override
-    public ResponseEntity<String> removeUserFromProjectAndRepo(Long projectId, Long userId, CollaboratorDTO collaboratorDTO){
-        Optional<Project> optionalProject = projectRepository.findById(projectId);
-        Optional<User> optionalUser = userRepository.findById(userId);
+    public ResponseEntity<String> removeUserFromProjectAndRepo(Long projectId, Long userId, CollaboratorDTO collaboratorDTO) {
+        try {
+            Optional<Project> optionalProject = projectRepository.findById(projectId);
+            Optional<User> optionalUser = userRepository.findById(userId);
 
-        if (optionalProject.isPresent() && optionalUser.isPresent()) {
-            Project project = optionalProject.get();
-            User user = optionalUser.get();
-            project.getUsers().remove(user);
-            projectRepository.save(project);
+            if (optionalProject.isPresent() && optionalUser.isPresent()) {
+                Project project = optionalProject.get();
+                User user = optionalUser.get();
+                project.getUsers().remove(user);
+                projectRepository.save(project);
 
-            boolean deleted = collaboratorService.deleteCollaborator(collaboratorDTO);
-            if (!deleted) {
-                return ResponseEntity.badRequest().build();
+                boolean deleted = collaboratorService.deleteCollaborator(collaboratorDTO);
+                if (!deleted) {
+                    logger.warn("Failed to delete collaborator for user with ID {}", user.getId());
+                    return ResponseEntity.badRequest().build();
+                }
+
+                logger.info("User with ID {} removed from project with ID {}", user.getId(), project.getProjectId());
+                return ResponseEntity.ok("User removed");
+            } else {
+                if (!optionalProject.isPresent()) {
+                    logger.warn("Project with ID {} not found", projectId);
+                }
+                if (!optionalUser.isPresent()) {
+                    logger.warn("User with ID {} not found", userId);
+                }
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project or User not found");
             }
-            return ResponseEntity.ok("User removed");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project or User not found");
+        } catch (Exception e) {
+            logger.error("Failed to remove user from project and repo", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unable to remove user");
         }
     }
-
-
-
 
     @Override
     public boolean existsByIdIsDeleted(Long id) {
+        // Add appropriate logger message for this method
+        logger.info("Checking if project with ID {} exists and is deleted", id);
         return false;
     }
 
@@ -293,8 +375,10 @@ public class ProjectServiceImpl implements ProjectService {
     public boolean softDeleteProject(Long id) {
         try {
             projectRepository.softDeleteProject(id);
+            logger.info("Project with ID {} soft-deleted", id);
             return true;
         } catch (Exception e) {
+            logger.error("Failed to soft-delete project with ID {}", id, e);
             return false;
         }
     }
@@ -302,6 +386,8 @@ public class ProjectServiceImpl implements ProjectService {
     // Check if a project with the given ID exists
     @Override
     public boolean existsProjectById(Long id) {
+        // Add appropriate logger message for this method
+        logger.info("Checking if project with ID {} exists", id);
         return projectRepository.existsById(id);
     }
 
@@ -312,40 +398,38 @@ public class ProjectServiceImpl implements ProjectService {
         return !userList.isEmpty();
     }
 
-
     // Get the count of all projects
-
     @Override
     public Integer getCountAllProjects() {
         Integer countProjects = projectRepository.countAllProjects();
-        // Handle the case where countProjects is null or 0
+        logger.info("Count of all projects: {}", countProjects);
         return countProjects != null ? countProjects : 0;
     }
 
-    // Get the count of all projects by role
+
+
+
     @Override
     public Integer getCountAllProjectsByRole(EnumRole enumRole) {
         Integer countProjects = projectRepository.countAllProjectsByRole(enumRole);
-        // Handle the case where countProjects is null or 0
+        logger.info("Count of all projects with role {}: {}", enumRole, countProjects);
         return countProjects != null ? countProjects : 0;
     }
 
-    // Get the count of all projects by a user's ID
     @Override
     public Integer getCountAllProjectsByUserId(Long id) {
         Integer countProjects = projectRepository.countAllProjectsByUserId(id);
-        // Handle the case where countProjects is null or 0
+        logger.info("Count of all projects for user with ID {}: {}", id, countProjects);
         return countProjects != null ? countProjects : 0;
     }
-    // Get the count of all users associated with a project by its ID
+
     @Override
     public Integer getCountAllUsersByProjectId(Long projectId) {
         Integer countUsers = projectRepository.countAllUsersByProjectId(projectId);
-        // Handle the case where countUsers is null or 0
+        logger.info("Count of all users associated with project ID {}: {}", projectId, countUsers);
         return countUsers != null ? countUsers : 0;
     }
 
-    // Get a list of project names and their associated people count
     @Override
     public List<ProjectNamePeopleCountDTO> getCountAllPeopleAndProjectName() {
         List<Project> projects = projectRepository.findAllProjects();
@@ -359,46 +443,43 @@ public class ProjectServiceImpl implements ProjectService {
             peopleCountDTO.setProjectName(project.getProjectName());
             peopleCountDTO.setCountPeople(count);
             peopleCountDTOS.add(peopleCountDTO);
+
+            logger.info("Project with ID {}: People count - {}", project.getProjectId(), count);
         }
         return peopleCountDTOS;
     }
 
-    // Get the count of all users associated with a project by its ID and role
     @Override
     public Integer getCountAllUsersByProjectIdAndRole(Long projectId, EnumRole enumRole) {
         Integer countUsers = projectRepository.countAllUsersByProjectIdAndRole(projectId, enumRole);
-        // Handle the case where countUsers is null or 0
+        logger.info("Count of all users associated with project ID {} and role {}: {}", projectId, enumRole, countUsers);
         return countUsers != null ? countUsers : 0;
     }
 
-    // Get the count of all active projects
     @Override
     public Integer getCountAllActiveProjects() {
         Integer countProjects = projectRepository.countAllActiveProjects();
-        // Handle the case where countProjects is null or 0
+        logger.info("Count of all active projects: {}", countProjects);
         return countProjects != null ? countProjects : 0;
     }
 
 
-    // Get the count of all inactive projects
     @Override
     public Integer getCountAllInActiveProjects() {
         Integer countProjects = projectRepository.countAllInActiveProjects();
-        // Handle the case where countProjects is null or 0
+        logger.info("Count of all inactive projects: {}", countProjects);
         return countProjects != null ? countProjects : 0;
     }
 
-    // Get a list of users associated with a project by its ID and role
     @Override
     public List<UserDTO> getUsersByProjectIdAndRole(Long projectId, String role) {
         EnumRole userRole = EnumRole.valueOf(role.toUpperCase());
         List<User> users = projectRepository.findUsersByProjectIdAndRole(projectId, userRole);
+        logger.info("Users associated with project ID {} and role {}: Count - {}", projectId, role, users.size());
         return users.stream()
                 .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
-                .toList(); // Use Stream.toList() to collect the stream elements into a List
+                .toList();
     }
-
-
 
     @Override
     public ResponseEntity<Object> addRepositoryToProject(Long projectId, Long repoId) {
@@ -408,63 +489,69 @@ public class ProjectServiceImpl implements ProjectService {
             if (optionalProject.isPresent() && optionalGitRepository.isPresent()) {
                 Project project = optionalProject.get();
                 GitRepository gitRepository = optionalGitRepository.get();
-                // Check if the project has been deleted
+
                 if (Boolean.FALSE.equals(project.getDeleted())) {
                     gitRepository.setProject(project);
                 } else {
                     gitRepository.setProject(null);
                 }
                 gitRepositoryRepository.save(gitRepository);
+
+                logger.info("Repository added to project ID {}: Repository ID - {}", projectId, repoId);
                 return ResponseEntity.ok("Stored successfully");
             } else {
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server Error"); // Set the response body
+            logger.error("Error while adding repository to project ID {}: Repository ID - {}", projectId, repoId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server Error");
         }
     }
 
 
-    // Get a list of ProjectDTOs for projects without Figma URLs
+
     @Override
     public List<ProjectDTO> getProjectsWithoutFigmaURL() {
         List<Project> projects = projectRepository.findAllProjects();
         List<ProjectDTO> projectDTOs = new ArrayList<>();
         for (Project project : projects) {
-            // Check if the project has no Figma or Figma URL
             if (project.getFigma() == null || project.getFigma().getFigmaURL() == null) {
                 ProjectDTO projectDTO = mapProjectToProjectDTO(project);
                 projectDTOs.add(projectDTO);
             }
         }
+        logger.info("Projects without Figma URL count: {}", projectDTOs.size());
         return projectDTOs;
     }
-    // Get a list of ProjectDTOs for projects without Google Drive links
+
     @Override
     public List<ProjectDTO> getProjectsWithoutGoogleDriveLink() {
         List<Project> projects = projectRepository.findAllProjects();
         List<ProjectDTO> projectDTOs = new ArrayList<>();
         for (Project project : projects) {
-            // Check if the project has no Google Drive or Drive link
             if (project.getGoogleDrive() == null || project.getGoogleDrive().getDriveLink() == null) {
                 ProjectDTO projectDTO = mapProjectToProjectDTO(project);
                 projectDTOs.add(projectDTO);
             }
         }
+        logger.info("Projects without Google Drive link count: {}", projectDTOs.size());
         return projectDTOs;
     }
 
-    // Get project details by its ID
     @Override
     public ProjectDTO getProjectDetailsById(Long projectId) {
         Optional<Project> optionalProject = projectRepository.findById(projectId);
         if (optionalProject.isPresent()) {
             Project project = optionalProject.get();
+            logger.info("Project details retrieved for project ID: {}", projectId);
             return mapProjectToDTO(project);
         } else {
-            return new ProjectDTO(); // Return an empty ProjectDTO if the project doesn't exist
+            logger.info("Project details not found for project ID: {}", projectId);
+            return new ProjectDTO();
         }
     }
+
+
 
     private ProjectDTO mapProjectToDTO(Project project) {
         String projectName = project.getProjectName();

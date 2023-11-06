@@ -17,7 +17,6 @@ public interface FigmaService {
 
     Optional<FigmaDTO> getFigmaById(Long figmaId);
 
-    void deleteFigma(Long figmaId);
 
     ProjectDTO mapProjectToProjectDTO(Project project);
 

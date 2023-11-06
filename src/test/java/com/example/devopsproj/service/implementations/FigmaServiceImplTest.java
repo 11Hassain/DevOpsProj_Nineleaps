@@ -297,17 +297,17 @@ import java.util.*;
     }
 
 
-    @Test
-    void testDeleteFigma_Success() {
-        // Arrange
-        Long figmaId = 1L;
-
-        // Mock the figmaRepository.deleteById method
-        doNothing().when(figmaRepository).deleteById(figmaId);
-
-        // Act and Assert
-        assertDoesNotThrow(() -> figmaService.deleteFigma(figmaId));
-    }
+//    @Test
+//    void testDeleteFigma_Success() {
+//        // Arrange
+//        Long figmaId = 1L;
+//
+//        // Mock the figmaRepository.deleteById method
+//        doNothing().when(figmaRepository).deleteById(figmaId);
+//
+//        // Act and Assert
+//        assertDoesNotThrow(() -> figmaService.deleteFigma(figmaId));
+//    }
 
 //    @Test
 //    void testDeleteFigma_FigmaNotFound() {

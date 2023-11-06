@@ -13,6 +13,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -31,9 +33,9 @@ public class UserServiceImpl implements IUserService, UserService {
     private final JwtServiceImpl jwtServiceImpl;
     private final ProjectRepository projectRepository;
     private final ModelMapper modelMapper;
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
-
-    //implementing user creation using DTO pattern
+    // Implementing user creation using DTO pattern
     @Override
     public User saveUser(@RequestBody UserCreationDTO userCreationDTO) {
         User user = new User();
@@ -43,7 +45,10 @@ public class UserServiceImpl implements IUserService, UserService {
         user.setEnumRole(userCreationDTO.getEnumRole());
         user.setLastUpdated(LocalDateTime.now());
         user.setLastLogout(LocalDateTime.now());
-        return userRepository.save(user);
+
+        User savedUser = userRepository.save(user);
+        logger.info("User created with ID: {}", savedUser.getId());
+        return savedUser;
     }
 
     @Override
@@ -54,54 +59,83 @@ public class UserServiceImpl implements IUserService, UserService {
             existingUser.setName(userDTO.getName());
             existingUser.setEnumRole(userDTO.getEnumRole());
             existingUser.setLastUpdated(LocalDateTime.now());
+
             User updatedUser = userRepository.save(existingUser);
+            logger.info("User updated with ID: {}", updatedUser.getId());
+
             return new UserDTO(updatedUser.getName(), updatedUser.getEnumRole(), updatedUser.getLastUpdated());
         } else {
+            logger.warn("User not found with ID: {}", id);
             throw new EntityNotFoundException("User not found" + id);
         }
     }
 
-    //find user by user id
+    // Find user by user id
     @Override
     public Optional<User> getUserById(Long id) {
-        return userRepository.findById(id);
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            logger.info("User found with ID: {}", id);
+        } else {
+            logger.warn("User not found with ID: {}", id);
+        }
+        return user;
     }
 
     @Override
     public boolean existsByIdIsDeleted(Long id) {
         Optional<User> checkUser = userRepository.findById(id);
-        if (checkUser.isEmpty()) {
-            return true;
+        if (checkUser.isPresent()) {
+            User cuser = checkUser.get();
+            if (cuser.getDeleted()) {
+                logger.info("User found and deleted with ID: {}", id);
+                return true;
+            } else {
+                logger.info("User found and not deleted with ID: {}", id);
+            }
+        } else {
+            logger.info("User not found with ID: {}", id);
         }
-        User cuser = checkUser.get();
-        return cuser.getDeleted(); // true if deleted=1, false otherwise
+        return false;
     }
 
-    //Soft deleting the user
+    // Soft deleting the user
     @Override
     public boolean softDeleteUser(Long id) {
         try {
             userRepository.softDelete(id);
-            return true; //setting deleted=1 / true
+            logger.info("User soft-deleted with ID: {}", id);
+            return true; // setting deleted=true
         } catch (Exception e) {
-            return false; //keeping deleted false
+            logger.error("Error while soft-deleting user with ID: {}", id, e);
+            return false; // keeping deleted false
         }
     }
 
     @Override
     public boolean existsById(Long id) {
-        return userRepository.existsById(id);
+        boolean exists = userRepository.existsById(id);
+        if (exists) {
+            logger.info("User exists with ID: {}", id);
+        } else {
+            logger.warn("User does not exist with ID: {}", id);
+        }
+        return exists;
     }
 
-    //get all user based on role id
+    // Get all users based on role ID
     @Override
     public List<User> getUsersByRole(EnumRole enumRole) {
-        return userRepository.findByRole(enumRole);
+        List<User> users = userRepository.findByRole(enumRole);
+        logger.info("Found {} users with role: {}", users.size(), enumRole);
+        return users;
     }
+
 
     @Override
     public List<UserDTO> getUserDTOsByRole(EnumRole role) {
         List<User> users = userRepository.findByEnumRole(role);
+        logger.info("Found {} users with role: {}", users.size(), role);
 
         return users.stream()
                 .map(user -> new UserDTO(
@@ -114,29 +148,32 @@ public class UserServiceImpl implements IUserService, UserService {
                 .toList();
     }
 
-
-
-
     @Override
     public Integer getCountAllUsers() {
-        return userRepository.countAllUsers();
+        Integer countUsers = userRepository.countAllUsers();
+        logger.info("Count of all users: {}", countUsers);
+        return countUsers;
     }
 
     @Override
     public Integer getCountAllUsersByRole(EnumRole role) {
-        return userRepository.countAllUsersByRole(role);
+        Integer countUsers = userRepository.countAllUsersByRole(role);
+        logger.info("Count of users with role {}: {}", role, countUsers);
+        return countUsers;
     }
 
     @Override
     public Integer getCountAllUsersByProjectId(Long projectId) {
         Integer countUsers = projectRepository.countAllUsersByProjectId(projectId);
-        // Handle the case where countUsers is null or 0
+        logger.info("Count of users for project with ID {}: {}", projectId, countUsers);
         return countUsers != null ? countUsers : 0;
     }
 
     @Override
     public List<UserProjectsDTO> getAllUsersWithProjects() {
         List<User> users = userRepository.findAllUsers();
+        logger.info("Found {} users", users.size());
+
         List<UserProjectsDTO> userProjectsDTOs = new ArrayList<>();
 
         for (User user : users) {
@@ -145,11 +182,11 @@ public class UserServiceImpl implements IUserService, UserService {
             // Remove any projects that are marked as deleted
             List<Project> existingProjects = projects.stream()
                     .filter(project -> !project.getDeleted())
-                    .toList(); // Replace 'toList()' with 'Stream.toList()'
+                    .toList();
 
             List<String> projectNames = existingProjects.stream()
                     .map(Project::getProjectName)
-                    .toList(); // Replace 'toList()' with 'Stream.toList()'
+                    .toList();
 
             UserProjectsDTO userProjectsDTO = new UserProjectsDTO(user.getId(), user.getName(), projectNames);
             userProjectsDTOs.add(userProjectsDTO);
@@ -161,6 +198,8 @@ public class UserServiceImpl implements IUserService, UserService {
     @Override
     public List<UserDTO> getAllUsersWithoutProjects(EnumRole role, Long projectId) {
         List<User> users = userRepository.findAllUsersByRole(role);
+        logger.info("Found {} users with role: {}", users.size(), role);
+
         List<UserDTO> userDTOs = new ArrayList<>();
 
         for (User user : users) {
@@ -173,50 +212,55 @@ public class UserServiceImpl implements IUserService, UserService {
         }
         return userDTOs;
     }
-
     @Override
     public List<UserProjectsDTO> getUsersWithMultipleProjects() {
         List<UserProjectsDTO> allUsersWithProjects = getAllUsersWithProjects();
+        logger.info("Retrieved {} users with projects.", allUsersWithProjects.size());
+
         List<UserProjectsDTO> usersWithMultipleProjects = new ArrayList<>();
 
         for (UserProjectsDTO userProjectsDTO : allUsersWithProjects) {
             List<String> projectNames = userProjectsDTO.getProjectNames();
             List<String> validProjectNames = new ArrayList<>();
 
-            // Check if each project exists in the database
             for (String projectName : projectNames) {
                 if (projectExists(projectName)) {
                     validProjectNames.add(projectName);
                 }
             }
 
-            // Update the UserProjectsDTO with valid project names
+            // Log project name filtering results
+            logger.info("User {} has {} valid projects out of {} total projects.",
+                    userProjectsDTO.getUserId(), validProjectNames.size(), projectNames.size());
+
             userProjectsDTO.setProjectNames(validProjectNames);
 
-            // Add the UserProjectsDTO to the list if it has multiple projects
             if (validProjectNames.size() > 1) {
                 usersWithMultipleProjects.add(userProjectsDTO);
             }
         }
 
+        logger.info("Found {} users with multiple projects.", usersWithMultipleProjects.size());
         return usersWithMultipleProjects;
     }
 
     @Override
     public boolean projectExists(String projectName) {
         List<Project> projects = projectRepository.findAllProjects();
-        return projects.stream()
+        boolean exists = projects.stream()
                 .anyMatch(project -> project.getProjectName().equals(projectName));
+        logger.info("Project '{}' exists: {}", projectName, exists);
+        return exists;
     }
 
     @Override
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
+        logger.info("Retrieved {} users from the database.", users.size());
         return users.stream()
                 .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
                 .toList();
     }
-
     @Override
     public List<ProjectDTO> getAllProjectsAndRepositoriesByUserId(Long userId) {
         User user = userRepository.findById(userId)
@@ -248,33 +292,40 @@ public class UserServiceImpl implements IUserService, UserService {
 
     @Override
     public String deleteUserById(Long userId) {
+        logger.info("Deleting user with ID: {}", userId);
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
+            logger.warn("User not found with ID: {}", userId);
             return "Invalid user ID";
         }
         User user = userOptional.get();
         if (Boolean.TRUE.equals(user.getDeleted())) {
+            logger.warn("User with ID {} is already deleted.", userId);
             return "User doesn't exist";
         }
 
         if (softDeleteUser(userId)) {
+            logger.info("User with ID {} successfully deleted", userId);
             return "User successfully deleted";
         } else {
+            logger.error("Failed to delete user with ID: {}", userId);
             return "404 Not found";
         }
     }
 
-
     @Override
     public List<Project> getUsersByRoleAndUserId(Long userId, EnumRole userRole) {
+        logger.info("Fetching users with role {} and ID: {}", userRole, userId);
         return userRepository.findByRoleAndUserId(userId, userRole);
     }
 
     @Override
     public UserDTO loginVerification(String email) {
+        logger.info("Verifying login for email: {}", email);
         UserDTO userDTO = new UserDTO();
         User user = userRepository.existsByEmail(email);
-        if(user == null){
+        if (user == null) {
+            logger.warn("User not found for email: {}", email);
             return null;
         }
         user.setLastUpdated(LocalDateTime.now());
@@ -287,30 +338,33 @@ public class UserServiceImpl implements IUserService, UserService {
         //generate token
         String jwtToken = jwtServiceImpl.generateToken(user);
         userDTO.setToken(jwtToken);
+        logger.info("Login verification successful for user with email: {}", email);
         return userDTO;
     }
 
 
 
     @Override
-    public String userLogout(Long id){
+    public String userLogout(Long id) {
         Optional<User> optionalUser = userRepository.findById(id);
-        if(optionalUser.isPresent()){
+        if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             user.setLastLogout(LocalDateTime.now());
             userRepository.save(user);
+            logger.info("User with ID {} logged out successfully.", id);
             return "User logged out successfully";
-        }else{
+        } else {
+            logger.warn("User logout unsuccessful for ID: {}", id);
             return "Log out unsuccessful";
         }
     }
-
-
 
     @Override
     public List<ProjectDTO> getProjectsByRoleIdAndUserId(Long userId, String role) {
         EnumRole userRole = EnumRole.valueOf(role.toUpperCase()); // Getting the value of the role (string)
         List<Project> projects = getUsersByRoleAndUserId(userId, userRole);
+
+        logger.info("Retrieved {} projects for User ID {} with role: {}", projects.size(), userId, role);
 
         return projects.stream()
                 .map(this::mapProjectToDTO)
@@ -354,14 +408,29 @@ public class UserServiceImpl implements IUserService, UserService {
 
     //-------------IUService-----------
 
+
     @Override
-    public User getUserViaPhoneNumber(String phoneNumber){
-        return userRepository.findByPhoneNumber(phoneNumber);
+    public User getUserViaPhoneNumber(String phoneNumber) {
+        logger.info("Getting user by phone number: {}", phoneNumber);
+        User user = userRepository.findByPhoneNumber(phoneNumber);
+        if (user != null) {
+            logger.info("User found for phone number: {}", phoneNumber);
+        } else {
+            logger.warn("User not found for phone number: {}", phoneNumber);
+        }
+        return user;
     }
 
     @Override
-    public User getUserByMail(String userMai) {
-        return userRepository.findByEmail(userMai);
+    public User getUserByMail(String userMail) {
+        logger.info("Getting user by email: {}", userMail);
+        User user = userRepository.findByEmail(userMail);
+        if (user != null) {
+            logger.info("User found for email: {}", userMail);
+        } else {
+            logger.warn("User not found for email: {}", userMail);
+        }
+        return user;
     }
 
 

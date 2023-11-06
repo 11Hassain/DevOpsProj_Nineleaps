@@ -19,18 +19,17 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 @Service
 @RequiredArgsConstructor
 public class AccessRequestServiceImpl implements AccessRequestService {
     private static final Logger logger = LoggerFactory.getLogger(AccessRequestServiceImpl.class);
 
-
     private final AccessRequestRepository accessRequestRepository;
-
-
 
     @Override
     public AccessRequestDTO createRequest(AccessRequestDTO accessRequestDTO) {
+        logger.info("Creating a new access request");
         AccessRequest accessRequest = new AccessRequest();
         accessRequest.setAccessRequestId(accessRequestDTO.getAccessRequestId());
         accessRequest.setPmName(accessRequestDTO.getPmName());
@@ -38,16 +37,22 @@ public class AccessRequestServiceImpl implements AccessRequestService {
         // Save the AccessRequest directly
         AccessRequest savedAccessRequest = accessRequestRepository.save(accessRequest);
 
+        logger.info("Access request created with ID: {}", savedAccessRequest.getAccessRequestId());
+
         // Create an AccessRequestDTO from the saved entity
         AccessRequestDTO createdRequestDTO = new AccessRequestDTO();
         createdRequestDTO.setAccessRequestId(savedAccessRequest.getAccessRequestId());
         createdRequestDTO.setPmName(savedAccessRequest.getPmName());
+
+        logger.info("AccessRequestDTO created for request ID: {}", createdRequestDTO.getAccessRequestId());
 
         return createdRequestDTO;
     }
 
     @Override
     public List<AccessRequestDTO> getAllRequests() {
+        logger.info("Fetching all access requests");
+
         List<AccessRequest> accessRequestList = accessRequestRepository.findAll();
         List<AccessRequestDTO> accessRequestDTOList = new ArrayList<>();
 
@@ -58,11 +63,15 @@ public class AccessRequestServiceImpl implements AccessRequestService {
 
             accessRequestDTOList.add(accessRequestDTO);
         }
+
+        logger.info("Fetched {} access requests", accessRequestDTOList.size());
         return accessRequestDTOList;
     }
 
     @Override
     public List<AccessRequestDTO> getAllActiveRequests() {
+        logger.info("Fetching all active access requests");
+
         List<AccessRequest> accessRequestList = accessRequestRepository.findAllActiveRequests();
         List<AccessRequestDTO> accessRequestDTOList = new ArrayList<>();
 
@@ -73,10 +82,15 @@ public class AccessRequestServiceImpl implements AccessRequestService {
 
             accessRequestDTOList.add(accessRequestDTO);
         }
+
+        logger.info("Fetched {} active access requests", accessRequestDTOList.size());
         return accessRequestDTOList;
     }
+
     @Override
     public List<AccessResponseDTO> getUpdatedRequests(Long id, AccessRequestDTO accessRequestDTO) {
+        logger.info("Fetching updated access requests");
+
         Optional<AccessRequest> optionalAccessRequest = accessRequestRepository.findById(id);
         if (optionalAccessRequest.isPresent()) {
             AccessRequest existingAccessRequest = optionalAccessRequest.get();
@@ -84,16 +98,23 @@ public class AccessRequestServiceImpl implements AccessRequestService {
         }
 
         List<AccessRequest> accessRequests = accessRequestRepository.findAllActiveRequests();
+
+        logger.info("Fetched {} updated access requests", accessRequests.size());
         return mapAccessRequestsToDTOs(accessRequests);
     }
 
     private void updateAccessRequest(AccessRequest accessRequest, AccessRequestDTO accessRequestDTO) {
+        logger.info("Updating access request with ID: {}", accessRequest.getAccessRequestId());
+
         accessRequest.setAllowed(accessRequestDTO.isAllowed());
         accessRequest.setUpdated(true);
         accessRequestRepository.save(accessRequest);
+
+        logger.info("Access request updated successfully");
     }
 
     private List<AccessResponseDTO> mapAccessRequestsToDTOs(List<AccessRequest> accessRequests) {
+        logger.info("Mapping access requests to DTOs");
         List<AccessResponseDTO> accessResponseDTOList = new ArrayList<>();
 
         for (AccessRequest accessRequest : accessRequests) {
@@ -101,10 +122,13 @@ public class AccessRequestServiceImpl implements AccessRequestService {
             accessResponseDTOList.add(accessResponseDTO);
         }
 
+        logger.info("Mapped {} access requests to DTOs", accessRequests.size());
         return accessResponseDTOList;
     }
 
     private AccessResponseDTO mapAccessRequestToDTO(AccessRequest accessRequest) {
+        logger.info("Mapping access request to DTO: AccessRequestId={}", accessRequest.getAccessRequestId());
+
         AccessResponseDTO accessResponseDTO = new AccessResponseDTO();
         accessResponseDTO.setAccessRequestId(accessRequest.getAccessRequestId());
         accessResponseDTO.setPmName(accessRequest.getPmName());
@@ -117,21 +141,30 @@ public class AccessRequestServiceImpl implements AccessRequestService {
         accessResponseDTO.setProject(projectDTO);
         accessResponseDTO.setUser(userDTO);
 
+        logger.info("Mapped access request to DTO: AccessRequestId={}", accessRequest.getAccessRequestId());
         return accessResponseDTO;
     }
 
     private ProjectDTO mapProjectToDTO(Project project) {
+        logger.info("Mapping project to DTO: ProjectId={}", project.getProjectId());
+
         ProjectDTO projectDTO = new ProjectDTO();
         projectDTO.setProjectId(project.getProjectId());
         projectDTO.setProjectName(project.getProjectName());
+
+        logger.info("Mapped project to DTO: ProjectId={}", project.getProjectId());
         return projectDTO;
     }
 
     private UserDTO mapUserToDTO(User user) {
+        logger.info("Mapping user to DTO: UserId={}", user.getId());
+
         UserDTO userDTO = new UserDTO();
         userDTO.setId(user.getId());
         userDTO.setName(user.getName());
         userDTO.setEmail(user.getEmail());
+
+        logger.info("Mapped user to DTO: UserId={}", user.getId());
         return userDTO;
     }
 
@@ -139,18 +172,30 @@ public class AccessRequestServiceImpl implements AccessRequestService {
 
     @Override
     public List<AccessResponseDTO> getPMUnreadRequests(String pmName) {
+        logger.info("Fetching unread PM requests for PM: {}", pmName);
+
         List<AccessRequest> accessRequests = accessRequestRepository.findAllUnreadPMRequestsByName(pmName);
+
+        logger.info("Fetched {} unread PM requests for PM: {}", accessRequests.size(), pmName);
+
         return mapAccessRequestsToResponseDTOs(accessRequests);
     }
 
     @Override
     public List<AccessResponseDTO> getPMRequests(String pmName) {
+        logger.info("Fetching PM requests for PM: {}", pmName);
+
         List<AccessRequest> accessRequests = accessRequestRepository.findAllPMRequestsByName(pmName);
+
+        logger.info("Fetched {} PM requests for PM: {}", accessRequests.size(), pmName);
+
         return mapAccessRequestsToResponseDTOs(accessRequests);
     }
 
     @Override
     public List<AccessResponseDTO> mapAccessRequestsToResponseDTOs(List<AccessRequest> accessRequests) {
+        logger.info("Mapping access requests to response DTOs");
+
         List<AccessResponseDTO> accessResponseDTOList = new ArrayList<>();
 
         for (AccessRequest accessRequest : accessRequests) {
@@ -167,26 +212,39 @@ public class AccessRequestServiceImpl implements AccessRequestService {
             accessResponseDTO.setNotified(accessRequest.isPmNotified());
             accessResponseDTOList.add(accessResponseDTO);
         }
+
+        logger.info("Mapped {} access requests to response DTOs", accessRequests.size());
+
         return accessResponseDTOList;
     }
 
     @Override
     public void setPMRequestsNotificationTrue(Long accessRequestId) {
+        logger.info("Setting PM requests notification to true for AccessRequestId: {}", accessRequestId);
+
         Optional<AccessRequest> optionalAccessRequest = accessRequestRepository.findById(accessRequestId);
+
         if (optionalAccessRequest.isPresent()) {
             AccessRequest accessRequest = optionalAccessRequest.get();
             accessRequest.setPmNotified(true);
             accessRequestRepository.save(accessRequest);
+
+            logger.info("PM requests notification set to true for AccessRequestId: {}", accessRequestId);
+        } else {
+            logger.warn("AccessRequest with AccessRequestId {} not found", accessRequestId);
         }
     }
-
     @Override
     @Transactional
     public void clearAllNotifications() {
+        logger.info("Clearing all notifications");
+
         List<AccessRequest> accessRequests = accessRequestRepository.findAll();
         for (AccessRequest accessRequest : accessRequests) {
             accessRequest.setDeleted(true);
         }
         accessRequestRepository.saveAll(accessRequests);
+
+        logger.info("Cleared all notifications");
     }
 }

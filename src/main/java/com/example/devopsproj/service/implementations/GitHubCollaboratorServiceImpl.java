@@ -67,6 +67,10 @@ public class GitHubCollaboratorServiceImpl implements GitHubCollaboratorService 
         headers.setBearerAuth(accessToken);
         headers.set("Accept", "application/vnd.github+json");
         headers.set("X-GitHub-Api-Version", "2022-11-28");
+
+        // Log information about the headers being created
+        logger.debug("Created HTTP headers with access token for GitHub API request.");
+
         return headers;
     }
 }

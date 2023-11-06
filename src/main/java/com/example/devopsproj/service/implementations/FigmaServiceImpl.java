@@ -19,96 +19,130 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 @RequiredArgsConstructor
 public class FigmaServiceImpl implements FigmaService {
 
     private final FigmaRepository figmaRepository;
     private final ProjectRepository projectRepository;
+        private static final Logger logger = LoggerFactory.getLogger(FigmaServiceImpl.class);
 
-
-    // Create a new Figma project
     @Override
-    public Figma createFigma(FigmaDTO figmaDTO) throws FigmaCreationException {
+    public Figma createFigma(FigmaDTO figmaDTO) {
+        logger.info("Creating a new Figma project");
+
         // Create a new Figma object and populate it with data from the DTO
         Figma figma = new Figma();
         figma.setProject(mapProjectDTOToProject(figmaDTO.getProjectDTO()));
         figma.setFigmaURL(figmaDTO.getFigmaURL());
 
+        // Attempt to save the new Figma project
+        Figma createdFigma = null;
         try {
-            // Save the new Figma project to the repository
-            return figmaRepository.save(figma);
+            createdFigma = figmaRepository.save(figma);
+            logger.info("Created Figma project with ID: {}", createdFigma.getFigmaId());
         } catch (DataIntegrityViolationException e) {
-            // If there's a specific data integrity violation related to Figma creation,
-            // you can catch it and rethrow it as your custom exception.
-            throw new FigmaCreationException("Could not create Figma", e);
+            // Log with contextual information
+            logger.error("Data integrity violation occurred while creating Figma", e);
         } catch (Exception e) {
-            // Handle any other exceptions that may occur and rethrow them as needed
-            throw new FigmaCreationException("An error occurred while creating Figma", e);
+            // Log with contextual information
+            logger.error("An error occurred while creating Figma", e);
         }
+
+        return createdFigma;
     }
 
 
 
 
-    // Get all Figma projects
+
+
+//     Get all Figma projects
     @Override
     public List<Figma> getAllFigmaProjects() {
-        try {
-            // Retrieve all active projects, map them to their associated Figma projects, and return as a list
-            return projectRepository.findAllProjects().stream()
-                    .map(Project::getFigma)
-                    .toList(); // Use Stream.toList() for simplicity
-        } catch (Exception e) {
-            throw new FigmaServiceException("An error occurred while retrieving Figma projects", e);
-        }
+        logger.info("Retrieving all Figma projects");
+
+        // Retrieve all active projects, map them to their associated Figma projects, and return as a list
+        List<Figma> figmaProjects = projectRepository.findAllProjects().stream()
+                .map(Project::getFigma)
+                .toList(); // Use Stream.toList() for simplicity
+
+        logger.info("Retrieved {} Figma projects", figmaProjects.size());
+
+        return figmaProjects;
     }
+
+
+
 
 
 
 
     @Override
     public Optional<FigmaDTO> getFigmaById(Long figmaId) {
+        logger.info("Retrieving Figma project by ID: {}", figmaId);
+
         // Retrieve the Figma project by ID
         Optional<Figma> optionalFigma = figmaRepository.findById(figmaId);
 
         if (optionalFigma.isPresent()) {
-            return optionalFigma.map(figma -> new FigmaDTO(mapProjectToProjectDTO(figma.getProject()), figma.getFigmaURL()));
+            Figma figma = optionalFigma.get();
+            FigmaDTO figmaDTO = new FigmaDTO(mapProjectToProjectDTO(figma.getProject()), figma.getFigmaURL());
+
+            logger.info("Retrieved Figma project by ID: {}", figmaId);
+
+            return Optional.of(figmaDTO);
         } else {
+            logger.info("Figma project not found for ID: {}", figmaId);
             return Optional.empty(); // Figma not found, returning empty Optional.
         }
     }
 
-    @Override
-    public void deleteFigma(Long figmaId) {
-
-    }
 
     @Override
     public void softDeleteFigma(Long figmaId) {
+        logger.info("Soft deleting Figma with ID: {}", figmaId);
+
         Optional<Figma> figmaOptional = figmaRepository.findById(figmaId);
         if (figmaOptional.isPresent()) {
             Figma figma = figmaOptional.get();
             figma.setDeleted(true);
             figmaRepository.save(figma);
+
+            logger.info("Figma with ID {} has been soft deleted", figmaId);
         } else {
+            logger.error("Figma with ID {} not found, unable to soft delete", figmaId);
             throw new FigmaNotFoundException("Figma with ID " + figmaId + " not found");
         }
     }
 
+
     @Override
     public String getFigmaURLByProjectId(Long projectId) {
+        logger.info("Retrieving Figma URL for project with ID: {}", projectId);
+
         Optional<Figma> optionalFigma = figmaRepository.findFigmaByProjectId(projectId);
         if (optionalFigma.isPresent()) {
             Figma figma = optionalFigma.get();
-            return figma.getFigmaURL();
+            String figmaURL = figma.getFigmaURL();
+
+            logger.info("Retrieved Figma URL for project with ID {}: {}", projectId, figmaURL);
+
+            return figmaURL;
         } else {
+            logger.warn("Figma not found for project with ID: {}", projectId);
             return null;
         }
     }
 
+
     @Override
     public void addUserAndScreenshots(Long figmaId, FigmaDTO figmaDTO) {
+        logger.info("Adding user and screenshots to Figma with ID: {}", figmaId);
+
         Optional<Figma> optionalFigma = figmaRepository.findById(figmaId);
         if (optionalFigma.isPresent()) {
             Figma figma = optionalFigma.get();
@@ -125,7 +159,10 @@ public class FigmaServiceImpl implements FigmaService {
             screenshotImagesByUser.put(user, figmaDTO.getScreenshotImage());
 
             figmaRepository.save(figma);
+
+            logger.info("Added user '{}' with screenshot image to Figma with ID: {}", user, figmaId);
         } else {
+            logger.warn("Figma not found for ID: {}", figmaId);
             throw new FigmaNotFoundException("Figma not found for ID: " + figmaId);
         }
     }
@@ -133,43 +170,67 @@ public class FigmaServiceImpl implements FigmaService {
 
     @Override
     public List<FigmaScreenshotDTO> getScreenshotsForFigmaId(Long figmaId) {
+        logger.info("Retrieving screenshots for Figma with ID: {}", figmaId);
+
         Optional<Figma> optionalFigma = figmaRepository.findById(figmaId);
         if (optionalFigma.isPresent()) {
             Figma figma = optionalFigma.get();
             Map<String, String> screenshotImagesByUser = figma.getScreenshotImagesByUser();
 
             if (screenshotImagesByUser != null && !screenshotImagesByUser.isEmpty()) {
-                List<FigmaScreenshotDTO> screenshotDTOList = new ArrayList<>();
-                for (Map.Entry<String, String> entry : screenshotImagesByUser.entrySet()) {
-                    FigmaScreenshotDTO screenshotDTO = new FigmaScreenshotDTO();
-                    screenshotDTO.setUser(entry.getKey());
-                    screenshotDTO.setScreenshotImageURL(entry.getValue());
-                    screenshotDTOList.add(screenshotDTO);
-                }
+                List<FigmaScreenshotDTO> screenshotDTOList = mapScreenshotImagesToDTOList(screenshotImagesByUser, figmaId);
+                logger.info("Retrieved {} screenshots for Figma with ID: {}", screenshotDTOList.size(), figmaId);
                 return screenshotDTOList;
             }
         }
+
+        logger.info("No screenshots found for Figma with ID: {}", figmaId);
         return Collections.emptyList();
     }
 
+    private List<FigmaScreenshotDTO> mapScreenshotImagesToDTOList(Map<String, String> screenshotImages, Long figmaId) {
+        List<FigmaScreenshotDTO> screenshotDTOList = new ArrayList<>();
+        for (Map.Entry<String, String> entry : screenshotImages.entrySet()) {
+            FigmaScreenshotDTO screenshotDTO = mapScreenshotImageToDTO(entry.getKey(), entry.getValue());
+            screenshotDTOList.add(screenshotDTO);
+        }
+        return screenshotDTOList;
+    }
+
+
+    private FigmaScreenshotDTO mapScreenshotImageToDTO(String user, String screenshotImageURL) {
+        FigmaScreenshotDTO screenshotDTO = new FigmaScreenshotDTO();
+        screenshotDTO.setUser(user);
+        screenshotDTO.setScreenshotImageURL(screenshotImageURL);
+        return screenshotDTO;
+    }
+
+
     @Override
     public List<FigmaDTO> getAllFigmaDTOs() {
+        logger.info("Retrieving all Figma DTOs");
+
         List<Project> activeProjects = projectRepository.findAllProjects();
         List<FigmaDTO> figmaDTOs = new ArrayList<>();
 
         for (Project project : activeProjects) {
             Figma figma = project.getFigma();
             if (figma != null) {
-                FigmaDTO figmaDTO = new FigmaDTO(
-                        figma.getFigmaId(),
-                        mapProjectToProjectDTO(figma.getProject()),
-                        figma.getFigmaURL()
-                );
+                FigmaDTO figmaDTO = mapFigmaToFigmaDTO(figma);
                 figmaDTOs.add(figmaDTO);
             }
         }
 
+        logger.info("Retrieved {} Figma DTOs", figmaDTOs.size());
         return figmaDTOs;
+    }
+
+    private FigmaDTO mapFigmaToFigmaDTO(Figma figma) {
+        Long figmaId = figma.getFigmaId();
+        ProjectDTO projectDTO = mapProjectToProjectDTO(figma.getProject());
+        String figmaURL = figma.getFigmaURL();
+
+        return new FigmaDTO(figmaId, projectDTO, figmaURL);
     }
 
 

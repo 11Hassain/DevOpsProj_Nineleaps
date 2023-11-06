@@ -29,6 +29,14 @@ import java.util.Collections;
 import java.util.List;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+
 @Service
 @RequiredArgsConstructor
 public class GitRepositoryServiceImpl implements GitRepositoryService {
@@ -36,14 +44,15 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
     private final GitRepositoryRepository gitRepositoryRepository;
     private final ProjectServiceImpl projectServiceImpl;
     private final JdbcTemplate jdbcTemplate;
+    private final RestTemplate restTemplate;
 
     private static final String API_BASE_URL = "https://api.github.com";
     private static final String USER_REPOS_ENDPOINT = "/user/repos";
     private static final String REPOS_ENDPOINT = "/repos/sahilanna";
     private static final String GITHUB_ACCESS_TOKEN = System.getenv("GITHUB_ACCESS_TOKEN");
 
-    private final RestTemplate restTemplate;
-
+    // Create a logger for the class
+    private static final Logger logger = LoggerFactory.getLogger(GitRepositoryServiceImpl.class);
 
     @Override
     @Transactional
@@ -69,6 +78,11 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
             throw new RepositoryCreationException("Error creating repository " + gitRepository.getName() + ". Response: " + responseEntity.getBody());
         }
     }
+
+
+
+
+
 
     // Get a list of all Git repositories
     @Override

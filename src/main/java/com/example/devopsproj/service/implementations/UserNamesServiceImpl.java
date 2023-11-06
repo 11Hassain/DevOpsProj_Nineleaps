@@ -12,33 +12,34 @@ import com.example.devopsproj.service.interfaces.UserNamesService;
 import com.example.devopsproj.utils.GitHubUserValidator;
 import lombok.RequiredArgsConstructor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
-
-
 
 @Service
 @RequiredArgsConstructor
 public class UserNamesServiceImpl implements UserNamesService {
 
     private final UserNamesRepository userNamesRepository;
-
     public final GitHubUserValidator gitHubUserValidator;
+
+    private static final Logger logger = LoggerFactory.getLogger(UserNamesServiceImpl.class);
 
     // Validates and saves a GitHub username with the associated user data.
     @Override
     public UserNamesDTO saveUsername(UserNamesDTO userNamesDTO) {
-        boolean yes = gitHubUserValidator.isGitHubUserValid(userNamesDTO.getUsername(), userNamesDTO.getAccessToken());
-        if (yes){
+        boolean isValidGitHubUser = gitHubUserValidator.isGitHubUserValid(userNamesDTO.getUsername(), userNamesDTO.getAccessToken());
+        if (isValidGitHubUser) {
             UserNames userNames = new UserNames();
             userNames.setUsername(userNamesDTO.getUsername());
             userNames.setUser(userNamesDTO.getUser());
             userNamesRepository.save(userNames);
+            logger.info("Saved GitHub username: {}", userNamesDTO.getUsername());
             return userNamesDTO;
-        }
-        else {
+        } else {
+            logger.warn("GitHub username validation failed for: {}", userNamesDTO.getUsername());
             return null;
         }
     }
@@ -46,6 +47,7 @@ public class UserNamesServiceImpl implements UserNamesService {
     @Override
     public List<String> getGitHubUserNamesByRole(EnumRole role) {
         List<UserNames> userNamesList = userNamesRepository.findByUserRole(role);
+        logger.debug("Retrieved GitHub usernames for role: {}", role);
         return userNamesList.stream()
                 .map(UserNames::getUsername)
                 .toList();
