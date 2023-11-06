@@ -1,7 +1,7 @@
 package com.example.devopsproj.controller;
 
 import com.example.devopsproj.dto.responsedto.CollaboratorDTO;
-import com.example.devopsproj.service.implementations.GitHubCollaboratorServiceImpl;
+import com.example.devopsproj.service.interfaces.GitHubCollaboratorService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -20,7 +20,7 @@ class GitHubCollaboratorControllerTest {
     @InjectMocks
     private GitHubCollaboratorController gitHubCollaboratorController;
     @Mock
-    private GitHubCollaboratorServiceImpl gitHubCollaboratorService;
+    private GitHubCollaboratorService gitHubCollaboratorService;
 
     @BeforeEach
     void setUp() {

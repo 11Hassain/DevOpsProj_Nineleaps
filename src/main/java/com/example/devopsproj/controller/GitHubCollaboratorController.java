@@ -1,7 +1,7 @@
 package com.example.devopsproj.controller;
 
-import com.example.devopsproj.service.implementations.GitHubCollaboratorServiceImpl;
 import com.example.devopsproj.dto.responsedto.CollaboratorDTO;
+import com.example.devopsproj.service.interfaces.GitHubCollaboratorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class GitHubCollaboratorController {
 
-    private final GitHubCollaboratorServiceImpl collaboratorService;
+    private final GitHubCollaboratorService collaboratorService;
 
     @PostMapping("/add")
     @Operation(

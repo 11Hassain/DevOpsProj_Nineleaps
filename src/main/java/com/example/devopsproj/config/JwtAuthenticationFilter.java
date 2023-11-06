@@ -1,7 +1,7 @@
 package com.example.devopsproj.config;
 
-import com.example.devopsproj.service.implementations.JwtServiceImpl;
 import com.example.devopsproj.repository.TokenRepository;
+import com.example.devopsproj.service.interfaces.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,7 +31,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtServiceImpl jwtServiceImpl;
+    private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
     private final TokenRepository tokenRepository;
 
@@ -51,11 +51,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         //HERE WE ARE EXTRACTING THE JWT TOKEN AND USERNAME IN THE NEXT LINE
         jwt = authHeader.substring(7);
-        userEmail = jwtServiceImpl.extractUsername(jwt);
+        userEmail = jwtService.extractUsername(jwt);
         //NOW WE EXTRACTING THE USER FRO TH DATABASE FOR THE VERIFICATION
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-            if (jwtServiceImpl.isTokenValid(jwt, userDetails)) {
+            if (jwtService.isTokenValid(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,

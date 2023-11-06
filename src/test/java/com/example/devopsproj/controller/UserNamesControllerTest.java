@@ -2,7 +2,7 @@ package com.example.devopsproj.controller;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.dto.responsedto.UserNamesDTO;
-import com.example.devopsproj.service.implementations.UserNamesServiceImpl;
+import com.example.devopsproj.service.interfaces.UserNamesService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -25,7 +25,7 @@ class UserNamesControllerTest {
     @InjectMocks
     private UserNamesController userNamesController;
     @Mock
-    private UserNamesServiceImpl userNamesService;
+    private UserNamesService userNamesService;
 
     @BeforeEach
     void setUp() {

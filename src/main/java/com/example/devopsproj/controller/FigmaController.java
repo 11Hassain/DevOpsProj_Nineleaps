@@ -2,9 +2,9 @@ package com.example.devopsproj.controller;
 
 import com.example.devopsproj.exceptions.NotFoundException;
 import com.example.devopsproj.model.Figma;
-import com.example.devopsproj.service.implementations.FigmaServiceImpl;
 import com.example.devopsproj.dto.responsedto.FigmaDTO;
 import com.example.devopsproj.dto.responsedto.FigmaScreenshotDTO;
+import com.example.devopsproj.service.interfaces.FigmaService;
 import com.example.devopsproj.utils.DTOModelMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -22,7 +22,7 @@ import java.util.*;
  * The FigmaController class is responsible for handling RESTful API endpoints related to Figma projects and their associated functionalities.
  * It provides endpoints for creating, retrieving, updating, and deleting Figma projects, as well as adding users and screenshots to a Figma project.
  * .
- * This controller integrates with the FigmaServiceImpl and JwtServiceImpl to perform Figma-related operations and authentication.
+ * This controller integrates with the FigmaService and JwtServiceImpl to perform Figma-related operations and authentication.
  *
  * @version 2.0
  */
@@ -33,7 +33,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class FigmaController {
 
-    private final FigmaServiceImpl figmaServiceImpl;
+    private final FigmaService figmaService;
 
     @PostMapping("/create")
     @Operation(
@@ -48,7 +48,7 @@ public class FigmaController {
     public ResponseEntity<String> createFigma(@Valid @RequestBody FigmaDTO figmaDTO) {
 
             try {
-                figmaServiceImpl.createFigma(figmaDTO);
+                figmaService.createFigma(figmaDTO);
 
                 return ResponseEntity.ok("Figma created successfully");
 
@@ -69,7 +69,7 @@ public class FigmaController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getAllFigmaProjects() {
 
-            List<Figma> figmaProjects = figmaServiceImpl.getAllFigmaProjects();
+            List<Figma> figmaProjects = figmaService.getAllFigmaProjects();
 
             List<FigmaDTO> figmaDTOs = figmaProjects.stream()
                     .filter(Objects::nonNull) // Filter out null values
@@ -104,7 +104,7 @@ public class FigmaController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getFigma(@PathVariable Long figmaId) {
 
-            Optional<FigmaDTO> optionalFigmaDTO = figmaServiceImpl.getFigmaById(figmaId);
+            Optional<FigmaDTO> optionalFigmaDTO = figmaService.getFigmaById(figmaId);
             if (optionalFigmaDTO.isPresent()) {
                 return ResponseEntity.ok(optionalFigmaDTO);
             } else {
@@ -129,7 +129,7 @@ public class FigmaController {
     {
 
             try {
-                String result = figmaServiceImpl.saveUserAndScreenshotsToFigma(figmaId, figmaDTO);
+                String result = figmaService.saveUserAndScreenshotsToFigma(figmaId, figmaDTO);
                 return ResponseEntity.ok(result);
             } catch (NotFoundException e) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -151,7 +151,7 @@ public class FigmaController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> deleteFigma(@PathVariable Long figmaId) {
 
-            figmaServiceImpl.deleteFigma(figmaId);
+            figmaService.deleteFigma(figmaId);
             return ResponseEntity.ok("Figma deleted successfully");
 
     }
@@ -169,7 +169,7 @@ public class FigmaController {
     public ResponseEntity<Object> getFigmaByProjectId(@PathVariable Long projectId) {
 
             try {
-                String figmaURL = figmaServiceImpl.getFigmaURLByProjectId(projectId);
+                String figmaURL = figmaService.getFigmaURLByProjectId(projectId);
                 return ResponseEntity.ok(figmaURL);
             } catch (NotFoundException e){
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -191,7 +191,7 @@ public class FigmaController {
     public ResponseEntity<Object> getScreenshotsForFigmaId(@PathVariable("figmaId") Long figmaId) {
 
             try {
-                List<FigmaScreenshotDTO> figmaScreenshotDTOS = figmaServiceImpl.getScreenshotsByFigmaId(figmaId);
+                List<FigmaScreenshotDTO> figmaScreenshotDTOS = figmaService.getScreenshotsByFigmaId(figmaId);
                 return ResponseEntity.ok(figmaScreenshotDTOS);
             } catch (NotFoundException e) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

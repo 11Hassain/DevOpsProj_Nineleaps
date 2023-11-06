@@ -2,8 +2,8 @@ package com.example.devopsproj.controller;
 
 import com.example.devopsproj.dto.requestdto.AccessRequestDTO;
 import com.example.devopsproj.dto.responsedto.AccessResponseDTO;
-import com.example.devopsproj.service.implementations.AccessRequestServiceImpl;
-import com.example.devopsproj.service.implementations.JwtServiceImpl;
+import com.example.devopsproj.service.interfaces.AccessRequestService;
+import com.example.devopsproj.service.interfaces.JwtService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -26,9 +26,9 @@ class AccessRequestControllerTest {
     @InjectMocks
     private AccessRequestController accessRequestController;
     @Mock
-    private AccessRequestServiceImpl accessRequestService;
+    private AccessRequestService accessRequestService;
     @Mock
-    private JwtServiceImpl jwtService;
+    private JwtService jwtService;
 
     @BeforeEach
     void setUp() {

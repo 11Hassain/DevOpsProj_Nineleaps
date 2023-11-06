@@ -4,7 +4,7 @@ import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.dto.responsedto.*;
 import com.example.devopsproj.dto.requestdto.UserCreationDTO;
 import com.example.devopsproj.model.User;
-import com.example.devopsproj.service.implementations.UserServiceImpl;
+import com.example.devopsproj.service.interfaces.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
@@ -30,7 +30,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserServiceImpl userServiceImpl;
+    private final UserService userService;
 
     @PostMapping("/") // Save the user
     @Operation(
@@ -42,7 +42,7 @@ public class UserController {
     )
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> saveUser(@Valid @RequestBody UserCreationDTO userCreationDTO){
-        UserDTO savedUser = userServiceImpl.saveUser(userCreationDTO);
+        UserDTO savedUser = userService.saveUser(userCreationDTO);
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
@@ -56,7 +56,7 @@ public class UserController {
             }
     )
     public ResponseEntity<Object> getUserById(@PathVariable Long userId){
-        Optional<User> optionalUser = userServiceImpl.getUserById(userId);
+        Optional<User> optionalUser = userService.getUserById(userId);
         if(optionalUser.isPresent()){
             User user = optionalUser.get();
             UserDTO userDTO = new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole(), user.getLastUpdated(), user.getLastLogout());
@@ -75,7 +75,7 @@ public class UserController {
     )
     public ResponseEntity<Object> updateUser(@PathVariable("id") Long id,
                                              @Valid @RequestBody UserDTO userDTO){
-        UserDTO userDTOs = userServiceImpl.updateUser(id, userDTO);
+        UserDTO userDTOs = userService.updateUser(id, userDTO);
         return new ResponseEntity<>(userDTOs, HttpStatus.OK);
     }
 
@@ -89,13 +89,13 @@ public class UserController {
             }
     )
     public ResponseEntity<String> deleteUserById(@PathVariable Long userId){
-        if(userServiceImpl.existsById(userId)) {
-            boolean checkIfDeleted = userServiceImpl.existsByIdIsDeleted(userId); //check if deleted = true?
+        if(userService.existsById(userId)) {
+            boolean checkIfDeleted = userService.existsByIdIsDeleted(userId); //check if deleted = true?
             if (checkIfDeleted) {
                 return ResponseEntity.ok("User doesn't exist");
                 //user is present in db but deleted=true(soft deleted)
             }
-            boolean isDeleted = userServiceImpl.softDeleteUser(userId); //soft deletes user with id (yes/no)
+            boolean isDeleted = userService.softDeleteUser(userId); //soft deletes user with id (yes/no)
             if(isDeleted){
                 return ResponseEntity.ok("User successfully deleted");
                 //successfully deleting user (soft delete) (user exists in db)
@@ -118,7 +118,7 @@ public class UserController {
     )
     public ResponseEntity<Object> getUserByRoleId(@PathVariable("role") String role){
         EnumRole userRole = EnumRole.valueOf(role.toUpperCase()); //getting value of role(string)
-        List<User> users = userServiceImpl.getUsersByRole(userRole);
+        List<User> users = userService.getUsersByRole(userRole);
         List<UserDTO> userDTOList = users.stream()
                 .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole(), user.getLastUpdated(), user.getLastLogout()))
                 .toList();
@@ -134,7 +134,7 @@ public class UserController {
             }
     )
     public ResponseEntity<Object> getCountAllUsers(){
-        Integer countUsers = userServiceImpl.getCountAllUsers();
+        Integer countUsers = userService.getCountAllUsers();
         if (countUsers == 0){
             return ResponseEntity.ok(0);
         }
@@ -153,7 +153,7 @@ public class UserController {
     )
     public ResponseEntity<Object> getCountAllUsersByRole(@PathVariable String role){
         EnumRole userRole = EnumRole.valueOf(role.toUpperCase());
-        Integer countUsersByRole = userServiceImpl.getCountAllUsersByRole(userRole);
+        Integer countUsersByRole = userService.getCountAllUsersByRole(userRole);
         if(countUsersByRole == 0){
             return ResponseEntity.ok(0);
         }
@@ -171,7 +171,7 @@ public class UserController {
             }
     )
     public ResponseEntity<Object> getCountAllUsersByProjectId(@PathVariable Long projectId){
-        Integer countUsersByProject = userServiceImpl.getCountAllUsersByProjectId(projectId);
+        Integer countUsersByProject = userService.getCountAllUsersByProjectId(projectId);
         if (countUsersByProject == 0){
             return ResponseEntity.ok(0);
         }
@@ -189,7 +189,7 @@ public class UserController {
             }
     )
     public ResponseEntity<Object> getAllProjectsByUserId(@PathVariable Long id) {
-        List<ProjectDTO> projects = userServiceImpl.getAllProjectsAndRepositoriesByUserId(id);
+        List<ProjectDTO> projects = userService.getAllProjectsAndRepositoriesByUserId(id);
         return ResponseEntity.ok(projects);
     }
 
@@ -205,7 +205,7 @@ public class UserController {
     public ResponseEntity<Object> getProjectsByRoleIdAndUserId(
             @PathVariable("id") Long userId,
             @PathVariable("role") String role) {
-        ResponseEntity<Object> response = userServiceImpl.getProjectsByRoleAndUserId(userId, role);
+        ResponseEntity<Object> response = userService.getProjectsByRoleAndUserId(userId, role);
 
         if (response.getStatusCode() == HttpStatus.OK) {
             return ResponseEntity.ok().body(response.getBody());
@@ -223,7 +223,7 @@ public class UserController {
             }
     )
     public ResponseEntity<Object> getAllUsers(){
-            return ResponseEntity.ok(userServiceImpl.getAllUsers());
+            return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @GetMapping("/getAll")
@@ -235,7 +235,7 @@ public class UserController {
             }
     )
     public ResponseEntity<Object> getAllUsersWithProjects(){
-        List<UserProjectsDTO> userProjectsDTOs = userServiceImpl.getAllUsersWithProjects();
+        List<UserProjectsDTO> userProjectsDTOs = userService.getAllUsersWithProjects();
         return ResponseEntity.ok(userProjectsDTOs);
     }
 
@@ -248,7 +248,7 @@ public class UserController {
             }
     )
     public ResponseEntity<Object> getUsersWithMultipleProjects() {
-        List<UserProjectsDTO> usersWithMultipleProjects = userServiceImpl.getUsersWithMultipleProjects();
+        List<UserProjectsDTO> usersWithMultipleProjects = userService.getUsersWithMultipleProjects();
         return ResponseEntity.ok(usersWithMultipleProjects);
     }
     @GetMapping("/withoutProject")
@@ -263,7 +263,7 @@ public class UserController {
             @RequestParam("role") String role,
             @RequestParam("projectId") Long projectId) {
         EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
-        List<UserDTO> userDTOList = userServiceImpl.getAllUsersWithoutProjects(enumRole, projectId);
+        List<UserDTO> userDTOList = userService.getAllUsersWithoutProjects(enumRole, projectId);
         return ResponseEntity.status(HttpStatus.OK).body(userDTOList);
     }
 
@@ -276,7 +276,7 @@ public class UserController {
             }
     )
     public ResponseEntity<String> userLogout(@PathVariable("userId") Long id){
-        String response = userServiceImpl.userLogout(id);
+        String response = userService.userLogout(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

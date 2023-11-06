@@ -5,7 +5,7 @@ import com.example.devopsproj.dto.responsedto.FigmaScreenshotDTO;
 import com.example.devopsproj.exceptions.NotFoundException;
 import com.example.devopsproj.model.Figma;
 import com.example.devopsproj.model.Project;
-import com.example.devopsproj.service.implementations.FigmaServiceImpl;
+import com.example.devopsproj.service.interfaces.FigmaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -28,7 +28,7 @@ class FigmaControllerTest {
     @InjectMocks
     private FigmaController figmaController;
     @Mock
-    private FigmaServiceImpl figmaService;
+    private FigmaService figmaService;
 
     @BeforeEach
     void setUp() {

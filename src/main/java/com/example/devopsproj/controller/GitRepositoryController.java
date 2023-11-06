@@ -2,8 +2,8 @@ package com.example.devopsproj.controller;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.model.GitRepository;
-import com.example.devopsproj.service.implementations.GitRepositoryServiceImpl;
 import com.example.devopsproj.dto.responsedto.GitRepositoryDTO;
+import com.example.devopsproj.service.interfaces.GitRepositoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
@@ -29,7 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GitRepositoryController {
 
-    private final GitRepositoryServiceImpl gitRepositoryServiceImpl;
+    private final GitRepositoryService gitRepositoryService;
 
     @PostMapping("/add")
     @Operation(
@@ -42,7 +42,7 @@ public class GitRepositoryController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> createRepository(@Valid @RequestBody GitRepository gitRepository) {
 
-            return ResponseEntity.ok(gitRepositoryServiceImpl.createRepository(gitRepository));
+            return ResponseEntity.ok(gitRepositoryService.createRepository(gitRepository));
 
     }
 
@@ -57,7 +57,7 @@ public class GitRepositoryController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getAllRepositories() {
 
-            return ResponseEntity.ok(gitRepositoryServiceImpl.getAllRepositories());
+            return ResponseEntity.ok(gitRepositoryService.getAllRepositories());
 
     }
 
@@ -73,7 +73,7 @@ public class GitRepositoryController {
     public ResponseEntity<Object> getAllReposByProject(
             @PathVariable Long id){
 
-            List<GitRepositoryDTO> gitRepositoryDTOS = gitRepositoryServiceImpl.getAllRepositoriesByProject(id);
+            List<GitRepositoryDTO> gitRepositoryDTOS = gitRepositoryService.getAllRepositoriesByProject(id);
             return new ResponseEntity<>(gitRepositoryDTOS, HttpStatus.OK);
 
     }
@@ -91,7 +91,7 @@ public class GitRepositoryController {
             @PathVariable("role") String role) {
 
             EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
-            return ResponseEntity.ok(gitRepositoryServiceImpl.getAllReposByRole(enumRole));
+            return ResponseEntity.ok(gitRepositoryService.getAllReposByRole(enumRole));
 
     }
 
@@ -108,7 +108,7 @@ public class GitRepositoryController {
     public ResponseEntity<Object> getRepositoryById(
             @PathVariable Long id) {
 
-            GitRepository repository = gitRepositoryServiceImpl.getRepositoryById(id);
+            GitRepository repository = gitRepositoryService.getRepositoryById(id);
             if (repository != null) {
                 GitRepositoryDTO repositoryDTO = new GitRepositoryDTO(repository.getName(), repository.getDescription());
                 return ResponseEntity.ok(repositoryDTO);
@@ -130,7 +130,7 @@ public class GitRepositoryController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> deleteRepository(@PathVariable Long repoId) {
         try {
-            gitRepositoryServiceImpl.deleteRepository(repoId); // Delete the repository
+            gitRepositoryService.deleteRepository(repoId); // Delete the repository
             return ResponseEntity.ok("Deleted successfully");
 
         } catch (Exception e) {

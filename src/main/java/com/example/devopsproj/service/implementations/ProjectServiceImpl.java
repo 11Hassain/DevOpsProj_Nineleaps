@@ -7,6 +7,7 @@ import com.example.devopsproj.repository.GitRepositoryRepository;
 import com.example.devopsproj.repository.UserRepository;
 import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.model.*;
+import com.example.devopsproj.service.interfaces.GitHubCollaboratorService;
 import com.example.devopsproj.service.interfaces.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -32,7 +33,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final UserRepository userRepository;
     private final GitRepositoryRepository gitRepositoryRepository;
     private final ModelMapper modelMapper;
-    private final GitHubCollaboratorServiceImpl collaboratorService;
+    private final GitHubCollaboratorService collaboratorService;
 
     @Override
     public ProjectDTO createProject(ProjectDTO projectDTO) {

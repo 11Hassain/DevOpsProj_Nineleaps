@@ -3,7 +3,7 @@ package com.example.devopsproj.controller;
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.dto.responsedto.GitRepositoryDTO;
 import com.example.devopsproj.model.GitRepository;
-import com.example.devopsproj.service.implementations.GitRepositoryServiceImpl;
+import com.example.devopsproj.service.interfaces.GitRepositoryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -26,7 +26,7 @@ class GitRepositoryControllerTest {
     @InjectMocks
     private GitRepositoryController gitRepositoryController;
     @Mock
-    private GitRepositoryServiceImpl gitRepositoryService;
+    private GitRepositoryService gitRepositoryService;
 
     @BeforeEach
     void setUp() {

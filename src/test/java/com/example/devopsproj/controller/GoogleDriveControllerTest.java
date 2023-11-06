@@ -4,7 +4,7 @@ import com.example.devopsproj.dto.responsedto.GoogleDriveDTO;
 import com.example.devopsproj.dto.responsedto.ProjectDTO;
 import com.example.devopsproj.model.GoogleDrive;
 import com.example.devopsproj.model.Project;
-import com.example.devopsproj.service.implementations.GoogleDriveServiceImpl;
+import com.example.devopsproj.service.interfaces.GoogleDriveService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -28,7 +28,7 @@ class GoogleDriveControllerTest {
     @InjectMocks
     private GoogleDriveController googleDriveController;
     @Mock
-    private GoogleDriveServiceImpl googleDriveService;
+    private GoogleDriveService googleDriveService;
 
     @BeforeEach
     void setUp() {

@@ -3,7 +3,7 @@ package com.example.devopsproj.controller;
 import com.example.devopsproj.dto.responsedto.HelpDocumentsDTO;
 import com.example.devopsproj.exceptions.NotFoundException;
 import com.example.devopsproj.model.HelpDocuments;
-import com.example.devopsproj.service.implementations.HelpDocumentsServiceImpl;
+import com.example.devopsproj.service.interfaces.HelpDocumentsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class HelpDocumentsController {
 
-    private final HelpDocumentsServiceImpl helpDocumentsServiceImpl;
+    private final HelpDocumentsService helpDocumentsService;
 
     @PostMapping("/upload")
     @Operation(
@@ -52,8 +52,8 @@ public class HelpDocumentsController {
             throws IOException {
 
             try {
-                String fileExtension = helpDocumentsServiceImpl.getFileExtension(projectFile);
-                return helpDocumentsServiceImpl.uploadFiles(projectId, projectFile, fileExtension);
+                String fileExtension = helpDocumentsService.getFileExtension(projectFile);
+                return helpDocumentsService.uploadFiles(projectId, projectFile, fileExtension);
             } catch (IllegalArgumentException e) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid parameters");
             }
@@ -74,7 +74,7 @@ public class HelpDocumentsController {
     public ResponseEntity<Object> getPdfFilesList(@RequestParam("projectId") long projectId) {
 
             try{
-                List<HelpDocumentsDTO> fileInfos = helpDocumentsServiceImpl.getAllDocumentsByProjectId(projectId);
+                List<HelpDocumentsDTO> fileInfos = helpDocumentsService.getAllDocumentsByProjectId(projectId);
                 return ResponseEntity.ok().body(fileInfos);
             }catch (NotFoundException e){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No PDF files found");
@@ -94,7 +94,7 @@ public class HelpDocumentsController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> downloadPdfFile(@PathVariable("fileName") String fileName) {
 
-            HelpDocuments pdfFile = helpDocumentsServiceImpl.getPdfFile(fileName);
+            HelpDocuments pdfFile = helpDocumentsService.getPdfFile(fileName);
             if (pdfFile == null) {
                 return ResponseEntity.notFound().build();
             }
@@ -118,9 +118,9 @@ public class HelpDocumentsController {
     )
     public ResponseEntity<String> deleteFile(@PathVariable("fileId") Long fileId){
 
-            Optional<HelpDocumentsDTO> helpDocumentsDTO = helpDocumentsServiceImpl.getDocumentById(fileId);
+            Optional<HelpDocumentsDTO> helpDocumentsDTO = helpDocumentsService.getDocumentById(fileId);
             if(helpDocumentsDTO.isPresent()){
-                helpDocumentsServiceImpl.deleteDocument(fileId);
+                helpDocumentsService.deleteDocument(fileId);
                 return ResponseEntity.ok("Document deleted successfully");
             }else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Document not found");

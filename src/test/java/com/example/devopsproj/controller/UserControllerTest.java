@@ -6,7 +6,7 @@ import com.example.devopsproj.dto.responsedto.ProjectDTO;
 import com.example.devopsproj.dto.responsedto.UserDTO;
 import com.example.devopsproj.dto.responsedto.UserProjectsDTO;
 import com.example.devopsproj.model.User;
-import com.example.devopsproj.service.implementations.UserServiceImpl;
+import com.example.devopsproj.service.interfaces.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -31,7 +31,7 @@ class UserControllerTest {
     @InjectMocks
     private UserController userController;
     @Mock
-    private UserServiceImpl userService;
+    private UserService userService;
 
     @BeforeEach
     void setUp() {

@@ -1,8 +1,8 @@
 package com.example.devopsproj.controller;
 
 import com.example.devopsproj.commons.enumerations.EnumRole;
-import com.example.devopsproj.service.implementations.UserNamesServiceImpl;
 import com.example.devopsproj.dto.responsedto.UserNamesDTO;
+import com.example.devopsproj.service.interfaces.UserNamesService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserNamesController {
 
-    private final UserNamesServiceImpl userNamesServiceImpl;
+    private final UserNamesService userNamesService;
 
 
     @PostMapping("/githubUsername")
@@ -45,7 +45,7 @@ public class UserNamesController {
     public ResponseEntity<Object> saveUsername(@Valid @RequestBody UserNamesDTO userNamesDTO) {
 
             try{
-                UserNamesDTO savedUserNames = userNamesServiceImpl.saveUsername(userNamesDTO);
+                UserNamesDTO savedUserNames = userNamesService.saveUsername(userNamesDTO);
                 if (savedUserNames == null){
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Github user not found");
                 }
@@ -70,7 +70,7 @@ public class UserNamesController {
     public ResponseEntity<Object> getUserNamesByRole(@PathVariable String role) {
 
             EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
-            return ResponseEntity.ok(userNamesServiceImpl.getGitHubUserNamesByRole(enumRole));
+            return ResponseEntity.ok(userNamesService.getGitHubUserNamesByRole(enumRole));
 
     }
 }

@@ -7,6 +7,8 @@ import com.example.devopsproj.repository.UserRepository;
 import com.example.devopsproj.dto.requestdto.UserCreationDTO;
 import com.example.devopsproj.service.interfaces.IUserService;
 import com.example.devopsproj.repository.ProjectRepository;
+import com.example.devopsproj.service.interfaces.JwtService;
+import com.example.devopsproj.service.interfaces.ProjectService;
 import com.example.devopsproj.service.interfaces.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +31,8 @@ import java.util.*;
 public class UserServiceImpl implements IUserService, UserService {
 
     private final UserRepository userRepository;
-    private final ProjectServiceImpl projectServiceImpl;
-    private final JwtServiceImpl jwtServiceImpl;
+    private final ProjectService projectService;
+    private final JwtService jwtService;
     private final ProjectRepository projectRepository;
 
 
@@ -121,7 +123,7 @@ public class UserServiceImpl implements IUserService, UserService {
 
     @Override
     public Integer getCountAllUsersByProjectId(Long projectId) {
-        Optional<Project> project = projectServiceImpl.getProjectById(projectId);
+        Optional<Project> project = projectService.getProjectById(projectId);
         if (project.isPresent()) {
             return userRepository.countAllUsersByProjectId(projectId);
         } else {
@@ -280,7 +282,7 @@ public class UserServiceImpl implements IUserService, UserService {
         userDTO.setEnumRole(user.getEnumRole());
         userDTO.setLastUpdated(user.getLastUpdated());
         //generate token
-        String jwtToken = jwtServiceImpl.generateToken(user);
+        String jwtToken = jwtService.generateToken(user);
         userDTO.setToken(jwtToken);
         return userDTO;
     }

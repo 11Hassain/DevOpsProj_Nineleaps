@@ -3,7 +3,7 @@ package com.example.devopsproj.controller;
 import com.example.devopsproj.dto.responsedto.HelpDocumentsDTO;
 import com.example.devopsproj.exceptions.NotFoundException;
 import com.example.devopsproj.model.HelpDocuments;
-import com.example.devopsproj.service.implementations.HelpDocumentsServiceImpl;
+import com.example.devopsproj.service.interfaces.HelpDocumentsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -29,7 +29,7 @@ class HelpDocumentsControllerTest {
     @InjectMocks
     private HelpDocumentsController helpDocumentsController;
     @Mock
-    private HelpDocumentsServiceImpl helpDocumentsService;
+    private HelpDocumentsService helpDocumentsService;
 
     @BeforeEach
     void setUp() {

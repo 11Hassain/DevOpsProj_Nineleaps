@@ -7,7 +7,7 @@ import com.example.devopsproj.exceptions.NotFoundException;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.model.User;
 import com.example.devopsproj.model.UserNames;
-import com.example.devopsproj.service.implementations.ProjectServiceImpl;
+import com.example.devopsproj.service.interfaces.ProjectService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -30,7 +30,7 @@ class ProjectControllerTest {
     @InjectMocks
     private ProjectController projectController;
     @Mock
-    private ProjectServiceImpl projectService;
+    private ProjectService projectService;
 
     @BeforeEach
     void setUp() {

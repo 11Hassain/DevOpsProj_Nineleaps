@@ -2,8 +2,8 @@ package com.example.devopsproj.controller;
 
 import com.example.devopsproj.dto.responsedto.ProjectDTO;
 import com.example.devopsproj.model.GoogleDrive;
-import com.example.devopsproj.service.implementations.GoogleDriveServiceImpl;
 import com.example.devopsproj.dto.responsedto.GoogleDriveDTO;
+import com.example.devopsproj.service.interfaces.GoogleDriveService;
 import com.example.devopsproj.utils.DTOModelMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -32,7 +32,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class GoogleDriveController {
 
-    private final GoogleDriveServiceImpl googleDriveServiceImpl;
+    private final GoogleDriveService googleDriveService;
 
     @PostMapping("/createGoogleDrive")
     @Operation(
@@ -44,7 +44,7 @@ public class GoogleDriveController {
     )
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> createGoogleDrive(@Valid @RequestBody GoogleDriveDTO googleDriveDTO) {
-            GoogleDrive googleDrive = googleDriveServiceImpl.createGoogleDrive(googleDriveDTO);
+            GoogleDrive googleDrive = googleDriveService.createGoogleDrive(googleDriveDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(new GoogleDriveDTO(
                     DTOModelMapper.mapProjectToProjectDTO(googleDrive.getProject()),
                     googleDrive.getDriveLink(),
@@ -64,7 +64,7 @@ public class GoogleDriveController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getAllGoogleDrives() {
 
-            List<GoogleDrive> googleDrives = googleDriveServiceImpl.getAllGoogleDrives();
+            List<GoogleDrive> googleDrives = googleDriveService.getAllGoogleDrives();
             List<GoogleDriveDTO> googleDriveDTOs = new ArrayList<>();
             for (GoogleDrive googleDrive : googleDrives) {
                 googleDriveDTOs.add(new GoogleDriveDTO(
@@ -89,7 +89,7 @@ public class GoogleDriveController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<GoogleDriveDTO> getGoogleDriveById(@PathVariable Long driveId) {
 
-            Optional<GoogleDriveDTO> optionalGoogleDriveDTO = googleDriveServiceImpl.getGoogleDriveById(driveId);
+            Optional<GoogleDriveDTO> optionalGoogleDriveDTO = googleDriveService.getGoogleDriveById(driveId);
             return optionalGoogleDriveDTO
                     .map(googleDriveDTO -> ResponseEntity.ok().body(googleDriveDTO))
                     .orElse(ResponseEntity.notFound().build());
@@ -108,7 +108,7 @@ public class GoogleDriveController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> deleteGoogleDriveById(@PathVariable Long driveId) {
 
-            boolean deleted = googleDriveServiceImpl.deleteGoogleDriveById(driveId);
+            boolean deleted = googleDriveService.deleteGoogleDriveById(driveId);
             if (deleted) {
                 return ResponseEntity.ok("Google Drive with ID: " + driveId + " deleted successfully.");
             } else {
@@ -129,7 +129,7 @@ public class GoogleDriveController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<GoogleDriveDTO> getGoogleDriveByProjectId(@PathVariable Long projectId) {
 
-            Optional<GoogleDrive> optionalGoogleDrive = googleDriveServiceImpl.getGoogleDriveByProjectId(projectId);
+            Optional<GoogleDrive> optionalGoogleDrive = googleDriveService.getGoogleDriveByProjectId(projectId);
             return optionalGoogleDrive.map(googleDrive -> {
                 GoogleDriveDTO googleDriveDTO = new GoogleDriveDTO(
                         new ProjectDTO(googleDrive.getProject().getProjectId(), googleDrive.getProject().getProjectName()),

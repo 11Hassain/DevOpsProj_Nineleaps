@@ -6,8 +6,8 @@ import com.example.devopsproj.exceptions.ConflictException;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.model.User;
 import com.example.devopsproj.model.UserNames;
-import com.example.devopsproj.service.implementations.ProjectServiceImpl;
 import com.example.devopsproj.exceptions.NotFoundException;
+import com.example.devopsproj.service.interfaces.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
@@ -36,7 +36,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ProjectController {
 
-    private final ProjectServiceImpl projectServiceImpl;
+    private final ProjectService projectService;
     private static final String INTERNAL_SERVER_ERROR = "Something went wrong";
 
 
@@ -51,7 +51,7 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> createProject(@Valid @RequestBody ProjectDTO projectDTO) {
 
-            ProjectDTO createdProjectDTO = projectServiceImpl.createProject(projectDTO);
+            ProjectDTO createdProjectDTO = projectService.createProject(projectDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdProjectDTO);
     }
 
@@ -69,7 +69,7 @@ public class ProjectController {
     public ResponseEntity<Object> getProjectById(@PathVariable("id") Long id) {
 
         try {
-            return projectServiceImpl.getProject(id);
+            return projectService.getProject(id);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -89,7 +89,7 @@ public class ProjectController {
     public ResponseEntity<Object> getAll() {
 
             try {
-                List<Project> projects = projectServiceImpl.getAll();
+                List<Project> projects = projectService.getAll();
                 List<ProjectDTO> projectDTOs = projects.stream()
                         .map(project -> new ProjectDTO(project.getProjectId(), project.getProjectName(),
                                 project.getProjectDescription(), project.getLastUpdated(), project.getDeleted()))
@@ -116,7 +116,7 @@ public class ProjectController {
     public ResponseEntity<Object> getAllProjectsWithUsers() {
 
         try {
-            List<ProjectWithUsersDTO> projectsWithUsers = projectServiceImpl.getAllProjectsWithUsers();
+            List<ProjectWithUsersDTO> projectsWithUsers = projectService.getAllProjectsWithUsers();
             return new ResponseEntity<>(projectsWithUsers, HttpStatus.OK);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -137,7 +137,7 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getAllUsersByProjectId(@PathVariable Long projectId) {
         try {
-            List<UserDTO> userDTOList = projectServiceImpl.getAllUsersByProjectId(projectId);
+            List<UserDTO> userDTOList = projectService.getAllUsersByProjectId(projectId);
             if (userDTOList.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
@@ -168,7 +168,7 @@ public class ProjectController {
 
             try {
                 EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
-                List<User> userList = projectServiceImpl.getAllUsersByProjectIdAndRole(projectId, enumRole);
+                List<User> userList = projectService.getAllUsersByProjectIdAndRole(projectId, enumRole);
                 if (userList.isEmpty()) {
                     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
                 }
@@ -203,13 +203,13 @@ public class ProjectController {
                                                 @Valid @RequestBody ProjectDTO projectDTO) {
 
             try {
-                Optional<Project> optionalProject = projectServiceImpl.getProjectById(projectId);
+                Optional<Project> optionalProject = projectService.getProjectById(projectId);
                 if (optionalProject.isPresent()) {
                     Project existingProject = optionalProject.get();
                     existingProject.setProjectName(projectDTO.getProjectName());
                     existingProject.setProjectDescription(projectDTO.getProjectDescription());
                     existingProject.setLastUpdated(LocalDateTime.now());
-                    Project updatedProject = projectServiceImpl.updateProject(existingProject);
+                    Project updatedProject = projectService.updateProject(existingProject);
                     ProjectDTO updatedProjectDTO = new ProjectDTO(updatedProject.getProjectId(), updatedProject.getProjectName(), updatedProject.getProjectDescription(), updatedProject.getLastUpdated());
                     return new ResponseEntity<>(updatedProjectDTO, HttpStatus.OK);
                 } else {
@@ -234,12 +234,12 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> deleteProject(@PathVariable("id") Long id) {
 
-            if (projectServiceImpl.existsProjectById(id)) {
-                boolean checkIfDeleted = projectServiceImpl.existsByIdIsDeleted(id);
+            if (projectService.existsProjectById(id)) {
+                boolean checkIfDeleted = projectService.existsByIdIsDeleted(id);
                 if (checkIfDeleted) {
                     return ResponseEntity.ok("Project doesn't exist");
                 }
-                boolean isDeleted = projectServiceImpl.softDeleteProject(id);
+                boolean isDeleted = projectService.softDeleteProject(id);
                 if (isDeleted) {
                     return ResponseEntity.ok("Deleted project successfully");
                 } else {
@@ -266,7 +266,7 @@ public class ProjectController {
             @PathVariable("userId") Long userId) {
 
             try {
-                ResponseEntity<Object> response = projectServiceImpl.addUserToProjectByUserIdAndProjectId(projectId, userId);
+                ResponseEntity<Object> response = projectService.addUserToProjectByUserIdAndProjectId(projectId, userId);
                 return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
             } catch (NotFoundException e){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found");
@@ -294,7 +294,7 @@ public class ProjectController {
             @PathVariable("userId") Long userId) {
 
             try {
-                ResponseEntity<String> response = projectServiceImpl.removeUserFromProjectByUserIdAndProjectId(projectId, userId);
+                ResponseEntity<String> response = projectService.removeUserFromProjectByUserIdAndProjectId(projectId, userId);
                 return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
             } catch (NotFoundException e){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found");
@@ -321,7 +321,7 @@ public class ProjectController {
             @Valid @RequestBody CollaboratorDTO collaboratorDTO) {
 
             try {
-                ResponseEntity<String> response = projectServiceImpl.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO);
+                ResponseEntity<String> response = projectService.removeUserFromProjectAndRepo(projectId, userId, collaboratorDTO);
                 if (response.getStatusCode() == HttpStatus.BAD_REQUEST){
                     return ResponseEntity.badRequest().body("Unable to remove user");
                 } else {
@@ -350,7 +350,7 @@ public class ProjectController {
             @PathVariable("projectId") Long projectId,
             @PathVariable("role") String role) {
 
-            List<UserDTO> userDTOList = projectServiceImpl.getUsersByProjectIdAndRole(projectId, role);
+            List<UserDTO> userDTOList = projectService.getUsersByProjectIdAndRole(projectId, role);
             return new ResponseEntity<>(userDTOList, HttpStatus.OK);
 
     }
@@ -371,7 +371,7 @@ public class ProjectController {
             @PathVariable("repoId") Long repoId) {
 
             try {
-                ResponseEntity<Object> result = projectServiceImpl.addRepositoryToProject(projectId, repoId);
+                ResponseEntity<Object> result = projectService.addRepositoryToProject(projectId, repoId);
                 if (result.getStatusCode() == HttpStatus.NOT_FOUND){
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Repository or Project not found");
                 }else {
@@ -395,7 +395,7 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getProjectsWithoutFigmaURL() {
 
-            List<ProjectDTO> projects = projectServiceImpl.getProjectsWithoutFigmaURL();
+            List<ProjectDTO> projects = projectService.getProjectsWithoutFigmaURL();
             return ResponseEntity.ok(projects);
 
     }
@@ -412,7 +412,7 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getProjectsWithoutGoogleDriveLink() {
 
-            List<ProjectDTO> projects = projectServiceImpl.getProjectsWithoutGoogleDriveLink();
+            List<ProjectDTO> projects = projectService.getProjectsWithoutGoogleDriveLink();
             return ResponseEntity.ok(projects);
 
     }
@@ -429,7 +429,7 @@ public class ProjectController {
     )
     public ResponseEntity<Object> countAllPeopleByProjectIdAndName() {
 
-            List<ProjectNamePeopleCountDTO> peopleCountDTOs = projectServiceImpl.getCountAllPeopleAndProjectName();
+            List<ProjectNamePeopleCountDTO> peopleCountDTOs = projectService.getCountAllPeopleAndProjectName();
             if (peopleCountDTOs.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Empty");
             } else {
@@ -450,7 +450,7 @@ public class ProjectController {
     )
     public ResponseEntity<Object> countAllProjects() {
 
-            Integer countProjects = projectServiceImpl.getCountAllProjects();
+            Integer countProjects = projectService.getCountAllProjects();
             if (countProjects == 0) {
                 return ResponseEntity.ok(0);
             } else {
@@ -472,7 +472,7 @@ public class ProjectController {
     public ResponseEntity<Object> countAllProjectsByRole(@PathVariable("role") String role) {
 
             EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
-            Integer countProjects = projectServiceImpl.getCountAllProjectsByRole(enumRole);
+            Integer countProjects = projectService.getCountAllProjectsByRole(enumRole);
             if (countProjects == 0) {
                 return ResponseEntity.ok(0);
             } else {
@@ -493,7 +493,7 @@ public class ProjectController {
     )
     public ResponseEntity<Object> countAllProjectsByUserId(@PathVariable("userId") Long id) {
 
-            Integer countProjects = projectServiceImpl.getCountAllProjectsByUserId(id);
+            Integer countProjects = projectService.getCountAllProjectsByUserId(id);
             if (countProjects == 0) {
                 return ResponseEntity.ok(0);
             } else {
@@ -514,7 +514,7 @@ public class ProjectController {
     )
     public ResponseEntity<Object> countAllUsersByProjectId(@PathVariable Long projectId) {
 
-            Integer countUsers = projectServiceImpl.getCountAllUsersByProjectId(projectId);
+            Integer countUsers = projectService.getCountAllUsersByProjectId(projectId);
             if (countUsers == 0) {
                 return ResponseEntity.ok(0);
             } else {
@@ -538,7 +538,7 @@ public class ProjectController {
             @PathVariable String role) {
 
             EnumRole enumRole = EnumRole.valueOf(role.toUpperCase());
-            Integer countUsers = projectServiceImpl.getCountAllUsersByProjectIdAndRole(projectId, enumRole);
+            Integer countUsers = projectService.getCountAllUsersByProjectIdAndRole(projectId, enumRole);
             if (countUsers == 0) {
                 return ResponseEntity.ok(0);
             } else {
@@ -559,7 +559,7 @@ public class ProjectController {
     )
     public ResponseEntity<Object> countAllActiveProjects() {
 
-            Integer countProjects = projectServiceImpl.getCountAllActiveProjects();
+            Integer countProjects = projectService.getCountAllActiveProjects();
             if (countProjects == 0) {
                 return ResponseEntity.ok(0);
             } else {
@@ -580,7 +580,7 @@ public class ProjectController {
     )
     public ResponseEntity<Object> countAllInActiveProjects() {
 
-            Integer countProjects = projectServiceImpl.getCountAllInActiveProjects();
+            Integer countProjects = projectService.getCountAllInActiveProjects();
             if (countProjects == 0) {
                 return ResponseEntity.ok(0);
             } else {
@@ -601,7 +601,7 @@ public class ProjectController {
     public ResponseEntity<Object> getProjectDetailsById(@PathVariable Long projectId) {
 
             try {
-                ProjectDTO projectDetails = projectServiceImpl.getProjectDetailsById(projectId);
+                ProjectDTO projectDetails = projectService.getProjectDetailsById(projectId);
                 return new ResponseEntity<>(projectDetails, HttpStatus.OK);
             } catch (Exception e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

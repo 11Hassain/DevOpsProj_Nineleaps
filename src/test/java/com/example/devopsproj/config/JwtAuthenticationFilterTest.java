@@ -3,6 +3,7 @@ package com.example.devopsproj.config;
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.repository.TokenRepository;
 import com.example.devopsproj.service.implementations.JwtServiceImpl;
+import com.example.devopsproj.service.interfaces.JwtService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -48,7 +49,7 @@ class JwtAuthenticationFilterTest {
     @Mock
     private FilterChain filterChain;
     @Mock
-    private JwtServiceImpl jwtService;
+    private JwtService jwtService;
     @Mock
     private TokenRepository tokenRepository;
 

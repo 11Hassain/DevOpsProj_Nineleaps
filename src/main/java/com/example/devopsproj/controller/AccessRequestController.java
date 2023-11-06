@@ -1,8 +1,8 @@
 package com.example.devopsproj.controller;
 
-import com.example.devopsproj.service.implementations.AccessRequestServiceImpl;
 import com.example.devopsproj.dto.requestdto.AccessRequestDTO;
 import com.example.devopsproj.dto.responsedto.AccessResponseDTO;
+import com.example.devopsproj.service.interfaces.AccessRequestService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
@@ -19,7 +19,7 @@ import java.util.List;
  * It provides endpoints for creating, updating, and retrieving access requests, as well as managing notifications for
  * project managers (PMs).
  * .
- * This controller integrates with the AccessRequestServiceImpl to perform operations related to access requests and
+ * This controller integrates with the accessRequestService to perform operations related to access requests and
  * uses JWT tokens for user authentication.
  *
  * @version 2.0
@@ -31,7 +31,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AccessRequestController {
 
-    private final AccessRequestServiceImpl accessRequestServiceImpl;
+    private final AccessRequestService accessRequestService;
 
     @PostMapping("/")
     @Operation(
@@ -43,7 +43,7 @@ public class AccessRequestController {
     })
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> createAccessRequest(@Valid @RequestBody AccessRequestDTO accessRequestDTO){
-        AccessRequestDTO accessRequestDTO1 = accessRequestServiceImpl.createRequest(accessRequestDTO);
+        AccessRequestDTO accessRequestDTO1 = accessRequestService.createRequest(accessRequestDTO);
         if (accessRequestDTO1 == null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid RequestDTO");
         }
@@ -61,7 +61,7 @@ public class AccessRequestController {
     )
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getAllActiveRequests(){
-        List<AccessRequestDTO>  accessRequestDTOList= accessRequestServiceImpl.getAllActiveRequests();
+        List<AccessRequestDTO>  accessRequestDTOList= accessRequestService.getAllActiveRequests();
         if (accessRequestDTOList.isEmpty()){
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No requests");
         }
@@ -80,7 +80,7 @@ public class AccessRequestController {
     )
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getAllRequests(){
-        List<AccessRequestDTO>  accessRequestDTOList= accessRequestServiceImpl.getAllRequests();
+        List<AccessRequestDTO>  accessRequestDTOList= accessRequestService.getAllRequests();
         if (accessRequestDTOList.isEmpty()){
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No requests");
         }
@@ -100,7 +100,7 @@ public class AccessRequestController {
     public ResponseEntity<Object> updateAccessRequest(
         @PathVariable("accessRequestId") Long requestId,
         @Valid @RequestBody AccessRequestDTO accessRequestDTO){
-        List<AccessResponseDTO> accessResponseDTOList = accessRequestServiceImpl.getUpdatedRequests(requestId, accessRequestDTO);
+        List<AccessResponseDTO> accessResponseDTOList = accessRequestService.getUpdatedRequests(requestId, accessRequestDTO);
         if (accessResponseDTOList.isEmpty()){
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
@@ -118,7 +118,7 @@ public class AccessRequestController {
     )
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getUnreadPMRequestsNotification(@RequestParam("pmName") String pmName){
-            List<AccessResponseDTO> accessResponseDTOList = accessRequestServiceImpl.getPMUnreadRequests(pmName);
+            List<AccessResponseDTO> accessResponseDTOList = accessRequestService.getPMUnreadRequests(pmName);
             if (accessResponseDTOList.isEmpty()){
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
@@ -137,7 +137,7 @@ public class AccessRequestController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getPMRequestsNotification(@RequestParam("pmName") String pmName){
 
-            List<AccessResponseDTO> accessResponseDTOList = accessRequestServiceImpl.getPMRequests(pmName);
+            List<AccessResponseDTO> accessResponseDTOList = accessRequestService.getPMRequests(pmName);
             if (accessResponseDTOList.isEmpty()){
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
@@ -158,7 +158,7 @@ public class AccessRequestController {
             @RequestParam("accessRequestId") Long accessRequestId
     ){
 
-            accessRequestServiceImpl.setPMRequestsNotificationTrue(accessRequestId);
+            accessRequestService.setPMRequestsNotificationTrue(accessRequestId);
             return ResponseEntity.ok("Notification read");
 
     }
@@ -174,7 +174,7 @@ public class AccessRequestController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> deleteAllNotifications(){
 
-            accessRequestServiceImpl.clearAllNotifications();
+            accessRequestService.clearAllNotifications();
             return ResponseEntity.noContent().build();
 
     }
