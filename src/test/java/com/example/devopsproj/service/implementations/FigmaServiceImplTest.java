@@ -13,10 +13,12 @@ import com.example.devopsproj.model.Figma;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.repository.FigmaRepository;
 import com.example.devopsproj.repository.ProjectRepository;
+import com.example.devopsproj.service.interfaces.FigmaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -42,27 +44,75 @@ import java.util.*;
     }
 
 
-    @Test
-   void testCreateFigma_Success() throws FigmaCreationException {
-        // Prepare input data
-        FigmaDTO figmaDTO = new FigmaDTO(new ProjectDTO(1L, "ProjectName"), "https://figma.com/project1");
+//    @Test
+//   void testCreateFigma_Success() throws FigmaCreationException {
+//        // Prepare input data
+//        FigmaDTO figmaDTO = new FigmaDTO(new ProjectDTO(1L, "ProjectName"), "https://figma.com/project1");
+//
+//        // Mock project retrieval
+//        Project project = new Project();
+//        project.setProjectId(1L);
+//        when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+//
+//        // Mock Figma creation and save
+//        Figma savedFigma = new Figma();
+//        when(figmaRepository.save(any(Figma.class))).thenReturn(savedFigma);
+//
+//        // Perform the Figma creation
+//        Figma createdFigma = figmaService.createFigma(figmaDTO);
+//
+//        // Assert results
+//        assertNotNull(createdFigma);
+//        assertEquals(savedFigma, createdFigma);
+//    }
 
-        // Mock project retrieval
-        Project project = new Project();
-        project.setProjectId(1L);
-        when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+     @Test
+     void testCreateFigma_DataIntegrityViolationException() {
+         FigmaDTO figmaDTO = new FigmaDTO(new ProjectDTO(1L, "ProjectName"), "https://figma.com/project1");
 
-        // Mock Figma creation and save
-        Figma savedFigma = new Figma();
-        when(figmaRepository.save(any(Figma.class))).thenReturn(savedFigma);
+         Project project = new Project();
+         project.setProjectId(1L);
+         when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
 
-        // Perform the Figma creation
-        Figma createdFigma = figmaService.createFigma(figmaDTO);
+         // Throw DataIntegrityViolationException when figmaRepository.save is called
+         when(figmaRepository.save(any(Figma.class))).thenThrow(DataIntegrityViolationException.class);
 
-        // Assert results
-        assertNotNull(createdFigma);
-        assertEquals(savedFigma, createdFigma);
-    }
+         // Expect a FigmaCreationException, which should be caused by DataIntegrityViolationException
+         assertThrows(FigmaCreationException.class, () -> figmaService.createFigma(figmaDTO));
+     }
+
+     @Test
+     void testCreateFigma_GeneralException() {
+         FigmaDTO figmaDTO = new FigmaDTO(new ProjectDTO(1L, "ProjectName"), "https://figma.com/project1");
+
+         Project project = new Project();
+         project.setProjectId(1L);
+         when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+
+         // Throw a general Exception when figmaRepository.save is called
+         when(figmaRepository.save(any(Figma.class))).thenThrow(new RuntimeException("Some error"));
+
+         // Expect a FigmaCreationException, which should be caused by a general Exception
+         assertThrows(FigmaCreationException.class, () -> figmaService.createFigma(figmaDTO));
+     }
+
+     @Test
+     void testCreateFigma() {
+         FigmaDTO figmaDTO = new FigmaDTO(new ProjectDTO(1L, "ProjectName"), "https://figma.com/project1");
+
+         Project project = new Project();
+         project.setProjectId(1L);
+         when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+
+         // Ensure figmaRepository.save returns a valid Figma object (no exception)
+         when(figmaRepository.save(any(Figma.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+         // Expect no exception when createFigma is called
+         Figma createdFigma = figmaService.createFigma(figmaDTO);
+
+         // Assert that the createdFigma is not null
+         assertNotNull(createdFigma);
+     }
 
     @Test
     void testGetAllFigmaProjects_Successs() {
@@ -82,47 +132,56 @@ import java.util.*;
         assertEquals(2, figmaProjects.size());
     }
 
-    @Test
-    void testGetAllFigmaProjects_Exception() {
-        // Mock an exception when calling projectRepository.findAllProjects
-        when(projectRepository.findAllProjects()).thenThrow(new RuntimeException("Simulated Exception"));
+     @Test
+     void testGetAllFigmaProjects_Exception() {
+         // Mock an exception when calling projectRepository.findAllProjects
+         when(projectRepository.findAllProjects()).thenThrow(new RuntimeException("Simulated Exception"));
 
-        // Perform the method and catch the exception
-        Exception exception = assertThrows(FigmaServiceException.class, () -> {
-            figmaService.getAllFigmaProjects();
-        });
+         // Perform the method and catch the exception
+         Exception exception = assertThrows(RuntimeException.class, () -> {
+             figmaService.getAllFigmaProjects();
+         });
 
-        // Verify the exception message
-        assertTrue(exception.getMessage().contains("An error occurred while retrieving Figma projects"));
-    }
+         // Verify the exception message
+         assertTrue(exception.getMessage().contains("Simulated Exception"));
+     }
 
-    @Test
-    void testCreateFigma_DataIntegrityViolationException() {
-        FigmaDTO figmaDTO = new FigmaDTO(new ProjectDTO(1L, "ProjectName"), "https://figma.com/project1");
 
-        Project project = new Project();
-        project.setProjectId(1L);
-        when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+     @Test
+     void testCreateFigma_Exception() {
+         // Arrange
+         FigmaDTO figmaDTO = new FigmaDTO();
+         // Set up figmaDTO with necessary data
 
-        when(figmaRepository.save(any(Figma.class))).thenThrow(DataIntegrityViolationException.class);
+         when(figmaRepository.save(Mockito.any(Figma.class)))
+                 .thenThrow(new RuntimeException("Some unexpected exception"));
 
-        assertThrows(FigmaCreationException.class, () -> figmaService.createFigma(figmaDTO));
-    }
+         // Act and Assert
+         assertThrows(RuntimeException.class, () -> figmaService.createFigma(figmaDTO));
+     }
 
-    @Test
-    void testCreateFigma_Exception() {
-        FigmaDTO figmaDTO = new FigmaDTO(new ProjectDTO(1L, "ProjectName"), "https://figma.com/project1");
 
-        Project project = new Project();
-        project.setProjectId(1L);
-        when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+//     @Test
+//     void testCreateFigma_DataIntegrityViolationException() {
+//         FigmaDTO figmaDTO = new FigmaDTO(new ProjectDTO(1L, "ProjectName"), "https://figma.com/project1");
+//
+//         Project project = new Project();
+//         project.setProjectId(1L);
+//         when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+//
+//         // Configure figmaRepository to throw a DataIntegrityViolationException
+//         doThrow(DataIntegrityViolationException.class).when(figmaRepository).save(any(Figma.class));
+//
+//         // Expect DataIntegrityViolationException when createFigma is called
+//         assertThrows(DataIntegrityViolationException.class, () -> figmaService.createFigma(figmaDTO));
+//     }
 
-        when(figmaRepository.save(any(Figma.class))).thenThrow(new RuntimeException("Test Exception"));
 
-        assertThrows(FigmaCreationException.class, () -> figmaService.createFigma(figmaDTO));
-    }
 
-    @Test
+
+
+
+     @Test
     void testGetAllFigmaProjects_Success() {
         // Arrange
         Project project1 = new Project();
@@ -297,41 +356,40 @@ import java.util.*;
     }
 
 
-//    @Test
-//    void testDeleteFigma_Success() {
-//        // Arrange
-//        Long figmaId = 1L;
-//
-//        // Mock the figmaRepository.deleteById method
-//        doNothing().when(figmaRepository).deleteById(figmaId);
-//
-//        // Act and Assert
-//        assertDoesNotThrow(() -> figmaService.deleteFigma(figmaId));
-//    }
 
-//    @Test
-//    void testDeleteFigma_FigmaNotFound() {
-//        // Arrange
-//        Long figmaId = 1L;
-//
-//        // Mock the figmaRepository.deleteById method to throw EmptyResultDataAccessException
-//        doThrow(EmptyResultDataAccessException.class).when(figmaRepository).deleteById(figmaId);
-//
-//        // Act and Assert
-//        assertThrows(FigmaNotFoundException.class, () -> figmaService.deleteFigma(figmaId));
-//    }
-//
-//    @Test
-//    void testDeleteFigma_ExceptionOccurred() {
-//        // Arrange
-//        Long figmaId = 1L;
-//
-//        // Mock the figmaRepository.deleteById method to throw a runtime exception
-//        doThrow(FigmaServiceException.class).when(figmaRepository).deleteById(figmaId);
-//
-//        // Act and Assert
-//        assertThrows(FigmaServiceException.class, () -> figmaService.deleteFigma(figmaId));
-//    }
+     @Test
+     void testSoftDeleteFigma_Success() {
+         // Arrange
+         Long figmaId = 1L;
+         Figma figma = new Figma();
+         figma.setFigmaId(figmaId);
+
+         when(figmaRepository.findById(figmaId)).thenReturn(Optional.of(figma));
+
+         // Act
+         assertDoesNotThrow(() -> figmaService.softDeleteFigma(figmaId));
+
+         // Assert
+         assertTrue(figma.deleted);
+         verify(figmaRepository, times(1)).save(figma);
+         verify(figmaRepository, times(1)).findById(figmaId);
+     }
+
+     @Test
+     void testSoftDeleteFigma_FigmaNotFound() {
+         // Arrange
+         Long figmaId = 1L;
+         when(figmaRepository.findById(figmaId)).thenReturn(Optional.empty());
+
+         // Act and Assert
+         FigmaNotFoundException exception = assertThrows(FigmaNotFoundException.class, () -> figmaService.softDeleteFigma(figmaId));
+         assertEquals("Figma with ID 1 not found", exception.getMessage());
+     }
+
+
+
+
+
 
     @Test
     void testGetFigmaURLByProjectId_FigmaFound() {

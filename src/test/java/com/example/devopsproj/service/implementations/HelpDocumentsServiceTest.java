@@ -289,50 +289,51 @@ import static org.mockito.Mockito.*;
         assertFalse(result.isPresent());
     }
 
-//    @Test
-//     void testDeleteDocument() {
-//        // Create a sample file ID
-//        Long fileId = 1L;
-//
-//        // Mock behavior for helpDocumentsRepository.findById
-//        when(helpDocumentsRepository.findById(fileId)).thenReturn(Optional.of(new HelpDocuments()));
-//
-//        // Call the deleteDocument method
-//        ResponseEntity<String> response = helpDocumentsService.deleteDocument(fileId);
-//
-//        // Verify that helpDocumentsRepository.findById and helpDocumentsRepository.deleteById were called
-//        verify(helpDocumentsRepository, times(1)).findById(fileId);
-//        verify(helpDocumentsRepository, times(1)).deleteById(fileId);
-//
-//        // Assert the expected ResponseEntity status code (OK)
-//        assertEquals(HttpStatus.OK, response.getStatusCode());
-//
-//        // Assert the expected response message
-//        assertEquals("Document deleted successfully", response.getBody());
-//    }
-//
-//    @Test
-//     void testDeleteDocumentWhenNotExists() {
-//        // Create a sample non-existent file ID
-//        Long fileId = 999L;
-//
-//        // Mock behavior for helpDocumentsRepository.findById
-//        when(helpDocumentsRepository.findById(fileId)).thenReturn(Optional.empty());
-//
-//        // Call the deleteDocument method
-//        ResponseEntity<String> response = helpDocumentsService.deleteDocument(fileId);
-//
-//        // Verify that helpDocumentsRepository.findById was called
-//        verify(helpDocumentsRepository, times(1)).findById(fileId);
-//
-//        // Assert the expected ResponseEntity status code (NOT_FOUND)
-//        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-//
-//        // Assert the expected response message
-//        assertEquals("Document not found", response.getBody());
-//    }
+     @Test
+     void testSoftDeleteDocument() {
+         // Create a sample file ID
+         Long fileId = 1L;
 
-    @Test
+         // Mock behavior for helpDocumentsRepository.findById
+         when(helpDocumentsRepository.findById(fileId)).thenReturn(Optional.of(new HelpDocuments()));
+
+         // Call the softDeleteDocument method
+         ResponseEntity<String> response = helpDocumentsService.softDeleteDocument(fileId);
+
+         // Verify that helpDocumentsRepository.findById and helpDocumentsRepository.save were called
+         verify(helpDocumentsRepository, times(1)).findById(fileId);
+         verify(helpDocumentsRepository, times(1)).save(any(HelpDocuments.class));
+
+         // Assert the expected ResponseEntity status code (OK)
+         assertEquals(HttpStatus.OK, response.getStatusCode());
+
+         // Assert the expected response message
+         assertEquals("Document with ID: " + fileId + " has been soft-deleted successfully.", response.getBody());
+     }
+
+     @Test
+     void testSoftDeleteDocumentWhenNotExists() {
+         // Create a sample non-existent file ID
+         Long fileId = 999L;
+
+         // Mock behavior for helpDocumentsRepository.findById
+         when(helpDocumentsRepository.findById(fileId)).thenReturn(Optional.empty());
+
+         // Call the softDeleteDocument method
+         ResponseEntity<String> response = helpDocumentsService.softDeleteDocument(fileId);
+
+         // Verify that helpDocumentsRepository.findById was called
+         verify(helpDocumentsRepository, times(1)).findById(fileId);
+
+         // Assert the expected ResponseEntity status code (NOT_FOUND)
+         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+
+         // Assert the expected response message
+         assertEquals("Document not found", response.getBody());
+     }
+
+
+     @Test
     void testGetFileExtensionn() {
         // Create a mock MultipartFile
         MultipartFile mockFile = mock(MultipartFile.class);

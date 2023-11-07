@@ -90,7 +90,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         List<ProjectDTO> projectDTOs = projects.stream()
-                .map(project -> mapProjectToProjectDTO(project))
+                .map(this::mapProjectToProjectDTO)
                 .toList(); // Use Stream.toList() to collect into a list
 
         logger.info("Retrieved {} projects", projectDTOs.size());
@@ -213,7 +213,7 @@ public class ProjectServiceImpl implements ProjectService {
             // Return the ProjectDTO directly
             return new ProjectDTO(updatedProject.getProjectId(), updatedProject.getProjectName(), updatedProject.getProjectDescription(), updatedProject.getLastUpdated());
         } else {
-            logger.error("Project with ID {} not found", projectId);
+            logger.error(PROJECT_WITH_ID_NOTFOUND, projectId);
             throw new NotFoundException("Project with ID " + projectId + " not found");
         }
     }
@@ -240,7 +240,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             return ResponseEntity.ok("Deleted project successfully");
         } else {
-            logger.error("Project with ID {} not found", id);
+            logger.error(PROJECT_WITH_ID_NOTFOUND, id);
             throw new NotFoundException("Project with ID " + id + " not found");
         }
     }
@@ -276,10 +276,10 @@ public class ProjectServiceImpl implements ProjectService {
                 return new ResponseEntity<>(projectUserDTO, HttpStatus.OK);
             } else {
                 if (!optionalProject.isPresent()) {
-                    logger.warn("Project with ID {} not found", projectId);
+                    logger.warn(PROJECT_WITH_ID_NOTFOUND, projectId);
                 }
                 if (!optionalUser.isPresent()) {
-                    logger.warn("User with ID {} not found", userId);
+                    logger.warn(USER_WITH_ID_NOTFOUND, userId);
                 }
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -288,8 +288,6 @@ public class ProjectServiceImpl implements ProjectService {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    private static final String UNABLE_TO_REMOVE_USER_MESSAGE = "Unable to remove user";
 
 
     @Override
@@ -314,10 +312,10 @@ public class ProjectServiceImpl implements ProjectService {
                 return ResponseEntity.ok("User removed");
             } else {
                 if (!optionalProject.isPresent()) {
-                    logger.warn("Project with ID {} not found", projectId);
+                    logger.warn(PROJECT_WITH_ID_NOTFOUND, projectId);
                 }
                 if (!optionalUser.isPresent()) {
-                    logger.warn("User with ID {} not found", userId);
+                    logger.warn(USER_WITH_ID_NOTFOUND, userId);
                 }
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project or User not found");
             }
@@ -350,16 +348,16 @@ public class ProjectServiceImpl implements ProjectService {
                 return ResponseEntity.ok("User removed");
             } else {
                 if (!optionalProject.isPresent()) {
-                    logger.warn("Project with ID {} not found", projectId);
+                    logger.warn(USER_WITH_ID_NOTFOUND, projectId);
                 }
                 if (!optionalUser.isPresent()) {
-                    logger.warn("User with ID {} not found", userId);
+                    logger.warn(USER_WITH_ID_NOTFOUND, userId);
                 }
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project or User not found");
             }
         } catch (Exception e) {
             logger.error("Failed to remove user from project and repo", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unable to remove user");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(UNABLE_TO_REMOVE_USER_MESSAGE);
         }
     }
 
@@ -623,5 +621,8 @@ public class ProjectServiceImpl implements ProjectService {
         // Map other properties as needed
         return project;
     }
+    private static final String UNABLE_TO_REMOVE_USER_MESSAGE = "Unable to remove user";
+    private static final String PROJECT_WITH_ID_NOTFOUND ="Project with ID {} not found";
+    private static final String USER_WITH_ID_NOTFOUND ="User with ID {} not found";
 
 }

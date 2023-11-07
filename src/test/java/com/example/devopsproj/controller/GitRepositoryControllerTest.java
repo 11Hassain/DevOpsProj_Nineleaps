@@ -178,27 +178,28 @@ import static org.mockito.Mockito.when;
         assertEquals(repoDescription, responseBody.getDescription());
     }
 
-    @Test
+     @Test
      void testDeleteRepository_Success() {
-        // Prepare mock data
-        Long repoId = 1L; // Repository ID to be used in the controller method
+         // Prepare mock data
+         Long repoId = 1L; // Repository ID to be used in the controller method
 
-        // Mock the service method to do nothing (since it's a void method)
-        doNothing().when(gitRepositoryService).deleteRepository(repoId);
+         // Mock the service method to do nothing (since it's a void method)
+         doNothing().when(gitRepositoryService).deleteRepository(repoId);
 
-        // Call the controller method
-        ResponseEntity<Object> response = gitRepositoryController.deleteRepository(repoId);
+         // Call the controller method
+         ResponseEntity<Object> response = gitRepositoryController.deleteRepository(repoId);
 
-        // Verify that gitRepositoryService.deleteRepository method was called once
-        verify(gitRepositoryService).deleteRepository(repoId);
+         // Verify that gitRepositoryService.deleteRepository method was called once
+         verify(gitRepositoryService).deleteRepository(repoId);
 
-        // Verify the HTTP status code
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+         // Verify the HTTP status code
+         assertEquals(HttpStatus.OK, response.getStatusCode());
 
-        // Verify the response message
-        String responseBody = (String) response.getBody();
-        assertEquals("Deleted successfully", responseBody);
-    }
+         // Verify the response message
+         String responseBody = (String) response.getBody();
+         assertEquals("Soft-deleted successfully", responseBody); // Update the expected message
+     }
 
 
-}
+
+ }

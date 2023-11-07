@@ -1,7 +1,6 @@
 package com.example.devopsproj.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,7 +8,7 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.Map;
 
-@AllArgsConstructor
+
 @NoArgsConstructor
 @Getter
 @Setter
@@ -28,7 +27,7 @@ public class Figma implements Serializable {
     private String user;
 
     @Column(name = "deleted")
-    private Boolean deleted = false;
+    public Boolean deleted = false;
 
 
     @ElementCollection

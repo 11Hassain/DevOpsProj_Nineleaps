@@ -352,6 +352,29 @@ import static org.mockito.Mockito.*;
 //    }
 
     @Test
+    void testClearAllNotifications() {
+       // Arrange
+       List<AccessRequest> accessRequests = new ArrayList<>();
+       AccessRequest accessRequest1 = new AccessRequest();
+       AccessRequest accessRequest2 = new AccessRequest();
+       accessRequests.add(accessRequest1);
+       accessRequests.add(accessRequest2);
+
+       when(accessRequestRepository.findAll()).thenReturn(accessRequests);
+
+       // Act
+       accessRequestService.clearAllNotifications();
+
+       // Assert
+       verify(accessRequestRepository, times(1)).findAll();
+       verify(accessRequestRepository, times(1)).saveAll(accessRequests);
+
+       // Verify that all access requests are marked as deleted
+       for (AccessRequest accessRequest : accessRequests) {
+          assertTrue(accessRequest.isDeleted());
+       }
+    }
+    @Test
      void testGetUpdatedRequests() {
         // Create a sample User object
         User sampleUser = new User();

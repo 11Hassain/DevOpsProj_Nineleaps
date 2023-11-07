@@ -68,13 +68,13 @@ public class GitRepositoryController {
         return ResponseEntity.ok(repositoryDTO);
     }
 
-    // Delete a Git repository by ID.
-    @DeleteMapping("/delete/{repoId}")
-    @ApiOperation("Delete a Git repository by ID")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> deleteRepository(@PathVariable Long repoId) {
-        gitRepositoryService.deleteRepository(repoId);
-        return ResponseEntity.ok(CommonConstants.DELETED_SUCCESSFULLY);
-    }
+        // Delete a Git repository by ID.
+        @DeleteMapping("/delete/{repoId}")
+        @ApiOperation("Delete a Git repository by ID")
+        @ResponseStatus(HttpStatus.OK)
+        public ResponseEntity<Object> deleteRepository(@PathVariable Long repoId) {
+            gitRepositoryService.deleteRepository(repoId);
+            return ResponseEntity.ok(CommonConstants.DELETED_SUCCESSFULLY);
+        }
 
 }

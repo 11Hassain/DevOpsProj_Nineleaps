@@ -152,29 +152,29 @@ import java.util.Optional;
         assertFalse(optionalGoogleDriveDTO.isPresent());
     }
 
-//    @Test
-//     void testDeleteGoogleDriveById_Success() {
-//        // Arrange
-//        Long driveId = 1L;
-//
-//        // Mock the googleDriveRepository.findById method to return a GoogleDrive object
-//        GoogleDrive googleDrive = new GoogleDrive();
-//        when(googleDriveRepository.findById(driveId)).thenReturn(Optional.of(googleDrive));
-//
-//        // Mock the googleDriveRepository.deleteById method to do nothing (you can also use doNothing() for void methods)
-//        doNothing().when(googleDriveRepository).deleteById(driveId);
-//
-//        // Act
-//        ResponseEntity<String> response = googleDriveService.deleteGoogleDriveById(driveId);
-//
-//        // Assert
-//        assertEquals("Google Drive with ID: 1 deleted successfully.", response.getBody());
-//        assertEquals(200, response.getStatusCodeValue());
-//
-//        // Verify that findById and deleteById methods were called
-//        Mockito.verify(googleDriveRepository, times(1)).findById(driveId);
-//        Mockito.verify(googleDriveRepository, times(1)).deleteById(driveId);
-//    }
+
+    @Test
+    void testDeleteGoogleDriveById_Success() {
+       // Arrange
+       Long driveId = 1L;
+
+       // Mock the googleDriveRepository.findById method to return a GoogleDrive object
+       GoogleDrive googleDrive = new GoogleDrive();
+       when(googleDriveRepository.findById(driveId)).thenReturn(Optional.of(googleDrive));
+
+       // Act
+       ResponseEntity<String> response = googleDriveService.deleteGoogleDriveById(driveId);
+
+       // Assert
+       assertEquals("Google Drive with ID: 1 has been soft-deleted successfully.", response.getBody());
+       assertEquals(200, response.getStatusCodeValue());
+
+       // Verify that findById method was called
+       Mockito.verify(googleDriveRepository, times(1)).findById(driveId);
+    }
+
+
+
 
     @Test
      void testDeleteGoogleDriveById_NotFound() {

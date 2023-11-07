@@ -29,6 +29,13 @@ import static org.junit.jupiter.api.Assertions.*;
     }
 
     @Test
+    void testDeletedFieldDefaultValue() {
+       HelpDocuments helpDocuments = new HelpDocuments(); // Create a HelpDocuments instance
+
+       // Verify that the 'deleted' field is initialized with the default value (false)
+       assertFalse(helpDocuments.isDeleted());
+    }
+    @Test
      void testNoArgsConstructor() {
         HelpDocuments helpDocuments = new HelpDocuments();
 
@@ -79,4 +86,5 @@ import static org.junit.jupiter.api.Assertions.*;
 
         assertEquals(project, helpDocumentsWithProject.getProject());
     }
+
 }

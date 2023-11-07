@@ -3,6 +3,7 @@ package com.example.devopsproj.service.implementations;
 import com.example.devopsproj.dto.responsedto.FigmaDTO;
 import com.example.devopsproj.dto.responsedto.FigmaScreenshotDTO;
 import com.example.devopsproj.dto.responsedto.ProjectDTO;
+import com.example.devopsproj.exceptions.FigmaCreationException;
 import com.example.devopsproj.exceptions.FigmaNotFoundException;
 
 
@@ -31,26 +32,20 @@ public class FigmaServiceImpl implements FigmaService {
 
     @Override
     public Figma createFigma(FigmaDTO figmaDTO) {
-        logger.info("Creating a new Figma project");
-
         // Create a new Figma object and populate it with data from the DTO
         Figma figma = new Figma();
         figma.setProject(mapProjectDTOToProject(figmaDTO.getProjectDTO()));
         figma.setFigmaURL(figmaDTO.getFigmaURL());
-
         // Attempt to save the new Figma project
         Figma createdFigma = null;
         try {
             createdFigma = figmaRepository.save(figma);
             logger.info("Created Figma project with ID: {}", createdFigma.getFigmaId());
         } catch (DataIntegrityViolationException e) {
-            // Log with contextual information
-            logger.error("Data integrity violation occurred while creating Figma", e);
+            throw new FigmaCreationException("Figma creation failed due to data integrity violation", e);
         } catch (Exception e) {
-            // Log with contextual information
-            logger.error("An error occurred while creating Figma", e);
+            throw new FigmaCreationException("Figma creation failed due to an error", e);
         }
-
         return createdFigma;
     }
 
@@ -59,7 +54,10 @@ public class FigmaServiceImpl implements FigmaService {
 
 
 
-//     Get all Figma projects
+
+
+
+    //     Get all Figma projects
     @Override
     public List<Figma> getAllFigmaProjects() {
         logger.info("Retrieving all Figma projects");

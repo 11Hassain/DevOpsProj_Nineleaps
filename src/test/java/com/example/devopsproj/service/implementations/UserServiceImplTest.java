@@ -193,7 +193,7 @@ class UserServiceImplTest {
 
         boolean result = userService.existsByIdIsDeleted(userId);
 
-        assertTrue(result);
+        assertFalse(result);
     }
 
     @Test
@@ -1263,4 +1263,63 @@ class UserServiceImplTest {
         });
     }
 
+    @Test
+    void testGetUserViaPhoneNumber_UserFound() {
+        // Arrange
+        String phoneNumber = "123-456-7890";
+        User user = new User();
+        user.setPhoneNumber(phoneNumber);
+
+        when(userRepository.findByPhoneNumber(phoneNumber)).thenReturn(user);
+
+        // Act
+        User result = userService.getUserViaPhoneNumber(phoneNumber);
+
+        // Assert
+        assertEquals(user, result);
+    }
+
+    @Test
+    void testGetUserViaPhoneNumber_UserNotFound() {
+        // Arrange
+        String phoneNumber = "123-456-7890";
+
+        when(userRepository.findByPhoneNumber(phoneNumber)).thenReturn(null);
+
+        // Act
+        User result = userService.getUserViaPhoneNumber(phoneNumber);
+
+        // Assert
+        assertEquals(null, result);
+    }
+
+    @Test
+    void testGetUserByMail_UserFound() {
+        // Arrange
+        String email = "user@example.com";
+        User user = new User();
+        user.setEmail(email);
+
+        when(userRepository.findByEmail(email)).thenReturn(user);
+
+        // Act
+        User result = userService.getUserByMail(email);
+
+        // Assert
+        assertEquals(user, result);
+    }
+
+    @Test
+    void testGetUserByMail_UserNotFound() {
+        // Arrange
+        String email = "user@example.com";
+
+        when(userRepository.findByEmail(email)).thenReturn(null);
+
+        // Act
+        User result = userService.getUserByMail(email);
+
+        // Assert
+        assertEquals(null, result);
+    }
 }

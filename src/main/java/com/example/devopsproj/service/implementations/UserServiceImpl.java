@@ -65,7 +65,7 @@ public class UserServiceImpl implements IUserService, UserService {
 
             return new UserDTO(updatedUser.getName(), updatedUser.getEnumRole(), updatedUser.getLastUpdated());
         } else {
-            logger.warn("User not found with ID: {}", id);
+            logger.warn(USER_NOT_FOUND_WITH_ID, id);
             throw new EntityNotFoundException("User not found" + id);
         }
     }
@@ -77,7 +77,7 @@ public class UserServiceImpl implements IUserService, UserService {
         if (user.isPresent()) {
             logger.info("User found with ID: {}", id);
         } else {
-            logger.warn("User not found with ID: {}", id);
+            logger.warn(USER_NOT_FOUND_WITH_ID, id);
         }
         return user;
     }
@@ -94,7 +94,7 @@ public class UserServiceImpl implements IUserService, UserService {
                 logger.info("User found and not deleted with ID: {}", id);
             }
         } else {
-            logger.info("User not found with ID: {}", id);
+            logger.info(USER_NOT_FOUND_WITH_ID, id);
         }
         return false;
     }
@@ -127,15 +127,19 @@ public class UserServiceImpl implements IUserService, UserService {
     @Override
     public List<User> getUsersByRole(EnumRole enumRole) {
         List<User> users = userRepository.findByRole(enumRole);
-        logger.info("Found {} users with role: {}", users.size(), enumRole);
+        logger.info(FOUND_USERS_WITH_ROLE, users.size(), enumRole);
         return users;
     }
+
+    private static final String FOUND_USERS_WITH_ROLE = "Found {} users with role: {}";
+    private static final String USER_NOT_FOUND_WITH_ID = "User not found with ID: {}";
+
 
 
     @Override
     public List<UserDTO> getUserDTOsByRole(EnumRole role) {
         List<User> users = userRepository.findByEnumRole(role);
-        logger.info("Found {} users with role: {}", users.size(), role);
+        logger.info(FOUND_USERS_WITH_ROLE, users.size(), role);
 
         return users.stream()
                 .map(user -> new UserDTO(
@@ -198,7 +202,7 @@ public class UserServiceImpl implements IUserService, UserService {
     @Override
     public List<UserDTO> getAllUsersWithoutProjects(EnumRole role, Long projectId) {
         List<User> users = userRepository.findAllUsersByRole(role);
-        logger.info("Found {} users with role: {}", users.size(), role);
+        logger.info(FOUND_USERS_WITH_ROLE, users.size(), role);
 
         List<UserDTO> userDTOs = new ArrayList<>();
 
@@ -295,7 +299,7 @@ public class UserServiceImpl implements IUserService, UserService {
         logger.info("Deleting user with ID: {}", userId);
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
-            logger.warn("User not found with ID: {}", userId);
+            logger.warn(USER_NOT_FOUND_WITH_ID, userId);
             return "Invalid user ID";
         }
         User user = userOptional.get();
