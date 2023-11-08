@@ -2,12 +2,15 @@ package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.dto.responsedto.GoogleDriveDTO;
 import com.example.devopsproj.dto.responsedto.ProjectDTO;
+import com.example.devopsproj.exceptions.NotFoundException;
 import com.example.devopsproj.model.GoogleDrive;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.repository.GoogleDriveRepository;
 import com.example.devopsproj.service.interfaces.GoogleDriveService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -45,22 +48,29 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
     }
     // Get a list of all Google Drive entries
     @Override
-    public List<GoogleDriveDTO> getAllGoogleDrives() {
+    public Page<GoogleDriveDTO> getAllGoogleDrives(Pageable pageable) {
         logger.info("Retrieving all Google Drive entries");
 
-        List<GoogleDrive> googleDrives = googleDriveRepository.findAll();
-        List<GoogleDriveDTO> googleDriveDTOs = new ArrayList<>();
-        for (GoogleDrive googleDrive : googleDrives) {
-            googleDriveDTOs.add(new GoogleDriveDTO(
-                    mapProjectToProjectDTO(googleDrive.getProject()),
-                    googleDrive.getDriveLink(),
-                    googleDrive.getDriveId()
-            ));
+        Page<GoogleDrive> googleDrivePage = googleDriveRepository.findAll(pageable);
+
+        if (googleDrivePage.isEmpty()) {
+            logger.warn("No Google Drive entries found");
+            throw new NotFoundException("No Google Drive entries found");
         }
 
-        logger.info("Retrieved {} Google Drive entries", googleDriveDTOs.size());
+        Page<GoogleDriveDTO> googleDriveDTOPage = googleDrivePage.map(this::mapGoogleDriveToGoogleDriveDTO);
 
-        return googleDriveDTOs;
+        logger.info("Retrieved {} Google Drive entries", googleDriveDTOPage.getTotalElements());
+
+        return googleDriveDTOPage;
+    }
+
+    private GoogleDriveDTO mapGoogleDriveToGoogleDriveDTO(GoogleDrive googleDrive) {
+        return new GoogleDriveDTO(
+                mapProjectToProjectDTO(googleDrive.getProject()),
+                googleDrive.getDriveLink(),
+                googleDrive.getDriveId()
+        );
     }
 
     // Get a Google Drive entry by its ID

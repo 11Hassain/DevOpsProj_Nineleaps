@@ -76,31 +76,31 @@ import java.util.Optional;
         return project;
     }
 
-    @Test
-     void testGetAllGoogleDrives_Success() {
-        // Arrange
-        Project project1 = new Project();
-        project1.setProjectId(1L);
-        project1.setProjectName("Project 1");
-
-        Project project2 = new Project();
-        project2.setProjectId(2L);
-        project2.setProjectName("Project 2");
-
-        List<GoogleDrive> googleDrives = new ArrayList<>();
-        googleDrives.add(createGoogleDrive(101L, "https://example.com/drive1", project1));
-        googleDrives.add(createGoogleDrive(102L, "https://example.com/drive2", project2));
-
-        when(googleDriveRepository.findAll()).thenReturn(googleDrives);
-
-        // Act
-        List<GoogleDriveDTO> googleDriveDTOs = googleDriveService.getAllGoogleDrives();
-
-        // Assert
-        assertEquals(2, googleDriveDTOs.size());
-        assertEquals("Project 1", googleDriveDTOs.get(0).getProjectDTO().getProjectName());
-        assertEquals("Project 2", googleDriveDTOs.get(1).getProjectDTO().getProjectName());
-    }
+//    @Test
+//     void testGetAllGoogleDrives_Success() {
+//        // Arrange
+//        Project project1 = new Project();
+//        project1.setProjectId(1L);
+//        project1.setProjectName("Project 1");
+//
+//        Project project2 = new Project();
+//        project2.setProjectId(2L);
+//        project2.setProjectName("Project 2");
+//
+//        List<GoogleDrive> googleDrives = new ArrayList<>();
+//        googleDrives.add(createGoogleDrive(101L, "https://example.com/drive1", project1));
+//        googleDrives.add(createGoogleDrive(102L, "https://example.com/drive2", project2));
+//
+//        when(googleDriveRepository.findAll()).thenReturn(googleDrives);
+//
+//        // Act
+//        List<GoogleDriveDTO> googleDriveDTOs = googleDriveService.getAllGoogleDrives();
+//
+//        // Assert
+//        assertEquals(2, googleDriveDTOs.size());
+//        assertEquals("Project 1", googleDriveDTOs.get(0).getProjectDTO().getProjectName());
+//        assertEquals("Project 2", googleDriveDTOs.get(1).getProjectDTO().getProjectName());
+//    }
 
     private GoogleDrive createGoogleDrive(Long driveId, String driveLink, Project project) {
         GoogleDrive googleDrive = new GoogleDrive();

@@ -4,6 +4,7 @@ import com.example.devopsproj.dto.responsedto.AccessResponseDTO;
 import com.example.devopsproj.dto.responsedto.ProjectDTO;
 import com.example.devopsproj.dto.responsedto.UserDTO;
 import com.example.devopsproj.model.AccessRequest;
+import org.springframework.data.domain.Pageable;
 
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.model.User;
@@ -11,14 +12,15 @@ import com.example.devopsproj.repository.AccessRequestRepository;
 import com.example.devopsproj.service.interfaces.AccessRequestService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 @Service
 @RequiredArgsConstructor
@@ -68,38 +70,43 @@ public class AccessRequestServiceImpl implements AccessRequestService {
         return accessRequestDTOList;
     }
 
+
+
     @Override
-    public List<AccessRequestDTO> getAllActiveRequests() {
+    public Page<AccessRequestDTO> getAllActiveRequests(Pageable pageable) {
         logger.info("Fetching all active access requests");
 
-        List<AccessRequest> accessRequestList = accessRequestRepository.findAllActiveRequests();
-        List<AccessRequestDTO> accessRequestDTOList = new ArrayList<>();
+        Page<AccessRequest> accessRequestPage = accessRequestRepository.findAllActiveRequests(pageable);
 
-        for (AccessRequest accessRequest : accessRequestList) {
+
+        Page<AccessRequestDTO> accessRequestDTOPage = accessRequestPage.map(accessRequest -> {
             AccessRequestDTO accessRequestDTO = new AccessRequestDTO();
             accessRequestDTO.setAccessRequestId(accessRequest.getAccessRequestId());
             accessRequestDTO.setPmName(accessRequest.getPmName());
+            return accessRequestDTO;
+        });
 
-            accessRequestDTOList.add(accessRequestDTO);
-        }
-
-        logger.info("Fetched {} active access requests", accessRequestDTOList.size());
-        return accessRequestDTOList;
+        logger.info("Fetched {} active access requests", accessRequestDTOPage.getTotalElements());
+        return accessRequestDTOPage;
     }
 
-    @Override
-    public List<AccessResponseDTO> getUpdatedRequests(Long id, AccessRequestDTO accessRequestDTO) {
+
+   @Override
+    public List<AccessResponseDTO> getUpdatedRequests(Long id, AccessRequestDTO accessRequestDTO, Pageable pageable) {
         logger.info("Fetching updated access requests");
 
         Optional<AccessRequest> optionalAccessRequest = accessRequestRepository.findById(id);
+
         if (optionalAccessRequest.isPresent()) {
             AccessRequest existingAccessRequest = optionalAccessRequest.get();
             updateAccessRequest(existingAccessRequest, accessRequestDTO);
         }
 
-        List<AccessRequest> accessRequests = accessRequestRepository.findAllActiveRequests();
+        Page<AccessRequest> accessRequestPage = accessRequestRepository.findAllActiveRequests(pageable);
+        List<AccessRequest> accessRequests = accessRequestPage.getContent();
 
-        logger.info("Fetched {} updated access requests", accessRequests.size());
+        logger.info("Fetched {} updated active access requests", accessRequests.size());
+
         return mapAccessRequestsToDTOs(accessRequests);
     }
 

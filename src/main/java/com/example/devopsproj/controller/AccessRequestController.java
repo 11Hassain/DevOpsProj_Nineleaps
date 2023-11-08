@@ -6,6 +6,9 @@ import com.example.devopsproj.dto.responsedto.AccessResponseDTO;
 import com.example.devopsproj.service.interfaces.AccessRequestService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,12 +38,22 @@ public class AccessRequestController {
     @GetMapping("/allActive")
     @ApiOperation("Get all active access requests")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getAllActiveRequests() {
-        List<AccessRequestDTO> accessRequestDTOList = accessRequestService.getAllActiveRequests();
+    public ResponseEntity<Object> getAllActiveRequests(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<AccessRequestDTO> accessRequestDTOPage = accessRequestService.getAllActiveRequests(pageable);
 
-        return ResponseEntity.status(accessRequestDTOList.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK)
-                .body(accessRequestDTOList.isEmpty() ? AccessRequestConstants.NO_REQUESTS : accessRequestDTOList);
+        List<AccessRequestDTO> accessRequestDTOList = accessRequestDTOPage.getContent();
+
+        if (accessRequestDTOList.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(AccessRequestConstants.NO_REQUESTS);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(accessRequestDTOList);
     }
+
     // Get all access requests.
     @GetMapping("/all")
     @ApiOperation("Get all access requests")
@@ -54,15 +67,23 @@ public class AccessRequestController {
     // Update an access request.
     @PutMapping("/update/{accessRequestId}")
     @ApiOperation("Update an access request")
-    @ResponseStatus(HttpStatus.OK) // Replace with the appropriate status code
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> updateAccessRequest(
             @PathVariable("accessRequestId") Long requestId,
-            @RequestBody AccessRequestDTO accessRequestDTO) {
-        List<AccessResponseDTO> accessResponseDTOList = accessRequestService.getUpdatedRequests(requestId, accessRequestDTO);
+            @RequestBody AccessRequestDTO accessRequestDTO,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<AccessResponseDTO> accessResponseDTOList = accessRequestService.getUpdatedRequests(requestId, accessRequestDTO, pageable);
 
-        return ResponseEntity.status(accessResponseDTOList != null && !accessResponseDTOList.isEmpty() ? HttpStatus.OK : HttpStatus.NOT_FOUND)
-                .body(accessResponseDTOList);
+        if (accessResponseDTOList != null && !accessResponseDTOList.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body(accessResponseDTOList);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No access requests found.");
+        }
     }
+
     // Get unread PM requests notification.
     @GetMapping("/unread/PM")
     @ApiOperation("Get unread PM requests notification")
@@ -80,7 +101,7 @@ public class AccessRequestController {
     // Get all PM requests notification.
     @GetMapping("/all/PM")
     @ApiOperation("Get all PM requests notification")
-    @ResponseStatus(HttpStatus.OK) // Replace with the appropriate status code
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getPMRequestsNotification(
             @RequestParam("pmName") String pmName) {
         List<AccessResponseDTO> result = accessRequestService.getPMRequests(pmName);

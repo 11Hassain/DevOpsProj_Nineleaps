@@ -4,6 +4,7 @@ public class CommonConstants {
     public static final String CREATED_SUCCESSFULLY = "Created successfully";
     public static final String DELETED_SUCCESSFULLY = "Soft-deleted successfully";
 
+    public static final String NOT_FOUND = "no entries found";
 
     // Private constructor to hide the implicit public one
     private CommonConstants() {

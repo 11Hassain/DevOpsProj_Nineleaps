@@ -1,6 +1,8 @@
 package com.example.devopsproj.repository;
 
 import com.example.devopsproj.model.AccessRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,8 +13,11 @@ import java.util.List;
 @Repository
 public interface AccessRequestRepository extends JpaRepository<AccessRequest, Long> {
 
-    @Query("SELECT a FROM AccessRequest a WHERE a.updated=false")
-    List<AccessRequest> findAllActiveRequests();
+//    @Query("SELECT a FROM AccessRequest a WHERE a.updated=false")
+//    List<AccessRequest> findAllActiveRequests();
+
+    @Query("SELECT a FROM AccessRequest a WHERE a.updated = false")
+    Page<AccessRequest> findAllActiveRequests(Pageable pageable);
 
     @Query("SELECT a FROM AccessRequest a WHERE a.pmName = :pmName AND " +
             "a.updated = true AND a.pmNotified = false")

@@ -14,6 +14,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -103,56 +106,59 @@ import static org.mockito.Mockito.*;
         // Assert the response body (should be empty)
         assertEquals(null, responseEntity.getBody());
     }
-    @Test
-    void testGetAllProjects() {
-        // Create a list of ProjectDTO objects
-        List<ProjectDTO> projectDTOs = new ArrayList<>();
-        projectDTOs.add(new ProjectDTO(1L, "Project 1", "Description 1", null, false));
-        projectDTOs.add(new ProjectDTO(2L, "Project 2", "Description 2", null, false));
 
-        // Mock the projectService to return the list of projects
-        when(projectService.getAll()).thenReturn(projectDTOs);
+     @Test
+     void testGetAllProjectsWithUsers() {
+         // Create a list of ProjectWithUsersDTO objects
+         List<ProjectWithUsersDTO> projectsWithUsers = new ArrayList<>();
+         projectsWithUsers.add(new ProjectWithUsersDTO(1L, "Project 1", "Description 1", LocalDateTime.now(), new ArrayList<>()));
+         projectsWithUsers.add(new ProjectWithUsersDTO(2L, "Project 2", "Description 2", LocalDateTime.now(), new ArrayList<>()));
 
-        // Call the getAll method
-        ResponseEntity<Object> responseEntity = projectController.getAll();
+         // Create a Page object with the list of ProjectWithUsersDTOs
+         Page<ProjectWithUsersDTO> projectWithUsersPage = new PageImpl<>(projectsWithUsers);
 
-        // Assert the response status code
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+         // Mock the projectService to return the Page object
+         when(projectService.getAllProjectsWithUsers(any(Pageable.class))).thenReturn(projectWithUsersPage);
 
-        // Assert the response body
-        List<ProjectDTO> responseProjects = (List<ProjectDTO>) responseEntity.getBody();
-        assertEquals(projectDTOs.size(), responseProjects.size());
-        for (int i = 0; i < projectDTOs.size(); i++) {
-            assertEquals(projectDTOs.get(i), responseProjects.get(i));
-        }
-    }
+         // Call the getAllProjectsWithUsers method
+         ResponseEntity<Object> responseEntity = projectController.getAllProjectsWithUsers(0, 10);
 
-    @Test
-    void testGetAllProjectsWithUsers() {
-        // Create a list of ProjectWithUsersDTO objects
-        List<ProjectWithUsersDTO> projectsWithUsers = new ArrayList<>();
-        // Using the constructor with projectId, projectName, projectDescription, lastUpdated, and users
-        ProjectWithUsersDTO project1 = new ProjectWithUsersDTO(1L, "Project 1", "Description 1", LocalDateTime.now(), new ArrayList<>());
+         // Assert the response status code
+         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
-        // Using the constructor with projectId, projectName, and projectDescription
-        ProjectWithUsersDTO project2 = new ProjectWithUsersDTO(2L, "Project 2", "Description 2");
+         // Assert the response body
+         List<ProjectWithUsersDTO> responseProjects = (List<ProjectWithUsersDTO>) responseEntity.getBody();
+         assertEquals(projectsWithUsers.size(), responseProjects.size());
+         for (int i = 0; i < projectsWithUsers.size(); i++) {
+             assertEquals(projectsWithUsers.get(i), responseProjects.get(i));
+         }
+     }
+     @Test
+     void testGetAllProjects() {
+         // Create a list of ProjectDTO objects
+         List<ProjectDTO> projectDTOs = new ArrayList<>();
+         projectDTOs.add(new ProjectDTO(1L, "Project 1", "Description 1", null, false));
+         projectDTOs.add(new ProjectDTO(2L, "Project 2", "Description 2", null, false));
 
-        // Mock the projectService to return the list of projects with users
-        when(projectService.getAllProjectsWithUsers()).thenReturn(projectsWithUsers);
+         // Create a Page object with the list of ProjectDTOs
+         Page<ProjectDTO> projectDTOPage = new PageImpl<>(projectDTOs);
 
-        // Call the getAllProjectsWithUsers method
-        ResponseEntity<Object> responseEntity = projectController.getAllProjectsWithUsers();
+         // Mock the projectService to return the Page object
+         when(projectService.getAll(any(Pageable.class))).thenReturn(projectDTOPage);
 
-        // Assert the response status code
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+         // Call the getAll method
+         ResponseEntity<Object> responseEntity = projectController.getAll(0, 10);
 
-        // Assert the response body
-        List<ProjectWithUsersDTO> responseProjects = (List<ProjectWithUsersDTO>) responseEntity.getBody();
-        assertEquals(projectsWithUsers.size(), responseProjects.size());
-        for (int i = 0; i < projectsWithUsers.size(); i++) {
-            assertEquals(projectsWithUsers.get(i), responseProjects.get(i));
-        }
-    }
+         // Assert the response status code
+         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+         // Assert the response body
+         List<ProjectDTO> responseProjects = (List<ProjectDTO>) responseEntity.getBody();
+         assertEquals(projectDTOs.size(), responseProjects.size());
+         for (int i = 0; i < projectDTOs.size(); i++) {
+             assertEquals(projectDTOs.get(i), responseProjects.get(i));
+         }
+     }
 
     @Test
      void testGetAllUsersByProjectId() {

@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -80,53 +82,57 @@ public class ProjectServiceImpl implements ProjectService {
 
     // Get a list of all projects
     @Override
-    public List<ProjectDTO> getAll() {
+    public Page<ProjectDTO> getAll(Pageable pageable) {
         logger.info("Retrieving all projects");
 
-        List<Project> projects = projectRepository.findAll();
-        if (projects.isEmpty()) {
+        Page<Project> projectPage = projectRepository.findAll(pageable);
+
+        if (projectPage.isEmpty()) {
             logger.warn("No projects found");
             throw new NotFoundException("No projects found");
         }
 
-        List<ProjectDTO> projectDTOs = projects.stream()
-                .map(this::mapProjectToProjectDTO)
-                .toList(); // Use Stream.toList() to collect into a list
+        Page<ProjectDTO> projectDTOPage = projectPage.map(this::mapProjectToProjectDTO);
 
-        logger.info("Retrieved {} projects", projectDTOs.size());
+        logger.info("Retrieved {} projects", projectDTOPage.getTotalElements());
 
-        return projectDTOs;
+        return projectDTOPage;
     }
 
     // Get a list of all projects, including inactive ones
     @Override
-    public List<ProjectWithUsersDTO> getAllProjectsWithUsers() {
+    public Page<ProjectWithUsersDTO> getAllProjectsWithUsers(Pageable pageable) {
         logger.info("Retrieving all projects with users");
 
-        List<Project> projects = projectRepository.findAll();
-        List<ProjectWithUsersDTO> projectsWithUsers = new ArrayList<>();
+        Page<Project> projectPage = projectRepository.findAll(pageable);
 
-        for (Project project : projects) {
-            List<User> userList = projectRepository.findAllUsersByProjectId(project.getProjectId());
-            List<UserDTO> userDTOList = userList.stream()
-                    .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
-                    .toList();
-
-            ProjectWithUsersDTO projectWithUsers = new ProjectWithUsersDTO(
-                    project.getProjectId(),
-                    project.getProjectName(),
-                    project.getProjectDescription(),
-                    project.getLastUpdated(),
-                    userDTOList
-            );
-
-            projectsWithUsers.add(projectWithUsers);
+        if (projectPage.isEmpty()) {
+            logger.warn("No projects with users found");
+            throw new NotFoundException("No projects with users found");
         }
 
-        logger.info("Retrieved {} projects with users", projectsWithUsers.size());
+        Page<ProjectWithUsersDTO> projectWithUsersPage = projectPage.map(this::mapProjectToProjectWithUsersDTO);
 
-        return projectsWithUsers;
+        logger.info("Retrieved {} projects with users", projectWithUsersPage.getTotalElements());
+
+        return projectWithUsersPage;
     }
+
+    private ProjectWithUsersDTO mapProjectToProjectWithUsersDTO(Project project) {
+        List<User> userList = projectRepository.findAllUsersByProjectId(project.getProjectId());
+        List<UserDTO> userDTOList = userList.stream()
+                .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
+                .toList();
+
+        return new ProjectWithUsersDTO(
+                project.getProjectId(),
+                project.getProjectName(),
+                project.getProjectDescription(),
+                project.getLastUpdated(),
+                userDTOList
+        );
+    }
+
 
     @Override
     public List<Project> getAllProjects() {

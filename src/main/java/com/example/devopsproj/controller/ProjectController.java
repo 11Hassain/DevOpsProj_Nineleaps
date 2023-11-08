@@ -8,6 +8,9 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,10 +52,18 @@ public class ProjectController {
     @GetMapping("/all")
     @ApiOperation("Get a list of all projects")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getAll() {
-        List<ProjectDTO> projectDTOs = projectService.getAll();
-        return new ResponseEntity<>(projectDTOs, HttpStatus.OK);
+    public ResponseEntity<Object> getAll(@RequestParam(value = "page", defaultValue = "0") int page,
+                                         @RequestParam(value = "size", defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ProjectDTO> projectDTOPage = projectService.getAll(pageable);
+
+        if (projectDTOPage.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No projects found");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(projectDTOPage.getContent());
     }
+
 
 
 
@@ -60,10 +71,18 @@ public class ProjectController {
     @GetMapping("/allProjects")
     @ApiOperation("Get a list of all projects along with associated users")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getAllProjectsWithUsers() {
-        List<ProjectWithUsersDTO> projectsWithUsers = projectService.getAllProjectsWithUsers();
-        return new ResponseEntity<>(projectsWithUsers, HttpStatus.OK);
+    public ResponseEntity<Object> getAllProjectsWithUsers(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                          @RequestParam(value = "size", defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ProjectWithUsersDTO> projectWithUsersPage = projectService.getAllProjectsWithUsers(pageable);
+
+        if (projectWithUsersPage.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No projects with users found");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(projectWithUsersPage.getContent());
     }
+
 
     // Get a list of users in a specific project.
     @GetMapping("/{projectId}/users")

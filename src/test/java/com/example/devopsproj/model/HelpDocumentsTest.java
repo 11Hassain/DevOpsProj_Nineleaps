@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
     @Test
     void testDeletedFieldDefaultValue() {
-       HelpDocuments helpDocuments = new HelpDocuments(); // Create a HelpDocuments instance
+       HelpDocuments helpDocuments = new HelpDocuments();
 
        // Verify that the 'deleted' field is initialized with the default value (false)
        assertFalse(helpDocuments.isDeleted());

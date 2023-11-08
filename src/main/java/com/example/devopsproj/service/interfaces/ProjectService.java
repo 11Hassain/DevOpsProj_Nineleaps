@@ -3,6 +3,8 @@ package com.example.devopsproj.service.interfaces;
 import com.example.devopsproj.commons.enumerations.EnumRole;
 import com.example.devopsproj.dto.responsedto.*;
 import com.example.devopsproj.model.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -15,12 +17,13 @@ public interface ProjectService {
 
     ProjectDTO getProjectById(Long id);
 
-    List<ProjectDTO> getAll();
+    Page<ProjectDTO> getAll(Pageable pageable);
 
 
     List<Project> getAllProjects();
 
-    List<ProjectWithUsersDTO> getAllProjectsWithUsers();
+    Page<ProjectWithUsersDTO> getAllProjectsWithUsers(Pageable pageable);
+
 
 
     Project updateProject(Project updatedProject);

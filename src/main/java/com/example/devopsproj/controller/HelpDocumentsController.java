@@ -54,6 +54,4 @@ public class HelpDocumentsController {
     public ResponseEntity<String> deleteFile(@PathVariable("fileId") Long fileId) {
         return helpDocumentsService.softDeleteDocument(fileId);
     }
-
-
 }

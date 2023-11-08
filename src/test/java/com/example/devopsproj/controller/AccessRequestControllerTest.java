@@ -4,20 +4,44 @@ import com.example.devopsproj.dto.requestdto.AccessRequestDTO;
 import com.example.devopsproj.dto.responsedto.AccessResponseDTO;
 import com.example.devopsproj.service.interfaces.AccessRequestService;
 import com.example.devopsproj.service.interfaces.JwtService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.MockMvc;
+
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static com.mysql.cj.exceptions.MysqlErrorNumbers.get;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
+
 
 class AccessRequestControllerTest {
 
@@ -26,17 +50,23 @@ class AccessRequestControllerTest {
 
     @Mock
     private AccessRequestService accessRequestService;
+    private MockMvc mockMvc;
 
-    @Mock
-    private JwtService jwtService;
+    @Autowired
+    private ObjectMapper objectMapper;
+
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+        mockMvc = standaloneSetup(accessRequestController).build();
     }
 
+
+
+
     @Test
-     void testCreateAccessRequest_Success() {
+    void testCreateAccessRequest_Success() {
         AccessRequestDTO requestDTO = new AccessRequestDTO();
         when(accessRequestService.createRequest(requestDTO)).thenReturn(requestDTO);
 
@@ -47,7 +77,7 @@ class AccessRequestControllerTest {
     }
 
     @Test
-     void testCreateAccessRequest_Failure() {
+    void testCreateAccessRequest_Failure() {
         AccessRequestDTO requestDTO = new AccessRequestDTO();
         when(accessRequestService.createRequest(requestDTO)).thenReturn(null); // Mocking a failure by returning null
 
@@ -57,98 +87,55 @@ class AccessRequestControllerTest {
         assert(response.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @Test
-    void testUpdateAccessRequestWithNonEmptyList() {
-        // Arrange
-        Long requestId = 1L;
-        AccessRequestDTO accessRequestDTO = new AccessRequestDTO();
-        List<AccessResponseDTO> accessResponseDTOList = new ArrayList<>();
-        accessResponseDTOList.add(new AccessResponseDTO());
 
-        when(accessRequestService.getUpdatedRequests(requestId, accessRequestDTO)).thenReturn(accessResponseDTOList);
-
-        // Act
-        ResponseEntity<Object> response = accessRequestController.updateAccessRequest(requestId, accessRequestDTO);
-
-        // Assert
-        verify(accessRequestService, times(1)).getUpdatedRequests(requestId, accessRequestDTO);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(accessResponseDTOList, response.getBody());
-    }
 
     @Test
-    void testUpdateAccessRequestWithNonEmptyListt() {
-        // Arrange
-        Long requestId = 1L;
-        AccessRequestDTO accessRequestDTO = new AccessRequestDTO();
-        List<AccessResponseDTO> accessResponseDTOList = new ArrayList<>();
-        accessResponseDTOList.add(new AccessResponseDTO());
+    void testGetAllActiveRequests_NoRequests() {
+        // Create an empty Page of AccessRequestDTO objects
+        Page<AccessRequestDTO> emptyPage = new PageImpl<>(Collections.emptyList());
 
-        when(accessRequestService.getUpdatedRequests(requestId, accessRequestDTO)).thenReturn(accessResponseDTOList);
+        // Mock the accessRequestService to return the empty Page
+        when(accessRequestService.getAllActiveRequests(any(Pageable.class))).thenReturn(emptyPage);
 
-        // Act
-        ResponseEntity<Object> response = accessRequestController.updateAccessRequest(requestId, accessRequestDTO);
+        // Call the getAllActiveRequests method
+        ResponseEntity<Object> responseEntity = accessRequestController.getAllActiveRequests(0, 10);
 
-        // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-    }
-    @Test
-    void testUpdateAccessRequestWithNonEmptyListll() {
-        // Arrange
-        Long requestId = 1L;
-        AccessRequestDTO accessRequestDTO = new AccessRequestDTO();
-        List<AccessResponseDTO> accessResponseDTOList = new ArrayList<>();
-        accessResponseDTOList.add(new AccessResponseDTO());
+        // Assert the response status code
+        assertEquals(HttpStatus.NO_CONTENT, responseEntity.getStatusCode());
 
-        when(accessRequestService.getUpdatedRequests(requestId, accessRequestDTO)).thenReturn(accessResponseDTOList);
-
-        // Act
-        ResponseEntity<Object> response = accessRequestController.updateAccessRequest(requestId, accessRequestDTO);
-
-        // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-    }
-
-    @Test
-    void testUpdateAccessRequestWithEmptyList() {
-        // Arrange
-        Long requestId = 1L;
-        AccessRequestDTO accessRequestDTO = new AccessRequestDTO();
-        List<AccessResponseDTO> accessResponseDTOList = new ArrayList<>();
-
-        when(accessRequestService.getUpdatedRequests(requestId, accessRequestDTO)).thenReturn(accessResponseDTOList);
-
-        // Act
-        ResponseEntity<Object> response = accessRequestController.updateAccessRequest(requestId, accessRequestDTO);
-
-        // Assert
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-    }
-
-    @Test
-     void testGetAllActiveRequests_NoRequests() {
-        when(accessRequestService.getAllActiveRequests()).thenReturn(Collections.emptyList());
-
-        ResponseEntity<Object> response = accessRequestController.getAllActiveRequests();
-
-        verify(accessRequestService, times(1)).getAllActiveRequests();
-        assert(response.getStatusCode() == HttpStatus.NO_CONTENT);
+        // Assert the response body to be the expected message
+        assertEquals("No requests", responseEntity.getBody());
     }
 
     @Test
     void testGetAllActiveRequests_WithRequests() {
+        // Create a list of AccessRequestDTO objects
         List<AccessRequestDTO> requestDTOList = Collections.singletonList(new AccessRequestDTO());
-        when(accessRequestService.getAllActiveRequests()).thenReturn(requestDTOList);
 
-        ResponseEntity<Object> response = accessRequestController.getAllActiveRequests();
+        // Create a Page object with the list of AccessRequestDTOs
+        Page<AccessRequestDTO> requestPage = new PageImpl<>(requestDTOList);
 
-        verify(accessRequestService, times(1)).getAllActiveRequests();
-        assert(response.getStatusCode() == HttpStatus.OK);
+        // Mock the accessRequestService to return the Page object
+        when(accessRequestService.getAllActiveRequests(any(Pageable.class))).thenReturn(requestPage);
+
+        // Call the getAllActiveRequests method
+        ResponseEntity<Object> responseEntity = accessRequestController.getAllActiveRequests(0, 10);
+
+        // Assert the response status code
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+        // Assert the response body
+        List<AccessRequestDTO> responseRequests = (List<AccessRequestDTO>) responseEntity.getBody();
+        assertEquals(requestDTOList.size(), responseRequests.size());
+        for (int i = 0; i < requestDTOList.size(); i++) {
+            assertEquals(requestDTOList.get(i), responseRequests.get(i));
+        }
     }
 
 
+
     @Test
-     void testGetAllRequests_NoRequests() {
+    void testGetAllRequests_NoRequests() {
         when(accessRequestService.getAllRequests()).thenReturn(Collections.emptyList());
 
         ResponseEntity<Object> response = accessRequestController.getAllRequests();
@@ -159,7 +146,7 @@ class AccessRequestControllerTest {
     }
 
     @Test
-     void testGetAllRequests_WithRequests() {
+    void testGetAllRequests_WithRequests() {
         List<AccessRequestDTO> requestDTOList = Collections.singletonList(new AccessRequestDTO());
         when(accessRequestService.getAllRequests()).thenReturn(requestDTOList);
 
@@ -170,32 +157,48 @@ class AccessRequestControllerTest {
         assert(response.getBody().equals(requestDTOList));
     }
 
+
     @Test
-     void testUpdateAccessRequest_Success() {
+    void testUpdateAccessRequest_Success() {
+        // Create a request ID and AccessRequestDTO
         Long requestId = 1L;
-        AccessRequestDTO requestDTO = new AccessRequestDTO();
-        List<AccessResponseDTO> responseDTOList = Collections.singletonList(new AccessResponseDTO());
+        AccessRequestDTO accessRequestDTO = new AccessRequestDTO();
+        // Create a list of AccessResponseDTO objects
+        List<AccessResponseDTO> accessResponseDTOList = Collections.singletonList(new AccessResponseDTO());
 
-        when(accessRequestService.getUpdatedRequests(requestId, requestDTO)).thenReturn(responseDTOList);
+        // Mock the yourService to return the list of AccessResponseDTO objects
+        when(accessRequestService.getUpdatedRequests(eq(requestId), eq(accessRequestDTO), any(Pageable.class)))
+                .thenReturn(accessResponseDTOList);
 
-        ResponseEntity<Object> response = accessRequestController.updateAccessRequest(requestId, requestDTO);
+        // Call the updateAccessRequest method
+        ResponseEntity<Object> responseEntity = accessRequestController.updateAccessRequest(requestId, accessRequestDTO, 0, 10);
 
-        verify(accessRequestService, times(1)).getUpdatedRequests(requestId, requestDTO);
-        assert(response.getStatusCode() == HttpStatus.OK);
-        assert(response.getBody().equals(responseDTOList));
+        // Assert the response status code
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+        // Assert the response body
+        List<AccessResponseDTO> responseBody = (List<AccessResponseDTO>) responseEntity.getBody();
+        assertEquals(accessResponseDTOList, responseBody);
     }
 
     @Test
-    void testUpdateAccessRequest_NotFound() {
+    void testUpdateAccessRequest_NoRequestsFound() {
+        // Create a request ID and AccessRequestDTO
         Long requestId = 1L;
-        AccessRequestDTO requestDTO = new AccessRequestDTO();
+        AccessRequestDTO accessRequestDTO = new AccessRequestDTO();
 
-        when(accessRequestService.getUpdatedRequests(requestId, requestDTO)).thenReturn(null);
+        // Mock the yourService to return an empty list
+        when(accessRequestService.getUpdatedRequests(eq(requestId), eq(accessRequestDTO), any(Pageable.class)))
+                .thenReturn(Collections.emptyList());
 
-        ResponseEntity<Object> response = accessRequestController.updateAccessRequest(requestId, requestDTO);
+        // Call the updateAccessRequest method
+        ResponseEntity<Object> responseEntity = accessRequestController.updateAccessRequest(requestId, accessRequestDTO, 0, 10);
 
-        verify(accessRequestService, times(1)).getUpdatedRequests(requestId, requestDTO);
-        assert(response.getStatusCode() == HttpStatus.NOT_FOUND);
+        // Assert the response status code
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+
+        // Assert the response body message
+        assertEquals("No access requests found.", responseEntity.getBody());
     }
 
     @Test
@@ -212,7 +215,7 @@ class AccessRequestControllerTest {
     }
 
     @Test
-     void testGetUnreadPMRequestsNotification_WithUnreadRequests() {
+    void testGetUnreadPMRequestsNotification_WithUnreadRequests() {
         String pmName = "John";
         List<AccessResponseDTO> unreadRequests = Collections.singletonList(new AccessResponseDTO());
 
@@ -226,7 +229,7 @@ class AccessRequestControllerTest {
     }
 
     @Test
-     void testGetPMRequestsNotification_WithRequests() {
+    void testGetPMRequestsNotification_WithRequests() {
         String pmName = "John";
         List<AccessResponseDTO> result = Collections.singletonList(new AccessResponseDTO());
 
@@ -240,7 +243,7 @@ class AccessRequestControllerTest {
     }
 
     @Test
-     void testSetPMRequestsNotificationToTrue_Success() {
+    void testSetPMRequestsNotificationToTrue_Success() {
         Long accessRequestId = 1L;
 
         ResponseEntity<String> response = accessRequestController.setPMRequestsNotificationToTrue(accessRequestId);
@@ -249,15 +252,6 @@ class AccessRequestControllerTest {
         assert(response.getStatusCode() == HttpStatus.OK);
         assert(response.getBody().equals("Notification read"));
     }
-
-//    @Test
-//     void testDeleteAllNotifications_Success() {
-//        ResponseEntity<String> response = accessRequestController.deleteAllNotifications();
-//
-//        verify(accessRequestService, times(1)).clearAllNotifications();
-//        assert(response.getStatusCode() == HttpStatus.OK);
-//        assert(response.getBody().equals("All notifications cleared"));
-//    }
 
 }
 

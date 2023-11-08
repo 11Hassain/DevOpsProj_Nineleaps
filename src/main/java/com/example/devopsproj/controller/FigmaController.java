@@ -34,7 +34,7 @@ public class FigmaController {
     // Get all Figma projects.
     @GetMapping("/getAll")
     @ApiOperation("Get all Figma projects")
-    @ResponseStatus(HttpStatus.OK) // Replace with the appropriate status code
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<FigmaDTO>> getAllFigmaProjects() {
         List<FigmaDTO> figmaDTOs = figmaService.getAllFigmaDTOs();
         return ResponseEntity.ok(figmaDTOs);
