@@ -166,21 +166,24 @@ class HelpDocumentsControllerTest {
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
-//    @Test
-//    void testDeleteFile() {
-//        // Arrange
-//        Long fileId = 1L;
-//        ResponseEntity<String> responseEntity = ResponseEntity.ok("File deleted successfully");
-//
-//        when(helpDocumentsService.deleteDocument(fileId)).thenReturn(responseEntity);
-//
-//        // Act
-//        ResponseEntity<String> response = helpDocumentsController.deleteFile(fileId);
-//
-//        // Assert
-//        verify(helpDocumentsService, times(1)).deleteDocument(fileId);
-//        assertEquals(responseEntity, response);
-//    }
+    @Test
+    void testDeleteFile_Success() {
+        Long fileId = 1L;
+        String successMessage = "Document deleted successfully";
+
+        // Mock the helpDocumentsService to return a ResponseEntity with a success message when softDeleteDocument is called
+        ResponseEntity<String> expectedResponseEntity = ResponseEntity.ok(successMessage);
+        when(helpDocumentsService.softDeleteDocument(fileId)).thenReturn(expectedResponseEntity);
+
+        // Call the deleteFile method
+        ResponseEntity<String> responseEntity = helpDocumentsController.deleteFile(fileId);
+
+        // Assert the response status code
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+        // Assert the response body message
+        assertEquals(successMessage, responseEntity.getBody());
+    }
 
 
 }

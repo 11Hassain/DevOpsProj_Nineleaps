@@ -2,15 +2,23 @@ package com.example.devopsproj.service.implementations;
 
 import com.example.devopsproj.dto.requestdto.AccessRequestDTO;
 import com.example.devopsproj.dto.responsedto.AccessResponseDTO;
+import com.example.devopsproj.dto.responsedto.ProjectDTO;
+import com.example.devopsproj.dto.responsedto.UserDTO;
 import com.example.devopsproj.model.AccessRequest;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.model.User;
 import com.example.devopsproj.repository.AccessRequestRepository;
+import com.example.devopsproj.service.interfaces.AccessRequestService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -416,4 +424,131 @@ class AccessRequestServiceTest {
 //      assertEquals(1, result.size());
 //      assertEquals(false, result.get(0).isAllowed());
 //   }
+
+
+   @Test
+   void testGetAllActiveRequests_Success() {
+      Pageable pageable = PageRequest.of(0, 10);
+
+      // Create a list of AccessRequest objects (modify as needed)
+      List<AccessRequest> accessRequests = new ArrayList<>();
+      accessRequests.add(new AccessRequest(/* your data */));
+
+      // Create a Page of AccessRequest objects
+      Page<AccessRequest> accessRequestPage = new PageImpl<>(accessRequests);
+
+      // Mock the accessRequestRepository to return the Page when findAllActiveRequests is called
+      when(accessRequestRepository.findAllActiveRequests(pageable)).thenReturn(accessRequestPage);
+
+      // Call the getAllActiveRequests method
+      Page<AccessRequestDTO> accessRequestDTOPage = accessRequestService.getAllActiveRequests(pageable);
+
+      // Assert that the mapping and retrieval were successful
+      assertEquals(accessRequestPage.getTotalElements(), accessRequestDTOPage.getTotalElements());
+      // Add more assertions for mapping if necessary
+
+      // Verify that the repository method was called with the correct pageable
+      verify(accessRequestRepository).findAllActiveRequests(pageable);
+   }
+
+   @Test
+   void testUpdateAccessRequest_Success() {
+      // Create a sample AccessRequest and AccessRequestDTO
+      AccessRequest accessRequest = new AccessRequest(/* provide your data */);
+      AccessRequestDTO accessRequestDTO = new AccessRequestDTO(/* provide your data */);
+
+      // Mock the behavior of the accessRequestRepository.save method
+      when(accessRequestRepository.save(any(AccessRequest.class))).thenReturn(accessRequest);
+
+      // Call the updateAccessRequest method
+      accessRequestService.updateAccessRequest(accessRequest, accessRequestDTO);
+
+      // Verify that the accessRequestRepository.save method was called with the correct argument
+      verify(accessRequestRepository, times(1)).save((accessRequest));
+
+      // Add assertions to verify the changes in accessRequest
+      assertTrue(accessRequest.isUpdated());
+      assertEquals(accessRequest.isAllowed(), accessRequestDTO.isAllowed());
+   }
+
+
+
+
+
+   @Test
+   void testMapProjectToDTO() {
+      // Create a sample Project object (modify as needed)
+      Project project = new Project();
+      project.setProjectId(1L);
+      project.setProjectName("Sample Project");
+
+      // Call the mapProjectToDTO method
+      ProjectDTO projectDTO = accessRequestService.mapProjectToDTO(project);
+
+      // Assert that the mapping is correct
+      assertEquals(1L, projectDTO.getProjectId());
+      assertEquals("Sample Project", projectDTO.getProjectName());
+
+   }
+
+   @Test
+   void testMapUserToDTO() {
+      // Create a sample User object (modify as needed)
+      User user = new User();
+      user.setId(1L);
+      user.setName("John Doe");
+      user.setEmail("john@example.com");
+
+      // Call the mapUserToDTO method
+      UserDTO userDTO = accessRequestService .mapUserToDTO(user);
+
+      // Assert that the mapping is correct
+      assertEquals(1L, userDTO.getId());
+      assertEquals("John Doe", userDTO.getName());
+      assertEquals("john@example.com", userDTO.getEmail());
+   }
+
+   @Test
+   void testGetUpdatedRequests() {
+      // Create a sample AccessRequest object
+      AccessRequest existingAccessRequest = new AccessRequest();
+      existingAccessRequest.setAccessRequestId(1L);
+      existingAccessRequest.setAllowed(true);
+
+      // Create a sample User for the AccessRequest
+      User user = new User();
+      user.setId(1L);
+      user.setName("Sample User");
+      existingAccessRequest.setUser(user);
+
+      // Create a sample Project for the AccessRequest
+      Project project = new Project();
+      project.setProjectId(1L);
+      project.setProjectName("Sample Project");
+      existingAccessRequest.setProject(project);
+
+      AccessRequestDTO accessRequestDTO = new AccessRequestDTO();
+      accessRequestDTO.setAccessRequestId(1L);
+      accessRequestDTO.setAllowed(false);
+
+      Page<AccessRequest> accessRequestPage = new PageImpl<>(Collections.singletonList(existingAccessRequest));
+      Pageable pageable = PageRequest.of(0, 10);
+
+      // Mock the behavior of AccessRequestRepository.findById
+      when(accessRequestRepository.findById(1L)).thenReturn(Optional.of(existingAccessRequest));
+
+      // Mock the behavior of AccessRequestRepository.findAllActiveRequests
+      when(accessRequestRepository.findAllActiveRequests(pageable)).thenReturn(accessRequestPage);
+
+      // Call the method to be tested
+      List<AccessResponseDTO> result = accessRequestService.getUpdatedRequests(1L, accessRequestDTO, pageable);
+
+      // Verify the result
+      assertNotNull(result);
+      assertEquals(1, result.size());
+      assertFalse(result.get(0).isAllowed());
+      assertEquals(existingAccessRequest.getAccessRequestId(), result.get(0).getAccessRequestId());
+   }
+
+
 }

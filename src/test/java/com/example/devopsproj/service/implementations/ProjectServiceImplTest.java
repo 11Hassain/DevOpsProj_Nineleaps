@@ -9,6 +9,7 @@ import com.example.devopsproj.repository.GitRepositoryRepository;
 import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.repository.UserRepository;
 
+import com.example.devopsproj.service.interfaces.ProjectService;
 import org.hibernate.service.spi.ServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,10 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -157,7 +162,7 @@ import static org.mockito.Mockito.*;
 //    }
 
      @Test
-     void testGetAllProjects_Success() {
+     void testGetAllProjectss_Success() {
          // Arrange
          List<Project> mockProjects = new ArrayList<>();
          Project project1 = new Project(1L, "Project1", "Description1", LocalDateTime.now(), false);
@@ -1821,63 +1826,120 @@ import static org.mockito.Mockito.*;
     }
 
 
-//    @Test
-//    void testGetAllProjectsWithUsers() {
-//        List<Project> projects = new ArrayList<>();
-//        List<User> users = new ArrayList<>();
-//
-//        Project project1 = new Project();
-//        project1.setProjectId(1L);
-//        project1.setProjectName("P1");
-//        project1.setProjectDescription("Description P1");
-//        project1.setLastUpdated(LocalDateTime.now());
-//
-//        Project project2 = new Project();
-//        project2.setProjectId(2L);
-//        project2.setProjectName("P2");
-//        project2.setProjectDescription("Description P2");
-//        project2.setLastUpdated(LocalDateTime.now());
-//
-//        User user1 = new User();
-//        user1.setId(1L);
-//        user1.setName("U1");
-//        user1.setEmail("user1@gmail.com");
-//        user1.setEnumRole(EnumRole.USER);
-//
-//        User user2 = new User();
-//        user2.setId(2L);
-//        user2.setName("U2");
-//        user2.setEmail("user2@gmail.com");
-//        user2.setEnumRole(EnumRole.USER);
-//
-//        projects.add(project1);
-//        projects.add(project2);
-//        users.add(user1);
-//        users.add(user2);
-//
-//        when(projectRepository.findAll()).thenReturn(projects);
-//        when(projectRepository.findAllUsersByProjectId(anyLong())).thenReturn(users);
-//
-//        List<ProjectWithUsersDTO> result = projectService.getAllProjectsWithUsers();
-//
-//        assertNotNull(result);
-//        assertEquals(2, result.size());
-//
-//        ProjectWithUsersDTO projectWithUsers1 = result.get(0);
-//        assertEquals(project1.getProjectId(), projectWithUsers1.getProjectId());
-//        assertEquals(project1.getProjectName(), projectWithUsers1.getProjectName());
-//        assertEquals(project1.getProjectDescription(), projectWithUsers1.getProjectDescription());
-//        assertEquals(project1.getLastUpdated(), projectWithUsers1.getLastUpdated());
-//        assertEquals(2, projectWithUsers1.getUsers().size());
-//
-//        ProjectWithUsersDTO projectWithUsers2 = result.get(1);
-//        assertEquals(project2.getProjectId(), projectWithUsers2.getProjectId());
-//        assertEquals(project2.getProjectName(), projectWithUsers2.getProjectName());
-//        assertEquals(project2.getProjectDescription(), projectWithUsers2.getProjectDescription());
-//        assertEquals(project2.getLastUpdated(), projectWithUsers2.getLastUpdated());
-//        assertEquals(2, projectWithUsers2.getUsers().size());
-//    }
-}
+
+
+
+     @Test
+     void testGetAllProjectsWithUsers_Success() {
+         // Arrange
+         List<Project> projects = new ArrayList<>();
+         List<User> users = new ArrayList<>();
+
+         Project project1 = new Project();
+         project1.setProjectId(1L);
+         project1.setProjectName("P1");
+         project1.setProjectDescription("Description P1");
+         project1.setLastUpdated(LocalDateTime.now());
+
+         Project project2 = new Project();
+         project2.setProjectId(2L);
+         project2.setProjectName("P2");
+         project2.setProjectDescription("Description P2");
+         project2.setLastUpdated(LocalDateTime.now());
+
+         User user1 = new User();
+         user1.setId(1L);
+         user1.setName("U1");
+         user1.setEmail("user1@gmail.com");
+         user1.setEnumRole(EnumRole.USER);
+
+         User user2 = new User();
+         user2.setId(2L);
+         user2.setName("U2");
+         user2.setEmail("user2@gmail.com");
+         user2.setEnumRole(EnumRole.USER);
+
+         projects.add(project1);
+         projects.add(project2);
+         users.add(user1);
+         users.add(user2);
+
+         Page<Project> projectPage = new PageImpl<>(projects, PageRequest.of(0, 10), projects.size());
+
+         when(projectRepository.findAll(any(Pageable.class))).thenReturn(projectPage);
+         when(projectRepository.findAllUsersByProjectId(anyLong())).thenReturn(users);
+
+         // Act
+         Page<ProjectWithUsersDTO> result = projectService.getAllProjectsWithUsers(PageRequest.of(0, 10));
+
+         // Assert
+         assertNotNull(result);
+         assertEquals(2, result.getTotalElements());
+
+         ProjectWithUsersDTO projectWithUsers1 = result.getContent().get(0);
+         assertEquals(project1.getProjectId(), projectWithUsers1.getProjectId());
+         assertEquals(project1.getProjectName(), projectWithUsers1.getProjectName());
+         assertEquals(project1.getProjectDescription(), projectWithUsers1.getProjectDescription());
+         assertEquals(project1.getLastUpdated(), projectWithUsers1.getLastUpdated());
+         assertEquals(2, projectWithUsers1.getUsers().size());
+
+         ProjectWithUsersDTO projectWithUsers2 = result.getContent().get(1);
+         assertEquals(project2.getProjectId(), projectWithUsers2.getProjectId());
+         assertEquals(project2.getProjectName(), projectWithUsers2.getProjectName());
+         assertEquals(project2.getProjectDescription(), projectWithUsers2.getProjectDescription());
+         assertEquals(project2.getLastUpdated(), projectWithUsers2.getLastUpdated());
+         assertEquals(2, projectWithUsers2.getUsers().size());
+     }
+
+     @Test
+     void testGetAllProjectsWithUsers_NoProjectsFound() {
+         // Arrange
+         Page<Project> emptyPage = new PageImpl<>(Collections.emptyList());
+
+         when(projectRepository.findAll(any(Pageable.class))).thenReturn(emptyPage);
+
+         // Act and Assert
+         assertThrows(NotFoundException.class, () -> {
+             projectService.getAllProjectsWithUsers(PageRequest.of(0, 10));
+         });
+     }
+
+
+
+
+     @Test
+     void testGetAll_Success() {
+         // Arrange
+         List<Project> mockProjects = new ArrayList<>();
+         mockProjects.add(new Project(1L, "Project1", "Description1", LocalDateTime.now(), false));
+         mockProjects.add(new Project(2L, "Project2", "Description2", LocalDateTime.now(), false));
+
+         Page<Project> projectPage = new PageImpl<>(mockProjects, PageRequest.of(0, 10), mockProjects.size());
+
+         when(projectRepository.findAll(any(Pageable.class))).thenReturn(projectPage);
+
+         // Act
+         Page<ProjectDTO> projectDTOPage = projectService.getAll(PageRequest.of(0, 10));
+
+         // Assert
+         assertNotNull(projectDTOPage);
+         assertEquals(2, projectDTOPage.getTotalElements()); // Assuming 2 projects are returned
+     }
+
+     @Test
+     void testGetAll_NoProjectsFound() {
+         // Arrange
+         Page<Project> emptyPage = new PageImpl<>(Collections.emptyList());
+
+         when(projectRepository.findAll(any(Pageable.class))).thenReturn(emptyPage);
+
+         // Act and Assert
+         assertThrows(NotFoundException.class, () -> {
+             projectService.getAll(PageRequest.of(0, 10));
+         });
+     }
+
+ }
 
 
 

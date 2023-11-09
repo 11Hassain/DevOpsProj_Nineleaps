@@ -253,6 +253,47 @@ class AccessRequestControllerTest {
         assert(response.getBody().equals("Notification read"));
     }
 
+
+
+    @Test
+    void testDeleteAllNotifications_Success() {
+        // Mock the accessRequestService to do nothing when clearAllNotifications is called
+        doNothing().when(accessRequestService).clearAllNotifications();
+
+        // Call the deleteAllNotifications method
+        ResponseEntity<String> responseEntity = accessRequestController.deleteAllNotifications();
+
+        // Assert the response status code
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+        // Assert the response body message (You may need to modify it based on the actual value in your code)
+        assertEquals("All notifications have been soft-deleted", responseEntity.getBody());
+
+        // Verify that clearAllNotifications was called
+        verify(accessRequestService).clearAllNotifications();
+    }
+
+
+
+    @Test
+    void testUpdateAccessRequest_Successs() {
+        // Create a list of AccessResponseDTO objects
+        List<AccessResponseDTO> responseDTOList = new ArrayList<>();
+        responseDTOList.add(new AccessResponseDTO(/* your data */));
+
+        // Mock the accessRequestService to return the list of AccessResponseDTO when getUpdatedRequests is called
+        when(accessRequestService.getUpdatedRequests(anyLong(), any(AccessRequestDTO.class), any(Pageable.class))).thenReturn(responseDTOList);
+
+        // Call the updateAccessRequest method
+        ResponseEntity<Object> responseEntity = accessRequestController.updateAccessRequest(1L, new AccessRequestDTO(/* your data */), 0, 10);
+
+        // Assert the response status code
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+        // Assert the response body contains the expected data
+        List<AccessResponseDTO> responseBody = (List<AccessResponseDTO>) responseEntity.getBody();
+        assertEquals(responseDTOList, responseBody);
+    }
 }
 
 

@@ -7,28 +7,33 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
- class GoogleDriveControllerTest {
+    class GoogleDriveControllerTest {
 
-    @InjectMocks
-    private GoogleDriveController googleDriveController;
+       @InjectMocks
+       private GoogleDriveController googleDriveController;
 
-    @Mock
-    private GoogleDriveService googleDriveService;
+       @Mock
+       private GoogleDriveService googleDriveService;
 
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
+       @BeforeEach
+       public void setUp() {
+           MockitoAnnotations.openMocks(this);
+       }
 
     @Test
      void testCreateGoogleDrive_Success() {
@@ -164,5 +169,53 @@ import static org.mockito.Mockito.when;
         // Verify the HTTP status code for not found
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
+
+
+
+    @Test
+    void testGetAllGoogleDrives_Success() {
+       // Create a list of GoogleDriveDTO objects
+       List<GoogleDriveDTO> googleDriveDTOList = Collections.singletonList(new GoogleDriveDTO());
+
+       // Create a Page object with the list of GoogleDriveDTOs
+       Page<GoogleDriveDTO> googleDrivePage = new PageImpl<>(googleDriveDTOList);
+
+       // Mock the googleDriveService to return the Page object
+       when(googleDriveService.getAllGoogleDrives(any(Pageable.class)))
+               .thenReturn(googleDrivePage);
+
+       // Call the getAllGoogleDrives method
+       ResponseEntity<Object> responseEntity = googleDriveController.getAllGoogleDrives(0, 10);
+
+       // Assert the response status code
+       assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+       // Assert the response body
+       List<GoogleDriveDTO> responseBody = (List<GoogleDriveDTO>) responseEntity.getBody();
+       assertEquals(googleDriveDTOList, responseBody);
+    }
+
+    @Test
+    void testGetAllGoogleDrives_NoDrivesFound() {
+
+
+       // Create an empty Page of GoogleDriveDTO objects
+       Page<GoogleDriveDTO> emptyPage = new PageImpl<>(Collections.emptyList());
+
+      // Mock the googleDriveService to return the empty Page
+       when(googleDriveService.getAllGoogleDrives(any(Pageable.class)))
+               .thenReturn(emptyPage);
+
+
+       // Call the getAllGoogleDrives method
+       ResponseEntity<Object> responseEntity = googleDriveController.getAllGoogleDrives(0, 10);
+
+       // Assert the response status code
+       assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+
+       // Assert the response body message (You may need to modify it based on the actual value in your code)
+       assertEquals("no entries found", responseEntity.getBody());
+    }
+
 }
 

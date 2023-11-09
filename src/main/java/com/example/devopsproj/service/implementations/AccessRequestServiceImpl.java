@@ -110,7 +110,7 @@ public class AccessRequestServiceImpl implements AccessRequestService {
         return mapAccessRequestsToDTOs(accessRequests);
     }
 
-    private void updateAccessRequest(AccessRequest accessRequest, AccessRequestDTO accessRequestDTO) {
+    void updateAccessRequest(AccessRequest accessRequest, AccessRequestDTO accessRequestDTO) {
         logger.info("Updating access request with ID: {}", accessRequest.getAccessRequestId());
 
         accessRequest.setAllowed(accessRequestDTO.isAllowed());
@@ -120,7 +120,7 @@ public class AccessRequestServiceImpl implements AccessRequestService {
         logger.info("Access request updated successfully");
     }
 
-    private List<AccessResponseDTO> mapAccessRequestsToDTOs(List<AccessRequest> accessRequests) {
+    List<AccessResponseDTO> mapAccessRequestsToDTOs(List<AccessRequest> accessRequests) {
         logger.info("Mapping access requests to DTOs");
         List<AccessResponseDTO> accessResponseDTOList = new ArrayList<>();
 
@@ -133,7 +133,7 @@ public class AccessRequestServiceImpl implements AccessRequestService {
         return accessResponseDTOList;
     }
 
-    private AccessResponseDTO mapAccessRequestToDTO(AccessRequest accessRequest) {
+    AccessResponseDTO mapAccessRequestToDTO(AccessRequest accessRequest) {
         logger.info("Mapping access request to DTO: AccessRequestId={}", accessRequest.getAccessRequestId());
 
         AccessResponseDTO accessResponseDTO = new AccessResponseDTO();
@@ -152,7 +152,7 @@ public class AccessRequestServiceImpl implements AccessRequestService {
         return accessResponseDTO;
     }
 
-    private ProjectDTO mapProjectToDTO(Project project) {
+    ProjectDTO mapProjectToDTO(Project project) {
         logger.info("Mapping project to DTO: ProjectId={}", project.getProjectId());
 
         ProjectDTO projectDTO = new ProjectDTO();
@@ -163,7 +163,7 @@ public class AccessRequestServiceImpl implements AccessRequestService {
         return projectDTO;
     }
 
-    private UserDTO mapUserToDTO(User user) {
+    UserDTO mapUserToDTO(User user) {
         logger.info("Mapping user to DTO: UserId={}", user.getId());
 
         UserDTO userDTO = new UserDTO();

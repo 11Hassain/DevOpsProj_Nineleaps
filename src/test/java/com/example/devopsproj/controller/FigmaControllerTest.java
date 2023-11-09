@@ -261,6 +261,24 @@ class FigmaControllerTest {
     }
 
 
+    @Test
+    void testDeleteFigma_Success() {
+        // Mock the figmaService to do nothing when softDeleteFigma is called
+        doNothing().when(figmaService).softDeleteFigma(anyLong());
+
+        // Call the deleteFigma method
+        ResponseEntity<String> responseEntity = figmaController.deleteFigma(1L);
+
+        // Assert the response status code
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+        // Assert the response body message (You may need to modify it based on the actual value in your code)
+        assertEquals("Soft-deleted successfully", responseEntity.getBody());
+
+        // Verify that softDeleteFigma was called with the correct figmaId
+        verify(figmaService).softDeleteFigma(1L);
+    }
+
 
 }
 

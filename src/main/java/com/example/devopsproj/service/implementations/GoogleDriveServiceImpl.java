@@ -65,7 +65,7 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
         return googleDriveDTOPage;
     }
 
-    private GoogleDriveDTO mapGoogleDriveToGoogleDriveDTO(GoogleDrive googleDrive) {
+    GoogleDriveDTO mapGoogleDriveToGoogleDriveDTO(GoogleDrive googleDrive) {
         return new GoogleDriveDTO(
                 mapProjectToProjectDTO(googleDrive.getProject()),
                 googleDrive.getDriveLink(),

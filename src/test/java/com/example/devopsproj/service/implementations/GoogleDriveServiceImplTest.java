@@ -1,12 +1,12 @@
 package com.example.devopsproj.service.implementations;
 
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 
 import com.example.devopsproj.dto.responsedto.GoogleDriveDTO;
 import com.example.devopsproj.dto.responsedto.ProjectDTO;
+import com.example.devopsproj.exceptions.NotFoundException;
 import com.example.devopsproj.model.GoogleDrive;
 import com.example.devopsproj.model.Project;
 import com.example.devopsproj.repository.GoogleDriveRepository;
@@ -17,13 +17,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -308,4 +312,68 @@ import java.util.Optional;
         assertEquals(driveId, googleDriveDTO.getDriveId());
     }
 
-}
+
+
+
+
+    @Test
+    void testGetAllGoogleDrives() {
+       // Create a sample GoogleDrive object
+       GoogleDrive googleDrive = new GoogleDrive();
+       googleDrive.setDriveLink("https://example.com/drive");
+       Long driveId = 12345L; // Use Long.valueOf to create a Long
+       googleDrive.setDriveId(driveId);
+       googleDrive.setProject(new Project()); // You may need to set a project here
+
+       // Create a sample Page of GoogleDrive
+       Page<GoogleDrive> googleDrivePage = new PageImpl<>(Collections.singletonList(googleDrive));
+
+       // Mock the googleDriveRepository to return the sample Page when findAll is called
+       when(googleDriveRepository.findAll(any(Pageable.class))).thenReturn(googleDrivePage);
+
+       // Call the getAllGoogleDrives method
+       Page<GoogleDriveDTO> result = googleDriveService.getAllGoogleDrives(PageRequest.of(0, 10));
+
+       // Verify that the result is not empty
+       assertFalse(result.isEmpty());
+
+       // Verify that the mapping was done correctly
+       GoogleDriveDTO googleDriveDTO = result.getContent().get(0);
+       assertEquals("https://example.com/drive", googleDriveDTO.getDriveLink());
+       assertEquals(driveId, googleDriveDTO.getDriveId()); // Compare with the Long value
+       // Add more assertions if needed for other properties.
+    }
+
+
+    @Test
+    void testGetAllGoogleDrives_NoEntriesFound() {
+       // Create an empty Page of GoogleDrive
+       Page<GoogleDrive> emptyPage = new PageImpl<>(Collections.emptyList());
+
+       // Mock the googleDriveRepository to return the empty Page when findAll is called
+       when(googleDriveRepository.findAll(any(Pageable.class))).thenReturn(emptyPage);
+
+       // Call the getAllGoogleDrives method and expect a NotFoundException
+       assertThrows(NotFoundException.class, () -> googleDriveService.getAllGoogleDrives(PageRequest.of(0, 10)));
+    }
+
+    @Test
+    void testMapGoogleDriveToGoogleDriveDTO() {
+       // Create a sample GoogleDrive object
+       GoogleDrive googleDrive = new GoogleDrive();
+       googleDrive.setDriveLink("https://example.com/drive");
+       Long driveId = 12345L; // Use Long.valueOf to create a Long
+       googleDrive.setDriveId(driveId);
+       googleDrive.setProject(new Project()); // You may need to set a project here
+
+       // Call the mapGoogleDriveToGoogleDriveDTO method
+       GoogleDriveDTO googleDriveDTO = googleDriveService.mapGoogleDriveToGoogleDriveDTO(googleDrive);
+
+       // Verify that the mapping is correct
+       assertEquals("https://example.com/drive", googleDriveDTO.getDriveLink());
+       assertEquals(driveId, googleDriveDTO.getDriveId()); // Compare with the Long value
+    }
+
+
+
+ }

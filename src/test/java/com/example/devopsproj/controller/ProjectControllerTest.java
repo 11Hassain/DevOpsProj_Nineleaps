@@ -1,53 +1,47 @@
 package com.example.devopsproj.controller;
-
-import aj.org.objectweb.asm.TypeReference;
 import com.example.devopsproj.commons.enumerations.EnumRole;
-import com.example.devopsproj.controller.ProjectController;
+
 import com.example.devopsproj.dto.responsedto.*;
-import com.example.devopsproj.model.Project;
+
 import com.example.devopsproj.service.interfaces.ProjectService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
+
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import org.springframework.http.ResponseEntity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
- class ProjectControllerTest {
+     class ProjectControllerTest {
 
-    @InjectMocks
-    private ProjectController projectController;
+        @InjectMocks
+        private ProjectController projectController;
 
-    @Mock
-    private ProjectService projectService;
+        @Mock
+        private ProjectService projectService;
 
-    private ObjectMapper objectMapper;
+        private ObjectMapper objectMapper;
 
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-        objectMapper = new ObjectMapper();
-    }
+        @BeforeEach
+        public void setUp() {
+            MockitoAnnotations.openMocks(this);
+            objectMapper = new ObjectMapper();
+        }
 
     @Test
     void testCreateProjectWithValidInput() throws Exception {
@@ -598,4 +592,44 @@ import static org.mockito.Mockito.*;
         // Assert the response status code (should be 404 NOT_FOUND)
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
     }
-}
+
+
+
+
+         @Test
+         void testGetAllProjectsWithUsers_NoProjectsFound() {
+             // Create an empty Page of ProjectWithUsersDTO objects
+             Page<ProjectWithUsersDTO> emptyPage = new PageImpl<>(Collections.emptyList());
+
+             // Mock the yourService to return the empty Page when getAllProjectsWithUsers is called with any Pageable
+             when(projectService.getAllProjectsWithUsers(any(Pageable.class))).thenReturn(emptyPage);
+
+             // Call the getAllProjectsWithUsers method
+             ResponseEntity<Object> responseEntity = projectController.getAllProjectsWithUsers(0, 10);
+
+             // Assert the response status code
+             assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+
+             // Assert the response body message
+             assertEquals("No projects with users found", responseEntity.getBody());
+         }
+
+         @Test
+         void testGetAllProjects_NoProjectsFound() {
+             // Create an empty Page of ProjectDTO objects
+             Page<ProjectDTO> emptyPage = new PageImpl<>(Collections.emptyList());
+
+             // Mock the projectService to return the empty Page when getAll is called with any Pageable
+             when(projectService.getAll(any(Pageable.class))).thenReturn(emptyPage);
+
+             // Call the getAll method
+             ResponseEntity<Object> responseEntity = projectController.getAll(0, 10);
+
+             // Assert the response status code
+             assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+
+             // Assert the response body message
+             assertEquals("No projects found", responseEntity.getBody());
+         }
+
+     }
