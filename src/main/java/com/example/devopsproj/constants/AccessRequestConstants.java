@@ -1,5 +1,9 @@
     package com.example.devopsproj.constants;
 
+    /**
+     * This class contains constants related to access request operations.
+     * It provides messages and codes for request status and notifications.
+     */
     public class AccessRequestConstants {
         public static final String REQUEST_SUCCESS = "Request made successfully";
         public static final String REQUEST_FAILURE = "Failed to create request";

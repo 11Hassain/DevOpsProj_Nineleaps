@@ -15,8 +15,13 @@ public class AuthController {
 
     private final UserService userService;
 
-    // Get email from a custom "emailToVerify" header.
-    @GetMapping("/get-email")
+
+    /**
+     * Get email from a custom "emailToVerify" header.
+     *
+     * @param emailToVerify The email to verify from the "emailToVerify" header.
+     * @return ResponseEntity with the result of email verification or not found status.
+     */    @GetMapping("/get-email")
     @ApiOperation("Get email from token")
     @ResponseStatus(HttpStatus.OK) // Replace with the appropriate status code
     public ResponseEntity<Object> getEmailFromToken(@RequestHeader("emailToVerify") String emailToVerify) {

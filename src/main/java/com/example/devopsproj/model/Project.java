@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Entity representing a project in the database.
+ */
 @NoArgsConstructor
 @Getter
 @Setter
@@ -36,11 +39,19 @@ public class Project implements Serializable {
     private List<AccessRequest> accessRequest;
 
     @Column(name = "is_deleted")
-    private Boolean deleted=false;
+    private Boolean deleted = false;
 
     @Column(nullable = false)
     @UpdateTimestamp
-    private LocalDateTime lastUpdated=LocalDateTime.now();
+    private LocalDateTime lastUpdated = LocalDateTime.now();
+
+    public Project(String projectName, String projectDescription) {
+        this.projectName = projectName;
+        this.projectDescription = projectDescription;
+        // Initialize other properties as needed
+    }
+
+
 
     //connecting project with user entity (project is owning side)
     @JsonIgnore

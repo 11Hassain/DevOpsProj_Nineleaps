@@ -12,6 +12,9 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 
+/**
+ * Data Transfer Object (DTO) representing a user.
+ */
 @NoArgsConstructor
 @Getter
 @Setter
@@ -21,9 +24,9 @@ public class UserDTO {
     @NotNull(message = "id cannot be null")
     private Long id;
 
-    @Size(max = 50, message = "projectName should not exceed 50 characters")
+    @Size(max = 50, message = "name should not exceed 50 characters")
     @NotNull(message = "name cannot be null")
-    @NotBlank(message = "name cannot be black")
+    @NotBlank(message = "name cannot be blank")
     private String name;
 
     @NotNull(message = "email cannot be null")
@@ -41,6 +44,8 @@ public class UserDTO {
 
     @NotNull(message = "lastLogout cannot be null")
     private LocalDateTime lastLogout;
+
+
 
     public UserDTO(Long id, String name, String email, EnumRole enumRole) {
         this.id = id;

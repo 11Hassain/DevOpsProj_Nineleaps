@@ -9,7 +9,9 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Entity representing user names in the database.
+ */
 @NoArgsConstructor
 @Getter
 @Setter

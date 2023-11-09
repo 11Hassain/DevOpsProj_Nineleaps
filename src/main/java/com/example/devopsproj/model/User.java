@@ -12,7 +12,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
+/**
+ * Entity representing a user in the database.
+ */
 @Getter
 @Setter
 @Builder

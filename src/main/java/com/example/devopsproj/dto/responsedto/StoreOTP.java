@@ -1,5 +1,7 @@
 package com.example.devopsproj.dto.responsedto;
-
+/**
+ * A utility class for storing and managing OTP (One-Time Password).
+ */
 public class StoreOTP {
 
     private static int otp;

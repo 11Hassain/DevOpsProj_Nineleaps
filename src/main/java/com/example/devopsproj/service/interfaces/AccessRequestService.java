@@ -12,18 +12,11 @@ import java.util.List;
 
 public interface AccessRequestService {
 
-    // Create a new access request
     AccessRequestDTO createRequest(AccessRequestDTO accessRequestDTO);
 
     List<AccessRequestDTO> getAllRequests();
 
-//    List<AccessRequestDTO> getAllActiveRequests();
-
-//    Page<AccessRequestDTO> getAllActiveRequests(int pageNumber, int pageSize);
-
     Page<AccessRequestDTO> getAllActiveRequests(Pageable pageable);
-
-//    List<AccessResponseDTO> getUpdatedRequests(Long id, AccessRequestDTO accessRequestDTO);
 
     List<AccessResponseDTO> getUpdatedRequests(Long id, AccessRequestDTO accessRequestDTO, Pageable pageable);
 

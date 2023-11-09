@@ -7,6 +7,9 @@ import lombok.*;
 import java.io.Serializable;
 
 
+/**
+ * Entity representing an access request.
+ */
 @NoArgsConstructor
 @Getter
 @Setter
@@ -30,7 +33,6 @@ public class AccessRequest implements Serializable {
     @JoinColumn(name = "project_id")
     private Project project;
 
-
     @Column(name = "deleted")
     private boolean deleted = false;
 
@@ -42,6 +44,5 @@ public class AccessRequest implements Serializable {
     private boolean updated = false;
 
     private boolean pmNotified = false;
-
-
 }
+

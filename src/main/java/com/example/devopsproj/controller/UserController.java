@@ -8,6 +8,7 @@ import com.example.devopsproj.model.User;
 
 import com.example.devopsproj.service.implementations.UserServiceImpl;
 
+import com.example.devopsproj.service.interfaces.UserService;
 import io.swagger.annotations.ApiOperation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,17 +19,25 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-
+/**
+ * Controller for managing user-related operations, including user creation, retrieval, and updates.
+ */
 @RestController
 @RequestMapping("/api/v1/users")
 @Validated
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserServiceImpl userServiceImpl;
+    private final UserService userServiceImpl;
 
 
-    // Save a user.
+
+    /**
+     * Save a user.
+     *
+     * @param userCreationDTO The user details to be saved.
+     * @return ResponseEntity indicating the result of the user creation operation.
+     */
     @PostMapping("/")
     @ApiOperation("Save a user")
     @ResponseStatus(HttpStatus.CREATED)
@@ -37,7 +46,12 @@ public class UserController {
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
-    // Find a user by user ID.
+    /**
+     * Find a user by user ID.
+     *
+     * @param userId The ID of the user to be retrieved.
+     * @return ResponseEntity containing the retrieved user's details or a "Not Found" response.
+     */
     @GetMapping("/{user_id}")
     @ApiOperation("Find a user by user ID")
     @ResponseStatus(HttpStatus.OK)
@@ -52,7 +66,13 @@ public class UserController {
         }
     }
 
-    // Get projects by user ID and role.
+    /**
+     * Get projects by user ID and role.
+     *
+     * @param userId The ID of the user.
+     * @param role   The role of the user.
+     * @return ResponseEntity containing a list of projects associated with the specified user and role.
+     */
     @GetMapping("/{id}/role/{role}/projects")
     @ApiOperation("Get projects by user ID and role")
     @ResponseStatus(HttpStatus.OK)
@@ -66,7 +86,13 @@ public class UserController {
         return new ResponseEntity<>(projectDTOList, HttpStatus.OK);
     }
 
-    // Update a user by ID.
+    /**
+     * Update a user by ID.
+     *
+     * @param id     The ID of the user to be updated.
+     * @param userDTO The updated user details.
+     * @return ResponseEntity containing the updated user details or an "OK" response.
+     */
     @PutMapping("/update/{id}")
     @ApiOperation("Update user by ID")
     @ResponseStatus(HttpStatus.OK)
@@ -75,7 +101,12 @@ public class UserController {
         return new ResponseEntity<>(updatedUserDTO, HttpStatus.OK);
     }
 
-    // Soft-delete a user.
+    /**
+     * Soft-delete a user by user ID.
+     *
+     * @param userId The ID of the user to be soft-deleted.
+     * @return ResponseEntity indicating the result of the user deletion operation.
+     */
     @DeleteMapping("/delete/{user_id}")
     @ApiOperation("Soft-delete user")
     @ResponseStatus(HttpStatus.OK)
@@ -84,7 +115,12 @@ public class UserController {
         return ResponseEntity.ok(deletionResult);
     }
 
-    // Get users by role.
+    /**
+     * Get users by role.
+     *
+     * @param role The role of the users to be retrieved.
+     * @return ResponseEntity containing a list of users with the specified role.
+     */
     @GetMapping("/role/{role}")
     @ApiOperation("Get users by role")
     @ResponseStatus(HttpStatus.OK)
@@ -94,7 +130,11 @@ public class UserController {
         return new ResponseEntity<>(userDTOList, HttpStatus.OK);
     }
 
-    // Get the count of all users.
+    /**
+     * Get the count of all users.
+     *
+     * @return ResponseEntity containing the count of all users.
+     */
     @GetMapping("/count")
     @ApiOperation("Get count of all users")
     @ResponseStatus(HttpStatus.OK)
@@ -109,7 +149,12 @@ public class UserController {
 
 
 
-    // Get the count of users by role.
+    /**
+     * Get the count of users by role.
+     *
+     * @param role The role of the users to be counted.
+     * @return ResponseEntity containing the count of users with the specified role.
+     */
     @GetMapping("/count/{role}")
     @ApiOperation("Get count of users by role")
     @ResponseStatus(HttpStatus.OK)
@@ -123,7 +168,13 @@ public class UserController {
         }
     }
 
-    // Get the count of users by project ID.
+
+    /**
+     * Get the count of users by project ID.
+     *
+     * @param projectId The ID of the project for which users are to be counted.
+     * @return ResponseEntity containing the count of users associated with the specified project.
+     */
     @GetMapping("/count/project/{projectId}")
     @ApiOperation("Get count of users by project ID")
     @ResponseStatus(HttpStatus.OK)
@@ -136,7 +187,12 @@ public class UserController {
         }
     }
 
-    // Get all projects and repositories by user ID.
+    /**
+     * Get all projects and repositories by user ID.
+     *
+     * @param id The ID of the user for which projects and repositories are to be retrieved.
+     * @return ResponseEntity containing a list of projects and repositories associated with the specified user.
+     */
     @GetMapping("/{id}/projects")
     @ApiOperation("Get all projects and repositories by user ID")
     @ResponseStatus(HttpStatus.OK)
@@ -145,7 +201,11 @@ public class UserController {
         return ResponseEntity.ok(projects);
     }
 
-    // Get all users.
+    /**
+     * Get all users.
+     *
+     * @return ResponseEntity containing a list of all users.
+     */
     @GetMapping("/get")
     @ApiOperation("Get all users")
     @ResponseStatus(HttpStatus.OK)
@@ -153,7 +213,12 @@ public class UserController {
         return ResponseEntity.ok(userServiceImpl.getAllUsers());
     }
 
-    // Get all users with their associated projects.
+
+    /**
+     * Get all users with their associated projects.
+     *
+     * @return ResponseEntity containing a list of users with their associated projects.
+     */
     @GetMapping("/getAll")
     @ApiOperation("Get all users with projects")
     @ResponseStatus(HttpStatus.OK)
@@ -163,7 +228,11 @@ public class UserController {
     }
 
 
-    // Get users with multiple projects.
+    /**
+     * Get users with multiple projects.
+     *
+     * @return ResponseEntity containing a list of users with multiple projects.
+     */
     @GetMapping("/getMultiple")
     @ApiOperation("Get users with multiple projects")
     @ResponseStatus(HttpStatus.OK)
@@ -172,7 +241,13 @@ public class UserController {
         return ResponseEntity.ok(usersWithMultipleProjects);
     }
 
-    // Get users without a specific project by role and project ID.
+    /**
+     * Get users without a specific project by role and project ID.
+     *
+     * @param role     The role of the users to be retrieved.
+     * @param projectId The ID of the project to exclude users from.
+     * @return ResponseEntity containing a list of users with the specified role without the specified project.
+     */
     @GetMapping("/withoutProject")
     @ApiOperation("Get users without a specific project by role and project ID")
     @ResponseStatus(HttpStatus.OK)
@@ -184,7 +259,12 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userDTOList);
     }
 
-    // Logout a user by ID.
+    /**
+     * Logout a user by ID.
+     *
+     * @param id The ID of the user to be logged out.
+     * @return ResponseEntity containing a response message.
+     */
     @PostMapping("/{userId}/logout")
     @ApiOperation("User logout by user ID")
     @ResponseStatus(HttpStatus.OK)

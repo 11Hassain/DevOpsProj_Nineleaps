@@ -8,6 +8,9 @@ import lombok.*;
 import java.util.List;
 
 
+/**
+ * Data Transfer Object (DTO) representing user projects.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
@@ -23,5 +26,4 @@ public class UserProjectsDTO {
     private String userName;
 
     private List<String> projectNames;
-
 }

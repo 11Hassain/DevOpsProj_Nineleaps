@@ -5,12 +5,17 @@ import lombok.*;
 
 
 
+/**
+ * Entity representing Help Documents in the database.
+ */
 @NoArgsConstructor
 @Getter
 @Setter
 @Entity
-@Table(name = "help_documents",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"file_name"}))
+@Table(
+        name = "help_documents",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"file_name"})
+)
 public class HelpDocuments {
 
     @Id
@@ -34,13 +39,14 @@ public class HelpDocuments {
     @Column(name = "deleted")
     private boolean deleted = false;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
     private Project project;
 
-
-    public HelpDocuments(Long helpDocumentId, byte[] data, String fileName, String category, String fileExtension, Project project) {
+    public HelpDocuments(
+            Long helpDocumentId, byte[] data, String fileName, String category,
+            String fileExtension, Project project
+    ) {
         this.helpDocumentId = helpDocumentId;
         this.data = data;
         this.fileName = fileName;

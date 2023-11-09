@@ -5,7 +5,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.support.ExecutorSubscribableChannel;
-
+/**
+ * Configuration class for Spring Security to define security settings and filters.
+ */
 @Configuration
 public class WebSocketConfig {
 

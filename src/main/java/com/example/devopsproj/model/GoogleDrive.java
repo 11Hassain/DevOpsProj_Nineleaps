@@ -8,6 +8,9 @@ import lombok.Setter;
 import java.io.Serializable;
 
 
+/**
+ * Entity representing Google Drive information in the database.
+ */
 @NoArgsConstructor
 @Getter
 @Setter

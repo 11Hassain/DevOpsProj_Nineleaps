@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Optional;
 
 
+/**
+ * Controller class for managing access requests.
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/request")
@@ -24,8 +27,12 @@ public class AccessRequestController {
 
     private final AccessRequestService accessRequestService;
 
-
-    // Create a new access request.
+    /**
+     * Create a new access request.
+     *
+     * @param accessRequestDTO The access request data.
+     * @return ResponseEntity with a success message or an error message.
+     */
     @PostMapping("/create")
     @ApiOperation("Create an Access Request")
     @ResponseStatus(HttpStatus.CREATED)
@@ -34,7 +41,14 @@ public class AccessRequestController {
         return createdRequest.map(request -> ResponseEntity.ok((Object) AccessRequestConstants.REQUEST_SUCCESS))
                 .orElse(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body((Object) AccessRequestConstants.REQUEST_FAILURE));
     }
-    // Get all active access requests.
+
+    /**
+     * Get all active access requests.
+     *
+     * @param page Page number.
+     * @param size Page size.
+     * @return ResponseEntity with a list of active access requests or a no content message.
+     */
     @GetMapping("/allActive")
     @ApiOperation("Get all active access requests")
     @ResponseStatus(HttpStatus.OK)
@@ -54,7 +68,11 @@ public class AccessRequestController {
         return ResponseEntity.status(HttpStatus.OK).body(accessRequestDTOList);
     }
 
-    // Get all access requests.
+    /**
+     * Get all access requests.
+     *
+     * @return ResponseEntity with a list of all access requests or a no content message.
+     */
     @GetMapping("/all")
     @ApiOperation("Get all access requests")
     @ResponseStatus(HttpStatus.OK)
@@ -64,7 +82,15 @@ public class AccessRequestController {
         return ResponseEntity.status(accessRequestDTOList.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK)
                 .body(accessRequestDTOList.isEmpty() ? AccessRequestConstants.NO_REQUESTS : accessRequestDTOList);
     }
-    // Update an access request.
+    /**
+     * Update an access request.
+     *
+     * @param requestId        The ID of the access request to update.
+     * @param accessRequestDTO The updated access request data.
+     * @param page             Page number.
+     * @param size             Page size.
+     * @return ResponseEntity with a list of updated access requests or a not found message.
+     */
     @PutMapping("/update/{accessRequestId}")
     @ApiOperation("Update an access request")
     @ResponseStatus(HttpStatus.OK)
@@ -84,7 +110,12 @@ public class AccessRequestController {
         }
     }
 
-    // Get unread PM requests notification.
+    /**
+     * Get unread PM requests notification.
+     *
+     * @param pmName The name of the PM.
+     * @return ResponseEntity with a list of unread PM requests or no content.
+     */
     @GetMapping("/unread/PM")
     @ApiOperation("Get unread PM requests notification")
     @ResponseStatus(HttpStatus.OK) // Replace with the appropriate status code
@@ -98,7 +129,12 @@ public class AccessRequestController {
             return ResponseEntity.ok(unreadRequests);
         }
     }
-    // Get all PM requests notification.
+    /**
+     * Get all PM requests notification.
+     *
+     * @param pmName The name of the PM.
+     * @return ResponseEntity with a list of all PM requests or no content.
+     */
     @GetMapping("/all/PM")
     @ApiOperation("Get all PM requests notification")
     @ResponseStatus(HttpStatus.OK)
@@ -107,7 +143,13 @@ public class AccessRequestController {
         List<AccessResponseDTO> result = accessRequestService.getPMRequests(pmName);
         return ResponseEntity.ok(result);
     }
-    // Set PM requests notification to true.
+
+    /**
+     * Set PM requests notification to true.
+     *
+     * @param accessRequestId The ID of the access request.
+     * @return ResponseEntity with a success message.
+     */
     @PutMapping("/notifiedPM")
     @ApiOperation("Set PM requests notification to true")
     @ResponseStatus(HttpStatus.OK)
@@ -117,7 +159,11 @@ public class AccessRequestController {
         return ResponseEntity.ok(AccessRequestConstants.SET_NOTIFICATION_SUCCESS);
     }
 
-    // Soft delete all notifications.
+    /**
+     * Soft delete all notifications.
+     *
+     * @return ResponseEntity with a success message.
+     */
     @DeleteMapping("/clearAll")
     @ApiOperation("Soft delete all notifications")
     @ResponseStatus(HttpStatus.OK)

@@ -9,6 +9,9 @@ import java.io.Serializable;
 import java.util.Map;
 
 
+/**
+ * Entity representing Figma details in the database.
+ */
 @NoArgsConstructor
 @Getter
 @Setter
@@ -29,7 +32,6 @@ public class Figma implements Serializable {
     @Column(name = "deleted")
     public Boolean deleted = false;
 
-
     @ElementCollection
     @CollectionTable(name = "figma_screenshots", joinColumns = @JoinColumn(name = "figma_id"))
     @MapKeyColumn(name = "user")  // Add this annotation to use 'user' as the map key
@@ -39,6 +41,8 @@ public class Figma implements Serializable {
     @OneToOne
     @JoinColumn(name = "project_id")
     private Project project;
+
+
 
     public Figma(Long figmaId, String figmaURL, String user, Map<String, String> screenshotImagesByUser, Project project) {
         this.figmaId = figmaId;

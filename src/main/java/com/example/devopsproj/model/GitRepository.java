@@ -9,6 +9,9 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * Entity representing Git repositories in the database.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -39,17 +42,18 @@ public class GitRepository implements Serializable {
     public Long getRepoId() {
         return repoId;
     }
+
     public GitRepository(String name) {
         this.name = name;
         // Initialize other properties as needed
     }
+
     public GitRepository(Long repoId, String name, String description) {
         this.repoId = repoId;
         this.name = name;
         this.description = description;
         // Initialize other properties as needed
     }
-
-
 }
+
 

@@ -1,5 +1,8 @@
 package com.example.devopsproj.commons.enumerations;
-
+/**
+ * This enum represents user roles within the application.
+ * It defines the available roles, such as SUPER_ADMIN, ADMIN, PROJECT_MANAGER, and USER.
+ */
 public enum EnumRole {
 
 

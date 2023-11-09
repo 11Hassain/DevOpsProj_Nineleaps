@@ -24,7 +24,13 @@ import java.util.Optional;
 public class GoogleDriveController {
     private final GoogleDriveService googleDriveService;
 
-    // Create a Google Drive entry.
+
+    /**
+     * Create a Google Drive entry.
+     *
+     * @param googleDriveDTO The GoogleDriveDTO containing entry details.
+     * @return ResponseEntity containing the created GoogleDriveDTO.
+     */
     @PostMapping("/create")
     @ApiOperation("Create a Google Drive entry")
     @ResponseStatus(HttpStatus.CREATED)
@@ -34,7 +40,13 @@ public class GoogleDriveController {
     }
 
 
-    // Get a list of all Google Drive entries.
+    /**
+     * Get a list of all Google Drive entries.
+     *
+     * @param page The page number for pagination.
+     * @param size The number of entries per page.
+     * @return ResponseEntity containing a list of GoogleDriveDTOs.
+     */
     @GetMapping("/getAllGoogleDrives")
     @ApiOperation("Get a list of all Google Drive entries")
     @ResponseStatus(HttpStatus.OK)
@@ -51,7 +63,13 @@ public class GoogleDriveController {
     }
 
 
-    // Get a Google Drive entry by ID.
+
+    /**
+     * Get a Google Drive entry by ID.
+     *
+     * @param driveId The ID of the Google Drive entry to retrieve.
+     * @return ResponseEntity containing the GoogleDriveDTO or indicating that it was not found.
+     */
     @GetMapping("/getGoogleDriveById/{driveId}")
     @ApiOperation("Get a Google Drive entry by ID")
     @ResponseStatus(HttpStatus.OK)
@@ -64,7 +82,12 @@ public class GoogleDriveController {
     }
 
 
-    // Delete a Google Drive entry by ID.
+    /**
+     * Delete a Google Drive entry by ID.
+     *
+     * @param driveId The ID of the Google Drive entry to delete.
+     * @return ResponseEntity indicating the status of the deletion.
+     */
     @DeleteMapping("/deleteGoogleDriveById/{driveId}")
     @ApiOperation("Soft delete a Google Drive entry by ID")
     @ResponseStatus(HttpStatus.OK)
@@ -74,7 +97,13 @@ public class GoogleDriveController {
 
 
 
-    // Get a Google Drive entry by project ID.
+
+    /**
+     * Get a Google Drive entry by project ID.
+     *
+     * @param projectId The ID of the project to retrieve the Google Drive entry for.
+     * @return ResponseEntity containing the GoogleDriveDTO or indicating that it was not found.
+     */
     @GetMapping("/getGoogleDriveByProjectId/{projectId}")
     @ApiOperation("Get a Google Drive entry by project ID")
     @ResponseStatus(HttpStatus.OK)

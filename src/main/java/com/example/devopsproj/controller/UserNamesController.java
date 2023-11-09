@@ -8,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+/**
+ * Controller for managing GitHub usernames.
+ */
 @RestController
 @RequestMapping("/api/v1/usernames")
 @RequiredArgsConstructor
@@ -16,7 +18,12 @@ public class UserNamesController {
 
     private final UserNamesService userNamesService;
 
-    // Save a GitHub username.
+    /**
+     * Save a GitHub username.
+     *
+     * @param userNamesDTO The GitHub username to be saved.
+     * @return ResponseEntity containing the saved GitHub username.
+     */
     @PostMapping("/githubUsername")
     @ApiOperation("Save GitHub username")
     @ResponseStatus(HttpStatus.CREATED)
@@ -25,7 +32,12 @@ public class UserNamesController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUserNames);
     }
 
-    // Get GitHub usernames by role.
+    /**
+     * Get GitHub usernames by role.
+     *
+     * @param role The role for which GitHub usernames are to be retrieved.
+     * @return ResponseEntity containing a list of GitHub usernames based on the specified role.
+     */
     @GetMapping("/role/{role}")
     @ApiOperation("Get GitHub usernames by role")
     @ResponseStatus(HttpStatus.OK)

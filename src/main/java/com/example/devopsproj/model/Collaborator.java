@@ -3,6 +3,9 @@ package com.example.devopsproj.model;
 import jakarta.persistence.*;
 
 
+/**
+ * Entity representing a collaborator in the database.
+ */
 @Entity
 @Table(name = "collaborators")
 public class Collaborator {
@@ -18,7 +21,6 @@ public class Collaborator {
 
     @Column(name = "username")
     private String username;
-
 
     public Long getId() {
         return id;

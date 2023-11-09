@@ -21,7 +21,12 @@ import java.util.List;
 public class GitRepositoryController {
     private final GitRepositoryService gitRepositoryService;
 
-    // Create a new Git repository.
+    /**
+     * Create a new Git repository.
+     *
+     * @param gitRepository The GitRepository object containing repository details.
+     * @return ResponseEntity indicating the status of the repository creation.
+     */
     @PostMapping("/add")
     @ApiOperation("Create a Git repository")
     @ResponseStatus(HttpStatus.CREATED)
@@ -29,8 +34,11 @@ public class GitRepositoryController {
         return ResponseEntity.ok(gitRepositoryService.createRepository(gitRepository));
     }
 
-
-    // Get a list of all Git repositories.
+    /**
+     * Get a list of all Git repositories.
+     *
+     * @return ResponseEntity containing a list of all Git repositories.
+     */
     @GetMapping("/get")
     @ApiOperation("Get a list of all Git repositories")
     @ResponseStatus(HttpStatus.OK)
@@ -38,7 +46,12 @@ public class GitRepositoryController {
         return ResponseEntity.ok(gitRepositoryService.getAllRepositories());
     }
 
-    // Get a list of Git repositories by project ID.
+    /**
+     * Get a list of Git repositories by project ID.
+     *
+     * @param id The project ID.
+     * @return ResponseEntity containing a list of Git repositories associated with the project.
+     */
     @GetMapping("/project/{id}")
     @ApiOperation("Get a list of Git repositories by project ID")
     @ResponseStatus(HttpStatus.OK)
@@ -48,7 +61,12 @@ public class GitRepositoryController {
     }
 
 
-    // Get a list of Git repositories by role.
+    /**
+     * Get a list of Git repositories by role.
+     *
+     * @param role The role name.
+     * @return ResponseEntity containing a list of Git repositories with the specified role.
+     */
     @GetMapping("/get/role/{role}")
     @ApiOperation("Get a list of Git repositories by role")
     @ResponseStatus(HttpStatus.OK)
@@ -58,7 +76,12 @@ public class GitRepositoryController {
     }
 
 
-    // Get a Git repository by ID.
+    /**
+     * Get a Git repository by ID.
+     *
+     * @param id The ID of the Git repository to retrieve.
+     * @return ResponseEntity containing the GitRepositoryDTO with repository details.
+     */
     @GetMapping("/get/{id}")
     @ApiOperation("Get a Git repository by ID")
     @ResponseStatus(HttpStatus.OK)
@@ -68,7 +91,12 @@ public class GitRepositoryController {
         return ResponseEntity.ok(repositoryDTO);
     }
 
-        // Delete a Git repository by ID.
+    /**
+     * Delete a Git repository by ID.
+     *
+     * @param repoId The ID of the Git repository to delete.
+     * @return ResponseEntity indicating the status of the repository deletion.
+     */
         @DeleteMapping("/delete/{repoId}")
         @ApiOperation("Delete a Git repository by ID")
         @ResponseStatus(HttpStatus.OK)
