@@ -14,34 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import com.example.devopsproj.dto.responsedto.CollaboratorDTO;
-import com.example.devopsproj.service.interfaces.GitHubCollaboratorService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.http.*;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import com.example.devopsproj.dto.responsedto.CollaboratorDTO;
-import com.example.devopsproj.service.implementations.GitHubCollaboratorServiceImpl;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
-
-import org.springframework.http.*;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class GitHubCollaboratorServiceImplTest {
 

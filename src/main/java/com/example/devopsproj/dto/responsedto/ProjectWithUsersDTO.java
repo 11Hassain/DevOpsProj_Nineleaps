@@ -8,7 +8,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
-
 /**
  * Data Transfer Object (DTO) for projects with associated users and other details.
  */
@@ -28,35 +27,37 @@ public class ProjectWithUsersDTO {
      */
     @Size(max = 255, message = "projectName should not exceed 255 characters")
     private String projectName;
-
     /**
      * The description of the project.
      */
     private String projectDescription;
-
     /**
      * The timestamp of the last update.
      */
     @NotBlank(message = "lastUpdated cannot be blank")
     private LocalDateTime lastUpdated;
-
     /**
      * The list of users associated with the project.
      */
     private List<UserDTO> users;
-
-    // Additional fields for repositories, status, Figma, and Google Drive can be documented here if needed.
+    /**
+     * The list of repositories associated with the project.
+     */
+    private List<GitRepositoryDTO> repositories;
+    /**
+     * The timestamp of the status of the project.
+     */
+    private boolean status;
+    /**
+     * The list of figma associated with the project.
+     */
+    private FigmaDTO figma;
+    /**
+     * The list of drives associated with the project.
+     */
+    private GoogleDriveDTO googleDrive;
 
     // Constructors
-    /**
-     * Constructs a ProjectWithUsersDTO with specified project details and associated users.
-     *
-     * @param projectId         The unique identifier of the project.
-     * @param projectName       The name of the project.
-     * @param projectDescription The description of the project.
-     * @param lastUpdated       The timestamp of the last update.
-     * @param users             The list of users associated with the project.
-     */
     public ProjectWithUsersDTO(Long projectId, String projectName, String projectDescription, LocalDateTime lastUpdated, List<UserDTO> users) {
         this.projectId = projectId;
         this.projectName = projectName;
@@ -65,18 +66,13 @@ public class ProjectWithUsersDTO {
         this.users = users;
     }
 
-    /**
-     * Constructs a ProjectWithUsersDTO with specified project details.
-     *
-     * @param projectId         The unique identifier of the project.
-     * @param projectName       The name of the project.
-     * @param projectDescription The description of the project.
-     */
     public ProjectWithUsersDTO(Long projectId, String projectName, String projectDescription) {
         this.projectId = projectId;
         this.projectName = projectName;
         this.projectDescription = projectDescription;
     }
+
 }
+
 
 
