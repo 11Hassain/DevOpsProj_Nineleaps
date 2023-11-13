@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -33,7 +35,14 @@ import java.util.Optional;
 public class GoogleDriveController {
 
     private final GoogleDriveService googleDriveService;
+    private static final Logger logger = LoggerFactory.getLogger(GoogleDriveController.class);
 
+    /**
+     * Create a Google Drive entry.
+     *
+     * @param googleDriveDTO The GoogleDriveDTO containing the Google Drive data.
+     * @return ResponseEntity with the created Google Drive entry or an error response.
+     */
     @PostMapping("/createGoogleDrive")
     @Operation(
             description = "Create Google Drive",
@@ -44,15 +53,28 @@ public class GoogleDriveController {
     )
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> createGoogleDrive(@Valid @RequestBody GoogleDriveDTO googleDriveDTO) {
-            GoogleDrive googleDrive = googleDriveService.createGoogleDrive(googleDriveDTO);
+        logger.info("Received a request to create a Google Drive entry.");
+
+        GoogleDrive googleDrive = googleDriveService.createGoogleDrive(googleDriveDTO);
+
+        if (googleDrive != null) {
+            logger.info("Google Drive entry created successfully.");
             return ResponseEntity.status(HttpStatus.CREATED).body(new GoogleDriveDTO(
                     DTOModelMapper.mapProjectToProjectDTO(googleDrive.getProject()),
                     googleDrive.getDriveLink(),
                     googleDrive.getDriveId()
             ));
-
+        } else {
+            logger.error("Failed to create Google Drive entry.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error");
+        }
     }
 
+    /**
+     * Get all Google Drive entries.
+     *
+     * @return ResponseEntity with the retrieved Google Drive entries or an error response.
+     */
     @GetMapping("/getAllGoogleDrives")
     @Operation(
             description = "Get All Google Drives",
@@ -63,20 +85,29 @@ public class GoogleDriveController {
     )
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getAllGoogleDrives() {
+        logger.info("Received a request to retrieve all Google Drive entries.");
 
-            List<GoogleDrive> googleDrives = googleDriveService.getAllGoogleDrives();
-            List<GoogleDriveDTO> googleDriveDTOs = new ArrayList<>();
-            for (GoogleDrive googleDrive : googleDrives) {
-                googleDriveDTOs.add(new GoogleDriveDTO(
-                        new ProjectDTO(googleDrive.getProject().getProjectId(), googleDrive.getProject().getProjectName()),
-                        googleDrive.getDriveLink(),
-                        googleDrive.getDriveId()
-                ));
-            }
-            return ResponseEntity.ok(googleDriveDTOs);
+        List<GoogleDrive> googleDrives = googleDriveService.getAllGoogleDrives();
+        List<GoogleDriveDTO> googleDriveDTOs = new ArrayList<>();
 
+        for (GoogleDrive googleDrive : googleDrives) {
+            googleDriveDTOs.add(new GoogleDriveDTO(
+                    new ProjectDTO(googleDrive.getProject().getProjectId(), googleDrive.getProject().getProjectName()),
+                    googleDrive.getDriveLink(),
+                    googleDrive.getDriveId()
+            ));
+        }
+
+        logger.info("Google Drives retrieved successfully.");
+        return ResponseEntity.ok(googleDriveDTOs);
     }
 
+    /**
+     * Get a Google Drive entry by its ID.
+     *
+     * @param driveId The ID of the Google Drive entry to retrieve.
+     * @return ResponseEntity with the retrieved Google Drive entry or an error response if not found.
+     */
     @GetMapping("/getGoogleDriveById/{driveId}")
     @Operation(
             description = "Get Google Drive by ID",
@@ -88,14 +119,25 @@ public class GoogleDriveController {
     )
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<GoogleDriveDTO> getGoogleDriveById(@PathVariable Long driveId) {
+        logger.info("Received a request to retrieve a Google Drive entry by ID: {}", driveId);
 
-            Optional<GoogleDriveDTO> optionalGoogleDriveDTO = googleDriveService.getGoogleDriveById(driveId);
-            return optionalGoogleDriveDTO
-                    .map(googleDriveDTO -> ResponseEntity.ok().body(googleDriveDTO))
-                    .orElse(ResponseEntity.notFound().build());
+        Optional<GoogleDriveDTO> optionalGoogleDriveDTO = googleDriveService.getGoogleDriveById(driveId);
 
+        if (optionalGoogleDriveDTO.isPresent()) {
+            logger.info("Google Drive retrieved successfully for ID: {}", driveId);
+            return ResponseEntity.ok().body(optionalGoogleDriveDTO.get());
+        } else {
+            logger.info("Google Drive not found for ID: {}", driveId);
+            return ResponseEntity.notFound().build();
+        }
     }
 
+    /**
+     * Delete a Google Drive entry by its ID.
+     *
+     * @param driveId The ID of the Google Drive entry to delete.
+     * @return ResponseEntity indicating the result of the operation.
+     */
     @DeleteMapping("/deleteGoogleDriveById/{driveId}")
     @Operation(
             description = "Delete Google Drive by ID",
@@ -107,16 +149,25 @@ public class GoogleDriveController {
     )
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> deleteGoogleDriveById(@PathVariable Long driveId) {
+        logger.info("Received a request to delete a Google Drive entry by ID: {}", driveId);
 
-            boolean deleted = googleDriveService.deleteGoogleDriveById(driveId);
-            if (deleted) {
-                return ResponseEntity.ok("Google Drive with ID: " + driveId + " deleted successfully.");
-            } else {
-                return ResponseEntity.notFound().build();
-            }
+        boolean deleted = googleDriveService.deleteGoogleDriveById(driveId);
 
+        if (deleted) {
+            logger.info("Google Drive with ID {} deleted successfully.", driveId);
+            return ResponseEntity.ok("Google Drive with ID: " + driveId + " deleted successfully.");
+        } else {
+            logger.info("Google Drive not found for ID: {}", driveId);
+            return ResponseEntity.notFound().build();
+        }
     }
 
+    /**
+     * Get a Google Drive entry by its associated Project ID.
+     *
+     * @param projectId The Project ID associated with the Google Drive entry.
+     * @return ResponseEntity with the retrieved Google Drive entry or an error response if not found.
+     */
     @GetMapping("/getGoogleDriveByProjectId/{projectId}")
     @Operation(
             description = "Get Google Drive by Project ID",
@@ -128,17 +179,23 @@ public class GoogleDriveController {
     )
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<GoogleDriveDTO> getGoogleDriveByProjectId(@PathVariable Long projectId) {
+        logger.info("Received a request to retrieve a Google Drive entry by Project ID: {}", projectId);
 
-            Optional<GoogleDrive> optionalGoogleDrive = googleDriveService.getGoogleDriveByProjectId(projectId);
-            return optionalGoogleDrive.map(googleDrive -> {
-                GoogleDriveDTO googleDriveDTO = new GoogleDriveDTO(
-                        new ProjectDTO(googleDrive.getProject().getProjectId(), googleDrive.getProject().getProjectName()),
-                        googleDrive.getDriveLink(),
-                        googleDrive.getDriveId()
-                );
-                return ResponseEntity.ok(googleDriveDTO);
-            }).orElse(ResponseEntity.notFound().build());
+        Optional<GoogleDrive> optionalGoogleDrive = googleDriveService.getGoogleDriveByProjectId(projectId);
 
+        if (optionalGoogleDrive.isPresent()) {
+            GoogleDrive googleDrive = optionalGoogleDrive.get();
+            GoogleDriveDTO googleDriveDTO = new GoogleDriveDTO(
+                    new ProjectDTO(googleDrive.getProject().getProjectId(), googleDrive.getProject().getProjectName()),
+                    googleDrive.getDriveLink(),
+                    googleDrive.getDriveId()
+            );
+            logger.info("Google Drive retrieved successfully for Project ID: {}", projectId);
+            return ResponseEntity.ok(googleDriveDTO);
+        } else {
+            logger.info("Google Drive not found for Project ID: {}", projectId);
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }

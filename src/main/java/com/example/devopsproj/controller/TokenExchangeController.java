@@ -36,6 +36,12 @@ public class TokenExchangeController {
 
     private static final Logger logger = LoggerFactory.getLogger(TokenExchangeController.class);
 
+    /**
+     * Exchange authorization code for access token.
+     *
+     * @param authorizationCode The authorization code obtained during authentication.
+     * @return ResponseEntity containing the access token or an error message.
+     */
     @GetMapping("/token-exchange")
     @Operation(
             description = "Exchange authorization code for access token",
@@ -48,6 +54,8 @@ public class TokenExchangeController {
     )
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> tokenExchange(@RequestParam("code") String authorizationCode) {
+        logger.info("Received a request to exchange authorization code for access token");
+
         String clientId = System.getenv("GOOGLE_CLIENT_ID");
         String clientSecret = System.getenv("GOOGLE_SECRET_KEY");
         String redirectUri = "https://www.google.com/";

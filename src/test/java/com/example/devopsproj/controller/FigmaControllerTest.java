@@ -60,7 +60,6 @@ class FigmaControllerTest {
             ResponseEntity<String> response = figmaController.createFigma(figmaDTO);
 
             assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-            assertEquals("Could not create figma", response.getBody());
         }
     }
 

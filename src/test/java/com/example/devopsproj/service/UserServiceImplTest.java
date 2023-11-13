@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +43,8 @@ class UserServiceImplTest {
     private ProjectRepository projectRepository;
     @Mock
     private JwtServiceImpl jwtServiceImpl;
+    @Mock
+    private ModelMapper modelMapper;
 
     @BeforeEach
     void setUp() {
@@ -49,7 +52,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testSaveUser(){
+    void testSaveUser_Success(){
         UserCreationDTO userCreationDTO = new UserCreationDTO();
         userCreationDTO.setId(1L);
         userCreationDTO.setName("John Doe");
@@ -64,16 +67,20 @@ class UserServiceImplTest {
         savedUser.setLastUpdated(LocalDateTime.now());
         savedUser.setLastLogout(LocalDateTime.now());
 
-        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+        UserDTO expectedDTO = new UserDTO();
+        expectedDTO.setId(userCreationDTO.getId());
+        expectedDTO.setName(userCreationDTO.getName());
+        expectedDTO.setEmail(userCreationDTO.getEmail());
+        expectedDTO.setEnumRole(userCreationDTO.getEnumRole());
+        expectedDTO.setLastLogout(LocalDateTime.now());
+        expectedDTO.setLastUpdated(LocalDateTime.now());
 
-        UserDTO savedUserResult = userService.saveUser(userCreationDTO);
+        when(userRepository.save(savedUser)).thenReturn(savedUser);
+        when(modelMapper.map(any(), eq(UserDTO.class))).thenReturn(expectedDTO);
 
-        assertEquals(userCreationDTO.getId(), savedUserResult.getId());
-        assertEquals(userCreationDTO.getName(), savedUserResult.getName());
-        assertEquals(userCreationDTO.getEmail(), savedUserResult.getEmail());
-        assertEquals(userCreationDTO.getEnumRole(), savedUserResult.getEnumRole());
-        assertNotNull(savedUserResult.getLastUpdated()); // Ensure lastUpdated is set
-        assertNotNull(savedUserResult.getLastLogout()); // Ensure lastLogout is set
+        UserDTO userDTO = userService.saveUser(userCreationDTO);
+
+        assertEquals(expectedDTO, userDTO);
     }
 
     @Nested

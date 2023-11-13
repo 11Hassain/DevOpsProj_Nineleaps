@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +29,14 @@ import org.springframework.web.bind.annotation.*;
 public class UserNamesController {
 
     private final UserNamesService userNamesService;
+    private static final Logger logger = LoggerFactory.getLogger(UserNamesController.class);
 
-
+    /**
+     * Save GitHub username.
+     *
+     * @param userNamesDTO The DTO containing the GitHub username.
+     * @return ResponseEntity containing the saved GitHub username or an error message.
+     */
     @PostMapping("/githubUsername")
     @Operation(
             description = "Save GitHub username",
@@ -43,18 +51,21 @@ public class UserNamesController {
     )
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> saveUsername(@Valid @RequestBody UserNamesDTO userNamesDTO) {
-
-            try{
-                UserNamesDTO savedUserNames = userNamesService.saveUsername(userNamesDTO);
-                if (savedUserNames == null){
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Github user not found");
-                }
-                else {
-                    return ResponseEntity.status(HttpStatus.CREATED).body(savedUserNames);
-                }
-            }catch (DataIntegrityViolationException e){
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists");
+        logger.info("Received a request to save GitHub username");
+        try{
+            UserNamesDTO savedUserNames = userNamesService.saveUsername(userNamesDTO);
+            if (savedUserNames == null){
+                logger.warn("GitHub user not found for the provided username");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Github user not found");
             }
+            else {
+                logger.info("GitHub username saved successfully: {}", savedUserNames.getUsername());
+                return ResponseEntity.status(HttpStatus.CREATED).body(savedUserNames);
+            }
+        }catch (DataIntegrityViolationException e){
+            logger.error("Conflict - Username already exists: {}", userNamesDTO.getUsername());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists");
+        }
 
     }
 

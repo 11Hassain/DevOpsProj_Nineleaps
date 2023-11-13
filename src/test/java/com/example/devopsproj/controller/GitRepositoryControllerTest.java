@@ -44,7 +44,7 @@ class GitRepositoryControllerTest {
 
             ResponseEntity<Object> response = gitRepositoryController.createRepository(gitRepository);
 
-            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(HttpStatus.CREATED, response.getStatusCode());
             assertEquals(gitRepository, response.getBody());
         }
     }

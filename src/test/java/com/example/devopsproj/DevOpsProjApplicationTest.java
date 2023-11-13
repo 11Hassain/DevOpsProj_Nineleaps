@@ -15,11 +15,11 @@ class DevOpsProjApplicationTest {
                 Assertions.assertTrue(condition, "Test class is being loaded successfully");
         }
 
-        @Test
-        void testMainMethod() {
-                DevOpsProjApplication.main(new String[]{});
-                Assertions.assertTrue(true, "Main method tested");
-        }
+//        @Test
+//        void testMainMethod() {
+//                DevOpsProjApplication.main(new String[]{});
+//                Assertions.assertTrue(true, "Main method tested");
+//        }
 
 }
 

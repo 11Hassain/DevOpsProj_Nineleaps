@@ -12,6 +12,7 @@ import com.example.devopsproj.service.interfaces.ProjectService;
 import com.example.devopsproj.service.interfaces.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ public class UserServiceImpl implements IUserService, UserService {
     private final ProjectService projectService;
     private final JwtService jwtService;
     private final ProjectRepository projectRepository;
+    private final ModelMapper modelMapper;
 
 
     //implementing user creation using DTO pattern
@@ -48,14 +50,7 @@ public class UserServiceImpl implements IUserService, UserService {
         user.setLastLogout(LocalDateTime.now());
         userRepository.save(user);
 
-        UserDTO userDTO = new UserDTO();
-        userDTO.setId(user.getId());
-        userDTO.setName(user.getName());
-        userDTO.setEmail(user.getEmail());
-        userDTO.setEnumRole(user.getEnumRole());
-        userDTO.setLastUpdated(user.getLastUpdated());
-        userDTO.setLastLogout(user.getLastLogout());
-        return userDTO;
+        return modelMapper.map(user, UserDTO.class);
     }
 
     @Override
