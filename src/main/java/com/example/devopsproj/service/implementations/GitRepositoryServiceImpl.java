@@ -47,10 +47,17 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
 
     private final RestTemplate restTemplate;
 
-
+    /**
+     * Create Repository
+     *
+     * @param gitRepository The model for storing the repository members.
+     * @return GitRepository to be created.
+     */
     @Override
     @Transactional
     public GitRepository createRepository(GitRepository gitRepository) {
+        logger.info("Creating repository: {}", gitRepository.getName());
+
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(GITHUB_ACCESS_TOKEN);
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -67,25 +74,43 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
             GitRepository createdGitRepository = responseEntity.getBody();
             assert createdGitRepository != null;
             gitRepositoryRepository.save(createdGitRepository);
+
+            logger.info("Repository {} created successfully.", createdGitRepository.getName());
+
             return createdGitRepository;
         } else {
+            logger.warn("Failed to create repository {}. Response: {}", gitRepository.getName(), responseEntity.getBody());
             throw new RepositoryCreationException("Error creating repository " + gitRepository.getName() + ". Response: " + responseEntity.getBody());
         }
     }
 
+    /**
+     * Get all repositories
+     *
+     * @return List of git repositories to be fetched using DTO
+     */
     @Override
     @Transactional(readOnly = true)
     public List<GitRepositoryDTO> getAllRepositories() {
+        logger.info("Fetching all repositories.");
         List<GitRepository> gitRepositories = gitRepositoryRepository.findAll();
 
+        logger.info("Fetched {} repositories", gitRepositories.size());
         return gitRepositories.stream()
                 .map(this::convertToDto)
                 .toList();
     }
 
+    /**
+     * Delete repository
+     *
+     * @param repoId The ID of the repository that is to be deleted.
+     */
     @Override
     @Transactional
     public void deleteRepository(Long repoId) {
+        logger.info("Deleting repository with repoId: {}", repoId);
+
         GitRepository repository = gitRepositoryRepository.findByRepoId(repoId)
                 .orElseThrow(() -> new NotFoundException("Repository with repoId " + repoId + " not found."));
 
@@ -103,38 +128,72 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
                     Void.class);
 
             if (responseEntity.getStatusCode() != HttpStatus.NO_CONTENT) {
+                logger.info("Repository with repoId {} deleted successfully.", repoId);
                 throw new RepositoryDeletionException("Error deleting repository with repoId " + repoId + ". Response: " + responseEntity.getBody());
             }
 
             gitRepositoryRepository.delete(repository);
         } catch (Exception e) {
+            logger.error("Error deleting repository with repoId {}: {}", repoId, e.getMessage());
             throw new RepositoryDeletionException("Error deleting repository with repoId " + repoId);
         }
     }
 
+    /**
+     * Get all repositories based on Project ID
+     *
+     * @param id The ID of project whose repositories are to be fetched.
+     * @return List of git repos that are fetched using DTO.
+     */
     @Override
     public List<GitRepositoryDTO> getAllRepositoriesByProject(Long id) {
+        logger.info("Fetching repositories for project with ID: {}", id);
+
         Project project = projectServiceImpl.getProjectById(id).orElse(null);
         if(project != null){
             List<GitRepository> repositories = gitRepositoryRepository.findRepositoriesByProject(project);
+
+            logger.info("Fetched {} repositories for project with ID: {}", repositories.size(), id);
+
             return repositories.stream()
                     .map(repository -> new GitRepositoryDTO(repository.getName(), repository.getDescription()))
                     .toList();
         }
-        else return Collections.emptyList();
+        else {
+            logger.warn("Project with ID {} not found.", id);
+            return Collections.emptyList();
+        }
     }
 
+    /**
+     * Get all repos by role
+     *
+     * @param enumRole The role based on which the repos are fetched.
+     * @return List of git repos using DTO.
+     */
     @Override
     public List<GitRepositoryDTO> getAllReposByRole(EnumRole enumRole) {
+        logger.info("Fetching repositories for role: {}", enumRole);
+
         List<GitRepository> gitRepositories = gitRepositoryRepository.findAllByRole(enumRole);
+
+        logger.info("Fetched {} repositories for role: {}", gitRepositories.size(), enumRole);
+
         return gitRepositories.stream()
                 .map(repository -> new GitRepositoryDTO(repository.getRepoId(), repository.getName(), repository.getDescription()))
                 .toList();
     }
 
+    /**
+     * Get repo by ID
+     *
+     * @param id The ID of the repository to be fetched.
+     * @return GitRepository that is fetched.
+     */
     @Override
     @Transactional(readOnly = true)
     public GitRepository getRepositoryById(Long id) {
+        logger.info("Fetching repository by ID: {}", id);
         return gitRepositoryRepository.findById(id).orElse(null);
     }
 

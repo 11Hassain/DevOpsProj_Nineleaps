@@ -22,7 +22,12 @@ public class GitHubCollaboratorServiceImpl implements GitHubCollaboratorService 
 
     private static final Logger logger = LoggerFactory.getLogger(GitHubCollaboratorServiceImpl.class);
 
-
+    /**
+     * Add collaborator to repository
+     *
+     * @param collaboratorDTO The DTO for adding the Collaborator.
+     * @return A boolean value saying whether the collaborator has been added to repo or not.
+     */
     @Override
     public boolean addCollaborator(CollaboratorDTO collaboratorDTO) {
         String apiUrl = String.format("https://api.github.com/repos/%s/%s/collaborators/%s",
@@ -46,6 +51,12 @@ public class GitHubCollaboratorServiceImpl implements GitHubCollaboratorService 
         }
     }
 
+    /**
+     * Remove a collaborator from repository
+     *
+     * @param collaboratorDTO The DTO for removing the collaborator.
+     * @return A boolean value saying whether the collaborator has been removed from repo or not.
+     */
     @Override
     public boolean deleteCollaborator(CollaboratorDTO collaboratorDTO) {
         String apiUrl = String.format("https://api.github.com/repos/%s/%s/collaborators/%s",
@@ -69,7 +80,6 @@ public class GitHubCollaboratorServiceImpl implements GitHubCollaboratorService 
     }
 
     // Creates HTTP headers for making requests to the GitHub API with the provided access token.
-    @Override
     public HttpHeaders createHttpHeaders(String accessToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);

@@ -9,6 +9,8 @@ import com.twilio.type.PhoneNumber;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
@@ -28,12 +30,20 @@ public class SmsService {
     private String phoneNumber;
     final IUserService userService;
 
+    private static final Logger logger = LoggerFactory.getLogger(SmsService.class);
     private static final String ACCOUNT_SID = System.getenv("TWILIO_ACCOUNT_SID");
     private static final String AUTH_TOKEN = System.getenv("TWILIO_AUTH");
     private static final String FROM_NUMBER = System.getenv("TWILIO_TRIAL_NUMBER");
     private static final String SECRET_KEY = System.getenv("SMS_SECRET_KEY");
 
+    /**
+     * Sends an OTP via SMS to the specified phone number using Twilio.
+     *
+     * @param sms The SMS object containing the phone number.
+     */
     public void send(SmsPojo sms){
+        logger.info("Sending OTP to phone number: {}", sms.getPhoneNumber());
+
         Twilio.init(ACCOUNT_SID,AUTH_TOKEN);
 
         // Create a SecureRandom instance for generating OTPs
@@ -51,5 +61,7 @@ public class SmsService {
                 .create();
         StoreOTP.setOtp(number);
         phoneNumber = sms.getPhoneNumber();
+
+        logger.info("OTP sent successfully to phone number: {}", sms.getPhoneNumber());
     }
 }

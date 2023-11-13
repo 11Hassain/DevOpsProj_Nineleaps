@@ -49,6 +49,7 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
+        logger.info(claims.getSubject());
         return claimsResolver.apply(claims);
     }
 
@@ -59,6 +60,7 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        logger.info("Generating token...");
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
@@ -96,6 +98,7 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public Claims extractAllClaims(String token) {
+        logger.info("Extracting all claims...");
         return Jwts
                 .parserBuilder()
                 .setSigningKey(getSignInKey())

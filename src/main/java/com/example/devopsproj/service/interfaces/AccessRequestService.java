@@ -20,8 +20,6 @@ public interface AccessRequestService {
 
     List<AccessResponseDTO> getPMRequests(String pmName);
 
-    List<AccessResponseDTO> mapAccessRequestsToResponseDTOs(List<AccessRequest> accessRequests);
-
     void setPMRequestsNotificationTrue(Long accessRequestId);
 
     @Transactional

@@ -8,5 +8,4 @@ public interface GitHubCollaboratorService {
 
     boolean deleteCollaborator(CollaboratorDTO collaboratorDTO);
 
-    HttpHeaders createHttpHeaders(String accessToken);
 }
