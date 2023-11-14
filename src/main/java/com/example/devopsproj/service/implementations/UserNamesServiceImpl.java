@@ -6,9 +6,9 @@ import com.example.devopsproj.dto.responsedto.UserNamesDTO;
 import com.example.devopsproj.repository.UserNamesRepository;
 import com.example.devopsproj.service.interfaces.UserNamesService;
 import com.example.devopsproj.utils.GitHubUserValidator;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,12 +21,17 @@ import java.util.List;
  */
 
 @Service
-@RequiredArgsConstructor
 public class UserNamesServiceImpl implements UserNamesService {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserNamesServiceImpl.class);
+    @Autowired
+    public UserNamesServiceImpl(UserNamesRepository userNamesRepository, GitHubUserValidator gitHubUserValidator) {
+        this.userNamesRepository = userNamesRepository;
+        this.gitHubUserValidator = gitHubUserValidator;
+    }
+
     private final UserNamesRepository userNamesRepository;
     public final GitHubUserValidator gitHubUserValidator;
+    private static final Logger logger = LoggerFactory.getLogger(UserNamesServiceImpl.class);
 
     /**
      * Saves a GitHub username and associated user information.

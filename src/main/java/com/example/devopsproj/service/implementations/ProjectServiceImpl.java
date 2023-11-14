@@ -9,10 +9,10 @@ import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.model.*;
 import com.example.devopsproj.service.interfaces.GitHubCollaboratorService;
 import com.example.devopsproj.service.interfaces.ProjectService;
-import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -28,8 +28,17 @@ import java.util.*;
  */
 
 @Service
-@RequiredArgsConstructor
 public class ProjectServiceImpl implements ProjectService {
+
+    @Autowired
+    public ProjectServiceImpl(ProjectRepository projectRepository, UserRepository userRepository, GitRepositoryRepository gitRepositoryRepository,
+                              ModelMapper modelMapper, GitHubCollaboratorService collaboratorService) {
+        this.projectRepository = projectRepository;
+        this.userRepository = userRepository;
+        this.gitRepositoryRepository = gitRepositoryRepository;
+        this.modelMapper = modelMapper;
+        this.collaboratorService = collaboratorService;
+    }
 
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;

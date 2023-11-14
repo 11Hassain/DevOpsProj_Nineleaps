@@ -9,9 +9,9 @@ import com.example.devopsproj.repository.FigmaRepository;
 import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.service.interfaces.FigmaService;
 import com.example.devopsproj.utils.DTOModelMapper;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -25,8 +25,13 @@ import java.util.*;
  */
 
 @Service
-@RequiredArgsConstructor
 public class FigmaServiceImpl implements FigmaService {
+
+    @Autowired
+    public FigmaServiceImpl(FigmaRepository figmaRepository, ProjectRepository projectRepository) {
+        this.figmaRepository = figmaRepository;
+        this.projectRepository = projectRepository;
+    }
 
     private final FigmaRepository figmaRepository;
     private final ProjectRepository projectRepository;

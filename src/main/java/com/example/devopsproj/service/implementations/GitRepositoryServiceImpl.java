@@ -11,9 +11,9 @@ import com.example.devopsproj.repository.GitRepositoryRepository;
 import com.example.devopsproj.service.interfaces.GitRepositoryService;
 import java.util.Collections;
 
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -31,12 +31,17 @@ import java.util.List;
  */
 
 @Service
-@RequiredArgsConstructor
 public class GitRepositoryServiceImpl implements GitRepositoryService {
+
+    @Autowired
+    public GitRepositoryServiceImpl(GitRepositoryRepository gitRepositoryRepository, ProjectServiceImpl projectServiceImpl, JdbcTemplate jdbcTemplate, RestTemplate restTemplate) {
+        this.gitRepositoryRepository = gitRepositoryRepository;
+        this.projectServiceImpl = projectServiceImpl;
+        this.restTemplate = restTemplate;
+    }
 
     private final GitRepositoryRepository gitRepositoryRepository;
     private final ProjectServiceImpl projectServiceImpl;
-    private final JdbcTemplate jdbcTemplate;
 
     private static final Logger logger = LoggerFactory.getLogger(GitRepositoryServiceImpl.class);
 

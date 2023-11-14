@@ -8,10 +8,10 @@ import com.example.devopsproj.dto.responsedto.AccessResponseDTO;
 import com.example.devopsproj.repository.AccessRequestRepository;
 import com.example.devopsproj.service.interfaces.AccessRequestService;
 import com.example.devopsproj.service.interfaces.JwtService;
-import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,14 +26,16 @@ import java.util.Optional;
  */
 
 @Service
-@RequiredArgsConstructor
 public class AccessRequestServiceImpl implements AccessRequestService {
 
+    @Autowired
+    public AccessRequestServiceImpl(AccessRequestRepository accessRequestRepository, ModelMapper modelMapper, JwtService jwtService) {
+        this.accessRequestRepository = accessRequestRepository;
+    }
+
     private final AccessRequestRepository accessRequestRepository;
-    private final ModelMapper modelMapper;
     private static final Logger logger = LoggerFactory.getLogger(AccessRequestServiceImpl.class);
     private static final String RESPONSE = "Request for adding ";
-    private final JwtService jwtService;
 
     /**
      * Create Request

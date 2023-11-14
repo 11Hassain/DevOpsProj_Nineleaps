@@ -5,10 +5,9 @@ import com.example.devopsproj.dto.responsedto.GoogleDriveDTO;
 import com.example.devopsproj.repository.GoogleDriveRepository;
 import com.example.devopsproj.service.interfaces.GoogleDriveService;
 import com.example.devopsproj.utils.DTOModelMapper;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,8 +21,12 @@ import java.util.Optional;
  */
 
 @Service
-@RequiredArgsConstructor
 public class GoogleDriveServiceImpl implements GoogleDriveService {
+
+    @Autowired
+    public GoogleDriveServiceImpl(GoogleDriveRepository googleDriveRepository) {
+        this.googleDriveRepository = googleDriveRepository;
+    }
 
     private final GoogleDriveRepository googleDriveRepository;
     private static final Logger logger = LoggerFactory.getLogger(GoogleDriveServiceImpl.class);

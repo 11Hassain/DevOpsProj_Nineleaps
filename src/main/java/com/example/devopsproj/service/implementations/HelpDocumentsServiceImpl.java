@@ -7,9 +7,9 @@ import com.example.devopsproj.model.Project;
 import com.example.devopsproj.repository.HelpDocumentsRepository;
 import com.example.devopsproj.repository.ProjectRepository;
 import com.example.devopsproj.service.interfaces.HelpDocumentsService;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,8 +27,13 @@ import java.util.Optional;
  */
 
 @Service
-@RequiredArgsConstructor
 public class HelpDocumentsServiceImpl implements HelpDocumentsService {
+
+    @Autowired
+    public HelpDocumentsServiceImpl(ProjectRepository projectRepository, HelpDocumentsRepository helpDocumentsRepository) {
+        this.projectRepository = projectRepository;
+        this.helpDocumentsRepository = helpDocumentsRepository;
+    }
 
     private final ProjectRepository projectRepository;
     private final HelpDocumentsRepository helpDocumentsRepository;

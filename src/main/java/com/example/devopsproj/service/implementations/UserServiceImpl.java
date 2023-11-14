@@ -11,10 +11,10 @@ import com.example.devopsproj.service.interfaces.JwtService;
 import com.example.devopsproj.service.interfaces.ProjectService;
 import com.example.devopsproj.service.interfaces.UserService;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -30,8 +30,16 @@ import java.util.*;
  */
 
 @Service
-@RequiredArgsConstructor
 public class UserServiceImpl implements IUserService, UserService {
+
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository, ProjectService projectService, JwtService jwtService, ProjectRepository projectRepository, ModelMapper modelMapper) {
+        this.userRepository = userRepository;
+        this.projectService = projectService;
+        this.jwtService = jwtService;
+        this.projectRepository = projectRepository;
+        this.modelMapper = modelMapper;
+    }
 
     private final UserRepository userRepository;
     private final ProjectService projectService;
