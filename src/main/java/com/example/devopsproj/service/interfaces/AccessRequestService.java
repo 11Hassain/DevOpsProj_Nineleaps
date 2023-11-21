@@ -9,6 +9,11 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
+/**
+ * Service interface for managing access request operations, including creation,
+ * retrieval, and mapping. Provides methods for handling both active and updated requests,
+ * as well as managing notifications for project managers.
+ */
 
 public interface AccessRequestService {
 

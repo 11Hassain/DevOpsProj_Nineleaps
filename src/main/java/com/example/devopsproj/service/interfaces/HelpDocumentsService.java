@@ -7,6 +7,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Optional;
+/**
+ * Service interface for managing Help Documents, including file upload, download,
+ * retrieval, deletion, and listing operations.
+ */
 
 public interface HelpDocumentsService {
 

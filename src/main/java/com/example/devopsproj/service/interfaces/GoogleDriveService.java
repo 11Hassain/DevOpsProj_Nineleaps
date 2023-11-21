@@ -8,9 +8,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
-import java.util.List;
 import java.util.Optional;
 
+
+/**
+ * Service interface for managing Google Drive-related operations, including
+ * creation, retrieval, deletion, and association with projects.
+ */
 public interface GoogleDriveService {
     GoogleDriveDTO createGoogleDrive(GoogleDriveDTO googleDriveDTO);
 

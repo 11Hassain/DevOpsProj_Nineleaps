@@ -27,7 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
+/**
+ * Service implementation for handling project-related operations.
+ */
 @Service
 @RequiredArgsConstructor
 public class ProjectServiceImpl implements ProjectService {
@@ -41,7 +43,13 @@ public class ProjectServiceImpl implements ProjectService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
 
-    // Create a project from a ProjectDTO and return the mapped DTO
+
+    /**
+     * Creates a new project from a ProjectDTO and returns the mapped DTO.
+     *
+     * @param projectDTO the ProjectDTO containing project details.
+     * @return the mapped ProjectDTO.
+     */
     @Override
     public ProjectDTO createProject(ProjectDTO projectDTO) {
         logger.info("Creating a new project: {}", projectDTO.getProjectName());
@@ -61,7 +69,13 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
 
-    // Get a project by its ID
+    /**
+     * Retrieves a project by its ID.
+     *
+     * @param id the ID of the project to retrieve.
+     * @return the ProjectDTO representing the retrieved project.
+     * @throws ProjectNotFoundException if the project with the given ID is not found.
+     */
     @Override
     public ProjectDTO getProjectById(Long id) {
         logger.info("Retrieving project with ID: {}", id);
@@ -80,7 +94,13 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
-    // Get a list of all projects
+    /**
+     * Retrieves a page of projects.
+     *
+     * @param pageable the pageable information.
+     * @return a Page of ProjectDTOs.
+     * @throws NotFoundException if no projects are found.
+     */
     @Override
     public Page<ProjectDTO> getAll(Pageable pageable) {
         logger.info("Retrieving all projects");
@@ -99,7 +119,13 @@ public class ProjectServiceImpl implements ProjectService {
         return projectDTOPage;
     }
 
-    // Get a list of all projects, including inactive ones
+     /**
+     * Retrieves a page of projects with associated users.
+     *
+     * @param pageable the pageable information.
+     * @return a Page of ProjectWithUsersDTOs.
+     * @throws NotFoundException if no projects with users are found.
+     */
     @Override
     public Page<ProjectWithUsersDTO> getAllProjectsWithUsers(Pageable pageable) {
         logger.info("Retrieving all projects with users");
@@ -132,8 +158,11 @@ public class ProjectServiceImpl implements ProjectService {
                 userDTOList
         );
     }
-
-
+    /**
+     * Retrieves a list of all projects.
+     *
+     * @return a List of Project entities.
+     */
     @Override
     public List<Project> getAllProjects() {
         logger.info("Retrieving all projects");
@@ -144,15 +173,14 @@ public class ProjectServiceImpl implements ProjectService {
         return projects;
     }
 
-    // Update a project
-    @Override
-    public Project updateProject(Project updatedProject) {
-        logger.info("Updating project with ID: {}", updatedProject.getProjectId());
 
-        return projectRepository.save(updatedProject);
-    }
-
-    // Get all users associated with a project by its ID
+    /**
+     * Retrieves a list of all users associated with a project by its ID.
+     *
+     * @param projectId the ID of the project.
+     * @return a List of UserDTOs representing the users associated with the project.
+     * @throws NotFoundException if no users are found for the project.
+     */
     @Override
     public List<UserDTO> getAllUsersByProjectId(Long projectId) {
         logger.info("Retrieving all users for project with ID: {}", projectId);
@@ -173,7 +201,15 @@ public class ProjectServiceImpl implements ProjectService {
         return userDTOs;
     }
 
-    // Get all users associated with a project by its ID and role
+
+    /**
+     * Retrieves a list of all users associated with a project by its ID and role.
+     *
+     * @param projectId the ID of the project.
+     * @param role      the role of the users.
+     * @return a List of UserDTOs representing the users associated with the project and role.
+     * @throws NotFoundException if no users are found for the project and role.
+     */
     @Override
     public List<UserDTO> getAllUsersByProjectIdAndRole(Long projectId, EnumRole role) {
         logger.info("Retrieving all users for project with ID: {} and role: {}", projectId, role);
@@ -199,7 +235,14 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
 
-
+    /**
+     * Updates a project with the given ID using information from the provided ProjectDTO.
+     *
+     * @param projectId  the ID of the project to update.
+     * @param projectDTO the ProjectDTO containing updated project details.
+     * @return the updated ProjectDTO.
+     * @throws NotFoundException if the project with the given ID is not found.
+     */
     @Override
     public ProjectDTO updateProject(Long projectId, ProjectDTO projectDTO) {
         logger.info("Updating project with ID: {}", projectId);
@@ -223,7 +266,13 @@ public class ProjectServiceImpl implements ProjectService {
             throw new NotFoundException("Project with ID " + projectId + " not found");
         }
     }
-
+    /**
+     * Deletes a project with the given ID.
+     *
+     * @param id the ID of the project to delete.
+     * @return a ResponseEntity with a success message if the project is deleted successfully.
+     * @throws NotFoundException if the project with the given ID is not found.
+     */
     @Override
     public ResponseEntity<String> deleteProject(Long id) {
         logger.info("Deleting project with ID: {}", id);
@@ -251,9 +300,13 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
-
-
-
+    /**
+     * Adds a user to a project.
+     *
+     * @param projectId the ID of the project.
+     * @param userId    the ID of the user to add to the project.
+     * @return a ResponseEntity containing either the updated ProjectUserDTO or a status code indicating an error.
+     */
     @Override
     public ResponseEntity<Object> addUserToProject(Long projectId, Long userId) {
         try {
@@ -295,7 +348,13 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
-
+    /**
+     * Removes a user from a project.
+     *
+     * @param projectId the ID of the project.
+     * @param userId    the ID of the user to remove from the project.
+     * @return a ResponseEntity with a success message if the user is removed successfully.
+     */
     @Override
     public ResponseEntity<String> removeUserFromProject(Long projectId, Long userId) {
         try {
@@ -331,7 +390,14 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
-
+    /**
+     * Removes a user from a project and deletes the associated collaborator.
+     *
+     * @param projectId       the ID of the project.
+     * @param userId          the ID of the user to remove from the project.
+     * @param collaboratorDTO the collaborator information to delete.
+     * @return a ResponseEntity with a success message if the user is removed successfully.
+     */
     @Override
     public ResponseEntity<String> removeUserFromProjectAndRepo(Long projectId, Long userId, CollaboratorDTO collaboratorDTO) {
         try {
@@ -366,7 +432,12 @@ public class ProjectServiceImpl implements ProjectService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(UNABLE_TO_REMOVE_USER_MESSAGE);
         }
     }
-
+    /**
+     * Checks if a project with the given ID exists and is deleted.
+     *
+     * @param id the ID of the project to check.
+     * @return true if the project exists and is deleted, false otherwise.
+     */
     @Override
     public boolean existsByIdIsDeleted(Long id) {
         // Add appropriate logger message for this method
@@ -374,7 +445,12 @@ public class ProjectServiceImpl implements ProjectService {
         return false;
     }
 
-    // Soft delete a project by setting its deleted flag to true
+    /**
+     * Soft deletes a project by setting its deleted flag to true.
+     *
+     * @param id the ID of the project to soft-delete.
+     * @return true if the project is soft-deleted successfully, false otherwise.
+     */
     @Override
     public boolean softDeleteProject(Long id) {
         try {
@@ -387,7 +463,13 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
-    // Check if a project with the given ID exists
+
+    /**
+     * Checks if a project with the given ID exists.
+     *
+     * @param id the ID of the project to check.
+     * @return true if the project exists, false otherwise.
+     */
     @Override
     public boolean existsProjectById(Long id) {
         // Add appropriate logger message for this method
@@ -395,14 +477,25 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepository.existsById(id);
     }
 
-    // Check if a user exists in a project by their IDs
+    /**
+     * Checks if a user exists in a project by their IDs.
+     *
+     * @param projectId the ID of the project.
+     * @param userId    the ID of the user.
+     * @return true if the user exists in the project, false otherwise.
+     */
     @Override
     public boolean existUserInProject(Long projectId, Long userId) {
         List<User> userList = projectRepository.existUserInProject(projectId, userId);
         return !userList.isEmpty();
     }
 
-    // Get the count of all projects
+
+    /**
+     * Gets the count of all projects.
+     *
+     * @return the count of all projects.
+     */
     @Override
     public Integer getCountAllProjects() {
         Integer countProjects = projectRepository.countAllProjects();
@@ -410,9 +503,12 @@ public class ProjectServiceImpl implements ProjectService {
         return countProjects != null ? countProjects : 0;
     }
 
-
-
-
+    /**
+     * Gets the count of all projects with a specific role.
+     *
+     * @param enumRole the role to filter projects.
+     * @return the count of all projects with the specified role.
+     */
     @Override
     public Integer getCountAllProjectsByRole(EnumRole enumRole) {
         Integer countProjects = projectRepository.countAllProjectsByRole(enumRole);
@@ -420,13 +516,24 @@ public class ProjectServiceImpl implements ProjectService {
         return countProjects != null ? countProjects : 0;
     }
 
+    /**
+     * Gets the count of all projects associated with a specific user.
+     *
+     * @param id the ID of the user.
+     * @return the count of all projects associated with the user.
+     */
     @Override
     public Integer getCountAllProjectsByUserId(Long id) {
         Integer countProjects = projectRepository.countAllProjectsByUserId(id);
         logger.info("Count of all projects for user with ID {}: {}", id, countProjects);
         return countProjects != null ? countProjects : 0;
     }
-
+    /**
+     * Gets the count of all users associated with a specific project.
+     *
+     * @param projectId the ID of the project.
+     * @return the count of all users associated with the project.
+     */
     @Override
     public Integer getCountAllUsersByProjectId(Long projectId) {
         Integer countUsers = projectRepository.countAllUsersByProjectId(projectId);
@@ -434,6 +541,11 @@ public class ProjectServiceImpl implements ProjectService {
         return countUsers != null ? countUsers : 0;
     }
 
+    /**
+     * Gets a list of DTOs containing the count of people associated with each project.
+     *
+     * @return a list of ProjectNamePeopleCountDTOs.
+     */
     @Override
     public List<ProjectNamePeopleCountDTO> getCountAllPeopleAndProjectName() {
         List<Project> projects = projectRepository.findAllProjects();
@@ -453,13 +565,24 @@ public class ProjectServiceImpl implements ProjectService {
         return peopleCountDTOS;
     }
 
+    /**
+     * Gets the count of all users associated with a specific project and role.
+     *
+     * @param projectId the ID of the project.
+     * @param enumRole  the role of the users.
+     * @return the count of all users associated with the project and role.
+     */
     @Override
     public Integer getCountAllUsersByProjectIdAndRole(Long projectId, EnumRole enumRole) {
         Integer countUsers = projectRepository.countAllUsersByProjectIdAndRole(projectId, enumRole);
         logger.info("Count of all users associated with project ID {} and role {}: {}", projectId, enumRole, countUsers);
         return countUsers != null ? countUsers : 0;
     }
-
+    /**
+     * Gets the count of all active projects.
+     *
+     * @return the count of all active projects.
+     */
     @Override
     public Integer getCountAllActiveProjects() {
         Integer countProjects = projectRepository.countAllActiveProjects();
@@ -467,14 +590,24 @@ public class ProjectServiceImpl implements ProjectService {
         return countProjects != null ? countProjects : 0;
     }
 
-
+    /**
+     * Gets the count of all inactive projects.
+     *
+     * @return the count of all inactive projects.
+     */
     @Override
     public Integer getCountAllInActiveProjects() {
         Integer countProjects = projectRepository.countAllInActiveProjects();
         logger.info("Count of all inactive projects: {}", countProjects);
         return countProjects != null ? countProjects : 0;
     }
-
+    /**
+     * Gets a list of UserDTOs for users associated with a specific project and role.
+     *
+     * @param projectId the ID of the project.
+     * @param role      the role of the users.
+     * @return a list of UserDTOs.
+     */
     @Override
     public List<UserDTO> getUsersByProjectIdAndRole(Long projectId, String role) {
         EnumRole userRole = EnumRole.valueOf(role.toUpperCase());
@@ -484,7 +617,13 @@ public class ProjectServiceImpl implements ProjectService {
                 .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
                 .toList();
     }
-
+    /**
+     * Adds a repository to a project.
+     *
+     * @param projectId the ID of the project.
+     * @param repoId    the ID of the repository.
+     * @return a ResponseEntity indicating the success or failure of the operation.
+     */
     @Override
     public ResponseEntity<Object> addRepositoryToProject(Long projectId, Long repoId) {
         try {
@@ -514,6 +653,11 @@ public class ProjectServiceImpl implements ProjectService {
 
 
 
+    /**
+     * Gets a list of projects without a Figma URL.
+     *
+     * @return a list of ProjectDTOs for projects without a Figma URL.
+     */
     @Override
     public List<ProjectDTO> getProjectsWithoutFigmaURL() {
         List<Project> projects = projectRepository.findAllProjects();
@@ -527,7 +671,11 @@ public class ProjectServiceImpl implements ProjectService {
         logger.info("Projects without Figma URL count: {}", projectDTOs.size());
         return projectDTOs;
     }
-
+    /**
+     * Gets a list of projects without a Google Drive link.
+     *
+     * @return a list of ProjectDTOs for projects without a Google Drive link.
+     */
     @Override
     public List<ProjectDTO> getProjectsWithoutGoogleDriveLink() {
         List<Project> projects = projectRepository.findAllProjects();
@@ -541,7 +689,12 @@ public class ProjectServiceImpl implements ProjectService {
         logger.info("Projects without Google Drive link count: {}", projectDTOs.size());
         return projectDTOs;
     }
-
+    /**
+     * Gets the details of a project by its ID.
+     *
+     * @param projectId the ID of the project.
+     * @return the ProjectDTO containing details of the project.
+     */
     @Override
     public ProjectDTO getProjectDetailsById(Long projectId) {
         Optional<Project> optionalProject = projectRepository.findById(projectId);

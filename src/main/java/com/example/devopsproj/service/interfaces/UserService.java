@@ -11,9 +11,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.Optional;
+/**
+ * Service interface for managing user-related operations, including creation, retrieval, update,
+ * deletion, and various counts related to users and their associated projects.
+ */
 
 public interface UserService {
-    //implementing user creation using DTO pattern
     User saveUser(@RequestBody UserCreationDTO userCreationDTO);
 
     UserDTO updateUser(Long id, UserDTO userDTO);

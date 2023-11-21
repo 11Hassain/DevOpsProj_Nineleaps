@@ -1,5 +1,8 @@
 package com.example.devopsproj.exceptions;
-
+/**
+ * JwtExceptionHandler is a class that extends ResponseEntityExceptionHandler and provides
+ * exception handling for JWT-related exceptions, such as JWTDecodeException.
+ */
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

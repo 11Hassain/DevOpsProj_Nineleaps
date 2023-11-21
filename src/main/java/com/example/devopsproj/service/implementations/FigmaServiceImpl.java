@@ -21,7 +21,9 @@ import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+/**
+ * Service implementation for managing Figma projects.
+ */
 @Service
 @RequiredArgsConstructor
 public class FigmaServiceImpl implements FigmaService {
@@ -29,7 +31,13 @@ public class FigmaServiceImpl implements FigmaService {
     private final FigmaRepository figmaRepository;
     private final ProjectRepository projectRepository;
         private static final Logger logger = LoggerFactory.getLogger(FigmaServiceImpl.class);
-
+    /**
+     * Creates a new Figma project.
+     *
+     * @param figmaDTO the DTO containing information about the Figma project.
+     * @return the Figma entity representing the newly created Figma project.
+     * @throws FigmaCreationException if the Figma creation fails due to data integrity violation or other errors.
+     */
     @Override
     public Figma createFigma(FigmaDTO figmaDTO) {
         // Create a new Figma object and populate it with data from the DTO
@@ -50,14 +58,11 @@ public class FigmaServiceImpl implements FigmaService {
     }
 
 
-
-
-
-
-
-
-
-    //     Get all Figma projects
+    /**
+     * Retrieves all Figma projects associated with active projects.
+     *
+     * @return a list of Figma entities representing all Figma projects.
+     */
     @Override
     public List<Figma> getAllFigmaProjects() {
         logger.info("Retrieving all Figma projects");
@@ -73,11 +78,12 @@ public class FigmaServiceImpl implements FigmaService {
     }
 
 
-
-
-
-
-
+    /**
+     * Retrieves a Figma project by ID.
+     *
+     * @param figmaId the ID of the Figma project.
+     * @return an Optional containing the DTO representing the retrieved Figma project, or an empty Optional if not found.
+     */
     @Override
     public Optional<FigmaDTO> getFigmaById(Long figmaId) {
         logger.info("Retrieving Figma project by ID: {}", figmaId);
@@ -98,7 +104,12 @@ public class FigmaServiceImpl implements FigmaService {
         }
     }
 
-
+    /**
+     * Soft deletes a Figma project by setting the 'deleted' flag to true.
+     *
+     * @param figmaId the ID of the Figma project to soft delete.
+     * @throws FigmaNotFoundException if the Figma project with the given ID is not found.
+     */
     @Override
     public void softDeleteFigma(Long figmaId) {
         logger.info("Soft deleting Figma with ID: {}", figmaId);
@@ -116,7 +127,12 @@ public class FigmaServiceImpl implements FigmaService {
         }
     }
 
-
+    /**
+     * Retrieves the Figma URL for a project by its ID.
+     *
+     * @param projectId the ID of the project.
+     * @return the Figma URL associated with the project, or null if not found.
+     */
     @Override
     public String getFigmaURLByProjectId(Long projectId) {
         logger.info("Retrieving Figma URL for project with ID: {}", projectId);
@@ -135,7 +151,13 @@ public class FigmaServiceImpl implements FigmaService {
         }
     }
 
-
+    /**
+     * Adds user and screenshots to a Figma project.
+     *
+     * @param figmaId   the ID of the Figma project.
+     * @param figmaDTO  the DTO containing user and screenshot information.
+     * @throws FigmaNotFoundException if the Figma project with the given ID is not found.
+     */
     @Override
     public void addUserAndScreenshots(Long figmaId, FigmaDTO figmaDTO) {
         logger.info("Adding user and screenshots to Figma with ID: {}", figmaId);
@@ -165,6 +187,12 @@ public class FigmaServiceImpl implements FigmaService {
     }
 
 
+    /**
+     * Retrieves screenshots for a Figma project by its ID.
+     *
+     * @param figmaId the ID of the Figma project.
+     * @return a list of DTOs representing the retrieved screenshots, or an empty list if not found.
+     */
     @Override
     public List<FigmaScreenshotDTO> getScreenshotsForFigmaId(Long figmaId) {
         logger.info("Retrieving screenshots for Figma with ID: {}", figmaId);
@@ -202,7 +230,11 @@ public class FigmaServiceImpl implements FigmaService {
         return screenshotDTO;
     }
 
-
+    /**
+     * Retrieves all Figma DTOs for active projects.
+     *
+     * @return a list of FigmaDTOs representing Figma projects associated with active projects.
+     */
     @Override
     public List<FigmaDTO> getAllFigmaDTOs() {
         logger.info("Retrieving all Figma DTOs");

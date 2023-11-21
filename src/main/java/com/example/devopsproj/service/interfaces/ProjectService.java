@@ -9,6 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+/**
+ * Service interface for managing project-related operations, including project creation,
+ * retrieval, deletion, and various counts related to projects and associated users.
+ */
 
 @Service
 public interface ProjectService {
@@ -24,11 +28,6 @@ public interface ProjectService {
 
     Page<ProjectWithUsersDTO> getAllProjectsWithUsers(Pageable pageable);
 
-
-
-    Project updateProject(Project updatedProject);
-
-    //    List<User> getAllUsersByProjectId(Long projectId); // Add this method
     List<UserDTO> getAllUsersByProjectId(Long projectId);
 
     List<UserDTO> getAllUsersByProjectIdAndRole(Long projectId, EnumRole role);

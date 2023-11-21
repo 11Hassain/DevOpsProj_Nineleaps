@@ -15,7 +15,9 @@ import java.security.SecureRandom;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-
+/**
+ * Service class for sending SMS using Twilio.
+ */
 @Component
 @Getter
 @Setter
@@ -29,6 +31,11 @@ public class SmsService {
 
 
     private static final Logger logger = LoggerFactory.getLogger(SmsService.class);
+    /**
+     * Sends an SMS with a random OTP to the specified phone number.
+     *
+     * @param sms The SmsPojo containing the phone number.
+     */
     public void send(SmsPojo sms) {
         logger.info("Sending SMS");
         Twilio.init(accountsid,authtoken);
@@ -45,12 +52,20 @@ public class SmsService {
         logger.info("SMS sent to phone number: {}", phoneNumber);
     }
 
-
+    /**
+     * Sets the phone number.
+     *
+     * @param phoneNumber The phone number to set.
+     */
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
-
+    /**
+     * Gets the current timestamp in the format "yyyy-MM-dd HH:mm:ss".
+     *
+     * @return The timestamp.
+     */
     public String getTimeStamp() {
         return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now());
     }

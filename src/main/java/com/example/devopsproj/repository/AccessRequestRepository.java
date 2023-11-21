@@ -9,12 +9,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
+/**
+ * Repository interface for managing {@link AccessRequest} entities, providing methods
+ * for retrieving access requests with various criteria such as active, unread by a project manager,
+ * all by a project manager, and those not marked as deleted.
+ */
 @Repository
 public interface AccessRequestRepository extends JpaRepository<AccessRequest, Long> {
-
-//    @Query("SELECT a FROM AccessRequest a WHERE a.updated=false")
-//    List<AccessRequest> findAllActiveRequests();
 
     @Query("SELECT a FROM AccessRequest a WHERE a.updated = false")
     Page<AccessRequest> findAllActiveRequests(Pageable pageable);
@@ -27,6 +28,4 @@ public interface AccessRequestRepository extends JpaRepository<AccessRequest, Lo
     List<AccessRequest> findAllPMRequestsByName(@Param("pmName") String pmName);
 
     List<AccessRequest> findByDeletedFalse();
-
-
 }

@@ -20,15 +20,21 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-
+/**
+ * Service implementation for managing access requests.
+ */
 @Service
 @RequiredArgsConstructor
 public class AccessRequestServiceImpl implements AccessRequestService {
     private static final Logger logger = LoggerFactory.getLogger(AccessRequestServiceImpl.class);
 
     private final AccessRequestRepository accessRequestRepository;
-
+    /**
+     * Creates a new access request.
+     *
+     * @param accessRequestDTO the DTO containing information about the access request.
+     * @return the DTO representing the newly created access request.
+     */
     @Override
     public AccessRequestDTO createRequest(AccessRequestDTO accessRequestDTO) {
         logger.info("Creating a new access request");
@@ -50,7 +56,11 @@ public class AccessRequestServiceImpl implements AccessRequestService {
 
         return createdRequestDTO;
     }
-
+    /**
+     * Retrieves all access requests.
+     *
+     * @return a list of DTOs representing all access requests.
+     */
     @Override
     public List<AccessRequestDTO> getAllRequests() {
         logger.info("Fetching all access requests");
@@ -70,8 +80,12 @@ public class AccessRequestServiceImpl implements AccessRequestService {
         return accessRequestDTOList;
     }
 
-
-
+    /**
+     * Retrieves a page of active access requests.
+     *
+     * @param pageable the pagination information.
+     * @return a page of DTOs representing active access requests.
+     */
     @Override
     public Page<AccessRequestDTO> getAllActiveRequests(Pageable pageable) {
         logger.info("Fetching all active access requests");
@@ -90,7 +104,14 @@ public class AccessRequestServiceImpl implements AccessRequestService {
         return accessRequestDTOPage;
     }
 
-
+    /**
+     * Retrieves updated access requests.
+     *
+     * @param id               the ID of the access request to update.
+     * @param accessRequestDTO the updated information for the access request.
+     * @param pageable         the pagination information.
+     * @return a list of DTOs representing the updated access requests.
+     */
    @Override
     public List<AccessResponseDTO> getUpdatedRequests(Long id, AccessRequestDTO accessRequestDTO, Pageable pageable) {
         logger.info("Fetching updated access requests");
@@ -177,6 +198,10 @@ public class AccessRequestServiceImpl implements AccessRequestService {
 
 
 
+    /**
+     * Sets PM requests notification to true for a specific access request.
+     *
+     */
     @Override
     public List<AccessResponseDTO> getPMUnreadRequests(String pmName) {
         logger.info("Fetching unread PM requests for PM: {}", pmName);
@@ -241,6 +266,10 @@ public class AccessRequestServiceImpl implements AccessRequestService {
             logger.warn("AccessRequest with AccessRequestId {} not found", accessRequestId);
         }
     }
+
+    /**
+     * Clears all notifications for access requests.
+     */
     @Override
     @Transactional
     public void clearAllNotifications() {

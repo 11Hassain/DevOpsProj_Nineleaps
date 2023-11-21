@@ -11,7 +11,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
+/**
+ * Repository interface for managing {@link User} entities, providing methods
+ * for retrieving users based on different criteria, such as ID, role, and project.
+ */
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 

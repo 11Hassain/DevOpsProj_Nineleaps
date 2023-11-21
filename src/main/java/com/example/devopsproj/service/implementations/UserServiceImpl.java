@@ -35,7 +35,12 @@ public class UserServiceImpl implements IUserService, UserService {
     private final ModelMapper modelMapper;
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
-    // Implementing user creation using DTO pattern
+    /**
+     * Creates a new user based on the provided UserCreationDTO.
+     *
+     * @param userCreationDTO The UserCreationDTO containing user information.
+     * @return The created User entity.
+     */
     @Override
     public User saveUser(@RequestBody UserCreationDTO userCreationDTO) {
         User user = new User();
@@ -51,6 +56,14 @@ public class UserServiceImpl implements IUserService, UserService {
         return savedUser;
     }
 
+    /**
+     * Updates an existing user with the provided information.
+     *
+     * @param id      The ID of the user to be updated.
+     * @param userDTO The UserDTO containing updated user information.
+     * @return The updated UserDTO.
+     * @throws EntityNotFoundException if the user with the specified ID is not found.
+     */
     @Override
     public UserDTO updateUser(Long id, UserDTO userDTO) {
         Optional<User> optionalUser = userRepository.findById(id);
@@ -70,7 +83,13 @@ public class UserServiceImpl implements IUserService, UserService {
         }
     }
 
-    // Find user by user id
+
+    /**
+     * Retrieves an optional User entity by its ID.
+     *
+     * @param id The ID of the user to retrieve.
+     * @return An optional containing the User entity if found; otherwise, an empty optional.
+     */
     @Override
     public Optional<User> getUserById(Long id) {
         Optional<User> user = userRepository.findById(id);
@@ -82,6 +101,12 @@ public class UserServiceImpl implements IUserService, UserService {
         return user;
     }
 
+    /**
+     * Checks if a user with the given ID exists and is marked as deleted.
+     *
+     * @param id The ID of the user to check.
+     * @return true if the user exists and is deleted, false otherwise.
+     */
     @Override
     public boolean existsByIdIsDeleted(Long id) {
         Optional<User> checkUser = userRepository.findById(id);
@@ -99,7 +124,12 @@ public class UserServiceImpl implements IUserService, UserService {
         return false;
     }
 
-    // Soft deleting the user
+    /**
+     * Checks if a user with the given ID exists.
+     *
+     * @param id The ID of the user to check.
+     * @return Soft deleting the user
+     */
     @Override
     public boolean softDeleteUser(Long id) {
         try {
@@ -112,6 +142,12 @@ public class UserServiceImpl implements IUserService, UserService {
         }
     }
 
+    /**
+     * Checks if a user with the given ID exists.
+     *
+     * @param id The ID of the user to check.
+     * @return true if the user exists, false otherwise.
+     */
     @Override
     public boolean existsById(Long id) {
         boolean exists = userRepository.existsById(id);
@@ -123,7 +159,13 @@ public class UserServiceImpl implements IUserService, UserService {
         return exists;
     }
 
-    // Get all users based on role ID
+
+    /**
+     * Retrieves a list of users based on their role.
+     *
+     * @param enumRole The role to filter users.
+     * @return List of users with the specified role.
+     */
     @Override
     public List<User> getUsersByRole(EnumRole enumRole) {
         List<User> users = userRepository.findByRole(enumRole);
@@ -135,7 +177,12 @@ public class UserServiceImpl implements IUserService, UserService {
     private static final String USER_NOT_FOUND_WITH_ID = "User not found with ID: {}";
 
 
-
+    /**
+     * Retrieves a list of UserDTOs based on their role.
+     *
+     * @param role The role to filter users.
+     * @return List of UserDTOs with the specified role.
+     */
     @Override
     public List<UserDTO> getUserDTOsByRole(EnumRole role) {
         List<User> users = userRepository.findByEnumRole(role);
@@ -151,21 +198,35 @@ public class UserServiceImpl implements IUserService, UserService {
                         user.getLastLogout()))
                 .toList();
     }
-
+    /**
+     * Retrieves the count of all users.
+     *
+     * @return The count of all users.
+     */
     @Override
     public Integer getCountAllUsers() {
         Integer countUsers = userRepository.countAllUsers();
         logger.info("Count of all users: {}", countUsers);
         return countUsers;
     }
-
+    /**
+     * Retrieves the count of users with a specific role.
+     *
+     * @param role The role to filter users.
+     * @return The count of users with the specified role.
+     */
     @Override
     public Integer getCountAllUsersByRole(EnumRole role) {
         Integer countUsers = userRepository.countAllUsersByRole(role);
         logger.info("Count of users with role {}: {}", role, countUsers);
         return countUsers;
     }
-
+    /**
+     * Retrieves the count of users associated with a specific project.
+     *
+     * @param projectId The ID of the project.
+     * @return The count of users associated with the specified project.
+     */
     @Override
     public Integer getCountAllUsersByProjectId(Long projectId) {
         Integer countUsers = projectRepository.countAllUsersByProjectId(projectId);
@@ -173,6 +234,11 @@ public class UserServiceImpl implements IUserService, UserService {
         return countUsers != null ? countUsers : 0;
     }
 
+    /**
+     * Retrieves a list of UserProjectsDTOs containing information about users and their associated projects.
+     *
+     * @return List of UserProjectsDTOs.
+     */
     @Override
     public List<UserProjectsDTO> getAllUsersWithProjects() {
         List<User> users = userRepository.findAllUsers();
@@ -198,7 +264,13 @@ public class UserServiceImpl implements IUserService, UserService {
 
         return userProjectsDTOs;
     }
-
+    /**
+     * Retrieves a list of UserDTOs for users without projects of a specific role and excluding a particular project.
+     *
+     * @param role      The role to filter users.
+     * @param projectId The ID of the project to exclude.
+     * @return List of UserDTOs for users without the specified project.
+     */
     @Override
     public List<UserDTO> getAllUsersWithoutProjects(EnumRole role, Long projectId) {
         List<User> users = userRepository.findAllUsersByRole(role);
@@ -216,6 +288,11 @@ public class UserServiceImpl implements IUserService, UserService {
         }
         return userDTOs;
     }
+    /**
+     * Retrieves a list of UserProjectsDTOs containing information about users with multiple projects.
+     *
+     * @return List of UserProjectsDTOs.
+     */
     @Override
     public List<UserProjectsDTO> getUsersWithMultipleProjects() {
         List<UserProjectsDTO> allUsersWithProjects = getAllUsersWithProjects();
@@ -247,7 +324,12 @@ public class UserServiceImpl implements IUserService, UserService {
         logger.info("Found {} users with multiple projects.", usersWithMultipleProjects.size());
         return usersWithMultipleProjects;
     }
-
+    /**
+     * Checks if a project with the given name exists.
+     *
+     * @param projectName The name of the project to check.
+     * @return true if the project exists, false otherwise.
+     */
     @Override
     public boolean projectExists(String projectName) {
         List<Project> projects = projectRepository.findAllProjects();
@@ -256,7 +338,11 @@ public class UserServiceImpl implements IUserService, UserService {
         logger.info("Project '{}' exists: {}", projectName, exists);
         return exists;
     }
-
+    /**
+     * Retrieves a list of UserDTOs containing information about all users.
+     *
+     * @return List of UserDTOs.
+     */
     @Override
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
@@ -265,6 +351,13 @@ public class UserServiceImpl implements IUserService, UserService {
                 .map(user -> new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getEnumRole()))
                 .toList();
     }
+    /**
+     * Retrieves a list of ProjectDTOs containing information about all projects and repositories associated with a user.
+     *
+     * @param userId The ID of the user.
+     * @return List of ProjectDTOs.
+     * @throws EntityNotFoundException if the user is not found.
+     */
     @Override
     public List<ProjectDTO> getAllProjectsAndRepositoriesByUserId(Long userId) {
         User user = userRepository.findById(userId)
@@ -293,7 +386,12 @@ public class UserServiceImpl implements IUserService, UserService {
         return projectDTOs;
     }
 
-
+    /**
+     * Deletes a user by ID, performing a soft delete.
+     *
+     * @param userId The ID of the user to delete.
+     * @return A message indicating the result of the operation.
+     */
     @Override
     public String deleteUserById(Long userId) {
         logger.info("Deleting user with ID: {}", userId);
@@ -316,13 +414,24 @@ public class UserServiceImpl implements IUserService, UserService {
             return "404 Not found";
         }
     }
-
+    /**
+     * Retrieves a list of projects for a user with a specific role and ID.
+     *
+     * @param userId   The ID of the user.
+     * @param userRole The role of the user.
+     * @return List of projects for the user with the specified role and ID.
+     */
     @Override
     public List<Project> getUsersByRoleAndUserId(Long userId, EnumRole userRole) {
         logger.info("Fetching users with role {} and ID: {}", userRole, userId);
         return userRepository.findByRoleAndUserId(userId, userRole);
     }
-
+    /**
+     * Verifies user login based on the provided email and generates a JWT token.
+     *
+     * @param email The email of the user.
+     * @return UserDTO containing user information and a JWT token if the login is successful, null otherwise.
+     */
     @Override
     public UserDTO loginVerification(String email) {
         logger.info("Verifying login for email: {}", email);
@@ -347,7 +456,12 @@ public class UserServiceImpl implements IUserService, UserService {
     }
 
 
-
+    /**
+     * Logs out a user by updating the last logout timestamp.
+     *
+     * @param id The ID of the user to log out.
+     * @return A message indicating the result of the operation.
+     */
     @Override
     public String userLogout(Long id) {
         Optional<User> optionalUser = userRepository.findById(id);
@@ -362,7 +476,13 @@ public class UserServiceImpl implements IUserService, UserService {
             return "Log out unsuccessful";
         }
     }
-
+    /**
+     * Retrieves a list of ProjectDTOs containing information about projects for a user with a specific role and ID.
+     *
+     * @param userId The ID of the user.
+     * @param role   The role of the user.
+     * @return List of ProjectDTOs.
+     */
     @Override
     public List<ProjectDTO> getProjectsByRoleIdAndUserId(Long userId, String role) {
         EnumRole userRole = EnumRole.valueOf(role.toUpperCase()); // Getting the value of the role (string)
@@ -412,7 +532,12 @@ public class UserServiceImpl implements IUserService, UserService {
 
     //-------------IUService-----------
 
-
+    /**
+     * Retrieves a user based on their phone number.
+     *
+     * @param phoneNumber The phone number of the user.
+     * @return The user associated with the provided phone number, or null if not found.
+     */
     @Override
     public User getUserViaPhoneNumber(String phoneNumber) {
         logger.info("Getting user by phone number: {}", phoneNumber);
@@ -424,7 +549,12 @@ public class UserServiceImpl implements IUserService, UserService {
         }
         return user;
     }
-
+    /**
+     * Retrieves a user based on their email address.
+     *
+     * @param userMail The email address of the user.
+     * @return The user associated with the provided email address, or null if not found.
+     */
     @Override
     public User getUserByMail(String userMail) {
         logger.info("Getting user by email: {}", userMail);

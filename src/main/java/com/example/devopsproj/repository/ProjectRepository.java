@@ -11,6 +11,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+/**
+ * Repository interface for managing {@link Project} entities, providing methods
+ * for retrieving projects and associated users based on various criteria.
+ */
 
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, Long> {

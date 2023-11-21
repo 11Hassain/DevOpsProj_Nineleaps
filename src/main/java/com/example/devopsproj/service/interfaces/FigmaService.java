@@ -8,7 +8,10 @@ import com.example.devopsproj.model.Project;
 
 import java.util.List;
 import java.util.Optional;
-
+/**
+ * Service interface for managing Figma-related operations, including creation,
+ * retrieval, mapping, deletion, and association with users and screenshots.
+ */
 public interface FigmaService {
 
     Figma createFigma(FigmaDTO figmaDTO);

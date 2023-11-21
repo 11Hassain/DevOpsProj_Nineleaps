@@ -36,7 +36,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
-
+/**
+ * Service implementation for managing Git repositories.
+ */
 @Service
 @RequiredArgsConstructor
 public class GitRepositoryServiceImpl implements GitRepositoryService {
@@ -54,6 +56,13 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
     // Create a logger for the class
     private static final Logger logger = LoggerFactory.getLogger(GitRepositoryServiceImpl.class);
 
+    /**
+     * Creates a new Git repository on GitHub and saves it to the local repository.
+     *
+     * @param gitRepository the GitRepository object to be created.
+     * @return the created Git repository.
+     * @throws RepositoryCreationException if an error occurs during repository creation.
+     */
     @Override
     @Transactional
     public GitRepository createRepository(GitRepository gitRepository) {
@@ -79,12 +88,11 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
         }
     }
 
-
-
-
-
-
-    // Get a list of all Git repositories
+    /**
+     * Retrieves a list of all Git repositories from the local repository.
+     *
+     * @return a list of GitRepositoryDTOs representing Git repositories.
+     */
     @Override
     @Transactional(readOnly = true)
     public List<GitRepositoryDTO> getAllRepositories() {
@@ -98,7 +106,11 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
     }
 
 
-    // Delete a Git repository by its ID
+    /**
+     * Deletes a Git repository from GitHub and removes it from the local repository.
+     *
+     * @param repoId the ID of the Git repository to be deleted.
+     */
     @Override
     @Transactional
     public void deleteRepository(Long repoId) {
@@ -128,7 +140,12 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
         }
     }
 
-
+    /**
+     * Retrieves a list of Git repositories associated with a specific project.
+     *
+     * @param id the ID of the project.
+     * @return a list of GitRepositoryDTOs representing Git repositories associated with the project.
+     */
     @Override
     public List<GitRepositoryDTO> getAllRepositoriesByProject(Long id) {
         ProjectDTO project = projectServiceImpl.getProjectById(id);
@@ -141,7 +158,12 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
             return Collections.emptyList();
         }
     }
-    // Get a list of Git repositories by role
+    /**
+     * Retrieves a list of Git repositories based on the role.
+     *
+     * @param enumRole the role to filter Git repositories.
+     * @return a list of GitRepositoryDTOs representing Git repositories filtered by role.
+     */
     @Override
     @Transactional(readOnly = true)
     public List<GitRepositoryDTO> getAllReposByRole(EnumRole enumRole) {
@@ -155,7 +177,12 @@ public class GitRepositoryServiceImpl implements GitRepositoryService {
     }
 
 
-    // Get a Git repository by its ID
+    /**
+     * Retrieves a Git repository by its ID.
+     *
+     * @param id the ID of the Git repository.
+     * @return the Git repository, or null if not found.
+     */
     @Override
     @Transactional(readOnly = true)
     public GitRepository getRepositoryById(Long id) {

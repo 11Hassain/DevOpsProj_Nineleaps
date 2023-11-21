@@ -10,6 +10,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+/**
+ * Repository interface for managing {@link GitRepository} entities, providing methods
+ * for retrieving Git repositories based on a project, finding repositories by user role,
+ * and fetching a repository by its ID.
+ */
 
 @Repository
 public interface GitRepositoryRepository extends JpaRepository<GitRepository, Long> {

@@ -1,5 +1,8 @@
 package com.example.devopsproj.mapper;
-
+/**
+ * UserMapper is a utility class with static methods for mapping User objects to UserDTO objects.
+ * It contains a private constructor to prevent instantiation as it is intended to be used as a utility class.
+ */
 import com.example.devopsproj.dto.responsedto.UserDTO;
 import com.example.devopsproj.model.User;
 

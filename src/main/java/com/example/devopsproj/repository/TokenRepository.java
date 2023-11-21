@@ -5,6 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
+/**
+ * Repository interface for managing {@link Token} entities, providing methods
+ * for retrieving tokens based on user ID and checking for valid tokens.
+ */
 
 public interface TokenRepository extends JpaRepository<Token, Integer> {
     @Query(value = """

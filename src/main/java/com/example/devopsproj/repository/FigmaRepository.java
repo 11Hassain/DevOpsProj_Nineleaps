@@ -8,7 +8,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-
+/**
+ * Repository interface for managing {@link Figma} entities, providing methods
+ * for retrieving figma records based on project ID and those not marked as deleted.
+ */
 @Repository
 public interface FigmaRepository extends JpaRepository<Figma, Long> {
     @Query("SELECT f FROM Figma f WHERE f.project.id = :projectId")

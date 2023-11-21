@@ -5,6 +5,10 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+/**
+ * Utility class for validating GitHub users by making API requests using the provided username
+ * and access token.
+ */
 
 public class GitHubUserValidation {
     private static final Logger logger = LoggerFactory.getLogger(GitHubUserValidation.class);

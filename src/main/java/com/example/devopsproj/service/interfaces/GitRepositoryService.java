@@ -5,6 +5,10 @@ import com.example.devopsproj.model.GitRepository;
 import com.example.devopsproj.commons.enumerations.EnumRole;
 
 import java.util.List;
+/**
+ * Service interface for managing Git repository-related operations, including
+ * creation, retrieval, deletion, and listing repositories by project or role.
+ */
 
 public interface GitRepositoryService {
 

@@ -8,13 +8,20 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-
+/**
+ * Service implementation for managing GitHub collaborators.
+ */
 @Service
 public class GitHubCollaboratorServiceImpl implements GitHubCollaboratorService {
 
     private static final Logger logger = LoggerFactory.getLogger(GitHubCollaboratorServiceImpl.class);
 
-
+    /**
+     * Adds a collaborator to a GitHub repository.
+     *
+     * @param collaboratorDTO the DTO containing information about the collaborator.
+     * @return true if the collaborator was successfully added, false otherwise.
+     */
     @Override
     public boolean addCollaborator(CollaboratorDTO collaboratorDTO) {
         String apiUrl = String.format("https://api.github.com/repos/%s/%s/collaborators/%s",
@@ -37,7 +44,12 @@ public class GitHubCollaboratorServiceImpl implements GitHubCollaboratorService 
             return false;
         }
     }
-
+    /**
+     * Deletes a collaborator from a GitHub repository.
+     *
+     * @param collaboratorDTO the DTO containing information about the collaborator.
+     * @return true if the collaborator was successfully deleted, false otherwise.
+     */
     @Override
     public boolean deleteCollaborator(CollaboratorDTO collaboratorDTO) {
         String apiUrl = String.format("https://api.github.com/repos/%s/%s/collaborators/%s",
@@ -60,7 +72,13 @@ public class GitHubCollaboratorServiceImpl implements GitHubCollaboratorService 
         }
     }
 
-    // Creates HTTP headers for making requests to the GitHub API with the provided access token.
+
+    /**
+     * Creates HTTP headers for making requests to the GitHub API with the provided access token.
+     *
+     * @param accessToken the GitHub access token.
+     * @return HttpHeaders with the necessary headers for GitHub API requests.
+     */
     @Override
     public HttpHeaders createHttpHeaders(String accessToken) {
         HttpHeaders headers = new HttpHeaders();

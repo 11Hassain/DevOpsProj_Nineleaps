@@ -19,6 +19,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * Service implementation for handling JWT (JSON Web Token) operations.
+ */
 @Service
 @RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
@@ -30,7 +33,12 @@ public class JwtServiceImpl implements JwtService {
     private static final Logger logger = LoggerFactory.getLogger(JwtServiceImpl.class);
 
 
-    // Extract the username from a JWT token
+    /**
+     * Extracts the username from a JWT token.
+     *
+     * @param token the JWT token.
+     * @return the extracted username.
+     */
     @Override
     public String extractUsername(String token) {
         Claims claims = extractAllClaims(token);
@@ -39,6 +47,14 @@ public class JwtServiceImpl implements JwtService {
         return username;
     }
 
+    /**
+     * Extracts a specific claim from a JWT token using a custom claims resolver function.
+     *
+     * @param token           the JWT token.
+     * @param claimsResolver  the custom claims resolver function.
+     * @param <T>             the type of the claim.
+     * @return the extracted claim.
+     */
     @Override
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
@@ -46,7 +62,12 @@ public class JwtServiceImpl implements JwtService {
         logger.info("Extracted claim '{}' from JWT token.", claim);
         return claim;
     }
-
+    /**
+     * Generates a JWT token for a given user details.
+     *
+     * @param userDetails the user details.
+     * @return the generated JWT token.
+     */
     @Override
     public String generateToken(UserDetails userDetails) {
         String token = generateToken(new HashMap<>(), userDetails);
@@ -54,6 +75,13 @@ public class JwtServiceImpl implements JwtService {
         return token;
     }
 
+    /**
+     * Generates a JWT token with extra claims for a given user details.
+     *
+     * @param extraClaims    the extra claims to include.
+     * @param userDetails    the user details.
+     * @return the generated JWT token with extra claims.
+     */
     @Override
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         Key signingKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
@@ -68,6 +96,12 @@ public class JwtServiceImpl implements JwtService {
         return token;
     }
 
+    /**
+     * Checks if a token is present in the system.
+     *
+     * @param token the token to check.
+     * @return true if the token is found, false otherwise.
+     */
     @Override
     public boolean isTokenTrue(String token) {
         User user = userRepository.findUserByToken(token);
@@ -79,7 +113,13 @@ public class JwtServiceImpl implements JwtService {
             return false;
         }
     }
-
+    /**
+     * Checks if a token is valid for a given user details.
+     *
+     * @param token         the token to validate.
+     * @param userDetails   the user details.
+     * @return true if the token is valid, false otherwise.
+     */
     @Override
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);

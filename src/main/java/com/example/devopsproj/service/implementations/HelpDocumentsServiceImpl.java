@@ -21,7 +21,9 @@ import java.util.List;
 import java.util.Optional;
 
 
-
+/**
+ * Service implementation for managing help documents associated with projects.
+ */
 @Service
 @RequiredArgsConstructor
 public class HelpDocumentsServiceImpl implements HelpDocumentsService {
@@ -33,7 +35,15 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
 
     private static final Logger logger = LoggerFactory.getLogger(HelpDocumentsServiceImpl.class);
 
-    // Upload a file associated with a project
+     /**
+     * Uploads a file associated with a project.
+     *
+     * @param projectId      the ID of the project.
+     * @param projectFile    the file to upload.
+     * @param fileExtension  the file extension.
+     * @return ResponseEntity indicating the result of the upload.
+     * @throws IOException if an I/O error occurs.
+     */
     @Override
     public ResponseEntity<Object> uploadFiles(long projectId, MultipartFile projectFile, String fileExtension) throws IOException {
         logger.info("Uploading a file for project with ID: {}", projectId);
@@ -61,7 +71,12 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
     }
 
 
-    // Extract and return the file extension from a multipart file
+    /**
+     * Extracts and returns the file extension from a multipart file.
+     *
+     * @param file the multipart file.
+     * @return the file extension.
+     */
     @Override
     public String getFileExtension(MultipartFile file) {
         logger.info("Getting file extension");
@@ -81,7 +96,12 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
     }
 
 
-
+    /**
+     * Retrieves a list of PDF files associated with a project.
+     *
+     * @param projectId the ID of the project.
+     * @return ResponseEntity containing the list of PDF files.
+     */
     @Override
     public ResponseEntity<Object> getPdfFilesList(long projectId) {
         logger.info("Getting PDF files list for project ID: {}", projectId);
@@ -103,7 +123,12 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
         return ResponseEntity.ok().body(fileInfos);
     }
 
-
+    /**
+     * Downloads a PDF file by its file name.
+     *
+     * @param fileName the name of the PDF file.
+     * @return ResponseEntity containing the PDF file data.
+     */
     @Override
     public ResponseEntity<byte[]> downloadPdfFile(String fileName) {
         logger.info("Downloading PDF file: {}", fileName);
@@ -132,8 +157,12 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
 
 
 
-
-    // Get information about a document by its ID
+    /**
+     * Retrieves information about a document by its ID.
+     *
+     * @param fileId the ID of the document.
+     * @return an optional containing the HelpDocumentsDTO if found.
+     */
     @Override
     public Optional<HelpDocumentsDTO> getDocumentById(Long fileId) {
         logger.info("Getting document by ID: {}", fileId);
@@ -157,7 +186,12 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
 
 
 
-    // Delete a document by its ID
+    /**
+     * Soft deletes a document by its ID.
+     *
+     * @param fileId the ID of the document to delete.
+     * @return ResponseEntity indicating the result of the deletion.
+     */
     @Override
     public ResponseEntity<String> softDeleteDocument(Long fileId) {
         logger.info("Soft deleting document by ID: {}", fileId);
@@ -176,7 +210,14 @@ public class HelpDocumentsServiceImpl implements HelpDocumentsService {
         }
     }
 
-
+    /**
+     * Saves a file for a HelpDocuments object.
+     *
+     * @param helpDocuments the HelpDocuments object.
+     * @param file          the file to save.
+     * @param fileExtension the file extension.
+     * @throws IOException if an I/O error occurs.
+     */
     @Override
     public void saveFile(HelpDocuments helpDocuments, MultipartFile file, String fileExtension) throws IOException {
         logger.info("Saving file for HelpDocuments");

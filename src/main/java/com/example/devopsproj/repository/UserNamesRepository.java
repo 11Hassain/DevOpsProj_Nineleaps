@@ -8,6 +8,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+/**
+ * Repository interface for managing {@link UserNames} entities, providing methods
+ * for retrieving user names based on user roles.
+ */
+
 @Repository
 public interface UserNamesRepository extends JpaRepository<UserNames, Long> {
 
